@@ -1,7 +1,7 @@
 # Plan Maestro — Torre Madre + Portátil Acer
 
 > Documento de referencia inviolable. Cualquier IA o sesión nueva debe leer esto primero.
-> Última actualización: 12 junio 2026, 20:31 CEST
+> Última actualización: 12 junio 2026, 21:09 CEST
 
 ---
 
@@ -27,50 +27,47 @@
 
 ## Fase 2 — Instalación y configuración ✅ COMPLETADA
 
-- `input-leap-git` compilado e instalado desde AUR (`yay -S input-leap-git`)
-- `~/.config/input-leap/input-leap.conf` creado en Madre — topología: madre izquierda, acer derecha
-- `~/.config/systemd/user/input-leap.service` creado y habilitado en Madre
-- `~/.config/hypr/hyprland.conf` modificado: `exec-once = /usr/lib/xdg-desktop-portal-hyprland`
+- `input-leap-git` compilado e instalado desde AUR
+- `~/.config/input-leap/input-leap.conf` creado en Madre
+- `~/.config/systemd/user/input-leap.service` habilitado en Madre
+- `exec-once = /usr/lib/xdg-desktop-portal-hyprland` en `hyprland.conf`
 - Ambos equipos reiniciados limpio
 
 ---
 
-## Fase 3 — Verificación remota ⚡ EN CURSO
+## Fase 3 — Desbloq. portales Wayland ⚡ EN CURSO
 
-**Objetivo:** confirmar servicio activo y portal expuesto vía SSH.
+### 3 bloqueos identificados
 
-```bash
-# Desde exterior (parque / móvil)
-ssh varo@100.91.112.32
-systemctl --user status input-leap.service
-busctl --user introspect org.freedesktop.portal.Desktop \
-  /org/freedesktop/portal/desktop | grep InputCapture
-```
+| # | Problema | Causa |
+|---|---|---|
+| 1 | GUI genera `/tmp/` volátiles, ignora conf estática | Wrapper `input-leap` sobreescribe config |
+| 2 | `input-leapc` en Acer se autotermina | `org.freedesktop.portal.RemoteDesktop` no activo |
+| 3 | Portal `InputCapture` no expuesto | `xdg-desktop-portal-hyprland` no negocia la interfaz |
 
-### Si el portal NO aparece en busctl
+### Intento actual — GUI + env -u
 
 ```bash
-WAYLAND_DISPLAY=wayland-1 /usr/lib/xdg-desktop-portal-hyprland &
-systemctl --user restart input-leap.service
-journalctl --user -u input-leap.service -f
+# MADRE: usar GUI, no CLI
+# Abrir input-leap GUI → configurar pantallas → Apply → esperar "Server is running"
+
+# ACER: cliente sin portales Wayland
+env -u XDG_SESSION_TYPE -u XDG_CURRENT_DESKTOP -u WAYLAND_DISPLAY \
+    /usr/bin/input-leapc -f -n acer 100.91.112.32:24800
 ```
 
-### Si hay error InvalidArgs en D-Bus
+### Criterio de éxito
+> El ratón salta entre los 2 monitores de Madre y la pantalla de Acer, sin errores en los logs.
 
-```bash
-# Diagnosticar con hyprctl
-hyprctl dispatch -- inputcapture
-busctl --user call org.freedesktop.portal.Desktop \
-  /org/freedesktop/portal/desktop \
-  org.freedesktop.portal.InputCapture CreateSession '{}'
-```
+### Si sigue fallando — Opción B
+- Evaluar **barrier-git** como alternativa (fork más maduro para Wayland)
+- Evaluar **lan-mouse** (implementación nativa libei, sin dependencias de portal)
 
 ---
 
-## Fase 4 — Validación física ⏳ Pendiente (al volver)
+## Fase 4 — Validación física ⏳ Pendiente
 
-**Criterio de éxito:**
-> El ratón salta limpiamente entre los 2 monitores de Madre y la pantalla de Acer, sin errores en los logs.
+Test físico del ratón saltando Madre ↔ Acer.
 
 ---
 
@@ -78,20 +75,17 @@ busctl --user call org.freedesktop.portal.Desktop \
 
 ### Fase 5 — SSH seguro
 - [ ] Claves Ed25519 Madre ↔ Acer
-- [ ] Deshabilitar auth por password en sshd
-- [ ] Test acceso remoto desde fuera de LAN
+- [ ] Deshabilitar auth por password
+- [ ] Test acceso remoto fuera de LAN
 
-### Fase 6 — Servicios (Dockerización)
-- [ ] Auditoría Docker preexistente en Acer
-- [ ] PostgreSQL dockerizado en Acer
-- [ ] THDORA migrado a Acer
-- [ ] Ollama + Open WebUI en Madre (GTX 1060)
-- [ ] Pi-hole en Acer
+### Fase 6 — Servicios
+- [ ] Auditoría Docker Acer
+- [ ] PostgreSQL + THDORA + Ollama + Pi-hole
 
 ### Fase 7 — Sincronización
 - [ ] dotfiles / omarchy Madre ↔ Acer
 - [ ] Headscale self-hosted
-- [ ] MacBook como tercer nodo Input Leap
+- [ ] MacBook tercer nodo
 
 ---
 
@@ -101,4 +95,4 @@ busctl --user call org.freedesktop.portal.Desktop \
 
 ---
 
-_Ver también: `setup/servidor/README.md` · `diarios/2026/2026-06-12.md`_
+_Ver detalles técnicos: `setup/servidor/README_CONNECT.md`_
