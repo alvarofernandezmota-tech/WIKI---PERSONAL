@@ -1,79 +1,75 @@
-# Equipos — Hardware del sistema
+# Equipos — Inventario de Hardware
 
-> Inventario actualizado. Última revisión: 12 junio 2026
-
----
-
-## Arquitectura actual
-
-```
-┌─────────────────────────────────────────┐
-│  EN CASA                                │
-│                                         │
-│  ORDENADOR MADRE        HP TOUCHSMART   │
-│  i5-8400 · 16GB         23" táctil      │
-│  GTX 1060               Pendiente OS    │
-│  Omarchy / Arch         Monitor logs    │
-│  WORKSTATION PRINCIPAL                  │
-└─────────────────────────────────────────┘
-
-┌─────────────────────────────────────────┐
-│  PORTÁTILES                             │
-│                                         │
-│  ACER Aspire            MacBook         │
-│  Ryzen 5 5500U · 8GB    macOS           │
-│  Omarchy / Arch         Portátil temp.  │
-│  HOME SERVER 24/7       Input Leap CLI  │
-└─────────────────────────────────────────┘
-        ↕ Input Leap (LAN)
-  MacBook usa teclado/ratón del Acer
-```
+> Inventario completo de máquinas y sus roles en el ecosistema.
+> **Frecuencia de actualización: al cambiar hardware o rol de una máquina.**
+> Última actualización: 12 junio 2026
 
 ---
 
-## Inventario detallado
+## Resumen de roles (decisión fijada 12 jun 2026)
 
-### Ordenador Madre — Workstation principal
-| Campo | Valor |
-|---|---|
-| CPU | Intel Core i5-8400 @ 2.80GHz (6 núcleos) |
-| RAM | 16 GB DDR4 |
-| GPU | NVIDIA GeForce GTX 1060 |
-| OS | Omarchy / Arch Linux + Hyprland |
-| Rol | Workstation — VSCode, Ollama, DBeaver, Docker |
-
-### Acer Aspire — Home Server
-| Campo | Valor |
-|---|---|
-| CPU | AMD Ryzen 5 5500U @ 2.10GHz |
-| RAM | 8 GB DDR4 |
-| SSD | 477 GB (127 GB usado) |
-| OS | Omarchy / Arch Linux + Hyprland |
-| IP local | 10.176.119.171 |
-| Rol | Home Server 24/7 — THDORA, PostgreSQL, Nextcloud, VPN |
-
-### MacBook
-| Campo | Valor |
-|---|---|
-| OS | macOS |
-| IP local | 10.176.119.229 |
-| Rol | Portátil temporal — Input Leap cliente |
-
-### HP TouchSmart 600
-| Campo | Valor |
-|---|---|
-| Pantalla | 23" Full HD 1080p táctil |
-| CPU | Intel Core 2 Duo |
-| OS | ⏳ Pendiente — Linux Mint recomendado |
-| Origen | Regalo Salvi — 1 mayo 2026 |
-| Rol | Monitor secundario — logs, dashboards |
+| Máquina | Rol | Acceso |
+|---|---|---|
+| **Madre** | Cerebro — workstation + GPU | Solo presencial |
+| **Acer** | Soporte 24/7 — servicios permanentes | LAN + exterior vía Tailscale |
+| **MacBook** | Cliente puro — consume, no aloja | Solo cliente |
+| **HP TouchSmart** | Monitor secundario / dashboards | Pendiente OS |
 
 ---
 
-## Upgrades pendientes
+## 🖥️ Ordenador Madre — Cerebro
 
-| Equipo | Upgrade | Coste aprox | Prioridad |
-|---|---|---|---|
-| Ordenador Madre | RTX 3060 12GB | ~200-250€ | 🔴 Alta |
-| Ordenador Madre | RAM 32GB DDR4 | ~40-50€ | 🟡 Media |
-| Acer | RAM 16GB SO-DIMM | ~40-50€ | 🟡 Media |
+| Campo | Valor |
+|---|---|
+| **Rol** | Workstation principal + servidor Input Leap + Ollama GPU |
+| **OS** | Omarchy (Arch Linux + Hyprland + Wayland) |
+| **CPU** | Intel i5-8400 (6 núcleos) |
+| **RAM** | 16 GB |
+| **GPU** | NVIDIA GTX 1060 6GB — para Ollama LLM local |
+| **IP LAN** | Pendiente fijar (DHCP ahora) |
+| **IP Tailscale** | Pendiente instalar |
+| **Servicios** | Input Leap server · Ollama · Open WebUI |
+| **Uso** | Todo lo que requiere GPU o intervención manual |
+
+---
+
+## 🗄️ Acer Aspire — Soporte 24/7
+
+| Campo | Valor |
+|---|---|
+| **Rol** | Servidor 24/7 — servicios permanentes + puerta exterior |
+| **OS** | Arch Linux |
+| **CPU** | AMD Ryzen 5 5500U |
+| **RAM** | 8 GB |
+| **GPU** | Integrada (no usada para IA) |
+| **IP LAN** | 10.176.119.171 (DHCP — fijar con Tailscale) |
+| **IP Tailscale** | Pendiente instalar |
+| **Servicios** | THDORA · PostgreSQL · Pi-hole · fail2ban · Input Leap client |
+| **Uso** | Todo lo que corre sin presencia humana + acceso remoto exterior |
+
+---
+
+## 💻 MacBook — Cliente puro
+
+| Campo | Valor |
+|---|---|
+| **Rol** | Portátil cliente — consume servicios, no aloja nada |
+| **OS** | macOS |
+| **IP LAN** | 10.176.119.229 (DHCP) |
+| **IP Tailscale** | Opcional (si se necesita acceso remoto) |
+| **Servicios** | Input Leap client |
+| **Uso** | Trabajo móvil · cuando se está fuera de casa se accede al Acer |
+
+---
+
+## 🖥️ HP TouchSmart 23" — Monitor secundario
+
+| Campo | Valor |
+|---|---|
+| **Rol** | Monitor secundario / panel de dashboards |
+| **OS** | Pendiente — candidato: Linux Mint o Arch mínimo |
+| **Estado** | Sin configurar |
+
+---
+
+_Ver arquitectura completa y servicios en `servidor/README.md`_
