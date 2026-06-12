@@ -57,6 +57,20 @@ vncviewer 10.176.119.171:5900  # por LAN
   ssh-copy-id varo@100.91.112.32
   ```
 - [ ] Test final desde Acer: `ssh varo@100.91.112.32`
+- [ ] UFW configurado en Madre:
+  ```bash
+  sudo pacman -S ufw
+  sudo ufw default deny incoming
+  sudo ufw allow from 100.86.119.102 to any port 22
+  sudo ufw allow from 100.86.119.102 to any port 5900
+  sudo ufw enable
+  sudo systemctl enable ufw
+  sudo ufw status verbose
+  ```
+- [ ] autostart `wayvnc` en Hyprland (`~/.config/hypr/hyprland.conf`):
+  ```ini
+  exec-once = /usr/bin/wayvnc --seat=seat0 --output=DP-1 0.0.0.0 5900
+  ```
 
 ---
 
@@ -65,7 +79,8 @@ vncviewer 10.176.119.171:5900  # por LAN
 - Instalaste el servicio pero olvidaste `systemctl enable`
 - Reiniciaste Madre sin verificar que sshd arranca solo
 - No tienes clave SSH configurada (dependes de contraseña)
+- No tienes UFW activo — cualquier puerto abierto es un riesgo
 
 ---
 
-_Ver también: [ssh.md](ssh.md) · [tailscale.md](tailscale.md) · [vnc.md](vnc.md)_
+_Ver también: [ssh.md](ssh.md) · [tailscale.md](tailscale.md) · [vnc.md](vnc.md) · [ufw.md](ufw.md)_
