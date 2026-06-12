@@ -2,6 +2,7 @@
 
 > Este archivo define los principios que guían todas las decisiones técnicas.
 > No es negociable. Cualquier herramienta, servicio o setup debe cumplirlos.
+> **Frecuencia de actualización: mensual o menos — solo si cambia un principio.**
 > Última actualización: 12 junio 2026
 
 ---
@@ -17,37 +18,11 @@ Esto no es una preferencia. Es una condición.
 - Software propietario en el servidor = inaceptable.
 
 ### Por qué
-
 - **Control total** — sabes exactamente qué corre en tu máquina.
 - **Auditable** — puedes leer el código. Puedes detectar puertas traseras.
 - **Sin dependencias de terceros** — ninguna empresa puede apagarte el servicio.
 - **Filosófico** — el conocimiento debe ser libre. El software también.
 - **Profesional** — los mejores ingenieros de sistemas trabajan con open source.
-
----
-
-## El stack open source completo (junio 2026)
-
-| Capa | Herramienta | Alternativa propietaria evitada |
-|---|---|---|
-| OS | Arch Linux + Omarchy | Windows, macOS |
-| Escritorio | Hyprland + Wayland | Windows UI, Aqua |
-| Periféricos compartidos | Input Leap | Synergy Pro (pago) |
-| LLM local | Ollama | OpenAI API, Azure AI |
-| Interfaz IA | Open WebUI | ChatGPT, Claude web |
-| Firewall | nftables / ufw | — |
-| Gestión servicios | systemd | — |
-| Contenedores | Docker + Compose | — |
-| Base de datos | PostgreSQL | MySQL Enterprise, MSSQL |
-| Sync nube | rclone | Google Drive cliente nativo |
-| VPN | WireGuard | NordVPN, ExpressVPN |
-| DNS / privacidad | Pi-hole | — |
-| Control versiones | Git + GitHub | GitLab (auto-hosteable también) |
-| Detección intrusos | fail2ban | — |
-| Logs | journald | Datadog, Splunk |
-| Diagramas | Mermaid.js | Lucidchart, draw.io (propietario) |
-| Bot personal | THDORA (Python propio) | — |
-| Agente IA | Perplexity + Gemini (capa externa) | Solución única propietaria |
 
 ---
 
@@ -82,6 +57,54 @@ Esto no es una preferencia. Es una condición.
 - Un servicio que entiendas completamente vale más que diez que no controlas.
 - Fase 1 siempre: que funcione. Fase 2: que sea seguro. Fase 3: que sea elegante.
 - No añadir servicios nuevos hasta que los existentes estén estables.
+
+---
+
+## Principio 6 — El repo como base de datos estructurada
+
+- Todo el conocimiento personal se documenta en este repo.
+- Estructura por secciones (`##`) como campos de una base de datos.
+- Un diario unificado por día — secciones por área, no archivos separados.
+- Cada archivo declara su frecuencia de actualización.
+- Si no está documentado, no existe para el sistema.
+
+### Frecuencias de actualización
+
+| Tipo de archivo | Frecuencia |
+|---|---|
+| Diario (`diarios/2026/*.md`) | Diario — cada sesión |
+| Estado actual (`CONTEXT.md`) | Semanal (domingo) |
+| Proyectos (`proyectos/*.md`) | Al tocar el proyecto |
+| Infraestructura (`setup/`) | Al cambiar config |
+| Formación (`formacion/`) | Quincenal |
+| Objetivos (`yo/objetivos-2026.md`) | Mensual |
+| Principios (`filosofia.md`) | Mensual o menos |
+| Sistema (`AGENT.md`) | Mensual o menos |
+| Perfil (`yo/perfil.md`) | Trimestral |
+
+---
+
+## El stack open source completo (junio 2026)
+
+| Capa | Herramienta | Alternativa propietaria evitada |
+|---|---|---|
+| OS | Arch Linux + Omarchy | Windows, macOS |
+| Escritorio | Hyprland + Wayland | Windows UI, Aqua |
+| Periféricos compartidos | Input Leap | Synergy Pro (pago) |
+| Red mesh / IPs fijas | Tailscale / Headscale | — |
+| LLM local | Ollama | OpenAI API, Azure AI |
+| Interfaz IA | Open WebUI | ChatGPT, Claude web |
+| Firewall | nftables / ufw | — |
+| Gestión servicios | systemd | — |
+| Contenedores | Docker + Compose | — |
+| Base de datos | PostgreSQL | MySQL Enterprise, MSSQL |
+| Sync nube | rclone | Google Drive cliente nativo |
+| VPN | WireGuard | NordVPN, ExpressVPN |
+| DNS / privacidad | Pi-hole | — |
+| Control versiones | Git + GitHub | — |
+| Detección intrusos | fail2ban | — |
+| Logs | journald | Datadog, Splunk |
+| Bot personal | THDORA (Python propio) | — |
 
 ---
 
