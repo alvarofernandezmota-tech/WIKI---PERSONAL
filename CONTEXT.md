@@ -1,17 +1,17 @@
 # CONTEXT — Estado actual del sistema
 
-> **Última actualización:** 12 junio 2026, 21:29 CEST
+> **Última actualización:** 12 junio 2026, 22:35 CEST
 
 ---
 
 ## 📍 Dónde estamos ahora
 
-**VNC operativo.** `wayvnc` (Madre) + `tigervnc` (Acer) funcionando sobre Tailscale.
-Input Leap abandonado con diagnóstico completo documentado.
+**VNC operativo en LAN. whisrs instalado en Acer (base.en offline).**
+Repo estructurado al 100% con 5 sesiones documentadas.
 
 ---
 
-## ✅ Completado hoy (12 jun 2026)
+## ✅ Completado hoy
 
 | Bloque | Estado |
 |---|---|
@@ -20,16 +20,25 @@ Input Leap abandonado con diagnóstico completo documentado.
 | Tailscale Madre + Acer | ✅ |
 | SSH Madre → Acer | ✅ |
 | UFW Zero Trust Acer | ✅ |
-| Input Leap — instalado, diagnosticado, abandonado | ✅ |
-| **VNC operativo (wayvnc + tigervnc)** | ✅ |
-| Repo alineado al 100% | ✅ |
+| Input Leap — diagnosticado y abandonado | ✅ |
+| VNC operativo (wayvnc + tigervnc, LAN) | ✅ |
+| `setup/omarchy/` creado | ✅ |
+| whisrs instalado en Acer (`base.en`) | ✅ |
 
 ---
 
 ## 🚧 Pendiente — próxima sesión
 
-- [ ] Evaluar `systemd` para wayvnc automático
-- [ ] Fase 6: SSH Ed25519
+### Urgente
+- [ ] Hotkey whisrs: `bind = SUPER, V, exec, whisrs toggle` en `hyprland.conf`
+- [ ] `sudo systemctl enable --now sshd` en Madre
+- [ ] Túmel VNC exterior: `ssh -L 5900:localhost:5900 varo@100.91.112.32`
+
+### Omarchy
+- [ ] whisrs en Madre (`small.en` + GPU)
+- [ ] VS Code + GitHub CLI + DBeaver
+
+### Repo
 - [ ] Migrar `yo/`, `formacion/`, `proyectos/`
 - [ ] Crear `tracking/`
 
@@ -39,9 +48,9 @@ Input Leap abandonado con diagnóstico completo documentado.
 
 | Máquina | IP Tailscale | Estado |
 |---|---|---|
-| **Madre** | `100.91.112.32` | ✅ wayvnc activo |
-| **Acer** | `100.86.119.102` | ✅ tigervnc cliente |
-| **VNC** | `100.91.112.32:5900` | ✅ operativo |
+| **Madre** | `100.91.112.32` | ✅ wayvnc · ⚠️ sshd sin verificar |
+| **Acer** | `100.86.119.102` | ✅ Tailscale · UFW · VNC · whisrs |
+| **VNC** | IP LAN Madre | ✅ LAN · ⏳ exterior pendiente |
 
 ---
 
@@ -59,23 +68,5 @@ Input Leap abandonado con diagnóstico completo documentado.
 **Conseguir trabajo antes de que acabe el año.**
 
 ---
-
-## 📁 Estado del repo
-
-```
-personal-v2/
-├── README.md              ✅
-├── AGENT.md               ✅
-├── CONTEXT.md             ✅
-├── CHANGELOG.md           ✅
-├── filosofia.md           ✅
-├── agentes/               ✅
-├── diarios/2026/          ✅ 2026-06-12.md completo
-├── setup/servidor/        ✅ plan-maestro + vnc + README_CONNECT
-├── yo/                    ⏳
-├── formacion/             ⏳
-├── proyectos/             ⏳
-└── tracking/              ❌
-```
 
 _Diario: `diarios/2026/2026-06-12.md`_
