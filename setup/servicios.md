@@ -1,27 +1,34 @@
 # Servicios — Arquitectura Home Server
 
 > Todos los servicios corriendo o planificados en el ecosistema.
-> Última actualización: 12 junio 2026
+> Última actualización: 13 junio 2026
 
 ---
 
-## Arquitectura objetivo
+## Arquitectura real
 
 ```
-Acer (Home Server — Omarchy/Arch)
+Madre (Servidor — siempre encendida, sin pantalla)
+├── sshd            acceso remoto terminal
+├── Tailscale       VPN mesh (100.91.112.32)
+├── wayvnc          acceso escritorio remoto
+├── Ollama          LLMs locales (GPU)
+├── PostgreSQL      base de datos producción
 ├── THDORA          bot Telegram 24/7
-├── PostgreSQL      DB de producción
-├── Nextcloud       datos personales, docs, fotos
-├── WireGuard       VPN — acceso seguro desde fuera
-├── Input Leap      teclado/ratón compartido con MacBook
-└── Drive Sync      GitHub Actions → rclone → Google Drive
+├── Pi-hole         DNS local + bloqueo ads
+└── Docker          contenedores de servicios
 
-Ordenador Madre
-├── Ollama          LLMs locales (próximo)
-├── VSCode          desarrollo
-├── DBeaver         gestión DB
-└── Docker          servicios varios
+Acer (Cliente — uso diario, portabilidad)
+├── Tailscale       VPN mesh (100.86.119.102)
+├── vncviewer       cliente VNC a Madre
+├── VSCode          desarrollo (SSH remoto a Madre)
+├── DBeaver         gestión PostgreSQL remoto
+├── Open WebUI      interfaz Ollama (conecta a Madre)
+├── btop            monitorización local y SSH
+└── whisrs          STT offline (instalado 12 jun)
 ```
+
+> **Regla:** Madre produce y sirve. Acer usa y gestiona.
 
 ---
 
@@ -29,57 +36,39 @@ Ordenador Madre
 
 | Servicio | Host | Estado | Notas |
 |---|---|---|---|
-| THDORA | Acer | 🔄 Migrando | Viene de Ordenador Madre |
-| PostgreSQL | Acer | 🔄 Migrando | Migración desde SQLite |
-| Nextcloud | Acer | ⏳ Pendiente | Instalar en Acer |
-| WireGuard VPN | Acer | ⏳ Pendiente | Acceso remoto seguro |
-| Input Leap | Acer↔Mac | ⏳ Completar | Servidor Acer, cliente MacBook |
-| Ollama | Ordenador Madre | ⏳ Próximo | LLM local para agente |
-| Drive Sync | GitHub Actions | ⏳ Pendiente | Ver sección abajo |
+| sshd | Madre | 🔴 Pendiente | Activar mañana. Ver [rescate.md](servidor/rescate.md) |
+| Tailscale | Madre + Acer | ✅ Operativo | IPs fijas asignadas |
+| wayvnc | Madre | ⚠️ Instalado | Sin autostart. Ver [vnc.md](servidor/vnc.md) |
+| UFW | Acer | ✅ Activo | Madre pendiente. Ver [ufw.md](servidor/ufw.md) |
+| Ollama | Madre | ⏳ Pendiente instalar | Ver [ollama.md](servidor/ollama.md) |
+| PostgreSQL | Madre | ⏳ Pendiente | Migración desde SQLite |
+| THDORA | Madre | ⏳ Pendiente migrar | Viene de Acer |
+| Pi-hole | Madre | ⏳ Pendiente | DNS local |
+| Docker | Madre | ⏳ Pendiente auditar | |
+| Nextcloud | Madre | ⏳ Pendiente | Alternativa a Google Drive |
+| whisrs | Acer | ✅ Instalado | STT offline, modelo base.en español |
+| Open WebUI | Acer | ⏳ Pendiente | Conectar a Ollama en Madre |
+| Drive Sync | GitHub Actions | ⏳ Pendiente | rclone + secret RCLONE_CONF |
 
 ---
 
-## Input Leap — Setup
+## Servicios descartados
 
-```bash
-# MacBook = cliente  (IP: 10.176.119.229)
-# Acer    = servidor (IP: 10.176.119.171)
-
-# En el Acer (servidor):
-input-leaps --config ~/.config/input-leap/input-leap.conf
-
-# En el MacBook (cliente):
-input-leapc --name macbook 10.176.119.171
-```
-
-Estado: ⏳ Pendiente completar — problemas de conexión por resolver
+| Servicio | Motivo |
+|---|---|
+| Input Leap | Bloqueo definitivo sesión Wayland (12 jun 2026) |
+| WireGuard | Sustituido por Tailscale |
 
 ---
 
-## Drive Sync — GitHub Actions + rclone
+## Drive Sync — GitHub Actions + rclone (pendiente)
 
-**Objetivo:** Sync automático nocturno de `personal-v2` → Google Drive
-
-**Arquitectura:**
-```
-GitHub repo personal-v2
-  └── GitHub Action (cron: 23:00 diario)
-        └── rclone sync → Google Drive/personal-v2/
-```
-
-**Pasos para configurar:**
-1. Instalar rclone localmente y configurar remote `gdrive`
-2. Exportar config rclone como secret en GitHub (`RCLONE_CONF`)
-3. Crear `.github/workflows/sync-drive.yml`
-4. Verificar primer sync manual
-
-**Workflow a crear:**
 ```yaml
 # .github/workflows/sync-drive.yml
 name: Sync to Google Drive
 on:
   schedule:
-    - cron: '0 22 * * *'  # 23:00 CEST (21:00 UTC)
+    - cron: '0 22 * * *'  # 23:00 CEST
   workflow_dispatch:
 jobs:
   sync:
@@ -94,4 +83,6 @@ jobs:
         run: rclone sync . gdrive:personal-v2 --exclude ".git/**"
 ```
 
-Estado: ⏳ Pendiente — configurar rclone y añadir secret a GitHub
+---
+
+_Ver: [plan-maestro.md](servidor/plan-maestro.md) · [rescate.md](servidor/rescate.md)_
