@@ -1,74 +1,61 @@
-# VNC — Escritorio remoto Madre → Acer
+# VNC — Acceso remoto con escritorio
 
 > Última actualización: 12 junio 2026
-> **Estado: OPERATIVO en LAN ✅ | Acceso externo (Tailscale) ⏳ pendiente**
 
 ---
 
-## ⚠️ Corrección importante
+## Estado
 
-Gemini documentó esto indicando que el transporte es Tailscale. **Eso es incorrecto.**
-
-| Afirmación de Gemini | Realidad confirmada |
+| Item | Estado |
 |---|---|
-| “Tailscale proporciona conectividad” | Tailscale está activo pero **no es el transporte VNC** |
-| “Acceso desde cualquier red” | **Falso** — solo funciona en LAN local |
-| `vncviewer 100.91.112.32:5900` | Esa es la IP Tailscale — **usar IP LAN de Madre** |
-
-> La IP `100.91.112.32` es la IP de Tailscale. VNC conecta por la IP LAN del router.
-> Para saber la IP LAN de Madre: `ip a` en Madre.
+| `wayvnc` en Madre | ⚠️ No activo — `Connection timed out` el 12 jun |
+| Puerto | `5900` |
+| Protocolo | RFB sobre Wayland (wayvnc) |
+| Acceso desde Acer | `vncviewer 100.91.112.32:5900` (requiere SSH activo primero) |
 
 ---
 
-## Arquitectura real
+## 🚨 Rescate — Mañana en Madre (paso 2, después de SSH)
 
-| Capa | Tecnología | Estado |
-|---|---|---|
-| **Red local (LAN)** | Router doméstico | ✅ Transporte VNC activo |
-| **VPN mesh** | Tailscale | ✅ Activo, pero NO usado para VNC todavía |
-| **Servidor VNC** | `wayvnc` (Wayland nativo) | ✅ Operativo |
-| **Cliente VNC** | `tigervnc` / `vncviewer` | ✅ Operativo |
-| **VNC desde exterior** | SSH tunnel + Tailscale | ⏳ Pendiente |
-
----
-
-## Quick-Start (en casa, misma LAN)
+> wayvnc requiere sesión Wayland/Hyprland activa. No funciona desde TTY.
 
 ```bash
-# MADRE — lanzar servidor
-killall wayvnc; wayvnc --address=0.0.0.0 --port=5900 --cursor-face=hidden --format=hevc
+# Lanzar manualmente
+/usr/bin/wayvnc --seat=seat0 --output=DP-1 0.0.0.0 5900
 
-# ACER — conectar (usar IP LAN de Madre, no Tailscale)
-vncviewer -shared <IP_LAN_MADRE>:5900
-# Ej: vncviewer -shared 192.168.1.XX:5900
+# Verificar que escucha
+ss -tlnp | grep 5900
+```
+
+Desde Acer:
+```bash
+vncviewer 100.91.112.32:5900   # por Tailscale
+vncviewer 10.176.119.171:5900  # por LAN
 ```
 
 ---
 
-## Acceso externo (pendiente — próxima sesión)
+## Autostart en Hyprland (pendiente configurar)
 
-Para VNC desde fuera de casa hay que tunelizar sobre Tailscale:
+Añadir en `~/.config/hypr/hyprland.conf`:
 
-```bash
-# Abrir túmel SSH desde Acer
-ssh -L 5900:localhost:5900 varo@100.91.112.32
-
-# Luego conectar a localhost
-vncviewer localhost:5900
+```ini
+exec-once = /usr/bin/wayvnc --seat=seat0 --output=DP-1 0.0.0.0 5900
 ```
 
-Esto sí pasaría por Tailscale de forma cifrada.
+Así wayvnc arranca solo con cada sesión de Hyprland.
 
 ---
 
-## Por qué VNC en vez de Input Leap
+## VNC por Tailscale (exterior)
 
-| Criterio | Input Leap | wayvnc |
-|---|---|---|
-| Compatibilidad Hyprland | ❌ Bloqueos D-Bus | ✅ Nativo Wayland |
-| Portales requeridos | `InputCapture` / `RemoteDesktop` | Ninguno |
-| Uso | Compartir periféricos | Escritorio completo |
+Si SSH está activo, tunnel seguro:
+
+```bash
+ssh -L 5900:localhost:5900 -f -N varo@100.91.112.32 && vncviewer localhost:5900
+```
 
 ---
 
-_Historial Input Leap: `README_CONNECT.md` · Red: `lan.md`_
+_Ver también: [rescate.md](rescate.md) · [ssh.md](ssh.md) · [tailscale.md](tailscale.md)_
+_Volver al índice: [README.md](README.md)_

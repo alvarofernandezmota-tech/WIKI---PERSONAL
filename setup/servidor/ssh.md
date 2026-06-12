@@ -15,11 +15,25 @@
 
 ---
 
-## Arrancar y fijar sshd en Madre
+## 🚨 Rescate — Mañana en Madre (paso 1)
+
+> Ejecutar en orden. Con esto SSH queda funcional para siempre.
 
 ```bash
+# 1. Instalar si no está
+sudo pacman -S openssh
+
+# 2. Activar y persistir
 sudo systemctl enable --now sshd
+
+# 3. Verificar
 sudo systemctl status sshd
+
+# 4. Copiar clave desde Acer (en Acer)
+ssh-copy-id varo@100.91.112.32
+
+# 5. Test final (en Acer)
+ssh varo@100.91.112.32
 ```
 
 ---
@@ -31,15 +45,14 @@ sudo systemctl status sshd
 ssh varo@100.91.112.32
 
 # Por LAN (en casa)
-ssh varo@<IP_LAN_MADRE>
+ssh varo@10.176.119.171
 ```
 
 ---
 
-## Túmel SSH para VNC externo
+## Túnel SSH para VNC externo
 
 ```bash
-# Abrir túmel + lanzar visor en un comando
 ssh -L 5900:localhost:5900 -f -N varo@100.91.112.32 && vncviewer localhost:5900
 ```
 
@@ -61,4 +74,5 @@ sudo systemctl restart sshd
 
 ---
 
+_Ver también: [rescate.md](rescate.md) · [tailscale.md](tailscale.md)_
 _Volver al índice: [README.md](README.md)_
