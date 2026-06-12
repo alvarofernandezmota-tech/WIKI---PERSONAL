@@ -1,96 +1,117 @@
-# Ollama — LLM Local
+# Ollama + Open WebUI — LLM Local
 
-> Última actualización: 12 junio 2026
-
----
-
-## Qué es
-
-**Ollama** permite correr modelos de lenguaje (LLMs) **en local**, sin internet, sin coste por token. La IA corre en tu hardware.
-
-**Open WebUI** es la interfaz web para hablar con Ollama desde el navegador (como ChatGPT pero local).
+> Stack completo para correr LLMs locales en el Ordenador Madre.
+> Diseñado por Gemini · Integrado por Perplexity · 12 junio 2026
+> Hardware: i5-8400 · 16GB RAM · GTX 1060 6GB
 
 ---
 
-## Por qué en el Ordenador Madre
-
-- GTX 1060 6GB — suficiente para modelos de 7B cuantizados
-- i5-8400 + 16GB RAM — sólido para inferencia
-- Es la máquina encendida durante el trabajo
-
----
-
-## Instalación
+## Requisito previo — NVIDIA Container Toolkit
 
 ```bash
-# Instalar Ollama
-curl -fsSL https://ollama.com/install.sh | sh
+# En Arch Linux (AUR)
+yay -S nvidia-container-toolkit
 
-# O desde AUR
-yay -S ollama
+# Reiniciar Docker para que detecte la GPU
+sudo systemctl restart docker
 
-# Habilitar como servicio
-sudo systemctl enable --now ollama
+# Verificar que Docker ve la GPU
+docker run --rm --gpus all nvidia/cuda:12.0-base nvidia-smi
 ```
 
 ---
 
-## Modelos recomendados para el hardware actual
+## Docker Compose
 
-| Modelo | Tamaño | RAM GPU | Uso |
+Crea `~/servidor/ollama/docker-compose.yml`:
+
+```yaml
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      - ./webui:/app/backend/data
+    depends_on:
+      - ollama
+```
+
+---
+
+## Arrancar el stack
+
+```bash
+# Levantar en background
+docker compose up -d
+
+# Verificar que corren
+docker compose ps
+
+# Ver logs
+docker compose logs -f
+```
+
+**Open WebUI disponible en:** http://localhost:3000 (o desde otra máquina: http://IP_MADRE:3000)
+
+---
+
+## Modelos recomendados para GTX 1060 6GB
+
+| Modelo | VRAM | Velocidad | Uso recomendado |
 |---|---|---|---|
-| llama3.2:3b | ~2GB | ~3GB VRAM | Rápido, respuestas cortas |
-| llama3.1:8b-q4 | ~5GB | ~5GB VRAM | Balance calidad/velocidad |
-| codellama:7b | ~4GB | ~4GB VRAM | Código Python/SQL/Bash |
-| mistral:7b-q4 | ~4GB | ~4GB VRAM | General, muy bueno |
+| `llama3.2:3b` | ~2GB | Rápido | Chat diario, respuestas rápidas |
+| `codellama:7b-q4` | ~4GB | Medio | Código, programación |
+| `mistral:7b-q4` | ~4GB | Medio | Razonamiento general |
+| `phi3:mini` | ~2GB | Muy rápido | Tareas ligeras |
 
 ```bash
-# Descargar modelo
-ollama pull llama3.2:3b
-ollama pull codellama:7b
-
-# Usar desde terminal
-ollama run codellama:7b
+# Descargar modelo (ejecutar dentro del contenedor)
+docker exec -it ollama ollama pull llama3.2:3b
+docker exec -it ollama ollama pull codellama:7b-q4
 ```
 
 ---
 
-## Open WebUI (interfaz web)
+## Integración con THDORA (futuro)
 
-```bash
-# Con Docker
-docker run -d \
-  -p 8080:8080 \
-  --add-host=host.docker.internal:host-gateway \
-  -v open-webui:/app/backend/data \
-  --name open-webui \
-  ghcr.io/open-webui/open-webui:main
+```python
+# THDORA llamando al LLM local
+import httpx
 
-# Acceso: http://localhost:8080
-# O desde Acer: http://IP_MADRE:8080
+response = httpx.post(
+    "http://IP_MADRE:11434/api/generate",
+    json={"model": "llama3.2:3b", "prompt": "...", "stream": False}
+)
 ```
 
 ---
 
-## Integración con personal-v2 (futuro)
+## Estado
 
-```
-Ollama local
-   └── AGENT.md + CONTEXT.md como system prompt
-   └── diarios/ como memoria RAG
-   └── THDORA llama a Ollama para razonar
-```
-
----
-
-## TODO
-
-- [ ] Instalar Ollama en Ordenador Madre
-- [ ] Descargar llama3.2:3b y codellama:7b
-- [ ] Instalar Open WebUI
-- [ ] Configurar acceso desde red local
-- [ ] Probar AGENT.md como system prompt
-
----
-
-_Ver también: `setup/servidor/README.md` | `agentes/gemini.md` | `AGENT.md`_
+| Tarea | Estado |
+|---|---|
+| NVIDIA Container Toolkit instalado | ⏳ Pendiente |
+| docker-compose.yml creado | ✅ Documentado aquí |
+| Primer `docker compose up` | ⏳ Pendiente |
+| Modelo descargado | ⏳ Pendiente |
+| Open WebUI accesible desde LAN | ⏳ Pendiente |
+| THDORA integrado con Ollama | ⏳ Futuro |

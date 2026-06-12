@@ -1,115 +1,122 @@
-# Input Leap / Barrier — Teclado y Ratón Compartido
+# Input Leap — Servidor (Systemd + UFW)
 
-> Última actualización: 12 junio 2026
-
----
-
-## Qué es
-
-**Input Leap** (fork activo de Barrier) permite usar **un solo teclado y ratón** para controlar varias máquinas en la misma red local. El cursor pasa de una pantalla a otra simplemente moviéndolo al borde.
-
-- **Servidor** = la máquina con el teclado/ratón físico
-- **Cliente** = la máquina que recibe el control por red
+> Configuración completa de Input Leap como servicio de producción.
+> Diseñado por Gemini · Integrado por Perplexity · 12 junio 2026
 
 ---
 
-## Setup actual
+## Arquitectura
 
 ```
-Acer Aspire (SERVIDOR Input Leap)
-    teclado + ratón físico aquí
-         │
-         │ LAN (puerto 24800)
-         │
-MacBook (CLIENTE Input Leap)
-    controlado remotamente
+Ordenador Madre (servidor Input Leap, puerto 24800)
+  ├── Acer Aspire  (cliente — IP: 10.176.119.171)
+  └── MacBook      (cliente — IP: 10.176.119.229)
 ```
-
-**Estado:** ✅ Funcionando
 
 ---
 
-## Setup objetivo (con Ordenador Madre)
+## 1. Archivo systemd
 
+Crea `/etc/systemd/system/input-leap.service`:
+
+```ini
+[Unit]
+Description=Input Leap Server Service
+After=network.target
+
+[Service]
+# Ejecutar como usuario sin privilegios por seguridad
+User=tu_usuario
+Group=tu_usuario
+ExecStart=/usr/bin/input-leap-server --no-tray --address :24800 --config /home/tu_usuario/.config/input-leap.conf
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
 ```
-Ordenador Madre (SERVIDOR Input Leap)
-    teclado + ratón físico aquí
-         │
-    ┌────┴─────┐
-    │          │
-  Acer      MacBook
- (cliente)  (cliente)
-```
 
-Un solo teclado/ratón controla las tres máquinas.
+> ⚠️ Sustituir `tu_usuario` por tu usuario real de Arch.
 
----
-
-## Instalación en Arch/Omarchy
+### Activar el servicio
 
 ```bash
-# Input Leap (recomendado sobre Barrier en Wayland)
-yay -S input-leap
+# Recargar systemd
+sudo systemctl daemon-reload
 
-# Barrier (alternativa, peor soporte Wayland)
-yay -S barrier
+# Habilitar al arranque
+sudo systemctl enable input-leap
+
+# Arrancar ahora
+sudo systemctl start input-leap
+
+# Verificar estado
+sudo systemctl status input-leap
 ```
-
-> ⚠️ **Wayland:** Hyprland/Wayland tiene limitaciones con Barrier. Input Leap tiene mejor soporte. Usar `input-leap` en Omarchy.
 
 ---
 
-## Configuración básica (servidor)
+## 2. Reglas UFW — Zero Trust
+
+**Filosofía:** bloquear todo, permitir solo las IPs conocidas.
 
 ```bash
-# Arrancar servidor Input Leap
-input-leap --server
+# Permitir solo desde nodos conocidos
+sudo ufw allow in from 10.176.119.171 to any port 24800 proto tcp   # Acer
+sudo ufw allow in from 10.176.119.229 to any port 24800 proto tcp   # MacBook
 
-# Como servicio systemd (recomendado)
-sudo systemctl enable --now input-leap-server
+# Bloquear resto de tráfico al puerto
+sudo ufw deny 24800/tcp
+
+# Activar UFW si no está activo
+sudo ufw enable
+
+# Verificar reglas aplicadas
+sudo ufw status verbose
 ```
 
-Archivo de configuración: `~/.config/input-leap/input-leap.conf`
-
-```
-section: screens
-    madre:
-    acer:
-    macbook:
-end
-
-section: links
-    madre:
-        right = acer
-    acer:
-        left = madre
-        right = macbook
-    macbook:
-        left = acer
-end
-```
+> ⚠️ Cuando el Ordenador Madre tenga IP fija, añadir también su IP como origen permitido.
 
 ---
 
-## TLS / Seguridad
+## 3. Auditoría — Logs en tiempo real
 
 ```bash
-# Generar certificado para cifrar la conexión
-openssl req -x509 -nodes -days 365 \
-  -newkey rsa:2048 \
-  -keyout ~/.local/share/input-leap/SSL/Barrier.pem \
-  -out ~/.local/share/input-leap/SSL/Barrier.pem
+# Ver logs del servicio en tiempo real
+journalctl -u input-leap -f
+
+# Ver logs de las últimas 24h
+journalctl -u input-leap --since "24 hours ago"
+
+# Ver intentos de conexión fallidos (UFW)
+sudo journalctl -k | grep UFW
 ```
 
----
-
-## TODO
-
-- [ ] Migrar servidor de Acer a Ordenador Madre
-- [ ] Configurar TLS
-- [ ] Añadir servicio systemd
-- [ ] Documentar layout de pantallas definitivo
+> En una entrevista: *"Uso listas blancas de IPs en lugar de dejar puertos abiertos al mundo, y audito conexiones con journalctl. Eso es Zero Trust aplicado en LAN."*
 
 ---
 
-_Ver también: `setup/servidor/lan.md` | `setup/equipos.md`_
+## 4. Próximo paso — TLS
+
+Pendiente: cifrar la comunicación con certificados TLS (openssl) para que nadie en la red pueda interceptar las pulsaciones de teclado.
+
+```bash
+# Generar certificados (pendiente implementar)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ~/.config/input-leap/server.key \
+  -out ~/.config/input-leap/server.crt
+```
+
+Estado: ⏳ Pendiente — implementar en Fase 2 (Seguridad)
+
+---
+
+## Estado
+
+| Tarea | Estado |
+|---|---|
+| Archivo .service creado | ⏳ Pendiente aplicar |
+| Reglas UFW configuradas | ⏳ Pendiente aplicar |
+| IP fija Madre en router | ⏳ Pendiente |
+| TLS habilitado | ⏳ Fase 2 |
+| Logs auditados con journalctl | ⏳ Tras activar servicio |

@@ -1,72 +1,102 @@
-# Servidor Casa — Documentación
+# Servidor Casa — Arquitectura y Estado
 
+> Infraestructura doméstica de Álvaro Fernández Mota.
+> 100% open source · Zero Trust · Auditado con Git
 > Última actualización: 12 junio 2026
 
 ---
 
-## Arquitectura general
+## Arquitectura completa
 
-```
-┌─────────────────────────────────────────────────────┐
-│  RED LOCAL (LAN)                                    │
-│                                                     │
-│  Router ISP                                         │
-│  └── Switch/WiFi                                    │
-│       ├── ORDENADOR MADRE  (servidor + workstation) │
-│       │    IP: TODO                                 │
-│       │    OS: Omarchy (Arch + Hyprland + Wayland)  │
-│       │    Rol: servidor principal + trabajo diario │
-│       │                                             │
-│       ├── ACER Aspire      (servidor secundario)    │
-│       │    IP: 10.176.119.171                       │
-│       │    OS: Omarchy (Arch + Hyprland + Wayland)  │
-│       │    Rol: 24/7 siempre encendido              │
-│       │                                             │
-│       ├── MacBook          (cliente)                │
-│       │    IP: 10.176.119.229                       │
-│       │    Rol: portátil, Input Leap cliente        │
-│       │                                             │
-│       └── HP TouchSmart    (monitor secundario)     │
-│            Rol: logs, dashboards, pantalla extra    │
-└─────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph "LAN 10.176.119.0/24"
+        Madre["🖥️ Ordenador Madre\ni5-8400 · 16GB · GTX1060\nOMARCHY / Arch + Hyprland"]
+        Acer["🗄️ Acer Aspire\nRyzen 5 5500U · 8GB\nServidor 24/7"]
+        Mac["💻 MacBook\nmacOS · Cliente"]
+        HP["🖥️ HP TouchSmart\nMonitor secundario"]
+
+        Madre -- "GPU GTX1060" --> Ollama["🤖 Ollama + Open WebUI\npuerto 3000 / 11434"]
+        Madre -- "Servidor puerto 24800" --> InputLeap(("⌨️ Input Leap"))
+        InputLeap --> Acer
+        InputLeap --> Mac
+
+        Acer --> Docker["🐳 Docker Containers\nPostgreSQL · THDORA\nNextcloud · Pi-hole"]
+    end
+
+    style InputLeap fill:#f9f,stroke:#333,stroke-width:2px
+    style Docker fill:#0db7ed,stroke:#333
+    style Ollama fill:#2d2,stroke:#333
 ```
 
 ---
 
-## Archivos de esta sección
+## Estado de servicios
+
+| Servicio | Máquina | Estado | Archivo |
+|---|---|---|---|
+| **Input Leap** | Madre → Acer + Mac | ⏳ Fase 1 | `barrier.md` |
+| **Ollama + Open WebUI** | Madre (GTX 1060) | ⏳ Fase 3 | `ollama.md` |
+| **PostgreSQL** | Acer | 🔄 Migrando | `../servicios.md` |
+| **THDORA** | Acer | 🔄 Migrando | `../../proyectos/thdora.md` |
+| **Pi-hole** | Por decidir | ⏳ Fase 3 | — |
+| **Nextcloud** | Acer | ⏳ Fase 3 | — |
+| **WireGuard VPN** | Acer | ⏳ Futuro | — |
+
+---
+
+## Roadmap — Fases de construcción
 
 ```
-setup/servidor/
-├── README.md          → este archivo — visión general
-├── lan.md             → arquitectura de red, IPs, DNS local
-├── servicios.md       → qué corre en cada máquina
-├── barrier.md         → teclado/ratón compartido (Input Leap)
-├── ollama.md          → LLM local
-└── docker-compose.yml → servicios en contenedores (TODO)
+FASE 1 — Conectividad (AHORA)
+  ├── IPs fijas en router (Madre + Acer)
+  ├── SSH entre Madre y Acer
+  └── Input Leap funcionando con systemd + UFW
+
+FASE 2 — Seguridad
+  ├── TLS en Input Leap (openssl)
+  ├── fail2ban instalado
+  └── Auditoría semanal de logs (journalctl)
+
+FASE 3 — Servicios
+  ├── Ollama + Open WebUI en Madre
+  ├── PostgreSQL consolidado en Acer
+  ├── THDORA migrado a Acer
+  └── Pi-hole en LAN
 ```
 
 ---
 
-## Estado actual
+## Auditoría de logs
 
-| Servicio | Máquina | Estado |
+```bash
+# Input Leap — logs en tiempo real
+journalctl -u input-leap -f
+
+# Intentos de conexión bloqueados por UFW
+sudo journalctl -k | grep UFW
+
+# Todos los servicios activos
+systemctl list-units --type=service --state=running
+```
+
+> Filosofía: si no está en los logs, no sucedió. Si no está en Git, no existe.
+
+---
+
+## Red LAN
+
+| Máquina | IP | Rol |
 |---|---|---|
-| Input Leap | Acer (servidor) → MacBook (cliente) | ✅ Funcionando |
-| Ollama | Ordenador Madre | ⏳ Pendiente instalar |
-| PostgreSQL | Acer | ⏳ Pendiente configurar |
-| Nextcloud | Acer | ⏳ Pendiente |
-| Pi-hole | TODO | ⏳ Pendiente |
-| WireGuard VPN | TODO | ⏳ Futuro |
+| Ordenador Madre | pendiente IP fija | Workstation + servidor Input Leap + Ollama |
+| Acer Aspire | 10.176.119.171 | Servidor 24/7 |
+| MacBook | 10.176.119.229 | Cliente |
+| HP TouchSmart | — | Monitor secundario |
+
+**Próximo paso crítico:** asignar IP fija a Ordenador Madre en el router.
 
 ---
 
-## Decisiones tomadas
+## Filosofía
 
-- **Ordenador Madre = servidor principal + workstation** — una máquina para todo
-- **Acer = servidor 24/7** — siempre encendido para servicios que no pueden parar
-- **Docker** para todos los servicios — fácil de replicar, actualizar y documentar
-- **IP fija local** para Madre y Acer — configurar en el router
-
----
-
-_Ver también: `setup/equipos.md` | `setup/servicios.md` | `agentes/gemini.md`_
+Ver [`/filosofia.md`](../../filosofia.md) — 100% open source, Zero Trust, todo bajo Git.
