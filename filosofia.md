@@ -3,7 +3,7 @@
 > Este archivo define los principios que guían todas las decisiones técnicas.
 > No es negociable. Cualquier herramienta, servicio o setup debe cumplirlos.
 > **Frecuencia de actualización: mensual o menos — solo si cambia un principio.**
-> Última actualización: 12 junio 2026
+> Última actualización: 13 junio 2026
 
 ---
 
@@ -81,6 +81,22 @@ Esto no es una preferencia. Es una condición.
 | Principios (`filosofia.md`) | Mensual o menos |
 | Sistema (`AGENT.md`) | Mensual o menos |
 | Perfil (`yo/perfil.md`) | Trimestral |
+
+---
+
+## Principio 7 — Pirámide de Resiliencia del servidor
+
+Cada nodo del ecosistema debe construirse en capas, en este orden. No se pasa a la siguiente sin completar la anterior.
+
+| Capa | Nombre | Qué garantiza | Herramientas |
+|---|---|---|---|
+| 0 | **Acceso** | Entrada siempre garantizada | `sshd`, Tailscale, `wayvnc` |
+| 1 | **Blindaje** | Nada entra sin permiso | `ufw`, `fail2ban` |
+| 2 | **Auditoría** | Visibilidad total del estado | `journald`, `lynis`, `ss` |
+| 3 | **Aislamiento** | Un fallo no colapsa el sistema | Docker, Podman |
+
+> Un servidor sin Capa 0 no es un servidor. Es una caja que puede existir o no.
+> Madre está en Capa 0 pendiente — 13 junio 2026.
 
 ---
 
