@@ -1,124 +1,135 @@
-# Tailscale — Red Mesh para IPs Fijas
+# Tailscale — Red Privada Zero Trust
 
-> Solución al problema de IPs dinámicas por WiFi/hotspot.
-> Diseñado por Gemini · Integrado por Perplexity · 12 junio 2026
-> Aplica en: Ordenador Madre + Acer Aspire
-
----
-
-## Por qué Tailscale
-
-Sin IPs fijas, Input Leap y SSH se rompen cada vez que cambias de red o usas hotspot.
-Tailscale crea una red mesh privada donde cada máquina tiene una IP fija (`100.x.x.x`) que nunca cambia, independientemente de la red a la que esté conectada.
-
-**Cliente Tailscale: open source ✅**
-**Servidor de coordinación: propietario ⚠️**
-→ Solución 100% open source: **Headscale** (self-hosted) — mismo proceso, añadir `--login-server` al levantar. Ver sección Headscale abajo.
+> Red mesh entre Madre y Acer para IPs estables 100.x.x.x.
+> Sustituye IPs DHCP inestables. Base de toda la Fase 1.
+> **Frecuencia de actualización: al cambiar nodos o IPs.**
+> Última actualización: 12 junio 2026
 
 ---
 
-## Instalación — igual en Madre y Acer
+## Arquitectura
 
-### 1. Instalar paquete
-
-```bash
-sudo pacman -S tailscale
+```
+Madre  (100.x.x.x)  ←→  Tailscale mesh  ←→  Acer (100.x.x.x)
+                              ↑
+                     MacBook (opcional)
 ```
 
-### 2. Habilitar servicio con systemd
+Tailscale asigna IPs `100.x.x.x` permanentes a cada nodo.
+Estas IPs no cambian aunque el DHCP de la LAN rote.
+UFW e Input Leap usan estas IPs — no las de la LAN.
+
+---
+
+## Estado actual
+
+| Nodo | Estado | IP Tailscale |
+|---|---|---|
+| **Madre** | ⏳ NeedsLogin — pendiente reauth | [anotar tras login] |
+| **Acer** | ⏳ Pendiente instalar | [anotar tras login] |
+
+---
+
+## 1. Instalación en MADRE (Omarchy/Arch)
 
 ```bash
-# Arrancar ahora y habilitar al inicio (antes de entrar a Hyprland)
+# Instalar
+sudo pacman -Syu tailscale --noconfirm
+
+# Habilitar servicio
 sudo systemctl enable --now tailscaled.service
 
-# Verificar que corre
-sudo systemctl status tailscaled.service
-```
-
-### 3. Autenticación
-
-**Opción A — Tailscale oficial (para empezar rápido):**
-
-```bash
+# Levantar y autenticar
 sudo tailscale up
 ```
 
-Te devuelve un enlace web → ábrelo en el navegador → autoriza el nodo.
-Repetir en cada máquina (Madre y Acer).
+### Fix: NeedsLogin (token expirado o proceso cancelado)
 
-**Opción B — Headscale self-hosted (100% open source, Fase 2):**
+Si `tailscale ip -4` devuelve `state: NeedsLogin`:
 
 ```bash
-sudo tailscale up --login-server https://tu-servidor-headscale.dominio
+sudo tailscale up --force-reauth
 ```
 
-### 4. Reglas UFW — Zero Trust
+Abre el enlace generado → autoriza en el panel web → vuelve a verificar.
 
 ```bash
-# Permitir tráfico solo desde dentro de la red Tailscale
-# Bloquea WiFi público y hotspot externo automáticamente
-sudo ufw allow in on tailscale0
+# Verificar IP asignada
+tailscale ip -4
+# → IP_TAILSCALE_MADRE: ___________
 ```
 
 ---
 
-## Verificar conectividad
+## 2. Instalación en ACER (Arch)
 
 ```bash
-# Ver IPs Tailscale de todas las máquinas
+# Instalar (solo crítico, sin entorno dev)
+sudo pacman -Syu tailscale --noconfirm
+
+# Habilitar servicio
+sudo systemctl enable --now tailscaled.service
+
+# Levantar y autenticar
+sudo tailscale up
+```
+
+```bash
+# Verificar IP asignada
+tailscale ip -4
+# → IP_TAILSCALE_ACER: ___________
+```
+
+---
+
+## 3. Verificación de interconexión
+
+Desde Madre, verificar que ve a Acer:
+
+```bash
 tailscale status
-
-# Ping entre máquinas por IP Tailscale
-ping 100.x.x.x
+# Debe mostrar ambos nodos con sus IPs 100.x.x.x
 ```
 
-Las IPs `100.x.x.x` son permanentes. Anótalas aquí cuando las tengas:
-
-| Máquina | IP Tailscale |
-|---|---|
-| Ordenador Madre | `100.` — pendiente |
-| Acer Aspire | `100.` — pendiente |
-| MacBook | `100.` — pendiente |
-
----
-
-## Usar IPs Tailscale para SSH e Input Leap
-
-Una vez activo, **olvidar las IPs 10.176.x.x** — usar siempre las Tailscale:
+Ping de prueba:
 
 ```bash
-# SSH de Madre a Acer
-ssh usuario@IP_TAILSCALE_ACER
-
-# En barrier.md / input-leap.conf
-# Cambiar IP del servidor por IP_TAILSCALE_MADRE
+ping -c 3 <IP_TAILSCALE_ACER>
 ```
 
 ---
 
-## Headscale — Ruta hacia 100% open source
+## IPs registradas
 
-Headscale es el servidor de coordinación de Tailscale pero self-hosted.
-Mismo cliente, mismos comandos, tus datos solo en tu servidor.
+> Rellenar cuando estén disponibles.
 
-```bash
-# Instalar Headscale en el Acer (servidor 24/7)
-# Ver: https://github.com/juanfont/headscale
-yay -S headscale
+```
+IP_TAILSCALE_MADRE = 
+IP_TAILSCALE_ACER  = 
 ```
 
-Estado: ⏳ Fase 2 — implementar cuando Tailscale oficial esté estable
+Estas IPs van a:
+- `setup/servidor/barrier.md` → UFW allowlist
+- `setup/servidor/lan.md` → mapa de red completo
 
 ---
 
-## Estado
+## Siguientes pasos tras completar esto
 
-| Tarea | Estado |
-|---|---|
-| Tailscale instalado en Madre | ⏳ Pendiente |
-| Tailscale instalado en Acer | ⏳ Pendiente |
-| IPs Tailscale anotadas arriba | ⏳ Pendiente |
-| UFW regla `tailscale0` aplicada | ⏳ Pendiente |
-| SSH funcionando por IP Tailscale | ⏳ Pendiente |
-| Input Leap usando IP Tailscale | ⏳ Pendiente |
-| Migrar a Headscale | ⏳ Fase 2 |
+1. ✅ Tailscale en Madre
+2. ✅ Tailscale en Acer
+3. → SSH Madre → Acer con IP Tailscale
+4. → Input Leap server en Madre, client en Acer
+5. → UFW en Acer: solo acepta Input Leap desde IP Tailscale de Madre
+
+---
+
+## Fase 2 — Headscale (self-hosted)
+
+Tailscale usa servidores de coordinación propietarios.
+En Fase 2 se sustituye por **Headscale** (open source, self-hosted en Acer).
+Los clientes Tailscale siguen funcionando — solo cambia el servidor de coordinación.
+
+---
+
+_Open source: Tailscale cliente (BSD) · Headscale servidor (MIT)_
