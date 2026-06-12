@@ -2,7 +2,7 @@
 
 > Base de datos personal de Álvaro Fernández Mota.
 > Fuente de verdad única · 100% Git · Auditado y versionado.
-> Última actualización: 12 junio 2026
+> Última actualización: 13 junio 2026
 
 ---
 
@@ -12,55 +12,49 @@
 personal-v2/
 ├── README.md              ← este archivo
 ├── AGENT.md               ← instrucciones para IAs (leer primero)
-├── CONTEXT.md             ← estado actual del sistema (actualizar siempre)
-├── CHANGELOG.md           ← historial de cambios importantes
+├── CONTEXT.md             ← estado actual del sistema
+├── CHANGELOG.md           ← historial de cambios
 ├── filosofia.md           ← principios y valores del sistema
+├── .gitignore
 │
 ├── agentes/               ← instrucciones y flujos por herramienta IA
-│   ├── perplexity.md
-│   ├── gemini.md
-│   └── prompts.md
-│
 ├── yo/                    ← perfil, CV, empleabilidad, certificaciones
-├── diarios/               ← diarios de sesión organizados por año
-│   └── 2026/
-├── formacion/             ← Python, SQL, Linux, SO, C, cursos externos
+├── diarios/               ← diarios de sesión por año
+├── formacion/             ← Python, SQL, Linux, SO, C, cursos
 ├── proyectos/             ← THDORA, thea-ia, ai-toolkit, analytics
-├── setup/                 ← configuración de máquinas y servicios
-│   └── servidor/
-│       ├── README.md      ← arquitectura + estado Fases
-│       ├── tailscale.md
-│       ├── barrier.md
-│       └── lan.md
-└── .github/               ← config GitHub
+└── setup/                 ← configuración de máquinas y servicios
+    ├── equipos.md
+    ├── servicios.md
+    ├── omarchy/
+    └── servidor/            ← ver setup/servidor/README.md
 ```
 
 ---
 
-## Carpetas pendientes de poblar
+## Ecosistema de máquinas
 
-Estas carpetas existen pero aún no tienen contenido migrado desde `personal` (repo madre):
+| Máquina | Rol | IP Tailscale | OS |
+|---|---|---|---|
+| **Madre** | Servidor — siempre encendida | `100.91.112.32` | Arch Linux / Hyprland |
+| **Acer** | Cliente — uso diario | `100.86.119.102` | Arch Linux / Hyprland |
+| **MacBook** | Tercer nodo | Pendiente | macOS |
 
-| Carpeta | Contenido pendiente |
-|---|---|
-| `yo/` | CV, empleabilidad, certificaciones, portfolio, begona.md |
-| `formacion/` | Python, SQL, Linux, SO2-kernel, C, cursos externos, chuletas |
-| `proyectos/` | THDORA, thea-ia/, ai-toolkit.md, personal-analytics.md |
-
----
-
-## Archivos raíz
-
-| Archivo | Propósito | Frecuencia de actualización |
-|---|---|---|
-| `AGENT.md` | Instrucciones para IAs | Al cambiar el flujo de trabajo |
-| `CONTEXT.md` | Estado actual del sistema | Cada sesión |
-| `CHANGELOG.md` | Historial de cambios | Al hacer cambios importantes |
-| `filosofia.md` | Principios del sistema | Cuando evoluciona la filosofía |
+> **Regla:** Madre produce y sirve. Acer usa y gestiona.
 
 ---
 
-## Flujo de trabajo
+## Estado del servidor — Pirámide de Resiliencia
+
+| Capa | Objetivo | Estado | Fecha |
+|---|---|---|---|
+| 0 — Acceso | sshd + wayvnc + Tailscale | ⚠️ Tailscale ✅, SSH pendiente | 13 jun 2026 |
+| 1 — Blindaje | UFW + fail2ban | ⚠️ UFW Acer ✅, Madre pendiente | 13 jun 2026 |
+| 2 — Auditoría | lynis + journald + btop | ⏳ Pendiente | — |
+| 3 — Aislamiento | Docker + contenedores | ⏳ Pendiente | — |
+
+---
+
+## Flujo de trabajo IA
 
 ```
 Gemini (voz / visual / docs largos)
@@ -76,14 +70,26 @@ GitHub — fuente de verdad
 
 ---
 
-## Estado del servidor
+## Archivos raíz
 
-| Fase | Estado | Fecha |
+| Archivo | Propósito | Frecuencia |
 |---|---|---|
-| Fase 1 — Conectividad (Tailscale + Input Leap + UFW) | ✅ Completada | 12 jun 2026 |
-| Fase 2 — Seguridad (TLS + fail2ban + Headscale) | ⏳ Pendiente | Próximo fin de semana |
-| Fase 3 — Servicios (Ollama + THDORA + PostgreSQL) | ⏳ Pendiente | — |
+| `AGENT.md` | Instrucciones para IAs | Al cambiar el flujo |
+| `CONTEXT.md` | Estado actual del sistema | Cada sesión |
+| `CHANGELOG.md` | Historial de cambios | Al hacer cambios |
+| `filosofia.md` | 7 principios del sistema | Mensual o menos |
+
+---
+
+## Carpetas pendientes de poblar
+
+| Carpeta | Contenido pendiente |
+|---|---|
+| `yo/` | CV, empleabilidad, certificaciones, portfolio |
+| `formacion/` | Python, SQL, Linux, SO2-kernel, C, cursos |
+| `proyectos/` | THDORA, thea-ia, ai-toolkit, analytics |
 
 ---
 
 _Ver `AGENT.md` para instrucciones completas de uso con IAs._
+_Ver `setup/servidor/plan-maestro.md` para tareas pendientes._

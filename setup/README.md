@@ -1,36 +1,32 @@
-# Setup
+# Setup — Configuración de máquinas y servicios
 
-> Toda la infraestructura técnica del sistema personal.
-> Última actualización: 12 junio 2026
+> Última actualización: 13 junio 2026
 
 ---
 
-## Índice
+## Archivos raíz de setup
 
-| Archivo / Carpeta | Descripción |
+| Archivo | Contenido |
 |---|---|
-| `equipos.md` | Inventario de hardware (CPU, RAM, GPU, roles) |
-| `servicios.md` | Servicios planificados y su estado |
-| `servidor/` | Arquitectura completa del servidor de casa |
-| `servidor/README.md` | Diagrama Mermaid + roadmap por fases |
-| `servidor/barrier.md` | Input Leap: systemd + UFW Zero Trust |
-| `servidor/ollama.md` | Docker Compose LLM local + modelos GTX 1060 |
-| `servidor/tailscale.md` | Red mesh para IPs fijas en Arch/Omarchy |
-| `servidor/lan.md` | Mapa de red, IPs, puertos |
+| [equipos.md](equipos.md) | Hardware, specs y configuración de Madre y Acer |
+| [servicios.md](servicios.md) | Arquitectura completa — qué corre dónde |
 
 ---
 
-## Secciones estándar de cada archivo de setup
+## Subcarpetas
 
-```
-## Arquitectura / Objetivo   ← qué hace y por qué
-## Configuración / Código   ← comandos, archivos, configs
-## Estado                    ← tabla con pendientes y completados
-## Próximo paso              ← una sola acción concreta
-```
+| Carpeta | Contenido |
+|---|---|
+| [servidor/](servidor/README.md) | Todos los servicios, apps y protocolos del servidor |
+| [omarchy/](omarchy/) | Configuración Omarchy / dotfiles |
 
 ---
 
-## Filosofía
+## Regla
 
-100% open source · Zero Trust · Todo bajo Git · Ver `../filosofia.md`
+> Madre produce y sirve. Acer usa y gestiona.
+> Cada app tiene su propio archivo en `setup/servidor/`.
+
+---
+
+_Volver al índice: [README.md](../README.md)_

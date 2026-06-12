@@ -1,57 +1,115 @@
-# Setup Servidor — Índice de aplicaciones
+# Setup Servidor — Índice completo
 
 > Cada aplicación tiene su propio archivo. Lee este README primero.
-> Última actualización: 12 junio 2026
+> Última actualización: 13 junio 2026
 
 ---
 
 ## Arquitectura del sistema
 
 ```
-Madre (Torre)  ──────────────────────  Acer (Portátil)
-100.91.112.32                          100.86.119.102
+Madre (Servidor)  ─────────────────────  Acer (Cliente)
+100.91.112.32                            100.86.119.102
 
-  [Tailscale]  ←── VPN mesh P2P ──►  [Tailscale]
-  [sshd]       ←── SSH (puerto 22) ── [ssh client]
-  [wayvnc]     ←── VNC (LAN/túmel) ── [vncviewer]
+  [sshd]        ←── SSH (Tailscale) ──←  [ssh / VSCode Remote]
+  [wayvnc]      ←── VNC (LAN/T.scale)─←  [vncviewer]
+  [Ollama]      ←── API :11434 ─────←  [Open WebUI]
+  [PostgreSQL]  ←── :5432 ─────────←  [DBeaver]
+  [Tailscale]   ←── VPN mesh P2P ───←  [Tailscale]
 ```
 
 ---
 
-## Aplicaciones instaladas
+## 🚨 Pendiente mañana — ir físicamente a Madre
 
-| App | Máquina | Para qué | Estado | Doc |
-|---|---|---|---|---|
-| **Tailscale** | Madre + Acer | VPN mesh — IPs permanentes entre equipos | ✅ Activo | [tailscale.md](tailscale.md) |
-| **sshd** | Madre | Acceso remoto por terminal | ⚠️ Verificar | [ssh.md](ssh.md) |
-| **UFW** | Acer | Firewall Zero Trust | ✅ Activo | [ufw.md](ufw.md) |
-| **wayvnc** | Madre | Servidor escritorio remoto (Wayland nativo) | ✅ Activo en LAN | [vnc.md](vnc.md) |
-| **tigervnc** | Acer | Cliente escritorio remoto | ✅ Instalado | [vnc.md](vnc.md) |
-| **input-leap-git** | Madre + Acer | KVM (compartir ratón/teclado) | ❌ Abandonado | [input-leap.md](input-leap.md) |
-| **Ollama** | Madre | LLM local (GTX 1060) | ⏳ Planificado | [ollama.md](ollama.md) |
+```bash
+sudo systemctl enable --now sshd
+```
+
+Después seguir checklist completo: [rescate.md](rescate.md)
 
 ---
 
-## Capas de red — bien separadas
+## Aplicaciones — Índice completo
 
-| Capa | Tecnología | Para qué | IP |
+### Acceso y red
+
+| App | Host | Estado | Doc |
 |---|---|---|---|
-| **VPN mesh** | Tailscale | Conectar equipos desde cualquier red | `100.x.x.x` |
-| **LAN local** | Router doméstico | Red en casa | `10.176.x.x` |
-| **VNC en casa** | wayvnc + LAN | Escritorio remoto dentro de casa | IP LAN Madre |
-| **VNC fuera** | wayvnc + túmel SSH/Tailscale | Escritorio remoto desde exterior | `100.91.112.32` |
+| **Tailscale** | Madre + Acer | ✅ Activo | [tailscale.md](tailscale.md) |
+| **sshd** | Madre | 🔴 Pendiente activar | [ssh.md](ssh.md) |
+| **wayvnc** | Madre | ⚠️ Instalado, sin autostart | [vnc.md](vnc.md) |
+| **tigervnc** | Acer | ✅ Instalado | [vnc.md](vnc.md) |
 
-> ⚠️ **Tailscale y VNC son cosas distintas.** Tailscale es la VPN. VNC es el escritorio remoto.
-> VNC usa Tailscale como transporte solo cuando estás fuera de casa (túmel SSH).
+### Seguridad
+
+| App | Host | Estado | Doc |
+|---|---|---|---|
+| **UFW** | Acer ✅ / Madre 🔴 | Acer activo, Madre pendiente | [ufw.md](ufw.md) |
+| **fail2ban** | Madre | ⏳ Pendiente (bootstrap) | [fail2ban.md](fail2ban.md) |
+
+### Servicios (Docker)
+
+| App | Host | Estado | Doc |
+|---|---|---|---|
+| **Docker** | Madre | ⏳ Pendiente instalar | [bootstrap-madre.sh](bootstrap-madre.sh) |
+| **Ollama** | Madre | ⏳ Pendiente | [ollama.md](ollama.md) |
+| **Open WebUI** | Madre | ⏳ Pendiente | [ollama.md](ollama.md) |
+| **PostgreSQL** | Madre | ⏳ Pendiente | — |
+| **Pi-hole** | Madre | ⏳ Pendiente | — |
+| **Uptime Kuma** | Madre | ⏳ Pendiente | [uptime-kuma.md](uptime-kuma.md) |
+| **THDORA** | Madre | ⏳ Migrar desde Acer | — |
+
+### Monitorización y auditoría
+
+| App | Host | Estado | Doc |
+|---|---|---|---|
+| **btop** | Acer + Madre | ✅ Acer / Madre pendiente | — |
+| **lynis** | Madre | ⏳ Pendiente (bootstrap) | — |
+| **rkhunter** | Madre | ⏳ Pendiente (bootstrap) | — |
+
+### Desarrollo
+
+| App | Host | Estado | Doc |
+|---|---|---|---|
+| **VSCode** | Acer → Madre (Remote SSH) | ⏳ Pendiente configurar | [vscode.md](vscode.md) |
+| **DBeaver** | Acer → Madre | ⏳ Pendiente instalar | [dbeaver.md](dbeaver.md) |
+| **GitHub SSH** | Madre | ⏳ Pendiente configurar | [github-setup.md](github-setup.md) |
+| **Google Colab** | Cloud | ⏳ Por configurar | [colab-aistudio.md](colab-aistudio.md) |
+| **AI Studio** | Cloud | ⏳ Por configurar | [colab-aistudio.md](colab-aistudio.md) |
+
+### Descartadas
+
+| App | Motivo |
+|---|---|
+| Input Leap | Bloqueo sesión Wayland — 12 jun 2026 |
+| WireGuard | Sustituido por Tailscale |
 
 ---
 
-## Pendiente urgente
+## Instalación automatizada
 
-- [ ] Verificar `sshd` activo en Madre: `sudo systemctl enable --now sshd`
-- [ ] Fijar IP LAN de Madre por MAC en el router
-- [ ] Probar túmel VNC sobre Tailscale desde exterior
+Una vez dentro de Madre por SSH:
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/alvarofernandezmota-tech/personal-v2/main/setup/servidor/bootstrap-madre.sh)
+```
+
+Ver: [bootstrap-madre.sh](bootstrap-madre.sh) · [herramientas.md](herramientas.md)
 
 ---
 
-_Plan maestro: [plan-maestro.md](plan-maestro.md)_
+## Capas de red
+
+| Capa | Tecnología | Para qué |
+|---|---|---|
+| VPN mesh | Tailscale | Conectar equipos desde cualquier red |
+| LAN local | Router | Red en casa (`10.176.x.x`) |
+| VNC en casa | wayvnc + LAN | Escritorio remoto dentro de casa |
+| VNC fuera | wayvnc + Tailscale | Escritorio remoto desde exterior |
+
+---
+
+_Plan maestro y tareas: [plan-maestro.md](plan-maestro.md)_
+_Protocolo de rescate: [rescate.md](rescate.md)_
+_Volver al índice: [README.md](../../README.md)_
