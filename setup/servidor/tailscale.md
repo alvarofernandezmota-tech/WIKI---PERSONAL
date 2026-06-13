@@ -1,89 +1,104 @@
-# Tailscale — VPN mesh
+# Tailscale — Red P2P privada
 
-> Última actualización: 12 junio 2026
-
----
-
-## Qué es
-
-Red privada virtual entre todos tus equipos. Cada máquina tiene una IP fija `100.x.x.x` accesible desde cualquier red del mundo.
-
-> Tailscale es la **VPN**. No es SSH. No es VNC. Es la capa de red que los hace posibles desde fuera de casa.
+> Última actualización: 13 junio 2026
 
 ---
 
-## IPs permanentes
+## Nodos activos
 
-| Máquina | Hostname | IP Tailscale | Estado |
+| Máquina | Usuario | IP Tailscale | Rol |
 |---|---|---|---|
-| **Madre** | `varpc` | `100.91.112.32` | ✅ Online |
-| **Acer** | `varo12f` | `100.86.119.102` | ✅ Online |
-| **MacBook** | pendiente | pendiente | ⏳ |
+| Madre | `varopc` | `100.91.112.32` | Servidor |
+| Acer | `varo` | `100.86.119.102` | Cliente |
+
+---
+
+## Estado
+
+```bash
+tailscale status        # ver todos los nodos
+tailscale ping 100.91.112.32   # verificar conexión a Madre
+```
 
 ---
 
 ## Comandos esenciales
 
 ```bash
-# Ver todos los nodos y estado
-tailscale status
+# Activar
+sudo systemctl enable --now tailscaled
+tailscale up
 
-# Monitorizar en continuo (refresca cada 5s)
-watch -n 5 tailscale status
-
-# Comprobar latencia con Madre
-tailscale ping 100.91.112.32
-
-# Ver tu propia IP Tailscale
+# Ver IPs
 tailscale ip
 
-# Activar
-sudo tailscale up
+# Ver estado de red
+tailscale status
 
-# Desactivar
-sudo tailscale down
-
-# Ver logs en directo
-sudo journalctl -u tailscaled -f
+# Desconectar (sin desinstalar)
+tailscale down
 ```
 
 ---
 
-## Mantener Acer siempre conectado (para acceso exterior)
-
-Tailscale arranca automáticamente con el sistema en Arch. Verificar:
+## Flujo de trabajo diario: Acer → Madre
 
 ```bash
-sudo systemctl status tailscaled
-sudo systemctl enable tailscaled  # si no está habilitado
+# 1. Verificar que Madre está online
+tailscale ping 100.91.112.32
+
+# 2. Conectar por SSH
+ssh varopc@100.91.112.32
+# o con atajo (si tienes ~/.ssh/config configurado):
+ssh madre
+
+# 3. Ejecutar comandos remotos sin entrar
+ssh varopc@100.91.112.32 'uptime && df -h'
+
+# 4. Copiar archivos Acer → Madre
+scp archivo.txt varopc@100.91.112.32:~/
+
+# 5. Copiar archivos Madre → Acer
+scp varopc@100.91.112.32:~/archivo.txt ~/
 ```
 
 ---
 
-## SSH sobre Tailscale
+## Atajo SSH recomendado
+
+Añadir en Acer `~/.ssh/config`:
+
+```
+Host madre
+    HostName 100.91.112.32
+    User varopc
+    IdentityFile ~/.ssh/id_ed25519
+```
+
+Despues: `ssh madre` en lugar del comando largo.
+
+---
+
+## Concepto clave
+
+```
+tailscale ping OK  ≠  ssh funciona
+
+Tailscale = red (capa 3) — garantiza que los paquetes llegan
+SSH = servicio (capa 7) — necesita sshd activo en destino
+```
+
+---
+
+## Instalación (Arch Linux)
 
 ```bash
-# Desde cualquier red del mundo
-ssh varo@100.91.112.32
-```
-
-> ⚠️ **BLOQUEADO** — `sshd` no está activo en Madre.
-> Primer comando al llegar a Madre:
-> ```bash
-> sudo systemctl enable --now sshd
-> ```
-> Después SSH funcionará desde cualquier sitio.
-
----
-
-## VNC sobre Tailscale (exterior)
-
-Una vez sshd activo en Madre:
-
-```bash
-ssh -L 5900:localhost:5900 -f -N varo@100.91.112.32 && vncviewer localhost:5900
+sudo pacman -S tailscale
+sudo systemctl enable --now tailscaled
+tailscale up
+# Abre el enlace en el navegador para autenticar
 ```
 
 ---
 
-_Volver al índice: [README.md](README.md)_
+_Ver: [ssh.md](ssh.md) · [rescate.md](rescate.md) · [arquitectura.md](arquitectura.md)_
