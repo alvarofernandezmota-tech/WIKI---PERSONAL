@@ -1,7 +1,7 @@
 # AGENT.md — Instrucciones para el Agente
 
 > **Este es el primer archivo que debes leer.** Todo lo demás se navega desde aquí.
-> Última actualización: 12 junio 2026
+> Última actualización: 14 junio 2026
 
 ---
 
@@ -30,6 +30,29 @@ Al proponer herramientas, soluciones o servicios, el agente debe:
 - Priorizar siempre la alternativa open source.
 - Nunca sugerir software propietario sin indicar que existe alternativa libre.
 - Si no hay alternativa open source, indicarlo explícitamente.
+
+---
+
+## 🧠 Principio fundamental — Documentación que sirve para trabajar
+
+**Este repo NO es un archivo histórico. Es una herramienta de trabajo viva.**
+
+Cada sección del repo sigue este principio de dos capas:
+
+| Capa | Propósito | Ejemplo |
+|---|---|---|
+| **Histórico / curso** | Registro de lo aprendido o hecho — para repasar | `formacion/python/curso/m1-introduccion/` |
+| **Referencia técnica** | Documentación consultable en el trabajo real | `formacion/python/referencia/poo.md` |
+
+**Regla:** si un archivo solo sirve para recordar que algo ocurrió, va al histórico. Si sirve para tomar decisiones o consultar en producción, va a la referencia.
+
+Esto aplica a todo el repo:
+- `setup/` → no es "lo que instalé", es la **referencia técnica viva del sistema**
+- `formacion/python/` → no es "el historial del curso", es **curso + referencia de trabajo**
+- `proyectos/` → no es "lo que hice", es **documentación de decisiones técnicas activas**
+- `diarios/` → no es un diario personal, es **registro de decisiones y aprendizajes útiles**
+
+**Un ingeniero consulta su repo como consulta la documentación oficial — rápido, preciso, sin buscar entre carpetas de "cuándo lo aprendí".**
 
 ---
 
@@ -125,6 +148,7 @@ Cada carpeta es una tabla. Cada archivo es una fila. Cada sección (`##`) es un 
 - **Proponer solo herramientas open source** — ver `filosofia.md`
 - **Respetar las secciones estándar** — no inventar estructura nueva
 - **Avisar cuándo toca actualizar** un archivo según su frecuencia
+- **Distinguir siempre entre capa histórica y capa de referencia** — no mezclarlas
 
 ### Nunca
 - Asumir que un archivo no actualizado en >4 semanas está vigente
@@ -133,6 +157,7 @@ Cada carpeta es una tabla. Cada archivo es una fila. Cada sección (`##`) es un 
 - Actualizar `CONTEXT.md` sin confirmación explícita
 - **Sugerir software propietario sin advertirlo explícitamente**
 - **Crear secciones nuevas** sin justificación — usar las estándar
+- **Tratar el histórico como referencia** — son capas distintas
 
 ### Fechas
 - Si la fecha actual no está disponible, preguntar antes de registrar nada

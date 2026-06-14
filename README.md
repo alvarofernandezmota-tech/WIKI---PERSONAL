@@ -2,7 +2,19 @@
 
 > Base de datos personal de Álvaro Fernández Mota.
 > Fuente de verdad única · 100% Git · Auditado y versionado.
-> Última actualización: 13 junio 2026
+> Última actualización: 14 junio 2026
+
+---
+
+## 🧠 Principio de este repo
+
+**Este repo NO es un archivo histórico. Es una herramienta de trabajo viva.**
+
+Cada sección existe en dos capas:
+- **Histórico** → lo que se aprendió o hizo (para repasar)
+- **Referencia técnica** → lo que se consulta en producción (para trabajar)
+
+Un ingeniero consulta su repo como consulta documentación oficial — rápido, preciso, sin buscar entre carpetas de "cuándo lo aprendí".
 
 ---
 
@@ -21,12 +33,17 @@ personal-v2/
 ├── yo/                    ← perfil, CV, empleabilidad, certificaciones
 ├── diarios/               ← diarios de sesión por año
 ├── formacion/             ← Python, SQL, Linux, SO, C, cursos
+│   └── python/
+│       ├── curso/         ← módulos Escuela Musk (M1→M7) — para estudiar
+│       └── referencia/    ← diccionario técnico vivo — para trabajar
 ├── proyectos/             ← THDORA, thea-ia, ai-toolkit, analytics
 └── setup/                 ← configuración de máquinas y servicios
     ├── equipos.md
+    ├── software.md
+    ├── workspace.md
     ├── servicios.md
     ├── omarchy/
-    └── servidor/            ← ver setup/servidor/README.md
+    └── servidor/
 ```
 
 ---
@@ -35,11 +52,11 @@ personal-v2/
 
 | Máquina | Rol | IP Tailscale | OS |
 |---|---|---|---|
-| **Madre** | Servidor — siempre encendida | `100.91.112.32` | Arch Linux / Hyprland |
-| **Acer** | Cliente — uso diario | `100.86.119.102` | Arch Linux / Hyprland |
-| **MacBook** | Tercer nodo | Pendiente | macOS |
+| **Madre** | Workstation principal + GPU | `100.91.112.32` | Arch Linux / Hyprland |
+| **Acer** | Servidor 24/7 | `100.86.119.102` | Arch Linux |
+| **MacBook** | Cliente puro | Pendiente | macOS |
 
-> **Regla:** Madre produce y sirve. Acer usa y gestiona.
+> **Regla:** Madre produce y sirve. Acer corre 24/7. MacBook solo consume.
 
 ---
 
@@ -86,7 +103,7 @@ GitHub — fuente de verdad
 | Carpeta | Contenido pendiente |
 |---|---|
 | `yo/` | CV, empleabilidad, certificaciones, portfolio |
-| `formacion/` | Python, SQL, Linux, SO2-kernel, C, cursos |
+| `formacion/python/referencia/` | Diccionario técnico consolidado desde M1–M5 |
 | `proyectos/` | THDORA, thea-ia, ai-toolkit, analytics |
 
 ---
