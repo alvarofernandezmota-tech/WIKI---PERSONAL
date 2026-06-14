@@ -1,7 +1,7 @@
 # Setup Omarchy — Índice de herramientas
 
 > Herramientas del entorno de trabajo diario.
-> Última actualización: 12 junio 2026
+> Última actualización: 14 junio 2026
 
 ---
 
@@ -9,6 +9,7 @@
 
 | App | Para qué | Acer | Madre | Doc |
 |---|---|---|---|---|
+| **Hyprland** | WM + config monitores y workspaces | — | ⏳ Pendiente | [hyprland.md](hyprland.md) |
 | **whisrs** | Dictado por voz offline | ✅ `base.en` | ⏳ `small.en` | [whisrs.md](whisrs.md) |
 | **VS Code** | Editor de código | ⏳ | ⏳ | [vscode-github.md](vscode-github.md) |
 | **GitHub CLI** | Git desde terminal | ⏳ | ⏳ | [vscode-github.md](vscode-github.md) |

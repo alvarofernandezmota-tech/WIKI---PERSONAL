@@ -2,7 +2,7 @@
 
 > Inventario completo de máquinas y sus roles en el ecosistema.
 > **Frecuencia de actualización: al cambiar hardware o rol de una máquina.**
-> Última actualización: 12 junio 2026
+> Última actualización: 14 junio 2026
 
 ---
 
@@ -30,6 +30,15 @@
 | **IP Tailscale** | Pendiente instalar |
 | **Servicios** | Input Leap server · Ollama · Open WebUI |
 | **Uso** | Todo lo que requiere GPU o intervención manual |
+
+### Monitores de Madre
+
+| Monitor | Conector | Posición | Workspaces |
+|---|---|---|---|
+| **LG** | `HDMI-A-1` | Izquierda (principal) | 1–5 |
+| **Sharp** | `DP-1` | Derecha (secundario) | 6–10 |
+
+_Config completa de Hyprland: [setup/omarchy/hyprland.md](omarchy/hyprland.md)_
 
 ---
 
