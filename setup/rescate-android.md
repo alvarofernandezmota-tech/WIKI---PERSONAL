@@ -17,7 +17,7 @@ Crear un entorno híbrido **(Nativo Arch Linux + Virtualización Windows)** para
 |-------------|------|-----|--------|
 | **varopc** | x86 | PC principal (Arch Linux) | ✅ activo |
 | **Samsung (Madre)** | Exynos/Snapdragon | Servidor THDORA producción | ✅ activo |
-| **Redmi A5** | Unisoc T765 *(corregido de T7250)* | Objetivo rescate/FRP | 🔄 en proceso |
+| **Redmi A5** | Unisoc T765 (Qogirl6) | Objetivo rescate/FRP | 🔄 en proceso |
 
 ---
 
@@ -39,23 +39,22 @@ Crear un entorno híbrido **(Nativo Arch Linux + Virtualización Windows)** para
 
 ### Redmi A5
 - [x] Chip identificado: **Unisoc T765** (Qogirl6), modelo 25028RN03
-- [x] ROM descargada: `A15.0.26.0.VGWMIXM` (~4.54 GB)
-- [x] Script de flash analizado — confirma Unisoc por particiones `qogirl6_pubcp_MHM_customer_nvitem.bin`
-- [x] Bootloader bloqueado por Xiaomi OEM → `Err:0xffffffff` definitivo
-- [x] Recovery (ISO del móvil) dañado — no se puede usar para flashear
-- [ ] Handshake FDL1/FDL2 para desbloquear BROM
+- [x] ROM descargada y extraída: `A15.0.26.0.VGWMIXM` — ruta: `~/isos/redmi-a5/serenity_global_images_A15.0.26.0.VGWMIXM_15.0/`
+- [x] `.tgz` corrupto (EOF al final) pero imágenes críticas extraídas correctamente
+- [x] Bootloader bloqueado por Xiaomi OEM → fastboot completamente cerrado
+- [x] Recovery (ISO del móvil) dañado
+- [ ] Entrar en modo BROM con `sfd_tool`
 - [ ] Flasheo completo
 
 ---
 
-## 📦 Stack instalado (15/06/2026)
+## 📦 Stack instalado
 
 ```bash
 sudo pacman -S qemu-full libvirt virt-manager virt-install virt-viewer dnsmasq
 sudo systemctl enable --now libvirtd
 sudo usermod -aG libvirt $USER
 
-# Sesión tarde 15/06:
 sudo pacman -S android-tools android-udev usbutils
 sudo usermod -aG adbusers varopc
 newgrp adbusers
@@ -69,8 +68,26 @@ newgrp adbusers
 
 - **Versión:** `A15.0.26.0.VGWMIXM` (Android 15, MIUI Global, build 27/04/2026)
 - **Tamaño:** 4.54 GB | **Ruta:** `~/isos/redmi-a5/serenity_global.tgz`
+- **Estado:** Extraída con error EOF (archivo corrupto/descarga incompleta) pero imágenes principales presentes
+
+### Imágenes disponibles
+```
+blackbox.img, boot.img, cache.img, init_boot.img
+l_gdsp.img, l_modem.img, pm_sys.img, prodnv.img
+super.img (4.3GB), userdata.img, vbmeta*.img, vendor_boot.img
+logo.bin, fdl1-sign.bin, lk-fdl2-sign.bin, lk-sign.bin
+sml-sign.bin, teecfg-sign.bin, tos-sign.bin, u-boot-spl-16k-emmc-sign.bin
+qogirl6_pubcp_MHM_customer_deltanv.bin
+```
+
+### Imágenes faltantes (al final del .tgz corrupto)
+```
+dtbo.img, rescue.img, cust.img, l_ldsp.img, l_agdsp.img
+vbmeta_system_ext.img, qogirl6_pubcp_MHM_customer_nvitem.bin
+```
 
 ```bash
+# Descarga ROM oficial
 mkdir -p ~/isos/redmi-a5 && cd ~/isos/redmi-a5
 curl -L -C - -o serenity_global.tgz \
   "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/A15.0.26.0.VGWMIXM/serenity_global-images-A15.0.26.0.VGWMIXM-user-20260427.0000.00-15.0-global-26c6dc7975.tgz"
@@ -78,84 +95,60 @@ curl -L -C - -o serenity_global.tgz \
 
 ---
 
-## 🔬 Sesión 15/06/2026 tarde — Diagnóstico completo
+## 🔬 Sesión 15/06/2026 tarde — Diagnóstico completo y pivot a BROM
 
-### Contexto
-El Redmi A5 tiene el sistema roto y el recovery (ISO) también dañado. No se puede entrar a ajustes para activar depuración USB ni aceptar el diálogo de autorización ADB.
+### Metodología de diagnóstico (de arriba a abajo)
+1. Recovery → ❌ dañado
+2. ADB → ❌ `unauthorized` (pantalla rota, no se puede aceptar diálogo)
+3. `fastboot oem unlock` → ❌ `Err:0xffffffff`
+4. `fastboot flashing unlock` → ❌ `unknown cmd`
+5. Flash directo → ❌ `Flashing Lock Flag is locked. Please unlock it first!`
+6. `fastboot oem flashing_unlock` → ❌ `unknown cmd`
+7. `fastboot flashing unlock_critical` → ❌ `Not implement`
+8. **Conclusión: fastboot 100% cerrado por Xiaomi. Única salida: BROM via `sfd_tool`**
 
-### Metodología de diagnóstico
-Se procedió paso a paso desde lo más alto hasta lo más bajo:
-1. Intentar Recovery → dañado, no funciona
-2. Intentar ADB → `unauthorized` (pantalla rota, no se puede aceptar diálogo)
-3. Intentar desbloqueo fastboot → bloqueado por OEM Xiaomi
-4. Identificar chip por script de flash → confirmado Unisoc T765 / Qogirl6
-5. Concluir: única salida es EDL / SPRD Download Mode
+### Tabla de estado
 
-### Estado detectado
-
-| Componente | Estado | Detalle |
-|---|---|---|
-| ADB | ❌ `unauthorized` | Pantalla rota — no se puede aceptar diálogo |
-| `fastboot oem unlock` | ❌ `Err:0xffffffff` | Bootloader bloqueado por OEM Xiaomi |
-| `fastboot flashing unlock` | ❌ `unknown cmd` | No soportado en este firmware |
-| Modo fastboot | ✅ Funciona | Serial: `863d0058304831323851135e23407c` |
-| Recovery / ISO | ❌ Dañado | No arranca |
-| Sistema operativo | ❌ Roto | HyperOS corrupto |
-
-### Comandos ejecutados y resultados
-
-```bash
-# ADB — siempre unauthorized
-adb kill-server && adb devices
-# → 863d0058304831323851135e23407c  unauthorized
-
-adb reboot bootloader
-# → error: device unauthorized.
-# → This adb server's $ADB_VENDOR_KEYS is not set
-
-# Intento desbloqueo fastboot
-fastboot oem unlock
-# → FAILED (remote: 'Unlock failed - Err:0xffffffff')
-
-fastboot flashing unlock
-# → FAILED (remote: 'unknown cmd.')
-
-fastboot reboot
-# → Rebooting  OKAY [0.000s]  ← esto sí funciona
-```
-
-### Solución de permisos USB intentada (sin éxito por diseño)
-```bash
-sudo pacman -S android-udev        # crea grupo adbusers
-sudo usermod -aG adbusers varopc
-newgrp adbusers
-adb kill-server && adb devices
-# → sigue unauthorized (lógico: la pantalla no puede mostrar el diálogo)
-```
-
-### Identificación del chip por script de flash
-El script `.sh` de flash contiene referencias a:
-- `qogirl6_pubcp_MHM_customer_nvitem.bin` → **Unisoc Qogirl6 = T765** ✅
-- Particiones: `l_modem`, `l_gdsp`, `l_ldsp`, `l_agdsp`, `pm_sys` → arquitectura Unisoc
-- Particiones Android: `boot`, `vendor_boot`, `init_boot`, `dtbo`, `super`, `vbmeta*`
-
-### Diagnóstico final
-El `Err:0xffffffff` en Unisoc con Xiaomi/HyperOS es definitivo — el bootloader está cerrado a nivel OEM. No se puede desbloquear desde fastboot normal. Opciones:
-
-1. **MiUnlock oficial (Windows)** — requiere cuenta Mi vinculada + 72h de espera + sistema funcional → no viable
-2. **EDL / Spreadtrum Download Mode** — bypass total, flashea directo al hardware. Puede requerir credenciales servidor Xiaomi en algunos firmwares
-3. **Test Point (hardware)** — cortocircuitar puntos en la placa para forzar EDL sin autenticación
+| Comando | Resultado |
+|---|---|
+| `fastboot flash fbootlogo` | ❌ `Flashing Lock Flag is locked` |
+| `fastboot oem unlock` | ❌ `Err:0xffffffff` |
+| `fastboot flashing unlock` | ❌ `unknown cmd` |
+| `fastboot oem flashing_unlock` | ❌ `unknown cmd` |
+| `fastboot flashing unlock_critical` | ❌ `Not implement` |
+| `fastboot reboot` | ✅ funciona |
+| `fastboot devices` | ✅ detecta el serial |
+| `lsusb` en modo BROM | ❌ sin resultado (no entró en BROM) |
 
 ---
 
-## 🔄 Pipeline validado
+## 🔄 Pipeline validado (BROM con sfd_tool)
 
 ```
-1. CONEXIÓN EN FRÍO   → Apagado + Vol↓ + USB = modo BROM
-2. IDENTIFICACIÓN     → sfd_tool → chip_uid
-3. DUMP (OBLIGATORIO) → frp + persist + nvram
-4. ACCIÓN             → quitar FRP o reparar sistema
-5. VERIFICACIÓN       → reboot + validar AVB
+1. CONEXIÓN EN FRÍO   → Apagado + Vol↓ + USB = modo BROM (pantalla negra)
+2. VERIFICAR BROM     → lsusb | grep -i "1782\|spreadtrum\|unisoc\|sprd"
+3. IDENTIFICACIÓN     → sfd_tool → chip_uid
+4. DUMP (OBLIGATORIO) → frp + persist + nvram
+5. FLASH              → sfd_tool con ROM .pac o imágenes directas
+6. VERIFICACIóN       → reboot + validar AVB
+```
+
+### Comandos sfd_tool (próximos pasos)
+
+```bash
+# 1. Verificar BROM (móvil apagado + Vol↓ + USB)
+lsusb | grep -i "1782\|spreadtrum\|unisoc\|sprd"
+
+# 2. Identificar dispositivo
+cd ~/sfd_tool
+sudo ./sfd_tool --scan
+
+# 3. Dump de seguridad antes de flashear
+sudo ./sfd_tool --read frp --output ~/isos/redmi-a5/backup/frp.bin
+sudo ./sfd_tool --read persist --output ~/isos/redmi-a5/backup/persist.bin
+
+# 4. Flash con XML de la ROM
+sudo ./sfd_tool --flash ~/isos/redmi-a5/serenity_global_images_A15.0.26.0.VGWMIXM_15.0/images/serenity_k515_in.xml
 ```
 
 ---
@@ -163,10 +156,8 @@ El `Err:0xffffffff` en Unisoc con Xiaomi/HyperOS es definitivo — el bootloader
 ## 💻 VM Windows — passthrough USB
 
 ```bash
-# Identificar móvil en modo descarga
 lsusb
 # En virt-manager → Hardware → Add Hardware → USB Host Device
-# Seleccionar ID del móvil → Apply
 ```
 
 ---
@@ -182,11 +173,11 @@ lsusb
 
 ## ⏭️ Pendientes
 
-- [ ] Verificar integridad ROM tras descarga
-- [ ] Extraer FDL1/FDL2 del paquete
-- [ ] Probar EDL: apagar → Vol↓ + USB → verificar con `lsusb`
-- [ ] Buscar test point para Unisoc T765 / Qogirl6 (requiere abrir el móvil)
+- [ ] Entrar en BROM: apagar → Vol↓ + USB → verificar con `lsusb`
+- [ ] `sfd_tool --scan` para identificar dispositivo en BROM
+- [ ] Dump backup: frp + persist antes de flashear
+- [ ] Flash con `sfd_tool` usando `serenity_k515_in.xml`
+- [ ] Verificar imágenes faltantes (re-descargar ROM completa si falla)
 - [ ] Crear VM Windows en virt-manager
 - [ ] Configurar USB passthrough
-- [ ] Flashear Redmi A5 en modo BROM con sfd_tool
 - [ ] Documentar reinstalación Samsung (Madre)
