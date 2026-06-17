@@ -1,48 +1,33 @@
-# Proyectos
+# 📁 Proyectos
 
-> Índice de todos los proyectos. Fuente de verdad sobre qué está activo, pausado o archivado.
-> Última actualización: 12 junio 2026
-
----
-
-## Proyectos activos
-
-| Proyecto | Estado | Descripción | Archivo |
-|---|---|---|---|
-| **THDORA** | 🔄 Migrando | Bot Telegram personal con IA | `thdora.md` |
-| **Home Server** | 🔄 Construyendo | Servidor casa con Arch + Docker | `../setup/servidor/` |
+> Índice de todos los proyectos. Activos, pausados y archivados.
+> Última actualización: 17 junio 2026
 
 ---
 
-## Proyectos pausados
+## 🟢 Activos
 
-| Proyecto | Descripción | Archivo |
+| Proyecto | Archivo | Próximo paso |
 |---|---|---|
-| **Impresión 3D** | Proyectos de impresora | `impresion-3d.md` (pendiente crear) |
-| **Portfolio web** | Web personal | `portfolio-web.md` (pendiente crear) |
+| **thdora** (bot TOKI) | [thdora.md](thdora.md) | Merge v0.17.0 → main |
+| **yggdrasil-dew** (este repo) | — | Auditoría completa + Obsidian |
+| **Servidor Madre** | [../setup/servidor/README.md](../setup/servidor/README.md) | UFW + fail2ban |
+| **Redmi A5 rescate** | [redmi-a5.md](redmi-a5.md) | Flash EDL cuando termine ROM |
+| **HP rescate** | [hp-rescate.md](hp-rescate.md) | Verificar cables SATA |
+
+## 🟡 Pausados
+
+| Proyecto | Archivo | Motivo |
+|---|---|---|
+| **Impresión 3D** | [impresion-3d.md](impresion-3d.md) | Sin impresora activa |
+| **Formación Python** | — | Pendiente retomar (Kaggle) |
+
+## 📦 Archivados
+
+| Proyecto | Archivo | Motivo |
+|---|---|---|
+| Migración personal-v1 | [migracion-personal-v1.md](migracion-personal-v1.md) | Completado — ahora es yggdrasil-dew |
 
 ---
 
-## Proyectos archivados
-
-_Ninguno por ahora._
-
----
-
-## Plantilla para nuevo proyecto
-
-Usar `_proyecto.md` como base para cualquier proyecto nuevo.
-
----
-
-## Secciones estándar de cada proyecto
-
-Cada archivo de proyecto tiene estas secciones:
-
-```
-## Qué es        ← descripción y objetivo
-## Estado actual  ← dónde está ahora mismo
-## Decisiones     ← por qué se tomó cada decisión importante
-## TODO próximo  ← siguiente paso concreto
-## Historial      ← log de cambios relevantes
-```
+_Ver ecosistema completo: [../ECOSISTEMA.md](../ECOSISTEMA.md)_

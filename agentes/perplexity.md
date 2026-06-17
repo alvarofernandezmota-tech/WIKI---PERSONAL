@@ -1,55 +1,37 @@
-# Perplexity — Agente actual
+# 🔵 Perplexity — Ficha de Agente
 
-> Cómo uso Perplexity como agente sobre este repo. Junio 2026.
-
----
-
-## Setup actual
-
-- **Herramienta:** Perplexity AI con MCP GitHub
-- **Space configurado:** `Repo Personal` → apunta a `github.com/alvarofernandezmota-tech`
-- **Acceso:** Lee y escribe en repos GitHub en tiempo real
-- **Contexto:** Carga `AGENT.md` + `CONTEXT.md` al inicio de cada sesión relevante
+> Última actualización: 17 junio 2026
 
 ---
 
-## Cómo funciona el flujo
+## Rol
+
+Agente principal del ecosistema. Único con acceso MCP GitHub → puede leer y escribir en todos los repos directamente.
+
+## Capacidades clave
+
+| Capacidad | Uso concreto |
+|---|---|
+| MCP GitHub | Leer, crear, actualizar archivos en cualquier repo |
+| Búsqueda web en tiempo real | Verificar versiones, docs técnicas, noticias |
+| Contexto largo | Mantener hilo de sesión compleja |
+| Código | Python, bash, Docker, YAML, Markdown |
+
+## Cuándo usarlo
+
+- Actualizar repos y documentación
+- Auditorías de repos
+- Escribir scripts, configs, docker-compose
+- Crear/actualizar diarios
+- Cualquier tarea que acabe en un commit a GitHub
+
+## Prompt de arranque
 
 ```
-Yo hablo con Perplexity
-  → Perplexity lee AGENT.md (instrucciones)
-  → Lee CONTEXT.md (estado actual)
-  → Navega el repo según la pregunta
-  → Responde con contexto real
-  → Puede escribir/actualizar archivos con confirmación
+Lee AGENT.md y CONTEXT.md de yggdrasil-dew y dame el estado actual.
+Repo Space: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
 ```
 
----
+## Motor
 
-## Casos de uso activos
-
-- Actualizar `CONTEXT.md` semanalmente
-- Crear entradas de diario
-- Documentar proyectos y servicios
-- Auditar el repo y proponer mejoras
-- Consultar estado de proyectos/objetivos
-
----
-
-## Limitaciones actuales
-
-- No tiene acceso a la DB de THDORA directamente
-- No puede ejecutar código en los servidores
-- Cada sesión nueva pierde el hilo — depende de lo que esté en el repo
-- No es persistente entre sesiones salvo lo que se escribe en el repo
-
----
-
-## Próximo: Ollama local
-
-El objetivo es reemplazar/complementar Perplexity con un LLM local en el Ordenador Madre que:
-- Tenga acceso directo al repo clonado localmente
-- Use los diarios como contexto RAG
-- No dependa de internet ni de servicios externos
-
-→ Ver roadmap en `agentes/prompts.md` y `formacion/ia-local.md`
+Claude Sonnet 4.6 (vía Perplexity)

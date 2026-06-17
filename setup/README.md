@@ -1,32 +1,45 @@
-# Setup — Configuración de máquinas y servicios
+# 🛠️ Setup — Índice
 
-> Última actualización: 13 junio 2026
+> Documentación técnica del sistema. Referencia viva, no histórico.
+> Última actualización: 17 junio 2026
 
 ---
 
-## Archivos raíz de setup
+## 🖥️ Hardware
+
+| Máquina | Rol | Archivo |
+|---|---|---|
+| **Madre** | Servidor producción | [servidor/README.md](servidor/README.md) |
+| **varopc (Acer Theodora)** | PC desarrollo | [varopc.md](varopc.md) |
+| **HP TouchSmart** | Pendiente rescate | [../proyectos/hp-rescate.md](../proyectos/hp-rescate.md) |
+
+---
+
+## 📲 Software instalado
 
 | Archivo | Contenido |
 |---|---|
-| [equipos.md](equipos.md) | Hardware, specs y configuración de Madre y Acer |
-| [servicios.md](servicios.md) | Arquitectura completa — qué corre dónde |
+| [servidor/README.md](servidor/README.md) | Servicios Madre: Docker, thdora, Ollama, pendientes |
+| [varopc.md](varopc.md) | Software varopc: KVM, Arch, Hyprland, herramientas |
+| [obsidian.md](obsidian.md) | Instalación Obsidian + plugin Git |
 
 ---
 
-## Subcarpetas
+## 📋 Pendientes de setup
 
-| Carpeta | Contenido |
-|---|---|
-| [servidor/](servidor/README.md) | Todos los servicios, apps y protocolos del servidor |
-| [omarchy/](omarchy/) | Configuración Omarchy / dotfiles |
+### Madre
+- [ ] UFW + fail2ban
+- [ ] PostgreSQL
+- [ ] Uptime Kuma
+- [ ] Open WebUI
+- [ ] n8n
+- [ ] wayvnc autostart
+
+### varopc
+- [ ] Obsidian + plugin Git ← **HOY**
+- [ ] `sudo pacman -S wget`
+- [ ] VM Windows 11 en KVM (para lab Android)
 
 ---
 
-## Regla
-
-> Madre produce y sirve. Acer usa y gestiona.
-> Cada app tiene su propio archivo en `setup/servidor/`.
-
----
-
-_Volver al índice: [README.md](../README.md)_
+_Ver estado completo: [../CONTEXT.md](../CONTEXT.md)_
