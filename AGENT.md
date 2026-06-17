@@ -1,23 +1,42 @@
 # AGENT.md — Instrucciones para el Agente
 
 > **Este es el primer archivo que debes leer.** Todo lo demás se navega desde aquí.
-> Última actualización: 14 junio 2026
+> Última actualización: **17 junio 2026**
 
 ---
 
 ## Quién soy
 
-Álvaro Fernández Mota — técnico en sistemas y datos, 26 años, Madrid/España.
-Stack actual: Python, SQL, Linux (Arch/Omarchy), PostgreSQL, Docker.
-Estoy en transición hacia roles de datos/IA con foco en construir mi propio ecosistema técnico.
+Álvaro Fernández Mota — dev autodidacta, Madrid/España.
+Stack actual: Python · FastAPI · SQLAlchemy · Alembic · Docker · Telegram · Linux (Arch).
+Construyo lo que yo mismo necesito. Filosofía: *«Si no está en el repo, no existe.»*
 
-**Setup de máquinas:**
-- 🖥️ **Ordenador Madre** — workstation principal + servidor, Omarchy (Arch + Hyprland + Wayland), i5-8400, 16GB, GTX 1060 6GB
-- 🗄️ **Acer Aspire** — servidor 24/7, Arch Linux, Ryzen 5 5500U, 8GB
-- 💻 **MacBook** — portátil cliente, macOS
-- 🖥️ **HP TouchSmart** — monitor secundario / dashboards (pendiente OS)
+### Hardware real (junio 2026)
 
-**Red:** todos en la misma LAN. IPs: Acer = 10.176.119.171 · MacBook = 10.176.119.229 · Madre = pendiente IP fija.
+| Máquina | Rol | OS | IP Tailscale | IP Local |
+|---|---|---|---|---|
+| **Madre** | Servidor 24/7 producción | Linux | `100.91.112.32` | `10.134.31.228` |
+| **Acer Theodora (varopc)** | PC desarrollo principal | Arch Linux + Hyprland/Wayland | `100.86.119.102` | `10.134.31.171` |
+| **HP TouchSmart** | Pendiente rescate | — | — | — |
+
+> ⚠️ NO hay MacBook. El Acer Theodora es el único cliente de desarrollo.
+
+**Red:** Tailscale P2P entre Madre y Acer. AP Isolation en router bloquea UDP LAN (lan-mouse no funciona).
+
+---
+
+## Ecosistema de repos
+
+| Repo | Rol | URL |
+|---|---|---|
+| **yggdrasil-dew** | 🧠 Cerebro / second brain — fuente de verdad única | https://github.com/alvarofernandezmota-tech/yggdrasil-dew |
+| **thdora** | 🤖 Bot Telegram (TOKI) — producto principal | https://github.com/alvarofernandezmota-tech/thdora |
+| **ai-toolkit** | 🛠️ Stack herramientas dev IA | https://github.com/alvarofernandezmota-tech/ai-toolkit |
+| impresion-3d | Proyecto | https://github.com/alvarofernandezmota-tech/impresion-3d |
+| python-snippets | Formación | https://github.com/alvarofernandezmota-tech/python-snippets |
+| unix | Formación | https://github.com/alvarofernandezmota-tech/unix |
+
+**Regla de conexión:** cada repo referencia `yggdrasil-dew` en su README como fuente de verdad del ecosistema.
 
 ---
 
@@ -51,8 +70,6 @@ Esto aplica a todo el repo:
 - `formacion/python/` → no es "el historial del curso", es **curso + referencia de trabajo**
 - `proyectos/` → no es "lo que hice", es **documentación de decisiones técnicas activas**
 - `diarios/` → no es un diario personal, es **registro de decisiones y aprendizajes útiles**
-
-**Un ingeniero consulta su repo como consulta la documentación oficial — rápido, preciso, sin buscar entre carpetas de "cuándo lo aprendí".**
 
 ---
 
@@ -124,15 +141,16 @@ Cada carpeta es una tabla. Cada archivo es una fila. Cada sección (`##`) es un 
 ## Cómo navegar este repo
 
 ```
-1. CONTEXT.md           → estado actual HOY — empieza siempre aquí
-2. yo/perfil.md         → quién soy, cómo pienso, cómo trabajo
-3. yo/objetivos-2026.md → qué quiero conseguir este año
-4. filosofia.md         → principios técnicos — open source, control de datos
-5. proyectos/README.md  → índice de proyectos activos y pausados
-6. formacion/README.md  → áreas de aprendizaje activas
-7. setup/README.md      → infraestructura y hardware
-8. agentes/             → cómo funciona la capa IA, prompts, roles
-9. diarios/2026/        → memoria episódica — entradas diarias
+1. CONTEXT.md              → estado actual HOY — empieza siempre aquí
+2. yo/perfil.md            → quién soy, cómo pienso, cómo trabajo
+3. yo/objetivos-2026.md    → qué quiero conseguir este año
+4. filosofia.md            → principios técnicos — open source, control de datos
+5. proyectos/README.md     → índice de proyectos activos y pausados
+6. formacion/README.md     → áreas de aprendizaje activas
+7. setup/README.md         → infraestructura y hardware
+8. setup/servidor/README.md → servidor Madre — estado real y servicios
+9. agentes/                → cómo funciona la capa IA, prompts, roles
+10. diarios/2026/          → memoria episódica — entradas diarias
 ```
 
 ---
@@ -158,6 +176,7 @@ Cada carpeta es una tabla. Cada archivo es una fila. Cada sección (`##`) es un 
 - **Sugerir software propietario sin advertirlo explícitamente**
 - **Crear secciones nuevas** sin justificación — usar las estándar
 - **Tratar el histórico como referencia** — son capas distintas
+- **Referirse a `personal` o `personal-v2`** — el repo se llama `yggdrasil-dew`
 
 ### Fechas
 - Si la fecha actual no está disponible, preguntar antes de registrar nada
@@ -167,60 +186,50 @@ Cada carpeta es una tabla. Cada archivo es una fila. Cada sección (`##`) es un 
 
 ## Ecosistema IA dual — Cómo trabajan juntas las herramientas
 
-Álvaro trabaja con **dos IAs en paralelo**. Cada una tiene un rol diferente y complementario.
+Álvaro trabaja con **múltiples IAs en paralelo**. Cada una tiene un rol diferente y complementario.
 
-### 🔵 Perplexity (este agente)
-**Rol: conexión con GitHub + documentación + búsqueda**
+| IA | Rol | Estado |
+|----|-----|--------|
+| **Perplexity** (Claude Sonnet 4.6) | 🔵 Código · repos · arquitectura · docs · MCP GitHub | ✅ Principal |
+| **Grok** (xAI) | 🔴 Investigación · mercado · datos frescos · X/Twitter | ✅ Activo |
+| **Gemini 2.0 Pro** | 🟡 Contexto 1M tokens · código completo · estudios | ✅ Activo |
+| **OpenCode** | ⚙️ Agente código en terminal · orquestador multi-repo | ✅ Configurado |
+| **Mistral Le Chat** | 🟢 Investigación EU · privacidad | ⏳ Ficha parcial |
 
-| Capacidad | Uso concreto |
-|---|---|
-| MCP GitHub | Leer, crear y actualizar archivos del repo directamente |
-| Búsqueda web en tiempo real | Verificar versiones, docs técnicas, noticias |
-| Diarios y tracking | Crear entradas diarias en `diarios/2026/` |
-| Documentación técnica | Escribir READMEs, fichas de proyecto, CONTEXT.md |
-| Auditoría del repo | Revisar estructura, detectar duplicados, proponer mejoras |
-
-### 🔴 Gemini (Google)
-**Rol: diseño técnico + voz + visual + documentos largos**
-
-| Capacidad | Uso concreto |
-|---|---|
-| Razonamiento técnico profundo | Diseño de infraestructura, arquitectura de sistemas |
-| Integración ecosistema Google | Google Docs, Drive, Calendar, Gmail |
-| Interacción por voz | Dictar notas, comandos por voz |
-| Visual / multimodal | Analizar imágenes, diagramas, capturas |
-| OCR y análisis de documentos | Fotos de libros, apuntes manuscritos → texto |
-
-### 🔄 Protocolo de handoff
+### Protocolo de handoff
 
 ```
-Gemini diseña → Álvaro copia resultado → Perplexity sube al repo
-Perplexity audita → Álvaro lleva contexto a Gemini → Gemini desarrolla
+Grok (investiga) → Perplexity (valida + sube al repo)
+Gemini (diseña / código largo) → Perplexity (sube al repo)
+Perplexity (audita repo) → output al resto de IAs como contexto
 ```
 
-**Regla:** output final en GitHub → pasa por Perplexity. Voz/visual/Google → pasa por Gemini.
+**Regla:** output final en GitHub → pasa por Perplexity (tiene MCP GitHub).
 
 ---
 
-## Roadmap servidor casa (junio 2026)
+## Roadmap servidor Madre (junio 2026)
 
 ```
-FASE 1 — Conectividad (AHORA)
-  ├── Tailscale instalado en Madre + Acer (IPs fijas 100.x.x.x)
-  ├── SSH entre máquinas
-  └── Input Leap con systemd + UFW
+FASE 1 — Acceso (COMPLETADO ✅)
+  ├── Tailscale instalado (Madre + Acer)
+  ├── SSH operativo
+  └── Docker operativo + thdora en producción
 
-FASE 2 — Seguridad
-  ├── TLS en Input Leap
+FASE 2 — Seguridad (PENDIENTE ⏳)
+  ├── UFW en Madre
   ├── fail2ban
-  └── Headscale (servidor Tailscale self-hosted)
+  └── wayvnc autostart
 
-FASE 3 — Servicios
-  ├── Ollama + Open WebUI (GTX 1060)
-  ├── PostgreSQL en Acer
-  ├── THDORA migrado
-  └── Pi-hole
+FASE 3 — Servicios (PLANIFICADO 🟢)
+  ├── PostgreSQL
+  ├── Open WebUI (RAG sobre yggdrasil-dew)
+  ├── Uptime Kuma
+  ├── Pi-hole
+  └── n8n (diario nocturno automático)
 ```
+
+> Ver detalle: [setup/servidor/README.md](setup/servidor/README.md)
 
 ---
 
@@ -235,10 +244,12 @@ FASE 3 — Servicios
 | ¿En qué proyectos trabaja? | `proyectos/README.md` |
 | ¿Qué está aprendiendo? | `formacion/README.md` |
 | ¿Cómo está montado el setup técnico? | `setup/README.md` |
-| ¿Cómo funciona el servidor? | `setup/servidor/README.md` |
+| ¿Cómo está el servidor Madre? | `setup/servidor/README.md` |
 | ¿Qué pasó hoy/esta semana? | `diarios/2026/` |
 | ¿Cómo uso cada IA? | `agentes/` |
+| ¿Qué repos hay y para qué? | `ECOSISTEMA.md` |
 
 ---
 
 _Frecuencia de actualización de este archivo: mensual o cuando cambia la estructura del sistema._
+_Última actualización: 17 junio 2026_
