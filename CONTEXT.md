@@ -1,146 +1,77 @@
-# CONTEXT.md — Estado actual del sistema
+# CONTEXT.md — Estado HOY
 
-> Actualizar al inicio de cada sesión con una IA.
-> Última actualización: **17 junio 2026 · 15:29 CEST**
+> Actualizar cada sesión. Este fichero es el "resumen ejecutivo" del ecosistema.
+> Última actualización: **20 junio 2026 — 00:36 CEST**
 
 ---
 
-## 🧠 Repos del ecosistema
+## ¿Dónde estamos?
 
-| Repo | Rol | URL |
+### THDORA
+- Versión: **v0.22.1** en rama `main`
+- Stack Docker en Madre: **6/6 contenedores arriba** ✅
+- API FastAPI (`thdora`): **healthy** en puerto 8000 ✅
+- Bot Telegram (`thdora-bot`): **Up pero en restart loop** ⚠️
+  - Causa: `langgraph.checkpoint.sqlite` no instalado en imagen vieja
+  - Fix: hacer `git pull + docker compose up -d --build` en Madre
+  - Pendiente confirmar que arranque limpio
+- CI/CD (`deploy.yml`): ✅ correcto, tiene `--build` y notificación Telegram
+- Tests CI (`tests.yml`): ✅ vars dummy inyectadas, no necesita credenciales reales
+
+### Yggdrasil-dew
+- Carpeta `osint/` creada ✅
+- `setup/obsidian.md` documentado ✅
+- Obsidian en varopc: ⏳ **PENDIENTE INSTALAR**
+- Open WebUI en Madre: ⏳ pendiente
+
+### varopc (Acer Theodora)
+- Obsidian: ⏳ **PENDIENTE** (`yay -S obsidian`)
+- Repo yggdrasil-dew clonado en varopc: ❓ verificar
+- nmap / theHarvester: ⏳ instalar cuando Obsidian esté
+
+### Madre (servidor)
+- Docker + docker-compose: ✅
+- Tailscale: ✅
+- UFW + fail2ban: ⏳ pendiente
+- Open WebUI: ⏳ pendiente
+- tmux: instalar para builds largos sin perder sesión SSH
+
+---
+
+## Próximos pasos en orden
+
+### 🔴 Urgente (mañana)
+1. SSH a Madre → `git pull origin main` → `docker compose up -d --build` → verificar bot
+2. `docker compose logs --tail=30 bot` → confirmar que no hay error `langgraph`
+3. Probar `/start` en Telegram → ver si TOKI responde
+
+### 🟡 Importante (esta semana)
+4. Instalar Obsidian en varopc: `yay -S obsidian`
+5. Abrir vault: `~/repos/yggdrasil-dew`
+6. Instalar plugin Git en Obsidian
+7. Primer commit desde Obsidian → verificar sync con GitHub
+
+### 🟢 Planificado
+8. nmap en varopc → primer OSINT real red de casa → guardar en `osint/resultados/`
+9. Open WebUI en Madre (Docker)
+10. UFW + fail2ban en Madre
+11. Handler `/diario` en thdora → escribir en Ygg desde Telegram
+12. n8n en Docker (automatización)
+
+---
+
+## Stack tecnológico activo
+
+| Herramienta | Dónde | Estado |
 |---|---|---|
-| **yggdrasil-dew** | Cerebro / second brain — fuente de verdad | https://github.com/alvarofernandezmota-tech/yggdrasil-dew |
-| **thdora** | Bot Telegram (TOKI) — producto principal | https://github.com/alvarofernandezmota-tech/thdora |
-| **ai-toolkit** | Stack herramientas dev IA | https://github.com/alvarofernandezmota-tech/ai-toolkit |
-
-> 📖 Ecosistema completo: [ECOSISTEMA.md](ECOSISTEMA.md)
-> 🖥️ Setup servidor Madre: [setup/servidor/README.md](setup/servidor/README.md)
-
----
-
-## Equipos
-
-| Máquina | Rol | IP Tailscale | IP Local | Estado |
-|---|---|---|---|---|
-| **Madre** | Servidor — torre fija | `100.91.112.32` | `10.134.31.228` | ✅ Operativa, sshd activo |
-| **Acer (Theodora / varopc)** | Cliente — portátil dev | `100.86.119.102` | `10.134.31.171` | ✅ Operativo, Arch Linux + Hyprland |
-| **HP** | Pendiente rescate | — | — | ❌ BIOHD-8, disco no detectado |
+| THDORA (API + bot) | Madre | ⚠️ API ok, bot restart loop |
+| Prometheus + Grafana | Madre | ✅ corriendo |
+| Tailscale | varopc + Madre | ✅ |
+| Ollama | varopc + Madre | ✅ |
+| Obsidian | varopc | ⏳ instalar |
+| Open WebUI | Madre | ⏳ pendiente |
+| n8n | Madre | ⏳ pendiente |
 
 ---
 
-## Bloqueante actual
-
-```
-AP Isolation en el router bloquea tráfico UDP entre Madre y Acer.
-Impide que lan-mouse funcione por red local.
-Requiere acceso al panel de configuración del router.
-```
-
----
-
-## Estado del servidor Madre — Pirámide de Resiliencia
-
-| Capa | Objetivo | Estado |
-|---|---|---|
-| 0 — Acceso | sshd + wayvnc + Tailscale | ✅ Tailscale ✅ · SSH ✅ |
-| 1 — Blindaje | UFW + fail2ban | ⚠️ UFW Acer ✅ · Madre ⏳ pendiente |
-| 2 — Auditoría | lynis + journald + btop | ⏳ Pendiente |
-| 3 — Aislamiento | Docker + contenedores | ✅ Docker Madre operativo |
-
-> 📋 Plan detallado del servidor: [setup/servidor/README.md](setup/servidor/README.md)
-
----
-
-## Servicios instalados (estado real)
-
-| Servicio | Host | Estado |
-|---|---|---|
-| Tailscale | Madre + Acer | ✅ Activo |
-| sshd | Madre | ✅ Activo |
-| wayvnc | Madre | ⚠️ Instalado, sin autostart |
-| UFW | Acer | ✅ Activo |
-| UFW | Madre | ⏳ Pendiente |
-| whisrs | Acer | ✅ Instalado, Super+V |
-| lan-mouse | Madre + Acer | ⚠️ Config lista, bloqueado por AP Isolation |
-| Docker | Madre | ✅ Operativo |
-| **THDORA** | Madre | ✅ En producción (v0.17.0 — pendiente merge a main) |
-| Ollama | Madre | ✅ Instalado — llama3.2:3b |
-| Ollama | Acer (varopc) | ✅ qwen2.5-coder:14b · deepseek-r1:14b · qwen3:8b |
-| KVM/virt-manager | Acer (varopc) | ✅ Instalado · libvirtd activo |
-| wget | Acer (varopc) | ⏳ Pendiente instalar |
-| PostgreSQL | Madre | ⏳ Pendiente |
-| Pi-hole | Madre | ⏳ Pendiente |
-| Uptime Kuma | Madre | ⏳ Pendiente |
-| Open WebUI | Madre | ⏳ Planificado |
-| Obsidian | Acer | ⏳ Planificado |
-| n8n | Madre | ⏳ Documentado en ai-toolkit, sin levantar |
-
----
-
-## Proyectos activos
-
-| Proyecto | Repo | Estado | Próximo paso |
-|---|---|---|---|
-| **THDORA** | [thdora](https://github.com/alvarofernandezmota-tech/thdora) | ✅ v0.17.0 rama activa, pendiente merge | Añadir secrets CI/CD + alembic upgrade + merge |
-| **yggdrasil-dew** | [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ✅ Vault central activo | Instalar Obsidian + plugin Git |
-| **ai-toolkit** | [ai-toolkit](https://github.com/alvarofernandezmota-tech/ai-toolkit) | ✅ Activo | Corregir CEREBRO.md (ref. `personal` → `yggdrasil-dew`) |
-| **Servidor Madre** | yggdrasil-dew/setup/servidor/ | 🔧 Setup en curso | UFW + PostgreSQL + completar servicios |
-| **Redmi A5** | yggdrasil-dew/setup/ | ⏳ Descargando ROM (curl en curso) | Flash EDL cuando termine descarga |
-| **Python** | — | ⏳ Pendiente retomar | Kaggle primera lección |
-
----
-
-## Flujo IA actual (roles confirmados)
-
-| IA | Rol | Estado |
-|----|-----|--------|
-| **Claude Sonnet 4.6** (vía Perplexity) | Código · repos · arquitectura · docs · contexto largo | ✅ Principal |
-| **Grok** (xAI) | Investigación · mercado · datos frescos · X/Twitter | ✅ Activo |
-| **Gemini 2.0 Pro** | Contexto 1M tokens · código completo · estudios | ✅ Activo |
-| **OpenCode** | Agente código en terminal · orquestador multi-repo | ✅ Configurado |
-| **Mistral Le Chat** | Investigación EU · privacidad | ⏳ Ficha parcial |
-
-**Flujo investigación:** Grok (brutal, datos frescos) → Perplexity (valida + estructura) → Claude (arquitectura + código) → Gemini (implementación código completo)
-
----
-
-## Ecosistema conectado — Flujo vivo
-
-```
-📱 Telegram (/diario texto...)
-    ↓ handler /diario (por implementar en thdora)
-🤖 thdora → GitHub Contents API → yggdrasil-dew/diarios/YYYY-MM-DD.md
-    ↓
-👁️ Obsidian (plugin Git) → edición visual + RAG local (Ollama)
-    ↓
-🧠 Open WebUI → chateas con todo tu historial (RAG nativo Markdown)
-    ↓
-🛠️ OpenCode → código más personalizado con contexto tuyo
-    ↓
-⚙️ GitHub Actions 23:00 → resumen nocturno → commit → Telegram notify
-```
-
-**Decisiones tomadas:**
-- `yggdrasil-dew` = fuente de verdad única del ecosistema
-- `thdora` = el bot que ejecuta, lee contexto de yggdrasil-dew
-- `ai-toolkit/diario/` = changelog técnico del stack (NO diario personal)
-- Handler /diario usará GitHub Contents API (sin Git local en contenedor)
-- Raíz de yggdrasil-dew = raíz del vault Obsidian
-
----
-
-## Contexto para IAs
-
-- **Usuario:** Álvaro Fernández Mota — dev autodidacta, Madrid
-- **Entorno:** Red P2P Tailscale · Hyprland/Wayland · Docker en Madre · Arch Linux en Acer
-- **Enfoque:** Sistemas · automatización · agentes IA personales · second brain Git-first
-- **Regla:** Si no está en el repo, no existe
-- **THDORA:** Bot Telegram en Madre. v0.17.0 en rama `feature/v0.17.0-nlp-llm-multiuser`, pendiente merge.
-- **Stack LLM local Madre:** Ollama llama3.2:3b (CPU) · THDORA usa GroqBackend + OllamaBackend (fallback)
-- **Stack LLM local Acer:** LiteLLM proxy :8000 · OpenCode configurado · qwen2.5-coder:14b
-
----
-
-_Ver ecosistema completo: [ECOSISTEMA.md](ECOSISTEMA.md)_
-_Ver setup servidor: [setup/servidor/README.md](setup/servidor/README.md)_
-_Última actualización: 17 junio 2026 — 15:29 CEST_
+_Mantenido por Perplexity (Claude Sonnet 4.6) vía MCP GitHub · 20 junio 2026_
