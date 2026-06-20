@@ -1,79 +1,79 @@
-# 💻 varopc (Acer Theodora) — Setup
-
-> PC de desarrollo principal.
-> Última actualización: 17 junio 2026
+# 💻 varopc — Acer Theodora
 
 ---
+tags: [setup, hardware, varopc, arch]
+fecha-actualizacion: 2026-06-20
+---
+
+## Qué es
+
+PC de desarrollo principal. El único cliente activo del ecosistema.
+Nombre real de máquina: **Acer Theodora**. Alias en el sistema: **varopc**.
+
+> ⚠️ No hay MacBook. Este es el único equipo de desarrollo.
 
 ## Hardware
 
-| Campo | Valor |
+| Componente | Detalle |
 |---|---|
-| Nombre | varopc / Acer Theodora |
-| CPU | Ryzen 5 5500U |
-| RAM | 8GB |
-| OS | Arch Linux + Hyprland/Wayland (Omarchy) |
+| Modelo | Acer Theodora |
+| OS | Arch Linux |
+| Escritorio | Hyprland / Wayland |
 | IP Tailscale | `100.86.119.102` |
 | IP local | `10.134.31.171` |
 
----
+> Hardware interno (CPU/RAM/disco): **pendiente documentar** — hacer `neofetch` o `inxi -F` y añadir aquí.
 
-## Software instalado
+## Para qué se usa
 
-| Herramienta | Estado | Notas |
-|---|---|---|
-| Arch Linux + Hyprland | ✅ | Omarchy |
-| Tailscale | ✅ | IP `100.86.119.102` |
-| UFW | ✅ | Activo |
-| whisrs | ✅ | Voz — Super+V |
-| Docker | ✅ | Instalado |
-| Git | ✅ | Nativo |
-| Python 3 | ✅ | Nativo |
-| KVM / QEMU | ✅ | qemu-full + virt-manager |
-| libvirtd | ✅ | Activo y habilitado |
-| Ollama | ✅ | qwen2.5-coder:14b · deepseek-r1:14b · qwen3:8b |
-| LiteLLM proxy | ✅ | Puerto :8000 |
-| OpenCode | ✅ | Configurado con opencode.json |
-| curl | ✅ | Nativo |
-| wget | ⏳ Pendiente | `sudo pacman -S wget` |
-| Obsidian | ⏳ Pendiente | Ver [obsidian.md](obsidian.md) |
+- Desarrollo activo: Python, FastAPI, Docker, Git
+- Obsidian — vault `~/Projects/yggdrasil-dew`
+- Terminal: Hyprland + Wayland
+- SSH a Madre vía Tailscale
+- IAs: Perplexity (principal), Claude, Gemini, Grok, ChatGPT
 
----
+## Programas instalados (relevantes)
 
-## Red
-
-- Tailscale P2P con Madre ✅
-- AP Isolation en router bloquea UDP LAN → lan-mouse no funciona ⚠️
-- Solución: desactivar AP Isolation en panel router
-
----
-
-## Lab Android (varopc)
-
-| Herramienta | Estado |
+| Programa | Para qué |
 |---|---|
-| sfd_tool | ✅ Compilado y funcionando |
-| mtkclient | ✅ Instalado |
-| KVM para Windows VM | ✅ Listo |
-| ROM Redmi A5 | ⏳ Descargando (curl en curso) |
+| Obsidian v1.12.7 | Vault yggdrasil-dew — segundo cerebro |
+| Docker | Desarrollo local (si aplica) |
+| Ollama | Modelos LLM locales |
+| tmux v3.6_b-2 | Sesiones persistentes en terminal |
+| yay | AUR helper de Arch Linux |
+| Git | Control de versiones |
+| SSH | Conexión a Madre |
+| nmap | OSINT / auditoría red — ⏳ instalar |
+| theHarvester | OSINT — ⏳ instalar |
 
----
+## Rutas importantes
 
-## Próximos pasos
+| Ruta | Contenido |
+|---|---|
+| `~/Projects/yggdrasil-dew/` | Vault Obsidian + cerebro |
+| `~/Projects/` | Repos de desarrollo |
+| `~/dev/` | (verificar contenido) |
+| `~/Downloads/` | Descargas |
+
+## Conectar a Madre
 
 ```bash
-# 1. wget
-sudo pacman -S wget
+# Siempre por Tailscale (funciona aunque estén en la misma LAN)
+ssh alvaro@100.91.112.32
 
-# 2. Obsidian
-yay -S obsidian
-# Abrir vault: ~/repos/yggdrasil-dew
-
-# 3. Clonar yggdrasil-dew para Obsidian
-mkdir -p ~/repos
-git clone git@github.com:alvarofernandezmota-tech/yggdrasil-dew.git ~/repos/yggdrasil-dew
+# Antes de builds largos — abrir tmux primero
+tmux new -s deploy
 ```
+
+> ⚠️ AP Isolation en el router bloquea UDP LAN — lan-mouse no funciona por LAN.
+> Tailscale P2P funciona correctamente.
+
+## Próximo paso
+
+- [ ] Ejecutar `inxi -F` y documentar CPU/RAM/disco aquí
+- [ ] Instalar nmap y theHarvester
+- [ ] Configurar plugin Git en Obsidian
 
 ---
 
-_Parte de [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)_
+_Ver también: [[setup/madre]] · [[setup/red]] · [[HOME]]_

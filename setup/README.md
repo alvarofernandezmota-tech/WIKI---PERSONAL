@@ -1,45 +1,52 @@
-# 🛠️ Setup — Índice
+# ⚙️ Setup — Infraestructura y Hardware
 
-> Documentación técnica del sistema. Referencia viva, no histórico.
-> Última actualización: 17 junio 2026
+> Referencia técnica viva del sistema. No es historial — es documentación consultable hoy.
+> Actualizar cuando cambie cualquier configuración real.
 
 ---
 
-## 🖥️ Hardware
+## Máquinas
 
-| Máquina | Rol | Archivo |
+| Archivo | Máquina | Rol |
 |---|---|---|
-| **Madre** | Servidor producción | [servidor/README.md](servidor/README.md) |
-| **varopc (Acer Theodora)** | PC desarrollo | [varopc.md](varopc.md) |
-| **HP TouchSmart** | Pendiente rescate | [../proyectos/hp-rescate.md](../proyectos/hp-rescate.md) |
+| [[setup/varopc]] | Acer Theodora | PC desarrollo principal |
+| [[setup/madre]] | Servidor Madre | Producción 24/7 |
+| [[setup/red]] | Red / Tailscale | Conectividad entre máquinas |
+
+## Estado rápido (20 jun 2026)
+
+| Servicio | Dónde | Estado |
+|---|---|---|
+| THDORA API + bot | Madre | ✅ healthy |
+| Prometheus + Grafana | Madre | ✅ corriendo |
+| Tailscale | varopc + Madre | ✅ |
+| Ollama | varopc + Madre | ✅ |
+| Obsidian | varopc | ✅ instalado |
+| Open WebUI | Madre | ⏳ pendiente |
+| UFW + fail2ban | Madre | ⏳ pendiente |
+| n8n | Madre | ⏳ pendiente |
+
+## Roadmap servidor Madre
+
+```
+FASE 1 — Acceso ✅
+  ├── Tailscale instalado
+  ├── SSH operativo
+  └── Docker + thdora en producción
+
+FASE 2 — Seguridad ⏳
+  ├── UFW
+  ├── fail2ban
+  └── wayvnc autostart
+
+FASE 3 — Servicios 🟢
+  ├── PostgreSQL
+  ├── Open WebUI (RAG sobre yggdrasil-dew)
+  ├── Uptime Kuma
+  ├── Pi-hole
+  └── n8n (diario nocturno automático)
+```
 
 ---
 
-## 📲 Software instalado
-
-| Archivo | Contenido |
-|---|---|
-| [servidor/README.md](servidor/README.md) | Servicios Madre: Docker, thdora, Ollama, pendientes |
-| [varopc.md](varopc.md) | Software varopc: KVM, Arch, Hyprland, herramientas |
-| [obsidian.md](obsidian.md) | Instalación Obsidian + plugin Git |
-
----
-
-## 📋 Pendientes de setup
-
-### Madre
-- [ ] UFW + fail2ban
-- [ ] PostgreSQL
-- [ ] Uptime Kuma
-- [ ] Open WebUI
-- [ ] n8n
-- [ ] wayvnc autostart
-
-### varopc
-- [ ] Obsidian + plugin Git ← **HOY**
-- [ ] `sudo pacman -S wget`
-- [ ] VM Windows 11 en KVM (para lab Android)
-
----
-
-_Ver estado completo: [../CONTEXT.md](../CONTEXT.md)_
+_Frecuencia: actualizar cuando cambie config real. Ver [[AGENT]] para reglas del sistema._

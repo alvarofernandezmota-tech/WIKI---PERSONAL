@@ -1,108 +1,91 @@
-# Madre — Workstation Principal
-
-> Máquina principal. Workstation + GPU + servidor + dos monitores.
-> Última actualización: 14 junio 2026
+# 🖥️ Madre — Servidor de producción
 
 ---
+tags: [setup, hardware, servidor, docker, produccion]
+fecha-actualizacion: 2026-06-20
+---
+
+## Qué es
+
+Servidor doméstico 24/7. Corre todos los servicios del ecosistema en producción.
+Nombre: **Madre**. Es el único servidor activo.
 
 ## Hardware
 
 | Componente | Detalle |
 |---|---|
-| CPU | Intel Core i5-8400 |
-| RAM | 16 GB |
-| GPU | NVIDIA GTX 1060 6GB |
-| OS | Arch Linux / Omarchy (Hyprland + Wayland) |
-| Hostname | `madre` / `varopc` |
-| IP LAN | pendiente IP fija |
+| OS | Linux |
 | IP Tailscale | `100.91.112.32` |
+| IP local | `10.134.31.228` |
+| Hardware interno | **pendiente documentar** — hacer `inxi -F` en Madre y añadir aquí |
 
----
+> Hardware (CPU/RAM/disco): pendiente. Conectar por SSH y ejecutar `inxi -F` o `neofetch`.
 
-## Monitores
+## Cómo conectar
 
-| ID | Nombre | Modelo | Resolución activa | Conexión | Rol |
-|---|---|---|---|---|---|
-| 0 | `HDMI-A-1` | Sharp HDMI (82cm x 46cm) | 1280x720@50Hz | HDMI | Secundario |
-| 1 | `DP-1` | LG TV (115cm x 65cm) | 1440x900@60Hz | DisplayPort | Principal (focused) |
-
-**Nota:** DP-1 tiene scale 2.0. Soporta hasta 1920x1080@60Hz.
-Si se quiere cambiar resolución del LG a 1080p:
 ```bash
-wlr-randr --output DP-1 --mode 1920x1080@60Hz
-# o en hyprland.conf:
-monitor=DP-1,1920x1080@60,0x0,2
+# Desde varopc — siempre por Tailscale
+ssh alvaro@100.91.112.32
+
+# Si vas a hacer un build largo, abre tmux primero
+tmux new -s deploy
+cd <ruta-repo-thdora>
+git pull
+docker compose up -d --build
 ```
 
----
+> ⚠️ Si SSH se corta durante un build, Docker sigue corriendo en background.
+> tmux evita perder la sesión si se cae la conexión.
 
-## Workspaces Hyprland
+## Servicios corriendo
 
-**Config aplicada** en `~/.config/hypr/hyprland.conf`:
+| Servicio | Puerto | Estado | Para qué |
+|---|---|---|---|
+| thdora API (FastAPI) | 8000 | ✅ healthy | Backend del bot TOKI |
+| thdora-bot | — | ✅ healthy | Bot Telegram (polling) |
+| Prometheus | 9090 | ✅ up | Métricas |
+| Grafana | 3000 | ✅ up | Dashboard métricas |
+| Ollama | 11434 | ✅ up | LLM local |
+| Open WebUI | — | ⏳ pendiente | RAG sobre yggdrasil-dew |
+| PostgreSQL | — | ⏳ pendiente | Base de datos thdora |
+| Uptime Kuma | — | ⏳ pendiente | Monitoreo servicios |
+| Pi-hole | — | ⏳ pendiente | DNS + bloqueo anuncios |
+| n8n | — | ⏳ pendiente | Automatización / diario nocturno |
+| UFW | — | ⏳ pendiente | Firewall |
+| fail2ban | — | ⏳ pendiente | Protección SSH |
 
-```
-workspace = 1, monitor:DP-1
-workspace = 2, monitor:DP-1
-workspace = 3, monitor:DP-1
-workspace = 4, monitor:DP-1
-workspace = 5, monitor:DP-1
-workspace = 6, monitor:HDMI-A-1
-workspace = 7, monitor:HDMI-A-1
-workspace = 8, monitor:HDMI-A-1
-workspace = 9, monitor:HDMI-A-1
-workspace = 10, monitor:HDMI-A-1
-```
+## Rutas en Madre
 
-| Monitor | Workspaces | Uso sugerido |
-|---|---|---|
-| DP-1 (LG, principal) | 1–5 | Trabajo principal: editor, terminal, browser |
-| HDMI-A-1 (Sharp, secundario) | 6–10 | Referencia, documentación, música, dashboards |
+| Ruta | Contenido |
+|---|---|
+| Repo thdora | **pendiente documentar** — hacer `find ~ -name docker-compose.yml` |
 
-**Para recargar sin reiniciar:**
+> Pendiente: conectar a Madre y anotar la ruta exacta del repo aquí.
+
+## Comandos útiles
+
 ```bash
-hyprctl reload
+# Ver estado de todos los contenedores
+docker compose ps
+
+# Ver logs del bot
+docker compose logs --tail=50 thdora-bot
+
+# Rebuild completo
+git pull && docker compose up -d --build
+
+# Ver salud de un contenedor
+docker inspect thdora-bot --format='{{json .State.Health}}'
 ```
 
----
+## Próximos pasos
 
-## Software instalado
-
-| Software | Estado | Notas |
-|---|---|---|
-| Omarchy (Hyprland + Wayland) | ✅ | OS base |
-| zsh | ✅ | Shell principal |
-| Starship | ✅ | Prompt |
-| Tailscale | ✅ | IP `100.91.112.32` |
-| fail2ban | ✅ | jail sshd activo |
-| whisrs | ✅ | Dictado por voz, keybind Super+V |
-| SSH server (sshd) | ✅ | Accesible desde Acer |
-| Docker | ⏳ Pendiente | Para desplegar thdora |
-| Ollama + Open WebUI | ⏳ Pendiente | GPU GTX 1060 |
-| UFW firewall | ⏳ Pendiente | |
+- [ ] Documentar hardware real (`inxi -F`)
+- [ ] Documentar ruta exacta del repo thdora
+- [ ] Instalar tmux en Madre
+- [ ] UFW + fail2ban (Fase 2 del roadmap)
+- [ ] Open WebUI en Docker
 
 ---
 
-## Rol en el ecosistema
-
-- **Produce y sirve** — todo el trabajo ocurre aquí
-- **GPU disponible** para Ollama (inferencia local)
-- **Servidor de servicios** — thdora, futuros contenedores Docker
-- Si Madre peta → Acer sigue vivo, GitHub tiene todo
-
----
-
-## Pendiente
-
-- [ ] IP fija en LAN
-- [ ] UFW firewall
-- [ ] `sshd_config` hardening (`PasswordAuthentication no`)
-- [ ] Docker instalado
-- [ ] thdora desplegado con `docker compose up -d`
-- [ ] Ollama + Open WebUI con GTX 1060
-- [ ] Cambiar resolución DP-1 a 1920x1080 si se desea
-- [ ] Workspaces config aplicada y probada
-
----
-
-_Ver `acer.md` para la máquina de backup._
-_Ver `setup/servidor/` para servicios desplegados._
+_Ver también: [[setup/varopc]] · [[setup/red]] · [[proyectos/thdora]] · [[HOME]]_
