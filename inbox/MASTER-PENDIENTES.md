@@ -38,15 +38,17 @@ revision: cada-domingo
 - [ ] Verificar contenido `~/dev/` — qué hay ahí
 
 ### varopc — escritorio (sesión tarde9)
-- [ ] **Volumen** → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland (primero verificar con `pactl info` si usa PipeWire o PulseAudio)
-- [ ] **Tercera pantalla** → conectar 3er monitor por DVI-D (necesita adaptador DVI-D → HDMI si solo tiene HDMI)
+- [ ] **Volumen** → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland · usa PipeWire 1.6.5
+- [ ] **Tercera pantalla** → comprar adaptador DVI-D (macho) → HDMI (hembra) ~3-5€, luego conectar y añadir línea en monitors.conf
 - [ ] **Setup completo madre** → documentar hardware, particiones y servicios en `setup/madre.md`
 - [ ] ✅ ~~Monitores DP-1 + HDMI-A-1 scale 1~~ → resuelto
 - [ ] ✅ ~~Sony Bravia overscan~~ → Full Pixel activado desde menú TV
 - [ ] ✅ ~~Salvapantallas hypridle~~ → listeners comentados
 
 ### Madre — servidor
-- [ ] SSH: `ssh alvaro@100.91.112.32` → documentar ruta repo thdora (`find ~ -name docker-compose.yml`)
+- [ ] ✅ ~~UFW: regla SSH añadida~~ → puerto 22 ALLOW · firewall recargado
+- [ ] ✅ ~~fail2ban~~ → active (running) desde 18:23 · enabled
+- [ ] SSH: documentar ruta repo thdora (`find ~ -name docker-compose.yml`)
 - [ ] Documentar OS actual: `uname -a` + `cat /etc/os-release`
 - [ ] Instalar tmux en Madre
 - [ ] `df -h` + `free -h` → actualizar ficha [[setup/madre]]
@@ -74,8 +76,6 @@ revision: cada-domingo
 - [ ] `/deploy` — git pull + rebuild desde Telegram
 
 ### Madre — seguridad (Fase 2)
-- [ ] UFW: `sudo ufw enable` + reglas básicas
-- [ ] fail2ban: instalar y configurar
 - [ ] PostgreSQL en Docker (sustituir SQLite en thdora)
 
 ### personal — migración
@@ -107,6 +107,7 @@ revision: cada-domingo
 - [ ] RTX 3060 12GB para Madre (~200-250€ 2ª mano)
 - [ ] HP TouchSmart → instalar Linux Mint + configurar como dashboard
 - [ ] Workstation IA futura: Ryzen 7 + 32GB + RTX 3060 (~400€ 2ª mano)
+- [ ] Adaptador DVI-D → HDMI para tercer monitor (~3-5€)
 
 ### Proyectos
 - [ ] ai-toolkit → crear ficha + arrancar
