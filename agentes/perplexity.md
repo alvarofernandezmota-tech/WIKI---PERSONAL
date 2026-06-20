@@ -1,37 +1,46 @@
-# 🔵 Perplexity — Ficha de Agente
+---
+tags: [agente, ia, perplexity, mcp, github]
+fecha-actualizacion: 2026-06-20
+---
 
-> Última actualización: 17 junio 2026
+# 🔵 Perplexity — Agente principal
+
+## Qué es
+
+IA principal del ecosistema. Modelo: **Claude Sonnet 4.6**.
+Acceso directo a GitHub vía **MCP** — puede leer y escribir en todos los repos.
+
+## Para qué se usa
+
+- Escribir y actualizar archivos en GitHub directamente
+- Auditorías de repo — leer estructura y contenido
+- Arquitectura · documentación · decisiones técnicas
+- Diarios diarios · fichas · setup
+- Código Python · Docker · CI/CD
+
+## Para qué NO se usa
+
+- Investigación de mercado o datos frescos → [[agentes/grok]]
+- Código muy largo o contexto >100k tokens → [[agentes/gemini]]
+- Código en terminal sin salir del editor → [[agentes/opencode]]
+
+## Protocolo
+
+```
+Grok (investiga) → Perplexity (valida + sube al repo)
+Gemini (diseña)  → Perplexity (sube al repo)
+Perplexity       → output final siempre en GitHub
+```
+
+> **Regla:** todo output final pasa por Perplexity porque tiene MCP GitHub.
+
+## Cómo sacarle más
+
+- Darle el contexto en el repo — no en el chat
+- Hacer `git push` antes de pedir análisis → lee el estado real
+- Pedirle auditorías completas antes de reorganizar
+- Un fix por sesión — no mezclar temas
 
 ---
 
-## Rol
-
-Agente principal del ecosistema. Único con acceso MCP GitHub → puede leer y escribir en todos los repos directamente.
-
-## Capacidades clave
-
-| Capacidad | Uso concreto |
-|---|---|
-| MCP GitHub | Leer, crear, actualizar archivos en cualquier repo |
-| Búsqueda web en tiempo real | Verificar versiones, docs técnicas, noticias |
-| Contexto largo | Mantener hilo de sesión compleja |
-| Código | Python, bash, Docker, YAML, Markdown |
-
-## Cuándo usarlo
-
-- Actualizar repos y documentación
-- Auditorías de repos
-- Escribir scripts, configs, docker-compose
-- Crear/actualizar diarios
-- Cualquier tarea que acabe en un commit a GitHub
-
-## Prompt de arranque
-
-```
-Lee AGENT.md y CONTEXT.md de yggdrasil-dew y dame el estado actual.
-Repo Space: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
-```
-
-## Motor
-
-Claude Sonnet 4.6 (vía Perplexity)
+_Ver también: [[agentes/grok]] · [[agentes/gemini]] · [[agentes/opencode]] · [[HOME]]_

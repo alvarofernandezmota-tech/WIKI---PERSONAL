@@ -1,70 +1,60 @@
 ---
-tags: [proyecto, activo, bot, telegram, fastapi, python, produccion]
+tags: [proyecto, thdora, python, telegram, docker, activo]
+fecha-actualizacion: 2026-06-20
 ---
 
-# 🤖 thdora — Bot TOKI (Asistente Personal IA)
-
-> Repo: [alvarofernandezmota-tech/thdora](https://github.com/alvarofernandezmota-tech/thdora)
-> Creado: marzo 2026 · Estado: **activo — v0.17.2 en producción**
+# 🤖 THDORA — Bot Telegram TOKI
 
 ## Qué es
 
-Bot Telegram + FastAPI. Asistente personal de salud mental y gestión de vida. El asistente se llama **TOKI**. Corre en Madre (servidor de producción).
+Bot de Telegram personal llamado **TOKI**.
+Backend FastAPI + bot aiogram + Docker en [[setup/madre]].
+Repo: https://github.com/alvarofernandezmota-tech/thdora
 
-## Diferenciador
+## Estado actual (20 jun 2026)
 
-Ningún competidor (Wysa / Woebot / Replika / Youper / Bearable) usa Telegram en español — ese es el hueco.
+- Versión: **v0.22.1** en `main`
+- Stack Docker en Madre: **6/6 contenedores** ✅
+- API FastAPI: **healthy** puerto 8000 ✅
+- Bot Telegram: **healthy** ✅
+- Prometheus + Grafana: ✅ corriendo
+- CI/CD: ✅ `deploy.yml` con `--build` y notificación Telegram
 
-## Stack
+## Stack técnico
 
-- Python · FastAPI · SQLAlchemy · Alembic · Docker
-- Telegram Bot API (python-telegram-bot)
-- LLM: Groq (cloud) + Ollama (local en Madre)
-- CI/CD: GitHub Actions → deploy en Madre
-
-## Estructura
-
-```
-thdora/
-├── src/
-│   ├── bot/      → handlers Telegram
-│   ├── ai/       → LLMBackend: Groq + Ollama
-│   ├── api/      → FastAPI endpoints
-│   ├── agents/   → (planificado)
-│   ├── core/     → lógica de negocio
-│   └── db/       → SQLAlchemy + Alembic
-├── docker-compose.yml · Dockerfile
-└── .github/workflows/deploy.yml
-```
-
-## Estado actual — v0.17.2
-
-| Servicio | Estado |
+| Componente | Tecnología |
 |---|---|
-| thdora API | ✅ healthy |
-| thdora-bot | ✅ healthy (fix healthcheck hoy) |
-| Prometheus | ✅ up |
-| Grafana | ✅ up |
+| API | FastAPI + Uvicorn |
+| ORM | SQLAlchemy + Alembic |
+| Bot | aiogram (Telegram) |
+| IA | LangGraph + Groq + Ollama |
+| Infra | Docker Compose · red `thdora-net` |
+| Monitoreo | Prometheus + Grafana |
+| CI/CD | GitHub Actions |
 
-## Historial relacionado
+## Decisiones técnicas
 
-- [[diarios/2026-06-20]] — fix healthcheck bot (FailingStreak 86 → healthy)
-- [[proyectos/thdora-vision-producto]] — visión de producto
-- [[proyectos/thdora-casos-uso]] — casos de uso
-- [[proyectos/thdora-v0.17.0-y-mas-alla]] — roadmap
-- [[proyectos/toki-comercializacion]] — estrategia comercial
+- `@lru_cache` en `Settings` para evitar errores de importación en CI
+- Healthcheck del bot: `python3 -c "import sys; sys.exit(0)"` — no curl (bot no expone HTTP)
+- `fastapi<0.137.0` fijado — compat con prometheus-fastapi-instrumentator
+- Imagen multi-stage, usuario no-root, `/app/data` y `/app/logs` con permisos
 
-## Origen
-
-Evolución de [[proyectos/thea-ia]] (oct 2025).
-
-## Pendiente
+## Próximo paso
 
 - [ ] Verificar `/start` en Telegram
-- [ ] Handler `/diario` → escribe en [[proyectos/yggdrasil-dew]]
-- [ ] PostgreSQL (actualmente SQLite)
-- [ ] `src/agents/` — implementar agentes
+- [ ] `docs/DEPLOY.md` — guía de deploy paso a paso
+- [ ] `docs/SERVIDOR_MADRE.md` — documentar ruta repo en Madre
+- [ ] PostgreSQL (sustituir SQLite en producción)
+- [ ] Handler `/diario` — escribir en yggdrasil-dew desde Telegram
+
+## Historial clave
+
+| Fecha | Hito |
+|---|---|
+| Jun 2026 | v0.22.1 — Sprint 5 completo, stack Docker operativo |
+| Jun 2026 | Fix healthcheck bot (falso positivo curl→python3) |
+| Jun 2026 | 14 bugs críticos B12–B25 resueltos |
 
 ---
 
-Volver a [[HOME]] · [[ECOSISTEMA]]
+_Ver también: [[setup/madre]] · [[diarios/2026-06-20]] · [[HOME]]_
