@@ -24,12 +24,26 @@ revision: cada-domingo
 
 ## 🟡 ESTA SEMANA
 
+### varopc — git sync automático
+- [ ] `git pull` en local para traer la tarde9 y todo lo nuevo
+- [ ] Instalar plugin **Obsidian Git** → configurar auto-commit cada X minutos
+- [ ] Verificar que los commits son instantáneos (push automático al guardar)
+- [ ] Probar flujo completo: editar en Obsidian → commit automático → push a GitHub
+
 ### varopc — setup local
 - [ ] Instalar nmap: `yay -S nmap`
 - [ ] Instalar theHarvester: `yay -S theharvester`
 - [ ] Configurar Local GPT en Obsidian → apuntar a Ollama Madre (`100.91.112.32:11434`)
 - [ ] Configurar `inbox/` como carpeta por defecto nuevas notas en Obsidian
 - [ ] Verificar contenido `~/dev/` — qué hay ahí
+
+### varopc — escritorio (sesión tarde9)
+- [ ] **Volumen** → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland (primero verificar con `pactl info` si usa PipeWire o PulseAudio)
+- [ ] **Tercera pantalla** → conectar 3er monitor por DVI-D (necesita adaptador DVI-D → HDMI si solo tiene HDMI)
+- [ ] **Setup completo madre** → documentar hardware, particiones y servicios en `setup/madre.md`
+- [ ] ✅ ~~Monitores DP-1 + HDMI-A-1 scale 1~~ → resuelto
+- [ ] ✅ ~~Sony Bravia overscan~~ → Full Pixel activado desde menú TV
+- [ ] ✅ ~~Salvapantallas hypridle~~ → listeners comentados
 
 ### Madre — servidor
 - [ ] SSH: `ssh alvaro@100.91.112.32` → documentar ruta repo thdora (`find ~ -name docker-compose.yml`)
