@@ -1,57 +1,102 @@
 ---
-tags: [pendiente, master, planificacion, urgente]
-fecha: 2026-06-20
+tags: [pendiente, master, planificacion, urgente, python, pentest, llm, ia-local]
+fecha: 2026-06-22
 revision: cada-domingo
+owner: alvarofernandezmota-tech
+perfil: dev-python · pentest-linux · ia-local · llm · ml
 ---
 
 # 📋 MASTER PENDIENTES — Ecosistema completo
 
 > Fuente única de verdad de TODO lo pendiente.
 > Se revisa cada domingo. Se ejecuta cada día desde aquí.
-> Cuando se completa una tarea → mover al diario del día.
+> Cuando se completa una tarea → marcar con ✅ + fecha + mover al diario del día.
 
 ---
 
-## 🔴 HOY — Sábado 20 jun (antes de dormir)
+## 🟣 PERFIL PROFESIONAL — Enfoque y norte del sistema
 
-- [ ] `git pull` en varopc → ver los ~25 archivos nuevos en Obsidian
-- [ ] Abrir `Ctrl+G` → verificar grafo conectado
-- [ ] Instalar plugin **Obsidian Git** → auto-sync permanente
-- [ ] Elegir IA para Obsidian (Local GPT + Ollama recomendado)
-- [ ] Verificar `/start` en Telegram → confirmar que TOKI responde
+> Este sistema está construido para soportar el crecimiento profesional de Álvaro
+> como **desarrollador Python + pentester Linux + ingeniero de IA local**.
+> Todo lo que se documenta, aprende o construye apunta a este perfil.
+
+### Stack profesional objetivo
+- **Lenguaje principal:** Python 3.x — scripting, automatización, bots, ML, APIs
+- **Seguridad ofensiva:** pentesting Linux, OSINT, reconocimiento de redes, CTF
+- **IA local:** Ollama, LLMs open source, RAG, fine-tuning, agentes autónomos
+- **LLMs y ML:** arquitecturas transformer, entrenamiento, inferencia, despliegue
+- **Chatbots:** Telegram bots (TOKI), integración LLM, handlers, memoria
+- **Infraestructura:** Linux Arch/Hyprland, Docker, Tailscale, servidores caseros
+
+### Formación activa
+- Python: curso activo (módulo 05 pendiente) + práctica real en thdora
+- OSINT: primeros scans con nmap + theHarvester pendientes
+- LLMs: documentación exhaustiva en `agentes/` — ronda 2 pendiente
+- Pentest: setup herramientas pendiente en Madre
+
+---
+
+## 🔴 AHORA — Próxima sesión
+
+### Ronda 2 LLM — Gemini Deep Research
+- [ ] Copiar Prompt Maestro v2 de `inbox/2026-06-22-tarde-netdata-agentes-llm.md`
+- [ ] Pegar en Gemini con Deep Research activado
+- [ ] Esperar output (7 archivos nuevos):
+  - `agentes/tecnicas-entrenamiento.md`
+  - `agentes/parametros-inferencia.md`
+  - `agentes/fine-tuning-local.md`
+  - `agentes/erika-persona.md`
+  - `agentes/arquitecturas-emergentes.md`
+  - `agentes/seguridad-ataques-llm.md`
+  - `agentes/etica-principios-por-modelo.md`
+- [ ] Pegar output en Perplexity → subir 7 fichas al repo
+
+### Auditoría inbox (sesión dedicada, ~60 min)
+> Ver protocolo completo en `inbox/README.md` sección 4
+- [ ] Ejecutar auditoría 1 a 1 de los 24 archivos `🟡 PENDIENTE` en inbox
+- [ ] Orden: abrir → leer contenido real → decidir (✅/✏️/🔀/📦/🗑️) → ejecutar
+- [ ] Actualizar inventario en `inbox/README.md` al finalizar
+- [ ] Actualizar este MASTER-PENDIENTES con lo que salga
+
+### SSH sin contraseña Madre → Acer
+- [ ] `ssh-keygen -t ed25519 -C "varopc"` en Madre
+- [ ] `ssh-copy-id varo@100.86.119.102`
+- [ ] Verificar login sin contraseña
+- [ ] Opcional: sudo sin contraseña en Acer para scripts remotos
 
 ---
 
 ## 🟡 ESTA SEMANA
 
+### Auditoría repo completo (después de vaciar inbox)
+> Solo hacer después de completar la auditoría inbox — ver razón en `inbox/README.md`
+- [ ] Explorar y auditar: `diarios/` `docs/` `formacion/` `osint/` `proyectos/` `setup/` `templates/` `tools/` `yo/`
+- [ ] Verificar que `CONTEXT.md` refleja estado real del ecosistema
+- [ ] Verificar que `HOME.md` tiene todas las secciones actuales
+- [ ] Verificar que `ECOSISTEMA.md` está actualizado con Netdata multi-nodo
+- [ ] Identificar carpetas vacías o con contenido obsoleto
+- [ ] Identificar huecos: ¿qué falta que debería existir?
+
+### Netdata — post-configuración
+- [ ] Conexión persistente Acer→Madre con autossh (no depender del reboot)
+- [ ] Dashboard HTML personalizado del ecosistema
+- [ ] Documentar configuración final en `setup/netdata.md`
+
 ### varopc — git sync automático
-- [ ] `git pull` en local para traer la tarde9 y todo lo nuevo
-- [ ] Instalar plugin **Obsidian Git** → configurar auto-commit cada X minutos
-- [ ] Verificar que los commits son instantáneos (push automático al guardar)
-- [ ] Probar flujo completo: editar en Obsidian → commit automático → push a GitHub
-
-### varopc — setup local
-- [ ] Instalar nmap: `yay -S nmap`
-- [ ] Instalar theHarvester: `yay -S theharvester`
-- [ ] Configurar Local GPT en Obsidian → apuntar a Ollama Madre (`100.91.112.32:11434`)
+- [ ] `git pull` en local para traer todos los archivos nuevos
+- [ ] Instalar plugin **Obsidian Git** → configurar auto-commit
 - [ ] Configurar `inbox/` como carpeta por defecto nuevas notas en Obsidian
-- [ ] Verificar contenido `~/dev/` — qué hay ahí
+- [ ] Probar flujo completo: editar en Obsidian → commit → push a GitHub
 
-### varopc — escritorio (sesión tarde9)
-- [ ] **Volumen** → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland · usa PipeWire 1.6.5
-- [ ] **Tercera pantalla** → comprar adaptador DVI-D (macho) → HDMI (hembra) ~3-5€, luego conectar y añadir línea en monitors.conf
-- [ ] **Setup completo madre** → documentar hardware, particiones y servicios en `setup/madre.md`
-- [ ] ✅ ~~Monitores DP-1 + HDMI-A-1 scale 1~~ → resuelto
-- [ ] ✅ ~~Sony Bravia overscan~~ → Full Pixel activado desde menú TV
-- [ ] ✅ ~~Salvapantallas hypridle~~ → listeners comentados
+### varopc — escritorio
+- [ ] Volumen → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland
+- [ ] Tercer monitor → comprar adaptador DVI-D (macho) → HDMI (hembra) ~3-5€
 
 ### Madre — servidor
-- [ ] ✅ ~~UFW: regla SSH añadida~~ → puerto 22 ALLOW · firewall recargado
-- [ ] ✅ ~~fail2ban~~ → active (running) desde 18:23 · enabled
-- [ ] SSH: documentar ruta repo thdora (`find ~ -name docker-compose.yml`)
-- [ ] Documentar OS actual: `uname -a` + `cat /etc/os-release`
 - [ ] Instalar tmux en Madre
-- [ ] `df -h` + `free -h` → actualizar ficha [[setup/madre]]
+- [ ] Documentar OS actual: `uname -a` + `cat /etc/os-release`
+- [ ] `df -h` + `free -h` → actualizar `setup/madre.md`
+- [ ] SSH: documentar ruta repo thdora (`find ~ -name docker-compose.yml`)
 
 ### thdora — bot TOKI
 - [ ] Verificar `/start` en Telegram → TOKI responde
@@ -60,13 +105,35 @@ revision: cada-domingo
 - [ ] Crear `docs/TROUBLESHOOTING.md` — errores conocidos
 
 ### yggdrasil-dew — segundo cerebro
-- [ ] Cerrar nota `inbox/segundo-cerebro-fix-gordo.md` → mover a diario 20 jun
-- [ ] Crear `yo/objetivos-2026.md` — lista detallada de objetivos
-- [ ] Crear fichas pendientes: `proyectos/ai-toolkit.md` · `proyectos/impresion-3d.md` · `proyectos/redmi-a5.md`
+- [ ] Migrar fichas antiguas: sustituir `gemini.md` y `grok.md` (stubs) por versiones completas
+- [ ] Ampliar `agentes/perplexity.md` con estructura nueva
+- [ ] Actualizar `agentes/README.md` con tabla completa de todos los modelos
+- [ ] Crear `yo/objetivos-2026.md` — objetivos profesionales y personales
 
 ---
 
 ## 🟢 PRÓXIMAS 2 SEMANAS
+
+### Python — desarrollo profesional
+- [ ] Terminar módulo 05 del curso Python
+- [ ] Leer `src/bot/handlers/menu.py` en thdora → documentar patrones en `formacion/python/handlers.md`
+- [ ] Crear `formacion/python/roadmap.md` — ruta desde nivel actual hasta dev profesional
+- [ ] Práctica: crear un script Python que haga query a Ollama API local
+- [ ] Práctica: crear un script Python de reconocimiento de red básico
+
+### OSINT + Pentest — setup herramientas en Madre
+- [ ] Instalar nmap: `yay -S nmap` (o `pacman -S nmap` en Madre)
+- [ ] Instalar theHarvester: `yay -S theharvester`
+- [ ] Primer scan real: `nmap -sV 10.134.31.0/24`
+- [ ] Documentar herramientas instaladas en `osint/herramientas.md`
+- [ ] Crear `osint/README.md` — metodología y flujo de trabajo OSINT
+- [ ] Input Leap — terminar conexión MacBook ↔ Acer
+
+### IA local — integración con sistema
+- [ ] Configurar Local GPT en Obsidian → apuntar a Ollama Madre (`100.91.112.32:11434`)
+- [ ] Open WebUI → RAG sobre yggdrasil-dew desde navegador
+- [ ] Crear Modelfile Erika en Ollama → primer agente local con personalidad
+- [ ] Fine-tuning LoRA básico → primer experimento con Unsloth en Madre
 
 ### thdora — handlers TOKI (por orden)
 - [ ] `/diario <texto>` — escribe en `diarios/YYYY-MM-DD.md` vía GitHub API
@@ -75,66 +142,78 @@ revision: cada-domingo
 - [ ] `/estado` — muestra estado Docker en Madre
 - [ ] `/deploy` — git pull + rebuild desde Telegram
 
-### Madre — seguridad (Fase 2)
-- [ ] PostgreSQL en Docker (sustituir SQLite en thdora)
-
 ### personal — migración
-- [ ] Leer `01_traking_diario/01_diarios/2025/` → migrar diarios 2025 a `diarios/2025/`
-- [ ] Leer `04_curiosidad/` → migrar lo útil a `inbox/`
-- [ ] Leer `00_yo/` → migrar a `yo/`
-- [ ] Leer `00_sistema/PROMPTS-DICCIONARIO.md` → migrar a `agentes/prompts.md`
-- [ ] Marcar `personal/README.md` como archivado
-
-### formación
-- [ ] Leer `src/bot/handlers/menu.py` en thdora → documentar en `formacion/python.md`
-- [ ] Terminar módulo 05 del curso Python en personal
-- [ ] Primer scan OSINT: `nmap -sV 10.134.31.0/24`
-- [ ] Input Leap — terminar conexión MacBook ↔ Acer
+- [ ] `01_traking_diario/01_diarios/2025/` → migrar diarios 2025 a `diarios/2025/`
+- [ ] `04_curiosidad/` → migrar lo útil a `inbox/`
+- [ ] `00_yo/` → migrar a `yo/`
+- [ ] `00_sistema/PROMPTS-DICCIONARIO.md` → migrar a `agentes/prompts.md`
 
 ---
 
 ## 🔵 FUTURO (cuando haya tiempo/presupuesto)
 
 ### Madre — servicios nuevos
-- [ ] Open WebUI → RAG sobre yggdrasil-dew desde navegador
 - [ ] Uptime Kuma → monitoreo servicios
 - [ ] Pi-hole → DNS + bloqueo anuncios
 - [ ] n8n → automatización (diario nocturno automático)
 - [ ] wayvnc autostart
+- [ ] PostgreSQL en Docker (sustituir SQLite en thdora)
+
+### IA local — proyectos avanzados
+- [ ] Desplegar pipeline RAG completo: documento → embeddings → búsqueda → respuesta
+- [ ] Agente autónomo Python que use herramientas (nmap, whois, etc.) vía LLM
+- [ ] personal-analytics → dashboard de hábitos y productividad
+- [ ] Sistema de notas con LLM integrado (mejor que Obsidian para dev)
 
 ### Hardware (cuando haya presupuesto)
 - [ ] RAM 16GB DDR4 SO-DIMM para varopc (~40-50€) 🔴 máximo impacto
-- [ ] RTX 3060 12GB para Madre (~200-250€ 2ª mano)
+- [ ] RTX 3060 12GB para Madre (~200-250€ 2ª mano) — para fine-tuning y modelos grandes
 - [ ] HP TouchSmart → instalar Linux Mint + configurar como dashboard
 - [ ] Workstation IA futura: Ryzen 7 + 32GB + RTX 3060 (~400€ 2ª mano)
 - [ ] Adaptador DVI-D → HDMI para tercer monitor (~3-5€)
 
-### Proyectos
+### Proyectos personales
 - [ ] ai-toolkit → crear ficha + arrancar
-- [ ] impresión 3D → crear ficha + plan
+- [ ] Impresión 3D → crear ficha + plan
 - [ ] Redmi A5 → crear ficha + plan
 - [ ] HP rescate → Linux Mint + dashboard
-- [ ] personal-analytics → arrancar en Madre
 
 ---
 
-## 🗓️ Planificación semanal — cómo usar el inbox por días
+## ✅ COMPLETADO (histórico)
+
+| Fecha | Tarea |
+|---|---|
+| 2026-06-20 | UFW: regla SSH añadida — puerto 22 ALLOW |
+| 2026-06-20 | fail2ban — active (running) + enabled |
+| 2026-06-20 | Monitores DP-1 + HDMI-A-1 scale 1 |
+| 2026-06-20 | Sony Bravia overscan — Full Pixel activado |
+| 2026-06-20 | Salvapantallas hypridle — listeners comentados |
+| 2026-06-22 | Netdata multi-nodo — Madre + Acer conectados |
+| 2026-06-22 | 15 fichas LLM creadas en `agentes/` |
+| 2026-06-22 | inbox/README.md elevado a estándar de ingeniería v2.0 |
+| 2026-06-22 | Prompt Maestro v2 documentado en inbox |
+
+---
+
+## 🗓️ Planificación semanal
 
 > Cada mañana: abrir esta nota → elegir 3 tareas → moverlas al diario del día.
 > Cada noche: cerrar el diario → marcar las completadas aquí.
 > Cada domingo: revisar esta nota completa → reordenar prioridades.
 
 ```
-Lunes    → thdora + Madre (día técnico)
-Martes   → formación Python o Linux
-Miércoles → thdora handlers TOKI
-Jueves   → OSINT + seguridad
-Viernes  → proyectos secundarios
-Sábado   → libre / exploración / curiosidad
-Domingo  → revisión semanal + actualizar este archivo
+Lunes     → thdora + Madre (día técnico)
+Martes    → formación Python — curso + práctica
+Miércoles → thdora handlers TOKI + Python bots
+Jueves    → OSINT + pentest + seguridad Linux
+Viernes   → LLM + IA local + Ollama + experimentos ML
+Sábado    → libre / exploración / proyectos secundarios
+Domingo   → revisión semanal + auditoría inbox + actualizar este archivo
 ```
 
 ---
 
-_Actualizado: 20 jun 2026 · Próxima revisión: domingo 22 jun 2026_
-_Ver también: [[diarios/2026-06-20]] · [[inbox/auditoria-ecosistema-2026-06-20]] · [[HOME]]_
+_Actualizado: 22 jun 2026 · Próxima revisión: domingo 28 jun 2026_
+_Perfil: dev Python · pentest Linux · IA local · LLMs · ML_
+_Ver: [[HOME]] · [[CONTEXT]] · [[ECOSISTEMA]] · [[inbox/README]]_
