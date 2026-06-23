@@ -1,6 +1,6 @@
 ---
 tags: [pendiente, master, planificacion, urgente, python, pentest, llm, ia-local]
-fecha: 2026-06-22
+fecha: 2026-06-23
 revision: cada-domingo
 owner: alvarofernandezmota-tech
 perfil: dev-python · pentest-linux · ia-local · llm · ml
@@ -38,6 +38,14 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 
 ## 🔴 AHORA — Próxima sesión
 
+### 🦇 BATCUEVA — Fase 1 (instalación esta semana)
+> Ver nota completa: `inbox/2026-06-23-batcueva-stack-definitivo.md`
+- [ ] **Open WebUI** en Madre (:3001) — UI para Ollama
+- [ ] **Uptime Kuma** en Madre (:3002) — vigilar servicios
+- [ ] **SpiderFoot** en Madre (:5001) — OSINT (estaba a medias)
+- [ ] **Portainer** en Madre (:9000) — UI Docker
+- [ ] **UFW + fail2ban** en Madre — seguridad básica
+
 ### Ronda 2 LLM — Gemini Deep Research
 - [ ] Copiar Prompt Maestro v2 de `inbox/2026-06-22-tarde-netdata-agentes-llm.md`
 - [ ] Pegar en Gemini con Deep Research activado
@@ -68,14 +76,20 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 
 ## 🟡 ESTA SEMANA
 
+### 🦇 BATCUEVA — Fase 2
+- [ ] **Shadowbroker** — aviones militares + civiles, 25k barcos AIS, GPS jamming
+- [ ] **OSIRIS** — globo 3D: satélites, cámaras CCTV, seísmos, nuclear
+- [ ] **Kismet** — red local WiFi/Bluetooth
+- [ ] **Pi-hole** — DNS + bloqueo anuncios
+- [ ] **tmux** — sesiones persistentes en Madre
+
 ### Auditoría repo completo (después de vaciar inbox)
 > Solo hacer después de completar la auditoría inbox — ver razón en `inbox/README.md`
 - [ ] Explorar y auditar: `diarios/` `docs/` `formacion/` `osint/` `proyectos/` `setup/` `templates/` `tools/` `yo/`
 - [ ] Verificar que `CONTEXT.md` refleja estado real del ecosistema
 - [ ] Verificar que `HOME.md` tiene todas las secciones actuales
-- [ ] Verificar que `ECOSISTEMA.md` está actualizado con Netdata multi-nodo
+- [ ] Verificar que `ECOSISTEMA.md` está actualizado con batcueva stack
 - [ ] Identificar carpetas vacías o con contenido obsoleto
-- [ ] Identificar huecos: ¿qué falta que debería existir?
 
 ### Netdata — post-configuración
 - [ ] Conexión persistente Acer→Madre con autossh (no depender del reboot)
@@ -88,11 +102,12 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 - [ ] Configurar `inbox/` como carpeta por defecto nuevas notas en Obsidian
 - [ ] Probar flujo completo: editar en Obsidian → commit → push a GitHub
 
-### varopc — escritorio
-- [ ] Volumen → mapear `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` en Hyprland
+### varopc — escritorio (pendientes marcados como TODO)
+- [ ] Audio sistema — mapear teclas volumen en Hyprland (⚠️ pendiente de hoy 23/06)
+- [ ] Salvapantallas Hyprland (⚠️ pendiente de hoy 23/06)
 - [ ] Tercer monitor → comprar adaptador DVI-D (macho) → HDMI (hembra) ~3-5€
 
-### Madre — servidor
+### Madre — servidor base
 - [ ] Instalar tmux en Madre
 - [ ] Documentar OS actual: `uname -a` + `cat /etc/os-release`
 - [ ] `df -h` + `free -h` → actualizar `setup/madre.md`
@@ -127,7 +142,6 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 - [ ] Primer scan real: `nmap -sV 10.134.31.0/24`
 - [ ] Documentar herramientas instaladas en `osint/herramientas.md`
 - [ ] Crear `osint/README.md` — metodología y flujo de trabajo OSINT
-- [ ] Input Leap — terminar conexión MacBook ↔ Acer
 
 ### IA local — integración con sistema
 - [ ] Configurar Local GPT en Obsidian → apuntar a Ollama Madre (`100.91.112.32:11434`)
@@ -152,12 +166,12 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 
 ## 🔵 FUTURO (cuando haya tiempo/presupuesto)
 
-### Madre — servicios nuevos
-- [ ] Uptime Kuma → monitoreo servicios
-- [ ] Pi-hole → DNS + bloqueo anuncios
-- [ ] n8n → automatización (diario nocturno automático)
-- [ ] wayvnc autostart
-- [ ] PostgreSQL en Docker (sustituir SQLite en thdora)
+### 🦇 BATCUEVA — Fase 3
+- [ ] **n8n** → automatización workflows (reemplaza Zapier, 100% gratis OS)
+- [ ] **Homepage/Homarr** → dashboard central que une TODO
+- [ ] **Headscale** → reemplaza Tailscale cloud (self-hosted, más control)
+- [ ] **Gitea** → GitHub propio self-hosted
+- [ ] **Code Server** → VSCode en el browser desde cualquier sitio
 
 ### IA local — proyectos avanzados
 - [ ] Desplegar pipeline RAG completo: documento → embeddings → búsqueda → respuesta
@@ -184,6 +198,9 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 
 | Fecha | Tarea |
 |---|---|
+| 2026-06-23 | Stack batcueva definitivo documentado (todo OS, coste 0€) |
+| 2026-06-23 | Maltego eliminado → sustituido por SpiderFoot |
+| 2026-06-23 | Zapier eliminado → sustituido por n8n |
 | 2026-06-20 | UFW: regla SSH añadida — puerto 22 ALLOW |
 | 2026-06-20 | fail2ban — active (running) + enabled |
 | 2026-06-20 | Monitores DP-1 + HDMI-A-1 scale 1 |
@@ -214,6 +231,6 @@ Domingo   → revisión semanal + auditoría inbox + actualizar este archivo
 
 ---
 
-_Actualizado: 22 jun 2026 · Próxima revisión: domingo 28 jun 2026_
+_Actualizado: 23 jun 2026 · Próxima revisión: domingo 28 jun 2026_
 _Perfil: dev Python · pentest Linux · IA local · LLMs · ML_
 _Ver: [[HOME]] · [[CONTEXT]] · [[ECOSISTEMA]] · [[inbox/README]]_
