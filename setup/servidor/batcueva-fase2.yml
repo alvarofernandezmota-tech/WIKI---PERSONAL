@@ -1,0 +1,59 @@
+# =========================================================================
+# BATCUEVA FASE 2 — docker-compose.yml
+# Servicios: Ollama (GPU) + tar1090 (aviones) + Kismet (WiFi)
+# Prereqs: nvidia-container-toolkit instalado, antena USB WiFi conectada
+# Ejecutar: docker compose up -d
+# =========================================================================
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: batcueva-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      - TZ=Europe/Madrid
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ollama_data:/root/.ollama
+
+  osiris-globe:
+    image: ghcr.io/sdr-enthusiasts/docker-tar1090:latest
+    container_name: osiris-globe
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    environment:
+      - TZ=Europe/Madrid
+      - LAT=40.4167
+      - LON=-3.7037
+      - NAME=Batcueva_Station
+    volumes:
+      - osiris_globe_data:/var/globe_history
+
+  kismet:
+    image: kismet/kismet:latest
+    container_name: kismet-server
+    restart: unless-stopped
+    network_mode: "host"
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - kismet_data:/rxtx
+      - /dev/bus/usb:/dev/bus/usb
+
+volumes:
+  ollama_data:
+  osiris_globe_data:
+  kismet_data:

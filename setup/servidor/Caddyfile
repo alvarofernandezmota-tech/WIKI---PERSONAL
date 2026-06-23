@@ -1,0 +1,19 @@
+# =========================================================================
+# CADDYFILE MAESTRO — Proxy inverso Tailscale MagicDNS
+# Madre (100.91.112.32) — todos los servicios sin puertos
+# Instalar: sudo pacman -S caddy
+# Activar:  sudo systemctl enable --now caddy
+# =========================================================================
+
+osiris.madre.tailscale    { reverse_proxy 127.0.0.1:8085 }
+kismet.madre.tailscale    { reverse_proxy 127.0.0.1:2501 }
+ollama.madre.tailscale    { reverse_proxy 127.0.0.1:11434 }
+thdora.madre.tailscale    { reverse_proxy 127.0.0.1:8000 }
+grafana.madre.tailscale   { reverse_proxy 127.0.0.1:3000 }
+prometheus.madre.tailscale{ reverse_proxy 127.0.0.1:9090 }
+portainer.madre.tailscale { reverse_proxy 127.0.0.1:9000 }
+uptime.madre.tailscale    { reverse_proxy 127.0.0.1:3002 }
+openwebui.madre.tailscale { reverse_proxy 127.0.0.1:3001 }
+spiderfoot.madre.tailscale{ reverse_proxy 127.0.0.1:5001 }
+ivre.madre.tailscale      { reverse_proxy 127.0.0.1:8089 }
+qdrant.madre.tailscale    { reverse_proxy 127.0.0.1:6333 }
