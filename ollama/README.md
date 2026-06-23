@@ -1,46 +1,73 @@
 ---
-tags: [ollama, modelos-locales, llm-local, madre, acer]
-fecha: 2026-06-23
+tags: [ollama, modelos-locales, llm-local, madre, acer, inferencia]
+fecha-actualizacion: 2026-06-23
+ruta-obsidian: ollama/README.md
 ---
 
-# Ollama — Modelos Locales en Madre y Acer
+# Ollama — Modelos LLM Locales
 
-Esta carpeta documenta los **modelos LLM que corren localmente** via Ollama.
-No son "agentes" — son motores de inferencia local instalados en las máquinas.
+> Modelos de inferencia que corren localmente en Madre (varopc) o Acer.
+> NO son "agentes" — son motores. Los usas desde terminal, desde el RAG o desde cli-tools.
 
-## Diferencia clave
+## Diferencia con agentes/
 
-| Carpeta | Qué contiene |
+| `agentes/` | `ollama/` |
 |---|---|
-| `agentes/` | LLMs externos que usas tú en el navegador (Claude, Gemini, GPT, Perplexity) |
-| `ollama/` | Modelos locales que corren en Madre/Acer via Ollama |
-| `tools/` | Código que corre en Madre (RAG, bots, scripts) |
+| IAs externas en el navegador | Modelos que corren en tu hardware |
+| Claude, Gemini, GPT, Perplexity | llama3.2, deepseek, phi4, gemma3 |
+| Requieren conexión | 100% offline, privados |
+| No los controlas | Tú los instalas y gestionas |
 
-## Modelos disponibles
-
-- `llama3.2:3b` — LLM principal del RAG en Madre
-- `nomic-embed-text` — embeddings para ChromaDB
-- `deepseek-r1` — razonamiento profundo
-- `gemma3` — general purpose
-- `phi4` — ligero, rápido
-- `qwen2.5-72b` — potente, requiere mucha RAM
-- `codegemma` / `starcoder2` — especializados en código
-- `mistral-7b` — general, ligero
-- `llama3.3-70b` — potente, solo Madre con suficiente VRAM
-
-## Comandos básicos
+## Instalación
 
 ```bash
 # Instalar Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Arrancar
+# Arrancar servidor
 ollama serve
-
-# Modelos del RAG (instalar primero)
-ollama pull llama3.2:3b
-ollama pull nomic-embed-text
 
 # Ver modelos instalados
 ollama list
+
+# Usar en terminal
+ollama run llama3.2:3b
 ```
+
+## Modelos del RAG (instalar primero)
+
+```bash
+ollama pull llama3.2:3b        # LLM principal RAG
+ollama pull nomic-embed-text   # embeddings ChromaDB
+```
+
+## Modelos disponibles
+
+| Modelo | Hardware | Para qué |
+|---|---|---|
+| `llama3.2:3b` | GTX 1060 6GB ✔️ | LLM principal RAG |
+| `nomic-embed-text` | CPU ✔️ | Embeddings ChromaDB |
+| `deepseek-r1:8b` | 6-8GB RAM ✔️ | Razonamiento profundo |
+| `gemma3` | 4-8GB ✔️ | General purpose |
+| `phi4` | 4GB ✔️ | Ligero y rápido |
+| `mistral:7b` | 5GB ✔️ | General, ligero |
+| `codegemma` | 4-7GB ✔️ | Autocompletado código |
+| `starcoder2` | 4-7GB ✔️ | Autocompletado código |
+| `qwen2.5:72b` | +40GB ❌ solo con mucha RAM | Potente, requiere mucho |
+| `llama3.3:70b` | +40GB ❌ solo con mucha RAM | Potente, requiere mucho |
+
+## Fichas individuales
+
+- [[ollama/llama3.2-3b]] — LLM principal RAG
+- [[ollama/nomic-embed-text]] — embeddings
+- [[ollama/ollama-deepseek-r1]] — razonamiento
+- [[ollama/ollama-gemma3]] — general
+- [[ollama/ollama-phi4]] — ligero
+- [[ollama/ollama-mistral-7b]] — general ligero
+- [[ollama/ollama-codegemma-starcoder2]] — código
+
+## Ver también
+
+- [[tools/ollama-rag/README]] — cómo usa Ollama el RAG
+- [[cli-tools/README]] — opencode y otras CLI con IA
+- [[agentes/README]] — IAs externas de chat
