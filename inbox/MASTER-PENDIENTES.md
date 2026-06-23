@@ -1,6 +1,6 @@
 ---
 tags: [pendiente, master, planificacion, urgente, python, pentest, llm, ia-local]
-fecha: 2026-06-23
+fecha: 2026-06-24
 revision: cada-domingo
 owner: alvarofernandezmota-tech
 perfil: dev-python · pentest-linux · ia-local · llm · ml
@@ -35,7 +35,7 @@ until docker pull ollama/ollama:latest; do echo "reintentando..."; sleep 5; done
 until docker pull ghcr.io/open-webui/open-webui:main; do sleep 5; done
 until docker pull qdrant/qdrant:latest; do sleep 5; done
 ```
-- Cuando estén las 3: `docker compose up -d`
+- Cuando estén las 3: usar compose de [[setup/servidor/docker-compose.yml]]
 
 ### 3. Migrar inbox/ desde el Acer (o Madre)
 ```bash
@@ -44,56 +44,35 @@ mkdir -p agentes/ollama agentes/prompts docs/adr docs/decisiones \
          setup proyectos/thdora proyectos/chatbot-control \
          proyectos/local-brain proyectos/terminal-ia proyectos/osint \
          diarios formacion yo
-cp inbox/2026-06-23-adr-ollama-en-agentes.md docs/adr/
-cp inbox/2026-06-23-auditoria-ollama.md agentes/ollama/
-cp inbox/2026-06-23-ollama-*.md agentes/ollama/
-cp inbox/2026-06-23-v4-pendiente-ollama.md agentes/ollama/
-cp inbox/2026-06-23-prompt-*.md agentes/prompts/
-cp inbox/2026-06-23-auditoria-setup.md inbox/2026-06-23-local-brain-setup.md \
-   inbox/2026-06-23-estado-descargas-madre.md inbox/2026-06-23-pull-stack-madre.md \
-   inbox/2026-06-23-systemd-plan.md setup/
-cp inbox/2026-06-23-proyecto-thdora.md proyectos/thdora/
-cp inbox/2026-06-23-proyecto-chatbot-control.md proyectos/chatbot-control/
-cp inbox/2026-06-23-proyecto-local-brain.md proyectos/local-brain/
-cp inbox/2026-06-23-proyecto-terminal-ia.md proyectos/terminal-ia/
-cp inbox/2026-06-23-auditoria-osint.md inbox/2026-06-23-osint-rag-mover.md proyectos/osint/
-cp inbox/2026-06-23-adr-docs-as-code-repos-cerebro.md docs/adr/
-cp inbox/2026-06-23-decision-*.md docs/decisiones/
-cp inbox/2026-06-23-estado-auditoria-repo.md inbox/2026-06-23-inbox-processor-implementacion.md \
-   inbox/2026-06-23-auditoria-docs.md inbox/2026-06-23-auditoria-tools*.md \
-   inbox/2026-06-23-dashboard-readme.md inbox/2026-06-23-tools-pendientes.md docs/
-cp inbox/2026-06-23-sesion-completa.md inbox/2026-06-23-yggdrasil-v4-diario-maestro.md \
-   inbox/2026-06-23-sesion-gemini-auditoria-inbox-perplexity.md \
-   inbox/2026-06-23-sesion-perplexity-auditoria-gemini-inbox.md diarios/
-cp inbox/2026-06-23-auditoria-formacion.md formacion/
-cp inbox/2026-06-23-auditoria-yo.md yo/
-git add -A
-git commit -m "refactor: migrar inbox/ a estructura definitiva — copia sin borrar 2026-06-23"
-git push
+git add -A && git commit -m "refactor: migrar inbox/ a estructura definitiva" && git push
 ```
 
 ---
 
-## 🔴 AHORA — Esta sesión (2026-06-23 tarde)
+## 🔴 AHORA — Esta sesión (2026-06-24 noche)
 
-### Docker en Madre — descargando AHORA
-- [ ] Esperar que terminen las 3 descargas: Ollama + Open WebUI + Qdrant
-- [ ] `docker compose up -d` cuando terminen
-- [ ] Verificar: `docker ps` + `curl http://localhost:11434/api/tags`
-- [ ] Open WebUI accesible en http://localhost:3000
-- [ ] Ver plan completo: [[inbox/2026-06-23-estado-descargas-madre]]
+### Stack Madre — EJECUTAR EN ORDEN
+- [ ] `cd ~/yggdrasil-dew && git pull` → traer docker-compose.yml actualizado
+- [ ] `docker compose down` (si está levantado)
+- [ ] `docker compose up -d` con el nuevo compose
+- [ ] `docker compose ps` → verificar 3 servicios healthy
+- [ ] `ollama pull qwen2.5:3b`
+- [ ] `ollama pull nomic-embed-text`
+- [ ] Crear Modelfile CPU → `ollama create qwen2.5:3b-cpu -f Modelfile`
+- [ ] Open WebUI: conectar Qdrant desde Admin → Settings → Documents
+- [ ] Test RAG: subir un .md y preguntar
 
-### Claude — crear repo ollama-stack (hacer YA mientras descargan)
-- [ ] Abrir Claude con acceso MCP
-- [ ] Copiar prompt de [[inbox/2026-06-23-prompt-claude-ecosistema-docker]]
-- [ ] Claude crea `alvarofernandezmota-tech/ollama-stack` con docker-compose completo
-- [ ] Claude documenta en cerebro: `ollama/README.md` + `setup/servidor/docker-stack.md`
+### Tailscale — hacer permanente YA
+- [ ] `sudo systemctl enable --now tailscaled`
+- [ ] Generar authkey en admin.tailscale.com (Reusable + No expiry)
+- [ ] `sudo tailscale up --authkey=tskey-XXXX`
+- [ ] `sudo reboot` → verificar que levanta solo
+- [ ] Ver guía: [[setup/servidor/tailscale-autoarranque.md]]
 
-### Post-instalación Ollama (cuando levanten los servicios)
-- [ ] Pull modelos: `qwen2.5:7b`, `qwen2.5:3b`, `bge-m3`, `nomic-embed-text`
-- [ ] Configurar Open WebUI — conectar con Ollama
-- [ ] Configurar Qdrant — crear colección RAG del cerebro
-- [ ] Test end-to-end: pregunta al cerebro via RAG
+### UFW — activar firewall
+- [ ] Ejecutar reglas de [[setup/servidor/ufw-seguridad.md]]
+- [ ] `sudo ufw enable`
+- [ ] `sudo ufw status` → verificar
 
 ---
 
@@ -124,8 +103,6 @@ git push
 - [ ] `alvarofernandezmota-tech/terminal-ia` — terminal con IA
 
 ### Ronda 2 LLM — Gemini Deep Research
-- [ ] Copiar Prompt Maestro v2 de [[inbox/2026-06-22-tarde-netdata-agentes-llm]]
-- [ ] Pegar en Gemini con Deep Research activado
 - [ ] 7 fichas nuevas en `agentes/`
 
 ### varopc — Obsidian sync
@@ -133,7 +110,6 @@ git push
 - [ ] Instalar plugin Obsidian Git → auto-commit
 - [ ] Instalar Dataview + Templater + Calendar
 - [ ] Configurar `inbox/` como carpeta por defecto nuevas notas
-- [ ] Test flujo: editar Obsidian → commit → push
 
 ### varopc — escritorio pendientes
 - [ ] Audio sistema — mapear teclas volumen en Hyprland
@@ -205,23 +181,22 @@ git push
 
 | Fecha | Tarea |
 |---|---|
+| 2026-06-24 | **docker-compose.yml optimizado** — CPU vars + healthchecks + restart:always |
+| 2026-06-24 | **ollama-cpu-setup.md** — Modelfile + vars para i5-8400 |
+| 2026-06-24 | **tailscale-autoarranque.md** — guía systemd + authkey |
+| 2026-06-24 | **ufw-seguridad.md** — reglas firewall stack IA |
+| 2026-06-24 | **setup/servidor/README.md** — índice setup Madre |
 | 2026-06-23 | **filosofia.md v3.0** — 3 leyes repos + ingeniero software organizado |
 | 2026-06-23 | **ADR homelab vs proyectos** — Batcueva = homelab, no proyecto |
 | 2026-06-23 | **ADR docs-as-code** — cómo enlazar repos Docker con cerebro |
 | 2026-06-23 | **ADR ollama vs agentes** — separación local vs API |
 | 2026-06-23 | **Auditorías completas** de todas las carpetas del repo |
-| 2026-06-23 | **Prompt Claude** refactor repo nivel ingeniero software |
-| 2026-06-23 | **Prompt Claude** ecosistema Docker paso a paso |
-| 2026-06-23 | **estado-auditoria-repo.md** — checklist master auditorías |
 | 2026-06-23 | Stack batcueva definitivo documentado |
-| 2026-06-23 | Maltego eliminado → SpiderFoot |
 | 2026-06-22 | Netdata multi-nodo — Madre + Acer conectados |
 | 2026-06-22 | 15 fichas LLM creadas en `agentes/` |
-| 2026-06-22 | inbox/README.md elevado a estándar ingeniería v2.0 |
 | 2026-06-20 | UFW: regla SSH añadida |
 | 2026-06-20 | fail2ban active + enabled |
 | 2026-06-20 | Monitores DP-1 + HDMI-A-1 scale 1 |
-| 2026-06-20 | Sony Bravia overscan — Full Pixel activado |
 
 ---
 
@@ -238,5 +213,5 @@ Domingo   → revisión semanal + auditoría inbox
 ```
 
 ---
-_Actualizado: 23 jun 2026 21:47 · Próxima revisión: domingo 28 jun 2026_
+_Actualizado: 24 jun 2026 01:05 · Próxima revisión: domingo 28 jun 2026_
 _Ver: [[HOME]] · [[CONTEXT]] · [[ECOSISTEMA]] · [[inbox/README]] · [[filosofia]]_
