@@ -1,14 +1,14 @@
 ---
 tags: [filosofia, sistema, principios, identidad, ingenieria, python, ia-local]
 fecha-creacion: 2026-06-20
-fecha-actualizacion: 2026-06-22
+fecha-actualizacion: 2026-06-23
 migrado-de: personal/00_sistema/sistema-filosofia.md
-version: 2.0
+version: 3.0
 ---
 
 # 🧭 Filosofía del Sistema
 
-> *"Áquí se evoluciona. Se aprende. Se reflexiona. Se crece. Se hace caos. Se ordena. Se derrumba todo. Y se vuelve a empezar — pero desde un piso más arriba que antes."*
+> *"Áquí se evoluciona. Se aprende. Se reflexiona. Se crece. Se hace caos. Se ordena. Se derrumba todo. Y se vuelve a empezar — pero desde un piso más arriba que antes."
 
 ---
 
@@ -31,11 +31,11 @@ Se derrumba todo ←────────────── Se derrumba todo
 
 ### 1. Las cosas se hacen haciendo
 La planificación es una herramienta, no un fin.
-> *"Producción primero, perfección después."*
+> *"Producción primero, perfección después."
 
 ### 2. Todo es un proceso
 No hay saltos. No hay atajos. El ritmo es más importante que el sprint.
-> *"Un commit imperfecto que existe vale más que una arquitectura perfecta que no existe todavía."*
+> *"Un commit imperfecto que existe vale más que una arquitectura perfecta que no existe todavía."
 
 ### 3. El foco está en uno mismo
 Analizarse. Evaluarse honestamente. Compararse con quien se era ayer, no con otros.
@@ -118,16 +118,63 @@ Tercer criterio:  ¿Cabe en el ecosistema actual sin romper nada?
 
 ---
 
+## Regla de oro — Repos y documentación
+
+> Añadida en v3.0 · 2026-06-23 — Ingeniero de software bien organizado
+
+### Separación de responsabilidades documental
+
+```
+Repo técnica (GitHub)     ← Código, docker-compose, README técnico
+Cerebro (yggdrasil-dew)   ← Conocimiento, decisiones, estado, wikilinks
+```
+
+### Las 3 leyes de las repos
+
+**Ley 1 — Nunca duplicar, siempre enlazar**
+> Si algo está en la repo técnica, el cerebro lo referencia con wikilink.
+> No se copia el contenido — se enlaza.
+
+**Ley 2 — Todo nuevo entra por inbox**
+> Cualquier idea, decisión, conocimiento o tarea entra primero en `inbox/`.
+> Desde inbox se procesa y se mueve a su lugar definitivo.
+> El inbox es la puerta de entrada de todo el sistema.
+
+**Ley 3 — Infraestructura ≠ Producto**
+> Un servidor no es un proyecto. Un proyecto corre sobre el servidor.
+> Homelab vive en `setup/servidor/`.
+> Productos viven en `proyectos/` con su repo GitHub propia.
+
+### Patrón de enlace repo técnica ↔ cerebro
+
+Cada proyecto con Docker tiene:
+```
+GitHub repo propia:
+  README.md          ← instalación, uso rápido
+  docker-compose.yml ← despliegue
+  docs/              ← docs técnicas internas
+
+yggdrasil-dew:
+  proyectos/NOMBRE/README.md   ← estado + [[enlace-repo-github]]
+  ollama/ o agentes/ o osint/  ← conocimiento transversal
+  setup/servidor/              ← qué corre en Madre y cómo
+```
+
+---
+
 ## Frases fundacionales
 
-- *"El orden no se construye en un día, pero sí se decide en uno."*
-- *"El ritmo es más importante que el sprint."*
-- *"Producción primero, perfección después."*
-- *"El caos es necesario para que haya orden."*
-- *"Cimientos en abril. Construcción en mayo. Sistema en junio."*
-- *"Si no puedes responder las 4 preguntas — no se hace."*
-- *"La solución más simple que funcione siempre gana."*
-- *"Un agente que nadie usa es peor que no tenerlo."*
+- *"El orden no se construye en un día, pero sí se decide en uno."
+- *"El ritmo es más importante que el sprint."
+- *"Producción primero, perfección después."
+- *"El caos es necesario para que haya orden."
+- *"Cimientos en abril. Construcción en mayo. Sistema en junio."
+- *"Si no puedes responder las 4 preguntas — no se hace."
+- *"La solución más simple que funcione siempre gana."
+- *"Un agente que nadie usa es peor que no tenerlo."
+- *"Nunca duplicar — siempre enlazar."
+- *"Todo nuevo entra por inbox."
+- *"Infraestructura ≠ Producto."
 
 ---
 
@@ -137,6 +184,7 @@ Tercer criterio:  ¿Cabe en el ecosistema actual sin romper nada?
 |---|---|---|
 | 1.0 | 2026-06-20 | Filosofía base — 5 principios, el ciclo, frases fundacionales |
 | 2.0 | 2026-06-22 | Añadidos principios de ingeniería: 4 preguntas, anti-patrones, criterio agentes Python, principio IA local |
+| 3.0 | 2026-06-23 | Regla de oro repos: 3 leyes, patrón enlace técnico-cerebro, Infraestructura ≠ Producto |
 
 ---
 _Ver también: [[yo/perfil]] · [[HOME]] · [[inbox/README]] · [[inbox/MASTER-PENDIENTES]]_
