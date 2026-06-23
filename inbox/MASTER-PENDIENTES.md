@@ -14,12 +14,63 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 
 ---
 
-## 🟣 PERFIL PROFESIONAL
+## 🚨 AL LLEGAR A CASA — PRIORIDAD 1
 
-- **Lenguaje principal:** Python 3.x — scripting, automatización, bots, ML, APIs
-- **Seguridad ofensiva:** pentesting Linux, OSINT, reconocimiento redes, CTF
-- **IA local:** Ollama, LLMs open source, RAG, fine-tuning, agentes autónomos
-- **Infraestructura:** Linux Arch/Hyprland, Docker, Tailscale, homelab Batcueva
+### 1. Despertar Madre (pantalla negra / suspensión)
+- [ ] Pulsar tecla o mover ratón en Madre para despertarla
+- [ ] Si no responde: botón de encendido corto
+- [ ] **Deshabilitar suspensión para siempre:**
+```bash
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+```
+
+### 2. Verificar descarga Docker (se cortó con TLS error)
+```bash
+docker images | grep -E "ollama|open-webui|qdrant"
+docker ps
+```
+- Si Ollama no está completo → ejecutar retry:
+```bash
+until docker pull ollama/ollama:latest; do echo "reintentando..."; sleep 5; done
+until docker pull ghcr.io/open-webui/open-webui:main; do sleep 5; done
+until docker pull qdrant/qdrant:latest; do sleep 5; done
+```
+- Cuando estén las 3: `docker compose up -d`
+
+### 3. Migrar inbox/ desde el Acer (o Madre)
+```bash
+cd ~/yggdrasil-dew && git pull
+mkdir -p agentes/ollama agentes/prompts docs/adr docs/decisiones \
+         setup proyectos/thdora proyectos/chatbot-control \
+         proyectos/local-brain proyectos/terminal-ia proyectos/osint \
+         diarios formacion yo
+cp inbox/2026-06-23-adr-ollama-en-agentes.md docs/adr/
+cp inbox/2026-06-23-auditoria-ollama.md agentes/ollama/
+cp inbox/2026-06-23-ollama-*.md agentes/ollama/
+cp inbox/2026-06-23-v4-pendiente-ollama.md agentes/ollama/
+cp inbox/2026-06-23-prompt-*.md agentes/prompts/
+cp inbox/2026-06-23-auditoria-setup.md inbox/2026-06-23-local-brain-setup.md \
+   inbox/2026-06-23-estado-descargas-madre.md inbox/2026-06-23-pull-stack-madre.md \
+   inbox/2026-06-23-systemd-plan.md setup/
+cp inbox/2026-06-23-proyecto-thdora.md proyectos/thdora/
+cp inbox/2026-06-23-proyecto-chatbot-control.md proyectos/chatbot-control/
+cp inbox/2026-06-23-proyecto-local-brain.md proyectos/local-brain/
+cp inbox/2026-06-23-proyecto-terminal-ia.md proyectos/terminal-ia/
+cp inbox/2026-06-23-auditoria-osint.md inbox/2026-06-23-osint-rag-mover.md proyectos/osint/
+cp inbox/2026-06-23-adr-docs-as-code-repos-cerebro.md docs/adr/
+cp inbox/2026-06-23-decision-*.md docs/decisiones/
+cp inbox/2026-06-23-estado-auditoria-repo.md inbox/2026-06-23-inbox-processor-implementacion.md \
+   inbox/2026-06-23-auditoria-docs.md inbox/2026-06-23-auditoria-tools*.md \
+   inbox/2026-06-23-dashboard-readme.md inbox/2026-06-23-tools-pendientes.md docs/
+cp inbox/2026-06-23-sesion-completa.md inbox/2026-06-23-yggdrasil-v4-diario-maestro.md \
+   inbox/2026-06-23-sesion-gemini-auditoria-inbox-perplexity.md \
+   inbox/2026-06-23-sesion-perplexity-auditoria-gemini-inbox.md diarios/
+cp inbox/2026-06-23-auditoria-formacion.md formacion/
+cp inbox/2026-06-23-auditoria-yo.md yo/
+git add -A
+git commit -m "refactor: migrar inbox/ a estructura definitiva — copia sin borrar 2026-06-23"
+git push
+```
 
 ---
 
@@ -75,7 +126,7 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 ### Ronda 2 LLM — Gemini Deep Research
 - [ ] Copiar Prompt Maestro v2 de [[inbox/2026-06-22-tarde-netdata-agentes-llm]]
 - [ ] Pegar en Gemini con Deep Research activado
-- [ ] 7 fichas nuevas en `agentes/`: tecnicas-entrenamiento, parametros-inferencia, fine-tuning-local, erika-persona, arquitecturas-emergentes, seguridad-ataques-llm, etica-principios-por-modelo
+- [ ] 7 fichas nuevas en `agentes/`
 
 ### varopc — Obsidian sync
 - [ ] `git pull` local para traer archivos de hoy
@@ -107,7 +158,6 @@ perfil: dev-python · pentest-linux · ia-local · llm · ml
 - [ ] **UFW + fail2ban** en Madre — seguridad básica
 - [ ] **tmux** en Madre
 - [ ] **Pi-hole** — DNS + bloqueo anuncios
-- [ ] Ver [[inbox/2026-06-23-auditoria-osint]] para osint-stack
 
 ### Python — desarrollo profesional
 - [ ] Terminar módulo 05 del curso Python
@@ -188,5 +238,5 @@ Domingo   → revisión semanal + auditoría inbox
 ```
 
 ---
-_Actualizado: 23 jun 2026 18:40 · Próxima revisión: domingo 28 jun 2026_
+_Actualizado: 23 jun 2026 21:47 · Próxima revisión: domingo 28 jun 2026_
 _Ver: [[HOME]] · [[CONTEXT]] · [[ECOSISTEMA]] · [[inbox/README]] · [[filosofia]]_
