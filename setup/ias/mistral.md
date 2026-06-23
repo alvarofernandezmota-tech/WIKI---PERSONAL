@@ -1,34 +1,36 @@
-# Mistral AI — Le Chat
-*Última actualización: 15 junio 2026*
+# Mistral — Mistral AI
+*Última actualización: 24 junio 2026*
 
-## Datos clave
+## Datos rápidos
 
 | Campo | Valor |
-|-------|-------|
-| Modelos | Mistral Large, Codestral, Mistral OCR |
-| Acceso | Le Chat (web) / API |
-| Límite alcanzado | ❌ No — sin límite alcanzado a 15 jun 2026 |
-| Reset | Desconocido (aún no llegamos al límite) |
-| Origen | 🇫🇷 Empresa europea (Francia) — ventaja GDPR |
+|---|---|
+| Modelos | Mistral Large / Le Chat |
+| Acceso | chat.mistral.ai |
+| Open source | ✅ modelos base open source |
+| Contexto | 128K tokens |
+| Europeo | ✅ empresa francesa |
 
-## Fortalezas
+## Usos documentados
+- **23 jun 2026:** Ronda 1 debate Docker — respuesta más completa y estructurada (healthchecks, systemd, backup, README)
 
-- **Empresa europea:** datos en Europa → ventaja directa para GDPR de THDORA
-- **Mistral OCR:** transcripción de notas manuscritas (feature MVP de Toki)
-- **Codestral:** modelo especializado en código
-- **Embeddings multilingües:** base de datos vectorial de Toki
-- Límites más generosos, sin límite conocido aún
-- Buena calidad en español
+---
 
-## Mejor uso en THDORA
+## AUTOCONOCIMIENTO — pendiente de entrevistar
+> Usar PLANTILLA-AGENTE.md · Lanzar protocolo en chat.mistral.ai
 
-- Pipeline OCR de fotos de notas manuscritas
-- Generación de embeddings para la memoria de Toki
-- Backup cuando Claude o ChatGPT se agotan
-- Consultas con perspectiva europea (regulación, mercado)
+### LO QUE SABEMOS
+- Empresa europea (París) — regulación GDPR nativa
+- Modelos base open source (Mistral 7B, Mixtral)
+- Le Chat usa Mistral Large (propietario)
+- Excelente en código y razonamiento estructurado
+- En Ronda 1: fue el más completo y profesional
 
-## Registro de agotamientos
+### MEJOR USO CONOCIDO
+- Código y arquitectura
+- Documentación técnica
+- Respuestas muy estructuradas
+- Privacidad (empresa europea)
 
-| Fecha | Hora | Tarea en curso | Reset estimado |
-|-------|------|----------------|----------------|
-| — | — | — | — |
+---
+*Ver: [[PLANTILLA-AGENTE]] · [[investigacion/]]*

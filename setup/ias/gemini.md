@@ -1,37 +1,47 @@
 # Gemini — Google DeepMind
 *Última actualización: 15 junio 2026*
 
-## Datos clave
+## Datos rápidos
 
 | Campo | Valor |
-|-------|-------|
-| Modelos | Gemini 2.0 Pro / Flash |
-| Acceso | Gemini web / Google AI Studio |
-| Límite | API gratuita: 1.500 req/día |
-| Reset | Diario (API) |
-| Ventana de contexto | **1M tokens** — el más largo del mercado |
+|---|---|
+| Modelos | Gemini 2.5 Pro / Flash |
+| Acceso | gemini.google.com / Google AI Studio |
+| Límite API gratuita | 1.500 req/día |
+| Ventana de contexto | **1M tokens** |
+| Deep Research | ✅ disponible |
 
-## Fortalezas
+## Usos documentados
+- **15 jun 2026:** Estudio de mercado THDORA #1
+- **23 jun 2026:** Ronda 1 debate Docker servidor Madre
+- **23 jun 2026:** Investigación stack IA privada (pendiente)
 
-- Ventana de 1M tokens — puede procesar el repo entero de una vez
-- Multimodal nativo: texto + imagen + audio + video en la misma consulta
-- Excelente para investigación de mercado extensa
-- Velocidad alta en Flash (prototipado rápido)
-- Integración con Google Workspace
+---
 
-## Uso documentado
+## AUTOCONOCIMIENTO — pendiente de entrevistar
+> Usar PLANTILLA-AGENTE.md · Lanzar protocolo en gemini.google.com con Gemini 2.5 Pro
 
-- **15 jun 2026:** Estudio de mercado THDORA #1 (TAM/SAM/SOM, competidores, personas, roadmap)
+### 1. IDENTIDAD
+- **Nombre técnico:** ...
+- **Versión activa:** ...
+- **Thinking mode:** ...
+- **Corte de conocimiento:** ...
 
-## Mejor uso
+### 2. ENTRENAMIENTO
+- **Acceso a internet:** ⚠️ sí en Deep Research, no en chat normal
+- **Diferencias Pro vs Flash:** Pro más razonamiento, Flash más velocidad
 
-- Investigación de mercado larga (pegar múltiples documentos)
-- Análisis de contexto largo (repo entero, bases de código)
-- Procesamiento de audio/video (demos de Toki)
-- Alternativa a Claude cuando se agota y necesitas ventana larga
+### 3. CAPACIDADES
+- **Ventana de contexto:** 1M tokens ✅
+- **Ejecuta código:** sí (sandbox)
+- **Ve imágenes:** sí ✅
+- **Busca internet:** sí en Deep Research ✅
 
-## Registro de agotamientos
+### MEJOR USO CONOCIDO
+- Investigación larga con Deep Research
+- Análisis de contexto enorme (repo entero)
+- Procesamiento multimodal
+- Alternativa a Claude para ventana larga
 
-| Fecha | Hora | Tarea | Reset estimado |
-|-------|------|-------|----------------|
-| — | — | — | — |
+---
+*Ver: [[PLANTILLA-AGENTE]] · [[investigacion/]] · [[debate docker]]*
