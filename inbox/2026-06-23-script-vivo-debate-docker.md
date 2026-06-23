@@ -1,18 +1,12 @@
 # SCRIPT VIVO — Debate Multi-IA Docker Servidor Madre
 **Fecha inicio:** 2026-06-23  
-**Estado:** 🟡 RONDA 1 en curso — Gemini ✅ · Grok ⏳ · Mistral ⏳  
+**Estado:** 🟠 RONDA 1 COMPLETADA — Gemini ✅ · Grok ✅ · Mistral ✅ · Ronda 2 pendiente  
 **IAs participantes:** Gemini · Grok · Mistral · Perplexity (síntesis)  
 **Metodología:** script crece cada ronda → se resume al final de cada vuelta
 
 ---
 
 ## CÓMO FUNCIONA ESTE SCRIPT
-
-1. Cada ronda **añade contexto** al script, no lo reemplaza
-2. Al final de cada ronda Perplexity hace un **resumen ejecutivo**
-3. El resumen se convierte en el contexto de la siguiente ronda
-4. Al final de las 2 rondas queda el **documento de decisión final**
-
 ```
 RONDA 1: cada IA responde sola
     ↓
@@ -27,147 +21,137 @@ REPO: commit con todo documentado
 
 ---
 
-## PROMPT BASE — RONDA 1
-
-```
-=== PROMPT RONDA 1 ===
-
-SISTEMA: Eres un ingeniero de infraestructura senior con experiencia en Docker, Linux, redes y arquitectura de servidores locales.
-
-CONTEXTO:
-Tengo un servidor Ubuntu llamado "Madre" montando un stack de IA privada con Docker Compose:
-- Ollama (motor IA local)
-- Open WebUI (interfaz web tipo ChatGPT)
-- Qdrant (base de datos vectorial para RAG)
-
-PROBLEMA:
-Descargas Docker fallan con "tls: bad record MAC". Servidor conectado vía hotspot Redmi. Ollama y Qdrant descargados tras reintentos. Open WebUI en progreso. Stack aún no levantado.
-Tailscale instalado pero "Unit tailscale.service not found".
-Suspensión deshabilitada. docker-compose.yml con atributo version obsoleto.
-
-OBJETIVO: servidor que arranque solo, contenedores automáticos, red estable, sistema documentado.
-
----
-
-ANTES DE RESPONDER, PRESÉNTATE:
-1. IDENTIDAD — nombre técnico, versión, corte de conocimiento, thinking mode, empresa
-2. CAPACIDADES — fortalezas y límites para este caso, confianza 1-10
-3. ÉTICA — cómo distingues ✅ certeza de ⚠️ suposición
-
-RESPONDE:
-4. DIAGNÓSTICO — causas del error tls bad record MAC por probabilidad
-5. SOLUCIÓN RED — estabilizar hotspot Redmi + Ubuntu
-6. SOLUCIÓN DOCKER — terminar descarga + levantar stack
-7. ARRANQUE AUTOMÁTICO — Docker + contenedores al boot
-8. RIESGOS — qué puede fallar, qué mejorarías
-9. COMENTARIO FINAL — una cosa que harías diferente
-
-USA ✅ para certeza y ⚠️ para suposición. Sé directo y técnico.
-=== FIN PROMPT RONDA 1 ===
-```
-
----
-
 ## RESPUESTAS RONDA 1
 
 ### GEMINI — Ronda 1 ✅
-**Modelo identificado:** Gemini-Architect-Systems · Gemini 1.5 Pro  
-**Corte de conocimiento:** 2026  
-**Thinking mode:** Determinista / Análisis de infraestructura local  
-**Empresa:** Google  
-**Confianza declarada:** 9/10  
+**Modelo:** Gemini 1.5 Pro · Google · Corte 2026 · Confianza 9/10  
 
-**Diagnóstico (causas ordenadas):**
-1. ⚠️ Corrupción de paquetes por hotspot saturado (Alta)
-2. ✅ Desajuste de MTU — Docker usa 1500, redes móviles exigen 1340-1420 (Alta)
-3. ⚠️ Saturación del hardware NAT del Redmi por descargas paralelas (Media)
+**Diagnóstico:**
+1. ✅ Desajuste MTU (Docker 1500 vs redes móviles 1340-1420) — causa principal
+2. ⚠️ Corrupción de paquetes por hotspot saturado
+3. ⚠️ Saturación NAT del Redmi por descargas paralelas
 
-**Solución red:**
-- Pasar a USB Tethering en lugar de WiFi hotspot
-- Bajar MTU a 1400: `sudo ip link set dev usb0 mtu 1400`
-- Hacerlo permanente en Netplan: `mtu: 1400`
-- Reparar Tailscale: `curl -fsSL https://tailscale.com/install.sh | sh` + `sudo systemctl enable --now tailscaled`
-
-**Solución Docker:**
-- Eliminar atributo `version` del compose
-- Limitar descargas paralelas en `/etc/docker/daemon.json`: `"max-concurrent-downloads": 1`
-- Reiniciar Docker y hacer `docker compose pull` + `docker compose up -d`
-
-**Arranque automático:**
-- `sudo systemctl enable docker.service containerd.service`
-- `restart: unless-stopped` en todos los servicios del compose
-
-**Riesgos detectados:**
-- Cambio de IP del hotspot → mitigado con Tailscale
-- Saturación RAM/VRAM en boot por Ollama + Qdrant simultáneos
-- Corrupción de Qdrant por apagón
-
-**Comentario final:**
-> No descargar imágenes por hotspot. Ir a red de fibra, hacer `docker save`, transferir por USB y hacer `docker load` en Madre. Ahorra horas de frustración.
+**Solución red:** USB Tethering + MTU 1400 en Netplan + reinstalar Tailscale con script oficial  
+**Solución Docker:** `max-concurrent-downloads: 1` en daemon.json + eliminar `version` del compose  
+**Boot:** `systemctl enable docker` + `restart: unless-stopped`  
+**Riesgo clave:** OOM en boot por Ollama + Qdrant simultáneos + corrupción Qdrant por apagón  
+**Recomendación estrella:** descargar imágenes en red fibra → `docker save` → USB → `docker load` en Madre
 
 ---
 
-### GROK — Ronda 1
-> *pendiente de recoger*
+### GROK — Ronda 1 ✅
+**Modelo:** Grok 3 · xAI · Confianza no declarada explícitamente  
+
+**Diagnóstico:**
+1. ✅ MTU incorrecto — causa #1
+2. ✅ Corrupción TLS por pérdida de paquetes en WiFi móvil
+3. ⚠️ DNS inestable del operador como causa secundaria
+
+**Solución red:** USB Tethering + MTU 1400 + DNS público (8.8.8.8, 1.1.1.1)  
+**Solución Docker:** confirma `max-concurrent-downloads: 1` + pull secuencial  
+**Boot:** `systemctl enable docker` + `restart: unless-stopped`  
+**Riesgo clave:** cambio IP hotspot (mitigado con Tailscale) + espacio en disco insuficiente  
+**Aportación diferencial:** añade DNS público como solución complementaria
 
 ---
 
-### MISTRAL — Ronda 1
-> *pendiente de recoger*
+### MISTRAL — Ronda 1 ✅
+**Modelo:** Mistral Large / Le Chat · Mistral AI  
+
+**Diagnóstico:**
+1. ✅ MTU y DNS como causas principales
+2. ✅ Hotspot Redmi como entorno inestable para descargas TLS grandes
+
+**Aportaciones exclusivas de Mistral:**
+- Docker Compose con `healthcheck` en los 3 servicios
+- `depends_on` con `condition: service_healthy` para arranque ordenado
+- Red Docker dedicada `ai_network` con subred propia `172.20.0.0/16`
+- Volúmenes con `driver_opts type: none + o: bind` para rutas locales controlables
+- Servicio `systemd` dedicado `ai-stack.service` como alternativa a restart policy
+- Script de backup automático con crontab (2 AM cada día)
+- Tabla de troubleshooting documentada
+- README.md completo para el stack
+- Checklist final de despliegue
+
+**Boot:** systemd service `ai-stack.service` + `restart: unless-stopped`  
+**Riesgo clave:** espacio en disco, GPU no detectada, Open WebUI no conecta a Ollama  
 
 ---
 
-## RESUMEN EJECUTIVO RONDA 1
-> *Perplexity sintetiza aquí cuando lleguen las 3 respuestas*
+## RESUMEN EJECUTIVO RONDA 1 — Perplexity
 
-**Puntos de acuerdo hasta ahora (con Gemini):**
-- MTU es causa principal del error TLS
-- USB Tethering > WiFi hotspot
-- `restart: unless-stopped` + `systemctl enable docker` para boot automático
-- Tailscale necesita reinstalación con el script oficial
+### Consenso entre las 3 IAs
+- ✅ **MTU** es la causa #1 del error `tls: bad record MAC`
+- ✅ **USB Tethering** > WiFi hotspot para estabilidad
+- ✅ **`restart: unless-stopped`** + **`systemctl enable docker`** para boot automático
+- ✅ **Tailscale** necesita reinstalación con script oficial
+- ✅ **`max-concurrent-downloads: 1`** en daemon.json
 
-**Pendiente verificar con Grok y Mistral:**
-- ¿Coinciden en priorizar MTU como causa #1?
-- ¿Proponen algo diferente para la estabilidad de red?
-- ¿Tienen diferente opinión sobre arranque automático?
+### Aportaciones únicas por IA
+| IA | Aportación diferencial |
+|---|---|
+| **Gemini** | `docker save/load` para transferir por USB desde red fibra |
+| **Grok** | DNS público (8.8.8.8) como solución complementaria |
+| **Mistral** | healthcheck + depends_on ordenado + systemd service + backup automático + README |
+
+### Veredicto Ronda 1
+- **Más completo:** Mistral (arquitectura profesional, healthchecks, backup, documentación)
+- **Más práctico inmediato:** Gemini (docker save/load es la solución más inteligente)
+- **Más conciso:** Grok (DNS público es un detalle que los otros olvidaron)
+
+### Pregunta para Ronda 2
+> ¿Es mejor usar `restart: unless-stopped` en compose O crear un `systemd service` dedicado para el stack? ¿Cuál da más control y es más robusto para un servidor sin monitor?
 
 ---
 
-## PROMPT RONDA 2
-> Se usará después de tener las 3 respuestas de Ronda 1.
-> Pega este bloque en el mismo hilo donde respondiste la Ronda 1 (para que recuerden su respuesta anterior).
+## PROMPT RONDA 2 — listo para pegar en cada hilo
+
+> Pega esto en el **mismo hilo** de cada IA (para que recuerde su Ronda 1)
 
 ```
 === PROMPT RONDA 2 ===
 
-Eres la misma IA de antes. Recuerdas tu respuesta de la Ronda 1 sobre el servidor "Madre".
+Eres la misma IA de antes. Recuerdas tu respuesta sobre el servidor "Madre" (Ronda 1).
 
-Las otras IAs han respondido lo siguiente al mismo problema:
+Las otras IAs respondieron lo siguiente:
 
 [GEMINI dijo:]
-- Causa #1 del error TLS: desajuste de MTU (Docker usa 1500, redes móviles necesitan 1340-1420)
-- Solución red: pasar a USB Tethering + bajar MTU a 1400 en Ubuntu
-- Reparar Tailscale con script oficial + systemctl enable --now tailscaled
-- Docker: max-concurrent-downloads: 1 en daemon.json
-- Boot: systemctl enable docker + restart: unless-stopped
-- Riesgo principal: OOM en boot por Ollama y Qdrant simultáneos
-- Recomendación estrella: descargar imágenes en red fibra, transferir por USB con docker save/load
+- MTU como causa #1 del error TLS
+- USB Tethering + MTU 1400 + Tailscale reinstalado
+- max-concurrent-downloads: 1 en daemon.json
+- Recomendación estrella: descargar en red fibra → docker save → USB → docker load en Madre
 
-[GROK dijo:] ... (pendiente)
-[MISTRAL dijo:] ... (pendiente)
+[GROK dijo:]
+- Coincide en MTU como causa #1
+- Añade DNS público (8.8.8.8) como solución complementaria
+- USB Tethering + pull secuencial
 
-Perplexity ha sintetizado: MTU y USB Tethering son la solución mayoritaria. Boot automático con systemctl + restart policy es consenso. Descargar por fibra y transferir por USB es la recomendación práctica más sólida.
+[MISTRAL dijo:]
+- Coincide en MTU y DNS
+- Aporta docker-compose con healthcheck + depends_on ordenado
+- Red Docker dedicada ai_network
+- Servicio systemd ai-stack.service como alternativa a restart policy
+- Script de backup automático con crontab
+- README.md y checklist de despliegue
+
+Perplexity sintetiza:
+- Consenso: MTU + USB Tethering + restart:unless-stopped + systemctl enable docker
+- La gran pregunta abierta: ¿es mejor restart:unless-stopped en compose O un systemd service dedicado para el stack?
+- Mistral fue el más completo, Gemini el más práctico, Grok el más conciso
 
 ---
 
-Ahora responde:
-1. ¿Estás de acuerdo con el diagnóstico de MTU como causa principal?
-2. ¿Dónde discrepas con Gemini o con el consenso?
-3. ¿Cambias algo de tu respuesta anterior?
-4. ¿Qué aportación única tienes que las demás no han mencionado?
-5. Los 3 pasos más importantes a ejecutar AHORA MISMO en orden exacto
+Ahora debate:
+1. ¿Estás de acuerdo con el diagnóstico mayoritario (MTU como causa #1)?
+2. ¿Dónde discrepas con las otras IAs?
+3. ¿Cambia algo de tu respuesta anterior viendo lo que dijeron las demás?
+4. LA PREGUNTA CLAVE: ¿restart:unless-stopped en compose O systemd service dedicado?
+   - ¿Cuál es más robusto para un servidor headless (sin monitor)?
+   - ¿Cuál da más control sobre el orden de arranque?
+   - ¿Cuál recomendaras tú y por qué?
+5. Los 3 pasos EXACTOS a ejecutar ahora mismo en Madre
 
-Sé directo. Marca ✅ certeza y ⚠️ suposición.
+Marca ✅ certeza y ⚠️ suposición. Sé directo.
 
 === FIN PROMPT RONDA 2 ===
 ```
@@ -191,8 +175,9 @@ Sé directo. Marca ✅ certeza y ⚠️ suposición.
 > *Se completa al final de Ronda 2*
 
 - **Decisión técnica adoptada:**
+- **restart:unless-stopped vs systemd service — ganador:**
 - **Modelo más preciso en diagnóstico:**
 - **Modelo más honesto:**
 - **Modelo más útil en práctica:**
-- **Acciones inmediatas:**
+- **Acciones inmediatas para Madre:**
 - **Documento de acción generado:**
