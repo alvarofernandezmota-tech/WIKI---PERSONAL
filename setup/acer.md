@@ -1,7 +1,7 @@
 # Acer Aspire — Servidor 24/7 y Backup
 
 > Máquina secundaria. Corre 24/7. Rol: redundancia y servicios ligeros.
-> Última actualización: 22 junio 2026
+> Última actualización: 23 junio 2026
 
 ---
 
@@ -42,6 +42,7 @@
 | SSH server (sshd) | ✅ | Accesible desde Madre |
 | UFW | ✅ | Activo |
 | tmux | ⏳ Pendiente | |
+| TLP | ⏳ Pendiente instalar | Ahorro batería |
 
 ---
 
@@ -53,6 +54,126 @@ ssh acer
 
 # Por Tailscale desde cualquier red
 ssh varopc@100.86.119.102
+```
+
+---
+
+## 🔋 Batería y consumo — comandos
+
+### Estado rápido de la batería
+
+```bash
+# Estado actual (nivel, carga, estado)
+cat /sys/class/power_supply/BAT0/capacity       # % batería
+cat /sys/class/power_supply/BAT0/status         # Charging / Discharging / Full
+cat /sys/class/power_supply/BAT0/energy_now     # energía actual (µWh)
+cat /sys/class/power_supply/BAT0/energy_full    # capacidad máxima (µWh)
+cat /sys/class/power_supply/BAT0/power_now      # consumo instantáneo (µW)
+
+# Resumen bonito
+upower -i /org/freedesktop/UPower/devices/battery_BAT0
+# Si no está: sudo pacman -S upower
+```
+
+### Consumo en tiempo real
+
+```bash
+# Ver consumo actual en vatios
+cat /sys/class/power_supply/BAT0/power_now | awk '{printf "%.2f W\n", $1/1000000}'
+
+# powertop — análisis detallado de consumo por proceso
+sudo powertop
+# Si no está: sudo pacman -S powertop
+
+# powertop modo auto-tune (aplica optimizaciones de consumo)
+sudo powertop --auto-tune
+
+# Ver consumo resumido sin modo interactivo
+sudo powertop --time=5 --csv=/tmp/powertop.csv
+```
+
+### TLP — gestor de energía (recomendado para Ryzen)
+
+```bash
+# Instalar TLP
+sudo pacman -S tlp tlp-rdw
+
+# Activar e iniciar
+sudo systemctl enable tlp
+sudo systemctl start tlp
+
+# Estado de TLP
+sudo tlp-stat -s          # estado general
+sudo tlp-stat -b          # solo batería
+sudo tlp-stat -p          # perfiles CPU actuales
+sudo tlp-stat             # todo completo
+
+# Modo manual
+sudo tlp bat              # forzar modo batería
+sudo tlp ac               # forzar modo corriente
+```
+
+### Límite de carga de batería (salud a largo plazo)
+
+```bash
+# Ver límites actuales de carga
+cat /sys/class/power_supply/BAT0/charge_control_start_threshold
+cat /sys/class/power_supply/BAT0/charge_control_end_threshold
+
+# Configurar en /etc/tlp.conf:
+# START_CHARGE_THRESH_BAT0=75
+# STOP_CHARGE_THRESH_BAT0=80
+# (carga entre 75-80% — ideal para batería siempre enchufada)
+
+sudo nano /etc/tlp.conf
+sudo systemctl restart tlp
+```
+
+### Reducir consumo CPU (AMD Ryzen 5500U)
+
+```bash
+# Ver governor CPU actual
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+# Cambiar a powersave
+sudo cpupower frequency-set -g powersave
+# Si no está: sudo pacman -S cpupower
+
+# Ver frecuencias actuales
+sudo cpupower frequency-info
+
+# Governors disponibles en Ryzen:
+# powersave   → mínimo consumo (recomendado batería)
+# schedutil   → balance automático (recomendado siempre conectado)
+# performance → máximo rendimiento (mayor consumo)
+
+# Hacer permanente con systemd
+sudo systemctl enable cpupower
+# Configurar en /etc/default/cpupower:
+# governor='powersave'
+```
+
+### Script rápido — resumen batería
+
+```bash
+#!/bin/bash
+# bat-status.sh — resumen de batería en una línea
+BAT=/sys/class/power_supply/BAT0
+echo "🔋 Batería: $(cat $BAT/capacity)%  |  Estado: $(cat $BAT/status)  |  Consumo: $(awk '{printf "%.1f W", $1/1000000}' $BAT/power_now)"
+```
+
+```bash
+# Uso rápido desde terminal
+bash -c 'B=/sys/class/power_supply/BAT0; echo "🔋 $(cat $B/capacity)% | $(cat $B/status) | $(awk "{printf \"%.1f W\", \$1/1000000}" $B/power_now)"'
+```
+
+### Alias útiles (añadir a ~/.zshrc)
+
+```bash
+alias bat='cat /sys/class/power_supply/BAT0/capacity && cat /sys/class/power_supply/BAT0/status'
+alias batw='cat /sys/class/power_supply/BAT0/power_now | awk "{printf \"%.2f W consumo\n\", \$1/1000000}"'
+alias batsave='sudo cpupower frequency-set -g powersave && sudo tlp bat'
+alias batmax='sudo cpupower frequency-set -g schedutil && sudo tlp ac'
 ```
 
 ---
@@ -222,6 +343,8 @@ swapon --show
 
 - [ ] tmux instalado y configurado
 - [ ] Alias `acer` en `~/.zshrc` de Madre
+- [ ] TLP instalado y configurado con límite de carga 75-80%
+- [ ] Aliases de batería añadidos a `~/.zshrc`
 - [ ] PostgreSQL (base de datos centralizada)
 - [ ] Pi-hole
 - [ ] Headscale (Tailscale self-hosted)
