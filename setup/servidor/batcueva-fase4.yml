@@ -1,0 +1,73 @@
+# =============================================================================
+# batcueva-fase4.yml — Proxy + Auto-update + LiteLLM
+# Ejecutar: docker compose -f batcueva-fase4.yml up -d
+# Requiere: Fase 1 activa (red batcueva creada)
+# Puerto 81: panel admin Nginx Proxy Manager
+# Puerto 80/443: tráfico HTTP/HTTPS público
+# =============================================================================
+
+services:
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:81"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "batcueva.fase=4"
+      - "batcueva.servicio=proxy-inverso"
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=86400
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - TZ=Europe/Madrid
+    labels:
+      - "batcueva.fase=4"
+      - "batcueva.servicio=auto-update"
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - OLLAMA_API_BASE=http://ollama:11434
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "batcueva.fase=4"
+      - "batcueva.servicio=litellm-proxy"
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
+
+networks:
+  default:
+    name: batcueva
+    external: true
