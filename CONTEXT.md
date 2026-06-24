@@ -1,125 +1,140 @@
 ---
 tags: [contexto, estado, sistema, agentes]
-fecha-actualizacion: 2026-06-23T21:24+02:00
-revision: semanal
+fecha-actualizacion: 2026-06-24T22:26+02:00
+revision: cada-sesion
 ruta-obsidian: CONTEXT.md
 ---
 
 # CONTEXT.md — Estado actual del sistema
 
-> Archivo de contexto para agentes. Se actualiza con cada sesión importante.
-> Los agentes leen este archivo para entender el estado real del ecosistema.
+> ⚠️ ARCHIVO CRÍTICO — los agentes leen esto para entender el ecosistema.
+> Debe estar SIEMPRE alineado con inbox/MASTER-PENDIENTES y ESTADO-SISTEMA.
+> Actualizar al inicio Y al final de cada sesión importante.
 
-## Fecha de última actualización
+---
 
-2026-06-23 21:24 CEST — Vaciado completo de inbox + descarga dockers LLM
+## 🕐 Última actualización
 
-## Perfil del dueño
+**2026-06-24 22:26 CEST** — Sesión noche móvil — alineación completa repos + Docker + inbox
+
+---
+
+## 👤 Perfil del dueño
 
 Álvaro — dev Python · pentest Linux · ingeniero IA local · homelab
 
-## Estado del repo (yggdrasil-dew)
+---
 
-- `filosofia.md` v3.0 — 3 leyes + ADRs definidos ✅
-- `agentes/` — 25+ fichas + bloque ollama migrado desde inbox ✅
-- `agentes/ollama/` — auditoria, bge-m3, qwen2.5-3b/7b, rag, ecosistema-prep, v4-pendiente ✅
-- `agentes/prompts/` — prompts reutilizables Claude + Gemini ✅
-- `ollama/modelos/` — fichas originales del repo ✅
-- `docs/adr/` — 2 ADRs migrados desde inbox ✅
-- `docs/decisiones/` — 2 decisiones arquitectónicas migradas ✅
-- `docs/` — 10 documentos migrados desde inbox ✅
-- `setup/` — 5 notas setup + instalacion-3-dockers-llm + pull-stack-estado ✅
-- `proyectos/thdora/`, `proyectos/chatbot-control/`, `proyectos/local-brain/`, `proyectos/terminal-ia/` — proyectos activos documentados ✅
-- `osint/` — auditoria + rag migrados ✅
-- `diarios/` — 4 sesiones migradas desde inbox ✅
-- `formacion/` — auditoria migrada ✅
-- `yo/` — auditoria migrada ✅
-- `tools/` — script vaciado Gemini + pull-stack-robusto.sh ✅
-- `inbox/` — **VACIADA** — solo permanentes: README, MASTER-PENDIENTES, .gitkeep, inbox-clasificado, VACIADO-MAESTRO ✅
+## 🗂️ Repos del ecosistema — estado REAL
 
-## Estado del homelab (Madre)
+| Repo | Privado | Estado | Último commit |
+|---|---|---|---|
+| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ❌ | ✅ activo | 24 jun 22:26 |
+| [personal](https://github.com/alvarofernandezmota-tech/personal) | ❌ | ✅ activo | 24 jun 02:19 |
+| [thdora](https://github.com/alvarofernandezmota-tech/thdora) | ❌ | 🔧 handlers pendientes | 24 jun 03:12 |
+| [local-brain](https://github.com/alvarofernandezmota-tech/local-brain) | ✅ | ⚠️ creado, README pendiente | 24 jun 03:13 |
+| [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) | ✅ | ⚠️ creado, README pendiente | 24 jun 03:13 |
+| [ai-toolkit](https://github.com/alvarofernandezmota-tech/ai-toolkit) | ❌ | ✅ estable | 16 jun |
+| [thea-ia](https://github.com/alvarofernandezmota-tech/thea-ia) | ❌ | 🟡 mantenimiento | feb 2026 |
+| [image-calculator](https://github.com/alvarofernandezmota-tech/image-calculator) | ❌ | ✅ estable | abr 2026 |
+| [impresion-3d](https://github.com/alvarofernandezmota-tech/impresion-3d) | ❌ | ✅ estable | may 2026 |
 
-- Ollama — ❌ descarga fallida `tls: bad record MAC` — ⏳ reintentando
-- Open WebUI — ⏳ descargando capas
-- Qdrant — ⏳ pendiente (imagen descargada, pendiente compose)
-- Acceso actual: SSH remoto — sync local pendiente al llegar a casa
-- repo `ollama-stack` — 🔴 pendiente crear
-- thdora (bot TOKI) — ✅ activo
-- Netdata multi-nodo — ✅ Madre + Acer
-- UFW + fail2ban — ✅ activo
+**Pendientes crear:** `ollama-stack` · `chatbot-control` · `terminal-ia`
 
-## Agentes activos
+---
+
+## 🖥️ Hardware
+
+| Máquina | Nombre | Rol | Estado |
+|---|---|---|---|
+| PC torre | Madre | Servidor Docker + Ollama | 🟡 encendida, sin verificar esta noche |
+| Portátil | varopc / Acer | Dev + Obsidian | ✅ activo |
+| Móvil | Redmi A5 | Control remoto + thdora | ✅ activo (sesión actual) |
+
+---
+
+## 🐳 Docker — Madre
+
+**37 imágenes descargadas** (verificado 24 jun 19:00). Stack completo listo.
+
+| Fase | Contenedores | Estado |
+|---|---|---|
+| Fase 1 — Base IA | ollama, open-webui, qdrant | ⚠️ pendiente `docker compose up` |
+| Fase 2 — Gateway | litellm, nginx-pm | ⚠️ pendiente |
+| Fase 3 — Productividad | n8n, gitea, paperless, vaultwarden | ⚠️ pendiente |
+| Fase 4 — Monitorización | portainer, uptime-kuma, grafana | ⚠️ pendiente |
+| Fase 5 — Seguridad | fail2ban, crowdsec, traefik, vault | ⚠️ pendiente |
+| Fase 6 — OSINT | searxng, perplexica, pihole | ⚠️ pendiente |
+
+> Ver compose files: [[setup/servidor/README]]
+
+---
+
+## 🤖 Ollama — Madre
+
+| Modelo | Estado |
+|---|---|
+| qwen2.5:3b | ✅ listo |
+| qwen2.5:7b | ✅ listo |
+| qwen2.5:14b | ✅ listo |
+| llama3.1:8b | ❌ pendiente ~4.7GB |
+| mistral:7b | ❌ pendiente ~4.1GB |
+| bge-m3 | ❌ pendiente ~1.2GB |
+| nomic-embed-text | ❌ pendiente ~0.3GB |
+
+---
+
+## 📥 Inbox — estado REAL
+
+- ⚠️ **~100 archivos** pendientes de migrar a carpetas definitivas
+- ✅ Script migración generado — ejecutar `bash migrate-inbox.sh` desde PC
+- ✅ `MASTER-PENDIENTES.md` actualizado 22:17
+- Regla: inbox = zona de paso · máx 10 archivos · se vacía cada sesión
+
+---
+
+## 🤖 Agentes activos
 
 | Agente | Rol | Estado |
 |---|---|---|
 | Perplexity | Documenta en tiempo real, MCP GitHub | ✅ activo |
 | Claude Sonnet 4.6 | Ejecuta con MCP, código, commits | ✅ listo |
-| Gemini 2.5 Pro | Auditorías masivas, vaciado inbox, Deep Research | ✅ listo |
-| TOKI (thdora) | Bot Telegram | ✅ activo |
-| Ollama local | LLM local en Madre | ⏳ instalando |
-
-## Repos del ecosistema
-
-| Repo | Estado |
-|---|---|
-| alvarofernandezmota-tech/yggdrasil-dew | ✅ activo |
-| alvarofernandezmota-tech/thdora | ✅ activo |
-| alvarofernandezmota-tech/ai-toolkit | ✅ activo |
-| alvarofernandezmota-tech/ollama-stack | 🔴 pendiente crear |
-| alvarofernandezmota-tech/osint-stack | 🔴 pendiente crear |
-
-## Estructura de carpetas activa (post-vaciado)
-
-```
-yggdrasil-dew/
-├── CONTEXT.md          ← este archivo
-├── AGENT.md
-├── ECOSISTEMA.md
-├── HOME.md
-├── CHANGELOG.md
-├── filosofia.md
-├── agentes/
-│   ├── ollama/             (10 fichas)
-│   └── prompts/            (3 prompts reutilizables)
-├── cli-tools/
-├── diarios/            (4 sesiones 2026-06-23)
-├── docs/
-│   ├── adr/               (2 ADRs)
-│   └── decisiones/        (2 decisiones)
-├── formacion/          (1 auditoria)
-├── inbox/              (✅ VACIADA — solo 5 permanentes)
-├── ollama/             (modelos originales)
-├── osint/              (2 docs OSINT)
-├── proyectos/
-│   ├── chatbot-control/
-│   ├── local-brain/
-│   ├── terminal-ia/
-│   └── thdora/
-├── setup/              (7 docs: setup + LLM + pull-stack)
-├── templates/
-├── tools/              (script Gemini + pull-stack-robusto.sh)
-├── yo/                 (auditoria personal)
-└── .github/
-```
-
-## Próximo paso inmediato
-
-1. ⏳ Esperar a que terminen las descargas Docker en Madre
-2. Retry Ollama: `docker pull ollama/ollama:latest` (o `bash tools/pull-stack-robusto.sh`)
-3. `docker compose up -d` cuando las 3 imágenes estén listas
-4. Pull modelos: `ollama pull qwen2.5:3b && ollama pull qwen2.5:7b && ollama pull bge-m3`
-5. Crear repo `ollama-stack` con Claude MCP
-6. Al llegar a casa: `git pull` en local para sincronizar todo
-
-## ADRs vigentes
-
-- `agentes/` = IAs externas con API + fichas ollama
-- `ollama/` = config y modelos locales
-- `setup/` = homelab Batcueva
-- `proyectos/` = repos GitHub propios
-- Todo Docker → repo propio + doc en cerebro
-- Nunca duplicar — wikilinks [[]] siempre
-- inbox = solo zona de paso, se vacía con cada sesión
+| Gemini 2.5 Pro | Auditorías masivas, vaciado inbox | ✅ listo |
+| TOKI (thdora) | Bot Telegram | ⚠️ handlers pendientes |
+| Ollama local | LLM local en Madre | ✅ 3 modelos listos |
 
 ---
-_Ver: [[HOME]] · [[ECOSISTEMA]] · [[filosofia]] · [[inbox/MASTER-PENDIENTES]] · [[docs/2026-06-23-registro-migracion-inbox]]_
+
+## 🔐 Red
+
+| Servicio | Estado |
+|---|---|
+| Tailscale varopc | ✅ activo (100.86.119.102) |
+| Tailscale Madre | ⚠️ pendiente systemctl enable |
+| SSH Madre→varopc sin pass | ⚠️ pendiente |
+| UFW Madre | ⚠️ pendiente activar |
+
+---
+
+## 📋 Próxima acción
+
+1. **Desde móvil ahora** → thdora handlers con Perplexity
+2. **Al llegar al PC** → `bash migrate-inbox.sh`
+3. **Verificar Madre** → `ollama list && docker images`
+4. **Levantar fases** → `docker compose up -d` por orden
+
+---
+
+## 📚 Reglas de alineación (NUEVO)
+
+> Estas reglas evitan que CONTEXT, ECOSISTEMA y el inbox se desincronicen.
+
+1. **Al abrir sesión** — leer CONTEXT.md antes de hacer nada
+2. **Al cerrar sesión** — actualizar CONTEXT.md + diario del día
+3. **Inbox** — máx 10 archivos · cada archivo nuevo tiene wikilink al diario del día
+4. **Nuevo repo** — añadir a CONTEXT.md + ECOSISTEMA.md en el mismo commit
+5. **Nuevo Docker** — actualizar tabla fases en CONTEXT.md + ECOSISTEMA.md
+6. **MASTER-PENDIENTES** — es la única lista de tareas · no duplicar en otros sitios
+
+---
+_Ver: [[HOME]] · [[ECOSISTEMA]] · [[ESTADO-SISTEMA]] · [[inbox/MASTER-PENDIENTES]] · [[filosofia]]_
