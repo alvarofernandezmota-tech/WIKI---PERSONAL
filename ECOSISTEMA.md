@@ -1,6 +1,6 @@
 # ECOSISTEMA.md — Fuente de Verdad
 > Auditoría completa del ecosistema personal de Álvaro Fernández Mota.
-> Última actualización: **20 junio 2026**
+> Última actualización: **24 junio 2026**
 > Fuente de verdad para cualquier IA que entre al ecosistema.
 > **Regla de oro:** *«Si no está en el repo, no existe.»*
 
@@ -26,8 +26,8 @@
 - IP Tailscale: `100.91.112.32` · IP local: `10.134.31.228`
 - OS: Linux · Docker + docker-compose operativo
 - Servicios activos: sshd ✅ · Tailscale ✅ · Docker ✅
-- Stack corriendo: thdora API + bot + Prometheus + Grafana ✅ (desde hoy 20/06)
-- Ollama instalado: `llama3.2:3b` (modelo ligero, CPU)
+- Stack corriendo: thdora API + bot + Prometheus + Grafana ✅
+- Ollama instalado: modelos en descarga (verificar con `ollama list`)
 - Acceso CI/CD: GitHub Actions → `appleboy/ssh-action` via secrets
 - Pendiente: UFW · fail2ban · PostgreSQL · Pi-hole · Uptime Kuma
 
@@ -36,7 +36,7 @@
 - OS: Arch Linux + Hyprland/Wayland + Omarchy
 - UFW ✅ · whisrs (voz, Super+V) ✅ · KVM/virt-manager ✅
 - Ollama: qwen2.5-coder:14b · deepseek-r1:14b · qwen3:8b
-- Obsidian v1.12.7 ✅ (instalado hoy)
+- Obsidian v1.12.7 ✅
 - Bloqueante: AP Isolation router bloquea UDP → lan-mouse no funciona
 
 ### HP TouchSmart (incidencia abierta)
@@ -71,7 +71,9 @@ yggdrasil-dew/          ← vault Obsidian + repo cerebro
 |------|-----|--------|--------|
 | [[proyectos/thdora\|thdora]] | 🤖 Bot + API producción | ✅ v0.17.2 healthy | [GitHub](https://github.com/alvarofernandezmota-tech/thdora) |
 | [[proyectos/yggdrasil-dew\|yggdrasil-dew]] | 🧠 Cerebro / second brain | ✅ Activo | [GitHub](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) |
-| [[proyectos/personal\|personal]] | 📔 Diarios y vida personal (contexto histórico) | ✅ Referencia | [GitHub](https://github.com/alvarofernandezmota-tech/personal) |
+| [[proyectos/local-brain\|local-brain]] | 🔎 Cerebro local IA (Ollama + RAG + Open WebUI) | ✅ Recién creado | [GitHub](https://github.com/alvarofernandezmota-tech/local-brain) |
+| [[proyectos/osint-stack\|osint-stack]] | 🕵️ Stack OSINT (herramientas + metodología) | ✅ Recién creado | [GitHub](https://github.com/alvarofernandezmota-tech/osint-stack) |
+| [[proyectos/huginn\|huginn]] | 📔 Diarios y vida personal (privado) | ✅ Activo — renombrar personal→huginn en GitHub Settings | [GitHub](https://github.com/alvarofernandezmota-tech/personal) |
 | [[proyectos/thea-ia\|thea-ia]] | 🗂️ Predecesor de THDORA (archivo) | 💤 Archivado | [GitHub](https://github.com/alvarofernandezmota-tech/thea-ia) |
 | [[proyectos/ai-toolkit\|ai-toolkit]] | 🛠️ Stack IA open source | ✅ Activo | [GitHub](https://github.com/alvarofernandezmota-tech/ai-toolkit) |
 | [[proyectos/impresion-3d\|impresion-3d]] | 🖨️ Hobby / Anycubic Photon V1 | ⏸️ Pausado | [GitHub](https://github.com/alvarofernandezmota-tech/impresion-3d) |
@@ -83,10 +85,9 @@ yggdrasil-dew/          ← vault Obsidian + repo cerebro
 
 > Un archivo por día en `diarios/`. Todo lo que ocurre va aquí.
 
+- [[diarios/2026-06-24]] — Auditoría inbox + limpieza sesión noche
+- [[diarios/2026-06-23]]
 - [[diarios/2026-06-20]] — Fix healthcheck thdora-bot · Obsidian configurado
-- [[diarios/2026-06-19]]
-- [[diarios/2026-06-18]]
-- [[diarios/2026-06-17]]
 
 > Ver todos: [diarios/](diarios/)
 
@@ -97,7 +98,9 @@ yggdrasil-dew/          ← vault Obsidian + repo cerebro
 | Proyecto | Ficha | Estado |
 |---|---|---|
 | thdora (bot TOKI) | [[proyectos/thdora]] | ✅ v0.17.2 en producción |
-| Obsidian second brain | [[proyectos/yggdrasil-dew]] | ✅ Configurado hoy |
+| local-brain | [[proyectos/local-brain]] | ✅ Recién creado, configurando |
+| osint-stack | [[proyectos/osint-stack]] | ✅ Recién creado, configurando |
+| Obsidian second brain | [[proyectos/yggdrasil-dew]] | ✅ Configurado |
 | Redmi A5 rescate | [[proyectos/redmi-a5]] | ROM descargando, EDL pendiente |
 | HP rescate | [[proyectos/hp-rescate]] | Verificar cables SATA |
 | Impresión 3D | [[proyectos/impresion-3d]] | Pausado |
@@ -141,25 +144,28 @@ yggdrasil-dew/          ← vault Obsidian + repo cerebro
 | thdora · ai-toolkit · yggdrasil-dew | ✅ Activos |
 | Ollama + OpenCode | ✅ Activos |
 | Tailscale | ✅ Activo |
-| Obsidian v1.12.7 | ✅ Instalado hoy en varopc |
+| Obsidian v1.12.7 | ✅ Instalado |
+| local-brain (Ollama + Qdrant + Open WebUI) | ✅ Repo creado, configurando |
+| osint-stack | ✅ Repo creado, configurando |
 | plugin Git Obsidian | ⏳ Por configurar |
-| Open WebUI | ⏳ Por instalar en Madre |
 | n8n | ⏳ Por levantar en Docker |
 
 ---
 
-## 8. PENDIENTES — 20 JUNIO 2026
+## 8. PENDIENTES — 24 JUNIO 2026
 
 ### 🔴 Urgente
+- [ ] Renombrar `personal` → `huginn` en GitHub Settings (manual)
+- [ ] Verificar modelos con `ollama list` en Madre
 - [ ] Configurar plugin Git en Obsidian (auto pull/push)
-- [ ] Verificar que el bot responde en Telegram (`/start`)
-- [ ] Crear fichas en `proyectos/` para cada repo
 
 ### 🟡 Importante
 - [ ] UFW + fail2ban en Madre
 - [ ] PostgreSQL en Madre
 - [ ] Handler `/diario` en thdora (escribe directo al repo)
-- [ ] Corregir `CEREBRO.md` en ai-toolkit (referencia a `personal` → `yggdrasil-dew`)
+- [ ] Auditar inbox ygg y migrar a repos correspondientes
+- [ ] Decidir: ¿Flowise va en local-brain o thdora?
+- [ ] Decidir: ¿n8n tiene repo propia o va en thdora?
 
 ### 🟢 Planificado
 - [ ] Open WebUI en Madre
@@ -168,7 +174,8 @@ yggdrasil-dew/          ← vault Obsidian + repo cerebro
 - [ ] Rescate Redmi A5: EDL + test point
 - [ ] Rescate HP: verificar cables SATA
 - [ ] GitHub Actions resumen nocturno 23:00
+- [ ] Repo dotfiles separado (Hyprland, aliases, bashrc)
 
 ---
 
-_Documento mantenido por Perplexity (Claude Sonnet 4.6) vía MCP GitHub · 20 junio 2026_
+_Documento mantenido por Perplexity (Claude Sonnet 4.6) vía MCP GitHub · 24 junio 2026_
