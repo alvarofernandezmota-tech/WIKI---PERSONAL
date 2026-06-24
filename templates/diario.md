@@ -1,72 +1,42 @@
 ---
+id: {{date:YYYYMMDDHHmm}}
+fecha: {{date:YYYY-MM-DD}}
+tipo: journal
+status: activo
+repo: yggdrasil-dew
 tags: [diario]
-fecha: <% tp.date.now("YYYY-MM-DD") %>
+sync: true
 ---
 
-# 🗓️ <% tp.date.now("dddd D MMMM YYYY") %>
+# 📓 Diario {{date:YYYY-MM-DD}}
 
-## ⭐ Lo más importante del día
-
--
-
----
-
-## 🐍 Técnico — qué se hizo
-
-### thdora
-- 
-
-### yggdrasil-dew
--
-
-### varopc / Madre
--
-
-### Formación
--
+> Ver: [[diarios/{{date-1d:YYYY-MM-DD}}]] · [[inbox/MASTER-PENDIENTES]] · [[CONTEXT]]
 
 ---
 
-## 📥 Inbox procesado hoy
+## ✅ Hecho hoy
 
-> Notas de inbox que se movieron a su destino:
-- 
-
----
-
-## ✅ Tareas completadas
-
-> Proyectos, formación, vida diaria:
-- [ ]
-
-## ⏳ Tareas que quedan para mañana
-
-- [ ]
-
----
-
-## 🧠 Qué aprendí hoy
-
--
-
----
-
-## 💬 Reflexión
 
 
 ---
 
-## 📊 Hábitos
+## 🟠 Pendiente
 
-| Hábito | |
+
+
+---
+
+## 📝 Decisiones
+
+| Decision | Detalle |
 |---|---|
-| 💤 Dormir | |
-| 💧 Agua | |
-| 🏋️ Ejercicio | |
-| 🐾 Thea | |
-| 🐍 Código | |
-| 📚 Formación | |
+| | |
 
 ---
 
-_Ver: [[HOME]] · [[CONTEXT]] · [[inbox/MASTER-PENDIENTES]] · [[yo/habitos]]_
+## 💡 Ideas / notas rapidas
+
+
+
+---
+_Ver: [[CONTEXT]] · [[inbox/MASTER-PENDIENTES]] · [[ECOSISTEMA]]_
