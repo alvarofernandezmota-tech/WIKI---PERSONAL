@@ -1,13 +1,14 @@
 # ESTADO DEL SISTEMA — Yggdrasil Dew
 
-> Última actualización: 24 junio 2026, 02:45 CEST
-> Leer esto primero si entras al repo en frío.
+> Última actualización: 24 junio 2026, 02:56 CEST
+> **Leer esto primero si entras al repo en frío.**
+> Si algo no concuerda con la realidad → actualizar este fichero.
 
 ---
 
 ## Filosofía
 
-Este repo es el **plan de rescate completo**. Si todo se pierde — Madre muere, cambias de casa, formateas — con este repo y conexión a internet reconstruyes el ecosistema desde cero en menos de 1 hora.
+Este repo es el **plan de rescate y cerebro completo**. Si todo se pierde — Madre muere, cambias de casa, formateas — con este repo y conexión a internet reconstruyes el ecosistema completo en menos de 1 hora.
 
 ---
 
@@ -16,7 +17,7 @@ Este repo es el **plan de rescate completo**. Si todo se pierde — Madre muere,
 | Equipo | Rol | OS | IP Tailscale |
 |---|---|---|---|
 | Torre Madre | Servidor homelab | Arch Linux / Hyprland | `100.91.112.32` |
-| Portátil Acer | Cliente principal | Arch Linux / Hyprland | `100.86.119.102` |
+| Portátil Acer (varopc) | Cliente principal | Arch Linux / Hyprland | `100.86.119.102` |
 
 ---
 
@@ -52,32 +53,42 @@ Este repo es el **plan de rescate completo**. Si todo se pierde — Madre muere,
 
 ---
 
-## Estructura del repo
+## Estructura COMPLETA del repo
 
 ```
 yggdrasil-dew/
-├── ESTADO-SISTEMA.md          ← este fichero (leer primero)
-├── inbox/                     ← ideas, sesiones, pendientes sin procesar
-│   ├── MASTER-PENDIENTES.md   ← lista maestra de pendientes
-│   └── README.md              ← cómo funciona el inbox
-├── setup/
-│   └── servidor/              ← todo para levantar Madre desde cero
-│       ├── docker-compose.yml           (Fase 1)
-│       ├── batcueva-fase2.yml           (Fase 2)
-│       ├── batcueva-fase3.yml           (Fase 3)
-│       ├── batcueva-fase2-doc.md
-│       ├── batcueva-fase3-doc.md
-│       ├── plan-maestro.md              (desfasado — ver este fichero)
-│       ├── .env.plantilla
-│       └── scripts/
-│           ├── batcueva-state.sh        ← PUNTO DE ENTRADA PRINCIPAL
-│           ├── arranque-madre.sh
-│           ├── pre-descarga-todo.sh
-│           ├── configurar-fase2.sh
-│           ├── configurar-fase3.sh
-│           └── cierre-sesion.sh        ← commit diario automático
-├── docs/                      ← (pendiente) manuales de uso por servicio
-└── diarios/                   ← diarios de sesión procesados
+├── AGENT.md               ← instrucciones para agentes IA
+├── CHANGELOG.md           ← historial de cambios
+├── CONTEXT.md             ← contexto completo del ecosistema
+├── CONVENCIONES.md        ← reglas del sistema (leer obligatorio)
+├── ECOSISTEMA.md          ← mapa del ecosistema completo
+├── ESTADO-SISTEMA.md      ← este fichero (foto viva)
+├── HOME.md                ← punto de entrada Obsidian
+├── MASTER-PENDIENTES.md   ← TODO lo pendiente priorizado
+├── ROADMAP.md             ← visión a largo plazo, 7 fases
+├── README.md              ← introducción al repo
+├── filosofia.md           ← principios y valores del sistema
+│
+├── agentes/               ← fichas de modelos LLM y prompts
+├── cli-tools/             ← herramientas CLI documentadas
+├── diarios/               ← diarios de sesión procesados
+├── docs/                  ← manuales de uso por servicio
+│   ├── obsidian-setup.md
+│   └── estructura-madre.md
+├── formacion/             ← apuntes y roadmaps de formación
+├── inbox/                 ← zona de aterrizaje (leer inbox/README.md)
+├── ollama/                ← Modelfiles, configs y guías de modelos
+├── osint/                 ← herramientas y metodología OSINT
+├── proyectos/             ← fichas privadas de proyectos
+├── setup/servidor/        ← infraestructura ejecutable Madre
+│   ├── scripts/batcueva-state.sh   ← PUNTO DE ENTRADA PRINCIPAL
+│   ├── scripts/cierre-sesion.sh    ← commit diario automático
+│   ├── docker-compose.yml          (Fase 1)
+│   ├── batcueva-fase2.yml          (Fase 2)
+│   └── batcueva-fase3.yml          (Fase 3)
+├── templates/             ← plantillas Obsidian y documentos
+├── tools/                 ← herramientas y scripts generales
+└── yo/                    ← información personal, CV, perfil
 ```
 
 ---
@@ -85,15 +96,10 @@ yggdrasil-dew/
 ## Reconstruir Madre desde cero
 
 ```bash
-# 1. Clonar repo
 git clone https://github.com/alvarofernandezmota-tech/yggdrasil-dew ~/Projects/yggdrasil-dew
 cd ~/Projects/yggdrasil-dew
-
-# 2. Copiar variables de entorno
 cp setup/servidor/.env.plantilla setup/servidor/.env
-# Editar .env con tus valores reales
-
-# 3. Ejecutar state script (hace todo)
+# Editar .env con valores reales
 bash setup/servidor/scripts/batcueva-state.sh
 ```
 
@@ -102,11 +108,12 @@ bash setup/servidor/scripts/batcueva-state.sh
 ## Pendientes críticos
 
 - [ ] Fase 3 levantar (n8n + Paperless + Vaultwarden)
-- [ ] Fase 4 crear compose + scripts (LiteLLM + Nginx + Watchtower)
-- [ ] `docs/` — manuales de uso por servicio
+- [ ] Fase 4 crear compose + scripts
+- [ ] `docs/` ampliar — manuales por servicio
+- [ ] `agentes/` y `ollama/` — auditar y actualizar contenido
 - [ ] Repo dotfiles separado (Hyprland, aliases, bashrc)
 - [ ] Migración inbox→repo automatizada (THDORA/n8n)
 
 ---
 
-_Ver: [MASTER-PENDIENTES.md](inbox/MASTER-PENDIENTES.md) · [inbox/README.md](inbox/README.md)_
+_Ver: [CONVENCIONES.md](CONVENCIONES.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [ROADMAP.md](ROADMAP.md) · [inbox/README.md](inbox/README.md)_

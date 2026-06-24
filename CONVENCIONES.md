@@ -3,6 +3,7 @@
 > Estas reglas existen para que cualquier IA, cualquier persona, o tú mismo
 > en 6 meses entienda el sistema sin preguntar nada.
 > **Si no está aquí documentado, no existe.**
+> Este fichero es vivo — se añaden reglas cuando se toman decisiones nuevas.
 
 ---
 
@@ -13,59 +14,45 @@ Nunca directamente a su destino final si no está revisado.
 
 ---
 
-## Regla 2 — Sincronización obligatoria al mover de inbox a repo
+## Regla 2 — Sincronización obligatoria al mover de inbox al repo
 
-**Cuando un fichero del inbox se procesa y mueve a su destino final,
-obligatoriamente hay que actualizar TODOS estos sitios:**
-
-### Checklist de sincronización
+Cuando un fichero del inbox se procesa y mueve a su destino, **actualizar obligatoriamente**:
 
 ```
-☐ 1. El fichero va a su destino (setup/, docs/, diarios/, proyectos/...)
+☐ 1. Fichero al destino (setup/, docs/, diarios/, agentes/, ollama/...)
 ☐ 2. MASTER-PENDIENTES.md — marcar tarea como ✅ si aplica
-☐ 3. ESTADO-SISTEMA.md — actualizar estado si cambia algo en el stack
+☐ 3. ESTADO-SISTEMA.md — actualizar si cambia algo en el stack
 ☐ 4. ROADMAP.md — marcar fase como completa si aplica
-☐ 5. README.md del directorio destino — añadir enlace al nuevo fichero
-☐ 6. inbox/ — eliminar o marcar el fichero original como procesado
-☐ 7. cierre-sesion.sh — ejecutar para commitear todo junto
+☐ 5. ECOSISTEMA.md — actualizar si cambia la arquitectura
+☐ 6. README.md del directorio destino — añadir enlace
+☐ 7. inbox/ — eliminar o archivar el fichero procesado
+☐ 8. cierre-sesion.sh — ejecutar para commitear todo
 ```
-
-### Ejemplo práctico
-
-Tienes `inbox/2026-06-24-script-batcueva-fase4.md` y lo conviertes en
-`setup/servidor/batcueva-fase4.yml`:
-
-1. Creas `setup/servidor/batcueva-fase4.yml` ✅
-2. En `MASTER-PENDIENTES.md` marcas "Crear batcueva-fase4.yml" como ✅ ✅
-3. En `ESTADO-SISTEMA.md` actualizas estado Fase 4 a "✅ lista" ✅
-4. En `ROADMAP.md` marcas Fase 4 como completa ✅
-5. En `setup/servidor/README.md` añades enlace al nuevo compose ✅
-6. Borras o archivas el fichero inbox original ✅
-7. `bash scripts/cierre-sesion.sh "fase4 implementada"` ✅
 
 ---
 
-## Regla 3 — Los 4 ficheros maestros siempre sincronizados
-
-Estos 4 ficheros son la fuente de verdad. Si se desincroniza uno, el sistema miente:
+## Regla 3 — Los 5 ficheros maestros siempre sincronizados
 
 | Fichero | Qué contiene | Cuándo actualizar |
 |---|---|---|
-| `ESTADO-SISTEMA.md` | Estado real del stack ahora mismo | Cada vez que un servicio cambia de estado |
-| `MASTER-PENDIENTES.md` | TODO lo pendiente priorizado | Cada sesión de trabajo |
-| `ROADMAP.md` | Visión a largo plazo + fases | Cuando se completa una fase |
-| `CONVENCIONES.md` | Reglas del sistema | Cuando se decide algo nuevo |
+| `ESTADO-SISTEMA.md` | Estado real del stack ahora mismo | Cada vez que un servicio cambia |
+| `MASTER-PENDIENTES.md` | TODO lo pendiente priorizado | Cada sesión |
+| `ROADMAP.md` | Visión + fases | Al completar una fase |
+| `CONVENCIONES.md` | Reglas del sistema | Al tomar decisiones nuevas |
+| `ECOSISTEMA.md` | Mapa completo arquitectura | Al añadir servicios o repos |
 
 ---
 
 ## Regla 4 — Nomenclatura de ficheros
 
 ```
-inbox/     → YYYY-MM-DD-tema-subtema.md         (siempre fecha al inicio)
-docs/      → nombre-descriptivo.md               (sin fecha, es documento vivo)
-diarios/   → YYYY-MM-DD.md                       (solo fecha)
-setup/     → nombre-tecnologia-proposito.yml/.sh  (sin fecha, es infraestructura)
-proyectos/ → nombre-proyecto/README.md            (carpeta por proyecto)
+inbox/     → YYYY-MM-DD-tema-subtema.md
+docs/      → nombre-descriptivo.md          (sin fecha, documento vivo)
+diarios/   → YYYY-MM-DD.md
+setup/     → nombre-tecnologia.yml/.sh       (sin fecha, infraestructura)
+agentes/   → nombre-modelo-proposito.md
+ollama/    → Modelfile.nombre o nombre.md
+proyectos/ → nombre-proyecto/README.md
 ```
 
 ---
@@ -76,71 +63,125 @@ proyectos/ → nombre-proyecto/README.md            (carpeta por proyecto)
 Formato: <tipo>: <descripción> — <contexto opcional>
 
 Tipos:
-  inbox:    añadir fichero al inbox
-  docs:     documentación nueva o actualizada
-  setup:    infraestructura (composes, scripts)
-  fix:      corrección de algo roto
-  refactor: reorganización sin cambio funcional
-  cierre:   commit automático de fin de sesión
-
-Ejemplos:
-  inbox: sesión madrugada 24 jun — auditoría setup/servidor
-  docs: obsidian-setup.md — plugins + Dataview queries
-  setup: batcueva-fase3.yml — n8n + Paperless + Vaultwarden
-  cierre: 2026-06-24 02:53 — CONVENCIONES + docs/
+  inbox:    añadir al inbox
+  docs:     documentación
+  setup:    infraestructura
+  agentes:  fichas o prompts de agentes
+  fix:      corrección
+  refactor: reorganización
+  cierre:   commit automático fin de sesión
 ```
 
 ---
 
 ## Regla 6 — Un README por directorio
 
-Cada carpeta principal tiene su `README.md` que explica:
-- Para qué sirve la carpeta
-- Qué hay dentro
-- Cómo se usa
+Cada carpeta principal tiene `README.md` con: para qué sirve, qué hay, cómo se usa.
 
-Directorios que necesitan README:
-- [x] `inbox/README.md` ✅
-- [x] `docs/README.md` — pendiente crear
-- [x] `setup/servidor/README.md` — ya existe
-- [ ] `diarios/README.md` — pendiente
-- [ ] `proyectos/README.md` — pendiente
+| Directorio | README |
+|---|---|
+| `inbox/` | ✅ existe |
+| `docs/` | ❌ pendiente |
+| `agentes/` | ❌ pendiente |
+| `ollama/` | ❌ pendiente |
+| `setup/servidor/` | ✅ existe |
+| `diarios/` | ❌ pendiente |
+| `proyectos/` | ❌ pendiente |
+| `formacion/` | ❌ pendiente |
+| `osint/` | ❌ pendiente |
+| `yo/` | ❌ pendiente |
 
 ---
 
 ## Regla 7 — Cierre de sesión obligatorio
 
-Al terminar cualquier sesión de trabajo:
-
 ```bash
-bash ~/Projects/yggdrasil-dew/setup/servidor/scripts/cierre-sesion.sh "descripción breve"
+bash ~/Projects/yggdrasil-dew/setup/servidor/scripts/cierre-sesion.sh "descripción"
 ```
 
-Esto hace:
-1. `git add -A` — todo lo nuevo y modificado
-2. `git commit` con fecha + descripción
-3. `git push` a GitHub
-
-Sin esto, el trabajo de la sesión existe solo en local — si Madre muere, se pierde.
+Sin esto, el trabajo existe solo en local. Si Madre muere → se pierde.
 
 ---
 
 ## Regla 8 — Sincronización entre repos
 
-Actualmente hay 2 repos principales:
-
-| Repo | Propósito | URL |
-|---|---|---|
-| `yggdrasil-dew` | Cerebro central — todo el ecosistema | este repo |
-| `personal-v2` | Repo anterior — en deprecación | github.com/alvarofernandezmota-tech/personal-v2 |
-
-**Regla:** Todo lo nuevo va en `yggdrasil-dew`. `personal-v2` no se actualiza más.
-
-Cuando se creen repos públicos de proyectos (`ollama-stack`, `osint-stack`, etc.):
-- El repo del proyecto tiene su propio README
-- `yggdrasil-dew/proyectos/nombre/` tiene el contexto privado y decisiones
-- `ESTADO-SISTEMA.md` enlaza ambos
+- Todo lo nuevo → `yggdrasil-dew`
+- `personal-v2` → deprecado, no actualizar
+- Repos públicos de proyectos: su README propio + contexto privado en `proyectos/nombre/`
 
 ---
-_Actualizado: 24 jun 2026 02:53 CEST_
+
+## Regla 9 — Escalamiento de proyectos
+
+Cuando un proyecto crece, sigue este orden:
+
+```
+Nivel 1 — Idea
+  inbox/YYYY-MM-DD-proyecto-nombre.md
+
+Nivel 2 — Ficha activa
+  proyectos/nombre/README.md
+  proyectos/nombre/decisions.md
+  proyectos/nombre/estado.md
+
+Nivel 3 — Repo propio
+  github.com/alvarofernandezmota-tech/nombre
+  + referencia en ECOSISTEMA.md
+  + contexto privado en proyectos/nombre/
+
+Nivel 4 — Servicio en Madre
+  setup/servidor/nombre.yml
+  + entrada en ESTADO-SISTEMA.md
+  + entrada en batcueva-state.sh
+```
+
+Regla: **nunca saltar niveles**. Una idea no pasa a repo público sin tener ficha activa.
+
+---
+
+## Regla 10 — Planificación de sprints
+
+Cada semana tiene un sprint informal:
+
+```
+Domingo noche → revisar MASTER-PENDIENTES → elegir 3 objetivos de la semana
+Diario        → ejecutar desde MASTER-PENDIENTES, no improvisar
+Viernes       → anotar qué se hizo y qué quedó en diarios/YYYY-MM-DD.md
+```
+
+Máximo **3 objetivos por semana**. Si hay más → van a P3/P4 en MASTER-PENDIENTES.
+
+---
+
+## Regla 11 — Formación como parte del sistema
+
+Todo lo que aprendes va documentado:
+
+```
+formacion/python/          ← apuntes Python
+formacion/linux/           ← apuntes Linux/Arch
+formacion/ia/              ← apuntes LLM, RAG, agentes
+formacion/pentest/         ← apuntes OSINT, seguridad
+formacion/ingenieria/      ← patrones, arquitectura, diseño de sistemas
+```
+
+Regla: **si lo estudias y no lo documentas, no lo sabrás en 3 meses**.
+Mínimo una nota por sesión de estudio.
+
+---
+
+## Regla 12 — Diseño de sistemas antes de código
+
+Antes de escribir cualquier script o servicio nuevo:
+
+1. ¿Qué problema resuelve? (1 frase)
+2. ¿Qué entra y qué sale? (inputs/outputs)
+3. ¿Cómo falla y cómo se recupera? (idempotencia)
+4. ¿Dónde vive en el repo? (ruta definitiva)
+
+Si no puedes responder las 4 → va al inbox como idea, no se implementa todavía.
+
+---
+
+_Actualizado: 24 jun 2026 02:56 CEST_
 _Ver: [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [ROADMAP.md](ROADMAP.md)_
