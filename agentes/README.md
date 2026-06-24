@@ -1,83 +1,134 @@
+# 🤖 Agentes e IAs — Directorio Maestro
+**Última actualización:** 2026-06-24  
+**Propósito:** Mapa completo de todas las IAs y agentes del ecosistema yggdrasil-dew
+
 ---
-tags: [agentes, ia-externa, llm, chat, investigacion, workflows]
-fecha-actualizacion: 2026-06-23
-ruta-obsidian: agentes/README.md
+
+## Estructura de esta carpeta
+
+```
+agentes/
+├── README.md                    ← este fichero — mapa maestro
+│
+├── 🌐 IAs EXTERNAS (APIs / web)
+│   ├── perplexity.md            ← Perplexity — investigación + GitHub MCP
+│   ├── claude-sonnet-4.6.md     ← Claude — código complejo, razonamiento
+│   ├── gemini-2.5-pro.md        ← Gemini Pro — contextos largos, PDFs
+│   ├── gemini.md                ← Gemini general
+│   ├── grok-3.md                ← Grok 3 — noticias X, tiempo real
+│   ├── grok.md                  ← Grok general
+│   ├── chatgpt-o3.md            ← ChatGPT o3 — razonamiento avanzado
+│   ├── mistral-large-2.md       ← Mistral Large — alternativa europea
+│   └── 2026-06-23-actualizacion-claude-gemini.md
+│
+├── 🏠 MODELOS LOCALES (Ollama en Madre)
+│   ├── ollama-qwen2.5-72b.md    ← mejor modelo local potente
+│   ├── ollama-llama3.3-70b.md   ← llama local grande
+│   ├── ollama-llama3.2-3b.md    ← rápido, 3B para tareas simples
+│   ├── ollama-mistral-7b.md     ← equilibrado
+│   ├── ollama-deepseek-r1.md    ← razonamiento local
+│   ├── ollama-gemma3.md         ← Google local
+│   ├── ollama-phi4.md           ← Microsoft local, eficiente
+│   ├── ollama-codegemma-starcoder2.md ← código local
+│   ├── ollama-qwen2.5-72b.md
+│   └── ollama/                  ← Modelfiles (erika, toki, etc.)
+│
+├── 👤 AGENTES PROPIOS
+│   ├── toki-bot.md              ← TOKI — bot Telegram maestro
+│   └── (Erika → ver ollama/)
+│
+├── 🛠️ TOOLS & ESPECIALIZADOS
+│   ├── AI_TOOLKIT.md            ← toolkit completo de herramientas IA
+│   ├── AGENT-SCRIPT.md          ← scripts de agentes
+│   ├── especializados-audio.md  ← Whisper, TTS, audio
+│   ├── especializados-embeddings.md ← bge-m3, RAG, vectores
+│   ├── especializados-ocr-vision.md ← OCR, visión, imágenes
+│   ├── opencode.md              ← OpenCode IDE IA
+│   └── auditoria-ai-toolkit.md
+│
+└── 📝 PROMPTS
+    ├── prompts.md               ← prompts maestros
+    └── prompts/                 ← librería de prompts
+```
+
 ---
 
-# Agentes IA — IAs Externas de Chat e Investigación
+## Cuándo usar cada IA — referencia rápida
 
-> IAs que usas tú en el navegador o integradas via API/MCP.
-> Son herramientas de investigación, documentación y razonamiento — NO corren en Madre.
-
-## Estructura de carpetas del ecosistema
-
-| Carpeta | Qué contiene |
-|---|---|
-| `agentes/` | IAs externas de chat — Claude, Gemini, GPT, Perplexity, Grok |
-| `ollama/` | Modelos locales en Madre/Acer — llama3.2, deepseek, phi4... |
-| `cli-tools/` | Herramientas IA de terminal — opencode, aider, shell_gpt |
-| `tools/` | Scripts y APIs propias — ollama-rag, inbox-processor, thdora |
-
-## IAs activas
-
-| IA | Acceso | Rol principal | Estado |
+| IA | Mejor para | Velocidad | Coste |
 |---|---|---|---|
-| **Perplexity** (Sonnet 4.6) | Web + MCP GitHub | Código · repos · docs · arquitectura | ✅ Principal |
-| **Grok 3** (xAI) | Web + X/Twitter | Investigación · mercado · datos frescos | ✅ Activo |
-| **Gemini 2.5 Pro** | Web | Contexto 1M tokens · código largo | ✅ Activo |
-| **Claude Sonnet 4.6** | Web + API | Razonamiento · escritura técnica | ✅ Activo |
-| **ChatGPT o3** | Web | Matemáticas · razonamiento formal | ✅ Activo |
-| **Mistral Le Chat** | Web | Investigación EU · privacidad | ⏳ Parcial |
+| **Perplexity** | Investigar + fuentes + GitHub MCP + documentar repo | ⚡⚡⚡ | Suscripción |
+| **Claude Sonnet** | Código complejo, refactoring, análisis largo | ⚡⚡ | Suscripción |
+| **Gemini 2.5 Pro** | PDFs largos, contexto 1M tokens, documentos | ⚡⚡ | Gratis/Pro |
+| **Gemini Flash** | Tareas rápidas con Gemini, API barata | ⚡⚡⚡ | Muy barato |
+| **Grok 3** | Noticias X, tiempo real, investigación actual | ⚡⚡ | Suscripción |
+| **ChatGPT o3** | Razonamiento avanzado, matemáticas, lógica | ⚡ | Suscripción |
+| **Mistral Large** | Alternativa europea, privacidad, código | ⚡⚡ | API |
+| **qwen2.5:7b local** | Uso diario offline, Erika, privacidad total | ⚡⚡ | 0€ |
+| **qwen2.5:3b local** | Rápido en CPU, respuestas cortas | ⚡⚡⚡ | 0€ |
+| **deepseek-r1 local** | Razonamiento offline, cadenas de pensamiento | ⚡ | 0€ |
 
-## Protocolo de handoff
+---
+
+## Flujo de investigación con IAs
 
 ```
-Grok (investiga) → Perplexity (valida + sube al repo)
-Gemini (diseña / código largo) → Perplexity (sube al repo)
-Claude (razona / escribe) → Perplexity (documenta)
-OpenCode (terminal) → commits locales → Perplexity documenta
+¿Qué quiero?
+│
+├── Buscar info + documentar en repo
+│     └── Perplexity (esta sesión) ← SIEMPRE PRIMERO
+│
+├── Escribir/refactorizar código largo
+│     └── Claude Sonnet
+│
+├── Analizar PDF / documento enorme
+│     └── Gemini 2.5 Pro (1M context)
+│
+├── Qué pasa en Twitter / noticias hoy
+│     └── Grok 3
+│
+├── Razonamiento matemático/lógico profundo
+│     └── ChatGPT o3
+│
+├── Consulta privada / offline / sin internet
+│     └── Ollama local (qwen2.5:7b → Erika)
+│
+└── Contrastar resultado importante
+      └── 2ª IA diferente a la primera
 ```
 
-**Regla de oro:** output final en GitHub → siempre pasa por Perplexity (tiene MCP GitHub).
+---
 
-## Cómo arrancar una sesión nueva
+## LiteLLM — acceso unificado (Fase 4)
 
-### Con Perplexity
-```
-Lee AGENT.md y CONTEXT.md de yggdrasil-dew y díme el estado actual.
-Repo: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
-```
+Con LiteLLM activo, todos los modelos se usan desde 1 endpoint:
 
-### Con Grok
-```
-Soy Álvaro. Ecosistema en: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
-Investiga [TEMA] y dame opciones con pros/contras.
-```
+```bash
+# Local (Ollama)
+curl http://litellm:4000/v1/chat/completions \
+  -d '{"model": "erika", "messages": [...]}'
 
-### Con Gemini
-```
-Soy Álvaro. Contexto en: yggdrasil-dew/ECOSISTEMA.md
-Implementa [TAREA LARGA] completa.
+# Claude via LiteLLM
+curl http://litellm:4000/v1/chat/completions \
+  -d '{"model": "claude-sonnet", "messages": [...]}'
+
+# Gemini via LiteLLM  
+curl http://litellm:4000/v1/chat/completions \
+  -d '{"model": "gemini-flash", "messages": [...]}'
 ```
 
-### Con Claude
-```
-Soy Álvaro. Lee CONTEXT.md: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
-Necesito razonar sobre [TEMA].
-```
+Ver configuración completa: `inbox/2026-06-24-fase4-litellm-sops-plan.md`
 
-## Fichas individuales
+---
 
-- [[agentes/perplexity]] — Perplexity + MCP GitHub
-- [[agentes/claude-sonnet-4.6]] — Claude Sonnet
-- [[agentes/gemini-2.5-pro]] — Gemini Pro
-- [[agentes/chatgpt-o3]] — ChatGPT o3
-- [[agentes/grok-3]] — Grok 3
-- [[agentes/mistral-large-2]] — Mistral
+## Estado de integración
 
-## Ver también
-
-- [[ollama/README]] — modelos locales
-- [[cli-tools/README]] — herramientas de terminal
-- [[tools/README]] — scripts y APIs propias
-- [[AGENT.md]] — roles completos del ecosistema
+| IA | En n8n | En LiteLLM | Modelfile | Documentada |
+|---|---|---|---|---|
+| Erika (qwen2.5:7b) | ✅ | ✅ fase4 | ✅ | ✅ |
+| qwen2.5:3b | ✅ | ✅ fase4 | — | ✅ |
+| TOKI bot | ✅ | — | — | ✅ |
+| Claude Sonnet | — | ✅ fase4 | — | ✅ |
+| Gemini Flash | — | ✅ fase4 | — | ✅ |
+| Grok 3 | — | pendiente | — | ✅ |
+| deepseek-r1 | — | pendiente | — | ✅ |
