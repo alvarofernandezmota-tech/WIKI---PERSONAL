@@ -1,59 +1,73 @@
-# =========================================================================
-# BATCUEVA FASE 2 — docker-compose.yml
-# Servicios: Ollama (GPU) + tar1090 (aviones) + Kismet (WiFi)
-# Prereqs: nvidia-container-toolkit instalado, antena USB WiFi conectada
-# Ejecutar: docker compose up -d
-# =========================================================================
-version: '3.8'
+# =============================================================================
+# batcueva-fase2.yml — Monitoring + OSINT + Gestión
+# Ejecutar: docker compose -f batcueva-fase2.yml up -d
+# Requiere: Fase 1 activa (Ollama + WebUI + Qdrant)
+# =============================================================================
 
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: batcueva-ollama
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    environment:
-      - TZ=Europe/Madrid
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    volumes:
-      - ollama_data:/root/.ollama
 
-  osiris-globe:
-    image: ghcr.io/sdr-enthusiasts/docker-tar1090:latest
-    container_name: osiris-globe
-    restart: unless-stopped
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
     ports:
-      - "8085:80"
-    environment:
-      - TZ=Europe/Madrid
-      - LAT=40.4167
-      - LON=-3.7037
-      - NAME=Batcueva_Station
+      - "9000:9000"
+      - "9443:9443"
     volumes:
-      - osiris_globe_data:/var/globe_history
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    labels:
+      - "batcueva.fase=2"
+      - "batcueva.servicio=portainer"
 
-  kismet:
-    image: kismet/kismet:latest
-    container_name: kismet-server
-    restart: unless-stopped
-    network_mode: "host"
-    privileged: true
-    cap_add:
-      - NET_ADMIN
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+    labels:
+      - "batcueva.fase=2"
+      - "batcueva.servicio=uptime-kuma"
+
+  spiderfoot:
+    image: smicallef/spiderfoot:latest
+    container_name: spiderfoot
+    restart: always
+    ports:
+      - "5001:5001"
+    volumes:
+      - spiderfoot_data:/home/spiderfoot/.spiderfoot
+    labels:
+      - "batcueva.fase=2"
+      - "batcueva.servicio=spiderfoot-osint"
+
+  heimdall:
+    image: linuxserver/heimdall:latest
+    container_name: heimdall
+    restart: always
+    ports:
+      - "8090:80"
+      - "8091:443"
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - kismet_data:/rxtx
-      - /dev/bus/usb:/dev/bus/usb
+      - heimdall_data:/config
+    labels:
+      - "batcueva.fase=2"
+      - "batcueva.servicio=dashboard"
 
 volumes:
-  ollama_data:
-  osiris_globe_data:
-  kismet_data:
+  portainer_data:
+  uptime_kuma_data:
+  spiderfoot_data:
+  heimdall_data:
+
+networks:
+  default:
+    name: batcueva
+    external: true
