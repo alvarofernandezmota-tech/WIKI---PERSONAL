@@ -1,114 +1,94 @@
----
-tags: [inbox, protocolo, flujo, obsidian, sistema]
-fecha-creacion: 2026-06-22
-fecha-actualizacion: 2026-06-23
-version: 3.0
-ruta-obsidian: inbox/README.md
----
+# inbox/ — Cómo funciona
 
-# 📥 inbox/ — Protocolo v3.0
-
-> Zona de aterrizaje de todo lo nuevo.
-> Nada se mueve sin pasar por aquí primero. Todo lo que entra, se procesa.
+> El inbox es la zona de aterrizaje. Todo entra aquí primero.
+> Nada se pierde. Todo se procesa después — manualmente o via agente.
 
 ---
 
-## Las 3 leyes que gobiernan el inbox
+## Regla de oro
 
-1. **Todo nuevo entra aquí primero** — sin excepciones
-2. **Nunca duplicar** — si ya existe, actualiza con wikilink
-3. **Infraestructura != Producto** — no mezclar en la misma ficha
+**Si tienes dudas de dónde va algo → inbox.**
+Mejor documentado en inbox que perdido.
 
 ---
 
-## Estructura del inbox
+## Estructura de ficheros
 
 ```
 inbox/
-  README.md                    ← este archivo (protocolo)
-  MASTER-PENDIENTES.md         ← fuente única de verdad de tareas
-  YYYY-MM-DD-tema.md           ← archivos de sesión (temporales)
-  YYYY-MM-DD-inbox-clasificado.md  ← snapshot de estado (permanente)
+├── README.md                          ← este fichero
+├── MASTER-PENDIENTES.md               ← MOVIDO A RAÍZ (ver /MASTER-PENDIENTES.md)
+│
+├── Sesiones de trabajo
+│   ├── YYYY-MM-DD-sesion-*.md         ← resumen de sesión con agente IA
+│   └── YYYY-MM-DD-sesion-completa.md  ← dump completo de conversación
+│
+├── Auditorías
+│   └── YYYY-MM-DD-auditoria-*.md      ← auditoría de una carpeta o área
+│
+├── Decisiones (ADR)
+│   └── YYYY-MM-DD-adr-*.md            ← Architecture Decision Records
+│   └── YYYY-MM-DD-decision-*.md       ← decisiones puntuales
+│
+├── Investigaciones
+│   └── YYYY-MM-DD-*-investigacion.md  ← deep research sobre un tema
+│   └── YYYY-MM-DD-ollama-*.md         ← investigaciones sobre modelos/RAG
+│
+├── Proyectos (fichas)
+│   └── YYYY-MM-DD-proyecto-*.md       ← ficha inicial de un proyecto
+│
+├── Scripts y configs pendientes
+│   └── YYYY-MM-DD-script-*.md         ← scripts a implementar
+│   └── YYYY-MM-DD-*-plan.md           ← planes de implementación
+│
+└── Varios
+    └── YYYY-MM-DD-*.md                ← todo lo que no encaja arriba
 ```
 
 ---
 
-## Frontmatter YAML obligatorio
+## Ciclo de vida de un fichero inbox
 
-Todo archivo del inbox lleva este frontmatter mínimo:
-
-```yaml
----
-tags: [tema, tipo, fecha]   # tags para Obsidian
-fecha: YYYY-MM-DD
-tipo: adr | auditoria | plan | prompt-agente | estado | sesion | ficha
-estado: pendiente | ejecutado | en-curso | obsoleto
-ruta-obsidian: inbox/nombre-archivo.md
----
+```
+Nueva idea / sesión
+       ↓
+  inbox/YYYY-MM-DD-nombre.md
+       ↓
+  [revisión manual o agente]
+       ↓
+  ┌────────────────────────────────────┐
+  │ ¿Es un script ejecutable?          │ → setup/servidor/scripts/
+  │ ¿Es documentación de un servicio?  │ → docs/
+  │ ¿Es un ADR/decisión?               │ → docs/adr/
+  │ ¿Es un diario de sesión procesado? │ → diarios/
+  │ ¿Es un proyecto?                   │ → proyectos/
+  │ ¿Es config de infraestructura?     │ → setup/
+  └────────────────────────────────────┘
+       ↓
+  Fichero eliminado de inbox/ (ya procesado)
 ```
 
 ---
 
-## Tipos de archivo y su destino final
+## Ficheros especiales (no tocar)
 
-| Tipo | Ejemplo | Destino definitivo |
-|---|---|---|
-| ADR | `adr-decision-X.md` | `docs/ADR/` |
-| Auditoría | `auditoria-carpeta.md` | ejecutar y archivar |
-| Plan | `plan-X.md` | ejecutar con agente |
-| Prompt agente | `prompt-claude-X.md` | usar y archivar |
-| Estado | `estado-X.md` | `setup/` o `diarios/` |
-| Sesión | `sesion-X.md` | `diarios/YYYY/MM/` |
-| Ficha conocimiento | `ollama-X.md` | carpeta temática |
-| Ficha proyecto | `proyecto-X.md` | `proyectos/X/` |
+| Fichero | Descripción |
+|---|---|
+| `MASTER-PENDIENTES.md` | Movido a raíz — editar en `/MASTER-PENDIENTES.md` |
+| `2026-06-23-VACIADO-MAESTRO-GEMINI.md` | Dump maestro Gemini — fuente histórica |
+| `2026-06-23-yggdrasil-v4-diario-maestro.md` | Diario maestro v4 — referencia |
 
 ---
 
-## Flujo de procesamiento
+## Automatización futura
 
-```
-Nuevo conocimiento/decisión
-  ↓
-  inbox/ (aterriza aquí)
-  ↓
-  clasificar (tipo + estado + destino)
-  ↓
-  ┌───────────────────────────────┐
-  │ EJECUTADO → mover a destino  │
-  │ PLAN → ejecutar con agente   │
-  │ CONOCIMIENTO → mover carpeta │
-  │ OBSOLETO → eliminar          │
-  └───────────────────────────────┘
-  ↓
-  inbox vacío = sistema sano
-```
+Cuando THDORA esté operativo en Fase 5, este proceso será automático:
+- THDORA lee inbox/ cada noche
+- Clasifica y mueve ficheros a sus destinos
+- Actualiza MASTER-PENDIENTES.md
+- Hace commit + push
+
+Hasta entonces: **revisión manual cada domingo**.
 
 ---
-
-## Agentes que trabajan con el inbox
-
-| Agente | Rol | Cómo |
-|---|---|---|
-| [[agentes/perplexity]] | Documenta en tiempo real | MCP GitHub directo |
-| [[agentes/claude-sonnet-4.6]] | Ejecuta planes del inbox | MCP + prompts |
-| [[agentes/gemini-2.5-pro]] | Audita el inbox masivamente | Texto serializado |
-
----
-
-## Permanentes (nunca mover)
-
-- `README.md` — este archivo
-- `MASTER-PENDIENTES.md` — fuente de verdad
-
----
-
-## Revisión semanal (cada domingo)
-
-1. Abrir `MASTER-PENDIENTES.md`
-2. Revisar tabla `inbox-clasificado` más reciente
-3. Mover archivos `EJECUTADO` a sus destinos
-4. Archivar sesiones en `diarios/`
-5. Actualizar MASTER con lo completado
-
----
-_v3.0 · Actualizado 2026-06-23 · Ver [[HOME]] · [[filosofia]] · [[agentes/AGENT-SCRIPT]]_
+_Ver: [MASTER-PENDIENTES.md](../MASTER-PENDIENTES.md) · [ROADMAP.md](../ROADMAP.md) · [ESTADO-SISTEMA.md](../ESTADO-SISTEMA.md)_
