@@ -1,94 +1,127 @@
-# inbox/ — Cómo funciona
+---
+tags: [inbox, reglas, workflow, obsidian]
+fecha-creacion: 2026-06-24
+actualizado: 2026-06-24
+estado: permanente
+---
 
-> El inbox es la zona de aterrizaje. Todo entra aquí primero.
-> Nada se pierde. Todo se procesa después — manualmente o via agente.
+# 📥 Inbox — Zona de aterrizaje temporal
+
+> **El inbox NO es un archivo. Es una puerta de entrada.**
+> Todo lo que entra aquí tiene 24h para encontrar su carpeta definitiva.
 
 ---
 
-## Regla de oro
+## ⚠️ Reglas de uso — NO negociables
 
-**Si tienes dudas de dónde va algo → inbox.**
-Mejor documentado en inbox que perdido.
-
----
-
-## Estructura de ficheros
-
-```
-inbox/
-├── README.md                          ← este fichero
-├── MASTER-PENDIENTES.md               ← MOVIDO A RAÍZ (ver /MASTER-PENDIENTES.md)
-│
-├── Sesiones de trabajo
-│   ├── YYYY-MM-DD-sesion-*.md         ← resumen de sesión con agente IA
-│   └── YYYY-MM-DD-sesion-completa.md  ← dump completo de conversación
-│
-├── Auditorías
-│   └── YYYY-MM-DD-auditoria-*.md      ← auditoría de una carpeta o área
-│
-├── Decisiones (ADR)
-│   └── YYYY-MM-DD-adr-*.md            ← Architecture Decision Records
-│   └── YYYY-MM-DD-decision-*.md       ← decisiones puntuales
-│
-├── Investigaciones
-│   └── YYYY-MM-DD-*-investigacion.md  ← deep research sobre un tema
-│   └── YYYY-MM-DD-ollama-*.md         ← investigaciones sobre modelos/RAG
-│
-├── Proyectos (fichas)
-│   └── YYYY-MM-DD-proyecto-*.md       ← ficha inicial de un proyecto
-│
-├── Scripts y configs pendientes
-│   └── YYYY-MM-DD-script-*.md         ← scripts a implementar
-│   └── YYYY-MM-DD-*-plan.md           ← planes de implementación
-│
-└── Varios
-    └── YYYY-MM-DD-*.md                ← todo lo que no encaja arriba
-```
-
----
-
-## Ciclo de vida de un fichero inbox
-
-```
-Nueva idea / sesión
-       ↓
-  inbox/YYYY-MM-DD-nombre.md
-       ↓
-  [revisión manual o agente]
-       ↓
-  ┌────────────────────────────────────┐
-  │ ¿Es un script ejecutable?          │ → setup/servidor/scripts/
-  │ ¿Es documentación de un servicio?  │ → docs/
-  │ ¿Es un ADR/decisión?               │ → docs/adr/
-  │ ¿Es un diario de sesión procesado? │ → diarios/
-  │ ¿Es un proyecto?                   │ → proyectos/
-  │ ¿Es config de infraestructura?     │ → setup/
-  └────────────────────────────────────┘
-       ↓
-  Fichero eliminado de inbox/ (ya procesado)
-```
-
----
-
-## Ficheros especiales (no tocar)
-
-| Fichero | Descripción |
+| Regla | Límite |
 |---|---|
-| `MASTER-PENDIENTES.md` | Movido a raíz — editar en `/MASTER-PENDIENTES.md` |
-| `2026-06-23-VACIADO-MAESTRO-GEMINI.md` | Dump maestro Gemini — fuente histórica |
-| `2026-06-23-yggdrasil-v4-diario-maestro.md` | Diario maestro v4 — referencia |
+| Máximo de archivos simultáneos | **10** |
+| Vida máxima de un archivo | **24 horas** |
+| Archivos permanentes permitidos | **3** (README, MASTER-PENDIENTES, PLANTILLA-DIARIO) |
+| Scripts en inbox | **❌ Nunca** → van a `codigo/scripts/` |
+| Documentación definitiva en inbox | **❌ Nunca** → va a `docs/` |
+| Sesiones completas en inbox | **❌ Nunca** → van a `diarios/` |
 
 ---
 
-## Automatización futura
+## ✅ Qué SÍ puede estar en inbox
 
-Cuando THDORA esté operativo en Fase 5, este proceso será automático:
-- THDORA lee inbox/ cada noche
-- Clasifica y mueve ficheros a sus destinos
-- Actualiza MASTER-PENDIENTES.md
-- Hace commit + push
+- Una idea que acaba de llegar y no sabes aún dónde va
+- Un enlace o referencia rápida para procesar hoy
+- Un borrador en construcción activa (máx 24h)
+- Un archivo de arranque de sesión (se migra al diario al cerrar)
 
-Hasta entonces: **revisión manual cada domingo**.
+## ❌ Qué NUNCA debe estar en inbox
+
+- Scripts o código → `codigo/scripts/`
+- Debates multi-IA resueltos → `docs/ias/debates/`
+- Documentación de setup → `docs/setup/servidor/`
+- Investigación de modelos/herramientas → `investigacion/`
+- Fichas de proyectos → `proyectos/`
+- Resúmenes de sesión → `diarios/YYYY-MM-DD.md`
+- ADRs (decisiones de arquitectura) → `docs/arquitectura/`
+- Prompts definitivos → `docs/ias/prompts/`
 
 ---
-_Ver: [MASTER-PENDIENTES.md](../MASTER-PENDIENTES.md) · [ROADMAP.md](../ROADMAP.md) · [ESTADO-SISTEMA.md](../ESTADO-SISTEMA.md)_
+
+## 🔁 Flujo correcto
+
+```
+Llega información / idea / código
+          ↓
+   ¿Sabes dónde va?
+   /            \
+  SÍ            NO
+   ↓              ↓
+Va directo     Inbox (máx 24h)
+a su carpeta        ↓
+               Al cerrar sesión:
+               → migra a su carpeta
+               → o consolida en diarios/
+```
+
+---
+
+## 📁 Destinos definitivos
+
+```
+yggdrasil-dew/
+│
+├── inbox/                    ← AQUÍ, temporal, máx 10 archivos
+│
+├── diarios/                  ← Un archivo por día con TODO lo de ese día
+│   └── YYYY-MM-DD.md
+│
+├── docs/                     ← Documentación permanente
+│   ├── arquitectura/         ← ADRs, decisiones de diseño
+│   ├── ias/
+│   │   ├── ollama/           ← Guías, modelfiles, benchmarks
+│   │   ├── debates/          ← Debates multi-IA resueltos
+│   │   └── prompts/          ← Prompts definitivos y plantillas
+│   └── setup/
+│       ├── servidor/         ← Docker, stacks, compose files
+│       ├── seguridad/        ← SSH, sysctl, hardening
+│       └── arch/             ← Arch Linux, Hyprland, dotfiles
+│
+├── codigo/                   ← Código ejecutable
+│   ├── scripts/              ← bash, python, utils
+│   ├── docker/               ← compose files, Dockerfiles
+│   └── agentes/              ← Modelfiles, prompts ejecutables
+│
+├── investigacion/            ← Research en proceso
+│   ├── modelos/              ← Comparativas, benchmarks de LLMs
+│   ├── herramientas/         ← Evaluación de tools nuevas
+│   └── osint/                ← Técnicas, herramientas OSINT
+│
+└── proyectos/                ← Proyectos activos
+    ├── thdora/
+    ├── local-brain/
+    ├── chatbot-control/
+    └── batcueva/
+```
+
+---
+
+## 📋 Archivos permanentes del inbox
+
+| Archivo | Propósito |
+|---|---|
+| `README.md` | Este archivo — reglas del inbox |
+| `MASTER-PENDIENTES.md` | Único tracker de tareas activas |
+| `PLANTILLA-DIARIO.md` | Template para arrancar sesiones |
+
+---
+
+## 🚨 Señal de alarma
+
+Si el inbox supera **10 archivos** → parar todo y vaciar antes de continuar.
+Si un archivo lleva **más de 24h** → migrarlo o borrarlo, sin excepciones.
+
+> **Historia:** En jun 2026 el inbox llegó a 93 archivos en 3 días.
+> Ese caos costó horas de auditoría. Esta regla existe por eso.
+
+---
+
+*Actualizado: 2026-06-24 por Perplexity vía MCP*
+*Ver también: [[MASTER-PENDIENTES]] · [[diarios/2026-06-24]]*
