@@ -1,190 +1,104 @@
 ---
-tags: [filosofia, sistema, principios, identidad, ingenieria, python, ia-local]
-fecha-creacion: 2026-06-20
-fecha-actualizacion: 2026-06-23
-migrado-de: personal/00_sistema/sistema-filosofia.md
-version: 3.0
+tipo: filosofia-core
+fecha_creacion: 2026-06-23
+ultima_actualizacion: 2026-06-24
+status: vigente
+tags: [filosofia, open-source, soberania, principios, homelab]
 ---
 
-# 🧭 Filosofía del Sistema
+# 🌳 Filosofía de Yggdrasil-Dew
 
-> *"Áquí se evoluciona. Se aprende. Se reflexiona. Se crece. Se hace caos. Se ordena. Se derrumba todo. Y se vuelve a empezar — pero desde un piso más arriba que antes."
+> El árbol del conocimiento crece desde las raíces propias, no de nubes ajenas.
 
----
+## Principios Absolutos (no negociables)
 
-## El Ciclo — La ley fundamental
+### 1. ⭐ 100% Open-Source
+Todo software, modelo, herramienta o infraestructura debe ser open-source.
+Si no hay alternativa open-source viable, se documenta el propietario pero
+el deploy real siempre espera a que exista la alternativa libre.
 
-```
-Se evoluciona → Se aprende → Se reflexiona → Se crece
-      ↑                                            ↓
-Se vuelve a empezar                       Se hace caos
-  (un piso más arriba)                          ↓
-      ↑                                    Se ordena
-Se derrumba todo ←────────────── Se derrumba todo
-```
+### 2. ⭐ Soberanía Digital
+Ningún dato privado sale del homelab.
+Los modelos cloud (Gemini, Grok, Claude) se usan **únicamente** para:
+- Investigación y documentación
+- Generación de prompts y templates
+- Debate técnico y aprendizaje
+Nunca para procesar datos personales, del homelab o de proyectos reales.
 
-**El caos no es un fallo del sistema. Es parte del sistema.**
+### 3. ⭐ Minimalismo Soberano
+Menos es más. Cada componente debe justificar su RAM, su CPU y su complejidad.
+Si una herramienta ligera hace el 80% de lo que hace una pesada, gana la ligera.
+- llama.cpp > Ollama (cuando hay overhead justificado)
+- Script Python > Framework agencial
+- CLI/TUI > WebUI cuando sea posible
 
----
+### 4. ⭐ CPU-Only Viable
+El homelab Madre (i5-8400, 16GB RAM, sin GPU) es una plataforma de producción real.
+Todo diseño debe funcionar en este hardware sin degradar servicios activos.
+- Modelos viables: 7B-8B (Q4_K_M o Q5_K_M)
+- num_thread ≤ 4 · num_ctx ≤ 4096
+- 14B+: solo si se libera RAM suficiente o cambia hardware
 
-## Los 5 principios del sistema
+### 5. ⭐ Conocimiento desde Primera Mano
+Documentar todo: cada decisión, cada error, cada aprendizaje.
+Las IAs se entrevistan, se debaten y sus respuestas se archivan.
+El conocimiento no se da por supuesto: se verifica, se prueba, se mide.
 
-### 1. Las cosas se hacen haciendo
-La planificación es una herramienta, no un fin.
-> *"Producción primero, perfección después."
-
-### 2. Todo es un proceso
-No hay saltos. No hay atajos. El ritmo es más importante que el sprint.
-> *"Un commit imperfecto que existe vale más que una arquitectura perfecta que no existe todavía."
-
-### 3. El foco está en uno mismo
-Analizarse. Evaluarse honestamente. Compararse con quien se era ayer, no con otros.
-
-### 4. Energía limpia
-Este proyecto no compite con nadie. Construir sin destruir. Avanzar sin pisar.
-
-### 5. Tres pilares de cada día
-
-| Pilar | Qué significa |
-|---|---|
-| 🔎 Curiosidad | Algo que no sabías antes de ese día |
-| 🪟 Introspección | Algo honesto sobre cómo estás |
-| 🏗️ Avance | Aunque sea pequeño — un commit, una idea |
-
----
-
-## Principios de Ingeniería — Antes de hacer cualquier cosa
-
-> Aplica a todo: crear un agente, escribir un script, documentar un archivo,
-> refactorizar código, instalar una herramienta, añadir una ficha al repo.
-> **Si no puedes responder las 4 preguntas — no se hace.**
-
-### Las 4 preguntas obligatorias
-
-```
-1. ¿QUÉ problema concreto existe ahora mismo?
-   (específico y real — no teórico)
-
-2. ¿POR QUÉ hay que resolverlo ahora y no después?
-   (si no tiene urgencia real, va al backlog)
-
-3. ¿CÓMO se resuelve de la forma más simple posible?
-   (la solución más sencilla que funcione — no la más elegante)
-
-4. ¿CÓMO se verifica que está resuelto?
-   (criterio de éxito concreto y medible)
-```
-
-### Anti-patrones del sistema
-
-> Cosas que parecen productivas pero no lo son:
-
-- **Documentar por documentar** — crear fichas sin información real o útil
-- **Construir herramientas que nadie usa** — automatizar algo que no duele
-- **Arquitectura prematura** — diseñar sistemas complejos antes de tener el problema
-- **Mover sin leer** — reorganizar archivos sin verificar su contenido
-- **Irse por las ramas** — explorar posibilidades en lugar de resolver lo concreto
-- **Perfeccionar antes de funcionar** — pulir algo que aún no hace lo básico
-
-### El criterio de un agente o herramienta Python
-
-Antes de escribir una línea de código:
-
-```
-¿Lo hago a mano ahora mismo y duele?
-  Sí → tiene sentido automatizar
-  No → no hace falta el agente
-
-¿El resultado mejora algo concreto del ecosistema?
-  Sí → adelante
-  No → es un juguete — va al backlog o se descarta
-
-¿Puedo construirlo en menos de 100 líneas de Python?
-  Sí → ésa es la versión 1.0
-  No → estás complicando algo simple
-```
-
-### Principio de IA local
-
-> La IA local no es un juguete — es infraestructura.
-> Cada agente que corre en Madre resuelve una necesidad real del ecosistema.
-> Un agente que nadie usa es peor que no tenerlo: es deuda técnica.
-
-```
-Primer criterio:  ¿Hay una necesidad real y concreta?
-Segundo criterio: ¿El LLM local añade valor que no tiene un script puro?
-Tercer criterio:  ¿Cabe en el ecosistema actual sin romper nada?
-```
+### 6. ⭐ Aprendizaje Continuo
+Autodidacta activo. El homelab es un laboratorio de aprendizaje permanente.
+Cada proyecto enseña algo concreto: Python, estadística, algoritmos, redes, seguridad.
+El error es datos. El fracaso es documentación.
 
 ---
 
-## Regla de oro — Repos y documentación
+## Stack Preferido (por filosofía)
 
-> Añadida en v3.0 · 2026-06-23 — Ingeniero de software bien organizado
-
-### Separación de responsabilidades documental
-
-```
-Repo técnica (GitHub)     ← Código, docker-compose, README técnico
-Cerebro (yggdrasil-dew)   ← Conocimiento, decisiones, estado, wikilinks
-```
-
-### Las 3 leyes de las repos
-
-**Ley 1 — Nunca duplicar, siempre enlazar**
-> Si algo está en la repo técnica, el cerebro lo referencia con wikilink.
-> No se copia el contenido — se enlaza.
-
-**Ley 2 — Todo nuevo entra por inbox**
-> Cualquier idea, decisión, conocimiento o tarea entra primero en `inbox/`.
-> Desde inbox se procesa y se mueve a su lugar definitivo.
-> El inbox es la puerta de entrada de todo el sistema.
-
-**Ley 3 — Infraestructura ≠ Producto**
-> Un servidor no es un proyecto. Un proyecto corre sobre el servidor.
-> Homelab vive en `setup/servidor/`.
-> Productos viven en `proyectos/` con su repo GitHub propia.
-
-### Patrón de enlace repo técnica ↔ cerebro
-
-Cada proyecto con Docker tiene:
-```
-GitHub repo propia:
-  README.md          ← instalación, uso rápido
-  docker-compose.yml ← despliegue
-  docs/              ← docs técnicas internas
-
-yggdrasil-dew:
-  proyectos/NOMBRE/README.md   ← estado + [[enlace-repo-github]]
-  ollama/ o agentes/ o osint/  ← conocimiento transversal
-  setup/servidor/              ← qué corre en Madre y cómo
-```
+| Categoría | Elección Open-Source | Alternativa Propietaria (solo investigación) |
+|-----------|----------------------|----------------------------------------------|
+| LLM local | llama.cpp + Qwen2.5-7B / Llama3.1-8B | Gemini, GPT-4, Claude |
+| UI local | LlamaStash (TUI) / CLI | OpenWebUI |
+| Vector DB | Qdrant | Pinecone, Weaviate Cloud |
+| Orquestación | FastAPI + scripts Python | CrewAI, LangChain, LangGraph |
+| Estadística | numpy + scipy | - |
+| Monitor | Prometheus + Grafana | Datadog, New Relic |
+| Git | Gitea (self-hosted) | GitHub (solo PKM público) |
+| DNS | Pihole | Cloudflare |
+| VPN | Wireguard + Headscale | Tailscale (propietario) |
+| Secretos | Vaultwarden + SOPS | 1Password, HashiCorp Cloud |
+| CI/CD | Gitea Actions | GitHub Actions |
+| OS | Arch Linux | - |
 
 ---
 
-## Frases fundacionales
+## Sobre las IAs Cloud
 
-- *"El orden no se construye en un día, pero sí se decide en uno."
-- *"El ritmo es más importante que el sprint."
-- *"Producción primero, perfección después."
-- *"El caos es necesario para que haya orden."
-- *"Cimientos en abril. Construcción en mayo. Sistema en junio."
-- *"Si no puedes responder las 4 preguntas — no se hace."
-- *"La solución más simple que funcione siempre gana."
-- *"Un agente que nadie usa es peor que no tenerlo."
-- *"Nunca duplicar — siempre enlazar."
-- *"Todo nuevo entra por inbox."
-- *"Infraestructura ≠ Producto."
+Gemini, Grok, Claude, ChatGPT y Perplexity son **herramientas de investigación**, no de producción.
+Se usan para:
+- Documentar modelos desde primera mano (autoentrevista)
+- Debates técnicos multi-IA
+- Generar prompts, templates y artefactos
+- Investigar arquitecturas y comparar opciones
+
+El conocimiento extraído se archiva en Yggdrasil-Dew y se aplica con herramientas open-source.
 
 ---
 
-## Changelog
+## Proyectos e Interés Personal
 
-| Versión | Fecha | Cambios |
-|---|---|---|
-| 1.0 | 2026-06-20 | Filosofía base — 5 principios, el ciclo, frases fundacionales |
-| 2.0 | 2026-06-22 | Añadidos principios de ingeniería: 4 preguntas, anti-patrones, criterio agentes Python, principio IA local |
-| 3.0 | 2026-06-23 | Regla de oro repos: 3 leyes, patrón enlace técnico-cerebro, Infraestructura ≠ Producto |
+Álvaro tiene interés especial en:
+- **Estadística y probabilidad**: cadenas de Markov, distribuciones, simulaciones
+- **Algoritmos**: diseño, análisis de complejidad, implementación desde cero
+- **OSINT**: herramientas open-source, análisis de redes, tshark, Scapy
+- **Seguridad**: pentest, ciberseguridad defensiva y ofensiva
+- **IA aplicada**: LLM como extractor semántico + cálculo nativo
 
----
-_Ver también: [[yo/perfil]] · [[HOME]] · [[inbox/README]] · [[inbox/MASTER-PENDIENTES]]_
+El patrón ideal de proyecto:
+```
+Dato real (red/archivo/texto)
+    ↓
+ LLM local (extrae semántica, genera estructura)
+    ↓
+numpy/scipy (cálculo determinista)
+    ↓
+Resultado útil + documentación en PKM
+```
