@@ -1,7 +1,7 @@
 # Acer Aspire — Servidor 24/7 y Backup
 
 > Máquina secundaria. Corre 24/7. Rol: redundancia y servicios ligeros.
-> Última actualización: 23 junio 2026
+> Última actualización: 24 junio 2026
 
 ---
 
@@ -41,8 +41,8 @@
 | fail2ban | ✅ | jail sshd activo |
 | SSH server (sshd) | ✅ | Accesible desde Madre |
 | UFW | ✅ | Activo |
+| TLP | ✅ **Activo** | Aplicado 24 jun — modo BAT + powersave |
 | tmux | ⏳ Pendiente | |
-| TLP | ⏳ Pendiente instalar | Ahorro batería |
 
 ---
 
@@ -60,119 +60,113 @@ ssh varopc@100.86.119.102
 
 ## 🔋 Batería y consumo — comandos
 
+> **Estado actual (24 jun 2026):** TLP activo en modo `balanced/BAT` + CPU governor `powersave` aplicados.
+> El Acer está enchufado 24/7 → `/sys/class/power_supply/BAT0/power_now` no existe (normal en AC).
+
+### Activar ahorro máximo (ONE-LINER)
+
+```bash
+sudo tlp bat && sudo cpupower frequency-set -g powersave
+# Alias: batsave
+```
+
 ### Estado rápido de la batería
 
 ```bash
-# Estado actual (nivel, carga, estado)
 cat /sys/class/power_supply/BAT0/capacity       # % batería
 cat /sys/class/power_supply/BAT0/status         # Charging / Discharging / Full
-cat /sys/class/power_supply/BAT0/energy_now     # energía actual (µWh)
-cat /sys/class/power_supply/BAT0/energy_full    # capacidad máxima (µWh)
-cat /sys/class/power_supply/BAT0/power_now      # consumo instantáneo (µW)
+cat /sys/class/power_supply/BAT0/power_now      # consumo instantáneo (µW) — solo si en batería
 
 # Resumen bonito
 upower -i /org/freedesktop/UPower/devices/battery_BAT0
-# Si no está: sudo pacman -S upower
+
+# Ver qué interfaces de energía hay
+ls /sys/class/power_supply/
 ```
 
-### Consumo en tiempo real
+### TLP — gestor de energía ✅ Instalado
 
 ```bash
-# Ver consumo actual en vatios
-cat /sys/class/power_supply/BAT0/power_now | awk '{printf "%.2f W\n", $1/1000000}'
-
-# powertop — análisis detallado de consumo por proceso
-sudo powertop
-# Si no está: sudo pacman -S powertop
-
-# powertop modo auto-tune (aplica optimizaciones de consumo)
-sudo powertop --auto-tune
-
-# Ver consumo resumido sin modo interactivo
-sudo powertop --time=5 --csv=/tmp/powertop.csv
-```
-
-### TLP — gestor de energía (recomendado para Ryzen)
-
-```bash
-# Instalar TLP
-sudo pacman -S tlp tlp-rdw
-
-# Activar e iniciar
-sudo systemctl enable tlp
-sudo systemctl start tlp
-
-# Estado de TLP
+# Estado
 sudo tlp-stat -s          # estado general
 sudo tlp-stat -b          # solo batería
 sudo tlp-stat -p          # perfiles CPU actuales
-sudo tlp-stat             # todo completo
 
 # Modo manual
-sudo tlp bat              # forzar modo batería
+sudo tlp bat              # forzar modo batería (mínimo consumo)
 sudo tlp ac               # forzar modo corriente
 ```
 
-### Límite de carga de batería (salud a largo plazo)
+### TLP — configuración avanzada Ryzen
 
 ```bash
-# Ver límites actuales de carga
-cat /sys/class/power_supply/BAT0/charge_control_start_threshold
-cat /sys/class/power_supply/BAT0/charge_control_end_threshold
-
-# Configurar en /etc/tlp.conf:
-# START_CHARGE_THRESH_BAT0=75
-# STOP_CHARGE_THRESH_BAT0=80
-# (carga entre 75-80% — ideal para batería siempre enchufada)
-
 sudo nano /etc/tlp.conf
+```
+Añadir/descomentar para consumo mínimo:
+```ini
+START_CHARGE_THRESH_BAT0=75
+STOP_CHARGE_THRESH_BAT0=80
+CPU_SCALING_GOVERNOR_ON_BAT=powersave
+CPU_ENERGY_PERF_POLICY_ON_BAT=power
+PLATFORM_PROFILE_ON_BAT=low-power
+RUNTIME_PM_ON_BAT=auto
+```
+```bash
 sudo systemctl restart tlp
 ```
 
-### Reducir consumo CPU (AMD Ryzen 5500U)
+### CPU Governor — powersave ✅ Aplicado
 
 ```bash
-# Ver governor CPU actual
-cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+# Ver governor actual
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+# Debe decir: powersave
 
 # Cambiar a powersave
 sudo cpupower frequency-set -g powersave
-# Si no está: sudo pacman -S cpupower
 
-# Ver frecuencias actuales
-sudo cpupower frequency-info
-
-# Governors disponibles en Ryzen:
-# powersave   → mínimo consumo (recomendado batería)
-# schedutil   → balance automático (recomendado siempre conectado)
-# performance → máximo rendimiento (mayor consumo)
-
-# Hacer permanente con systemd
-sudo systemctl enable cpupower
-# Configurar en /etc/default/cpupower:
+# Hacer permanente — en /etc/default/cpupower:
 # governor='powersave'
+sudo systemctl enable cpupower
 ```
 
-### Script rápido — resumen batería
+### Servicios — qué deshabilitar sin romper nada
 
-```bash
-#!/bin/bash
-# bat-status.sh — resumen de batería en una línea
-BAT=/sys/class/power_supply/BAT0
-echo "🔋 Batería: $(cat $BAT/capacity)%  |  Estado: $(cat $BAT/status)  |  Consumo: $(awk '{printf "%.1f W", $1/1000000}' $BAT/power_now)"
-```
+> WiFi (`iwd`), SSH, Tailscale, fail2ban y netdata deben quedar **siempre activos**.
 
 ```bash
-# Uso rápido desde terminal
-bash -c 'B=/sys/class/power_supply/BAT0; echo "🔋 $(cat $B/capacity)% | $(cat $B/status) | $(awk "{printf \"%.1f W\", \$1/1000000}" $B/power_now)"'
+# SDDM — display manager gráfico innecesario en servidor headless → DESHABILITAR
+sudo systemctl disable --now sddm.service
+
+# rtkit — solo necesario para audio en tiempo real
+sudo systemctl disable --now rtkit-daemon.service
+
+# smartd — monitorización SMART, opcional
+sudo systemctl disable --now smartd.service
+
+# bluetooth — si no se usa
+sudo systemctl disable --now bluetooth.service
 ```
+
+| Servicio | Acción | Por qué |
+|---|---|---|
+| `iwd` | ✅ Mantener | WiFi |
+| `tailscaled` | ✅ Mantener | Acceso remoto |
+| `sshd` | ✅ Mantener | SSH |
+| `fail2ban` | ✅ Mantener | Seguridad |
+| `netdata` | ✅ Mantener | Monitorización |
+| `tlp` | ✅ Mantener | Ahorro energía |
+| `sddm` | ❌ Deshabilitar | Gráfico innecesario |
+| `rtkit-daemon` | ❌ Deshabilitar | Solo para audio |
+| `smartd` | ❌ Deshabilitar | Opcional |
+| `bluetooth` | ❌ Deshabilitar | No se usa |
 
 ### Alias útiles (añadir a ~/.zshrc)
 
 ```bash
 alias bat='cat /sys/class/power_supply/BAT0/capacity && cat /sys/class/power_supply/BAT0/status'
 alias batw='cat /sys/class/power_supply/BAT0/power_now | awk "{printf \"%.2f W consumo\n\", \$1/1000000}"'
-alias batsave='sudo cpupower frequency-set -g powersave && sudo tlp bat'
+alias batsave='sudo tlp bat && sudo cpupower frequency-set -g powersave'
 alias batmax='sudo cpupower frequency-set -g schedutil && sudo tlp ac'
 ```
 
@@ -203,11 +197,8 @@ ip route
 # Test de conectividad
 ping -c 3 8.8.8.8
 
-# DNS — ver configuración
+# DNS
 cat /etc/resolv.conf
-
-# Reiniciar red (NetworkManager)
-sudo systemctl restart NetworkManager
 
 # Estado NetworkManager
 nmcli device status
@@ -219,26 +210,9 @@ nmcli connection show
 ## 🦷 Bluetooth — comandos
 
 ```bash
-# Estado del servicio
 sudo systemctl status bluetooth
-
-# Activar bluetooth
-sudo systemctl start bluetooth
-sudo systemctl enable bluetooth
-
-# Entrar al gestor interactivo
 bluetoothctl
-
-# Dentro de bluetoothctl:
-power on              # encender
-scan on               # buscar dispositivos
-devices               # ver los encontrados
-pair XX:XX:XX:XX      # emparejar por MAC
-connect XX:XX:XX:XX   # conectar
-trust XX:XX:XX:XX     # confiar (auto-conecta al arrancar)
-disconnect XX:XX:XX   # desconectar
-remove XX:XX:XX:XX    # olvidar dispositivo
-quit                  # salir
+# power on / scan on / pair XX:XX / connect XX:XX / trust XX:XX / quit
 ```
 
 ---
@@ -246,41 +220,17 @@ quit                  # salir
 ## 📊 Monitorización — comandos
 
 ```bash
-# CPU, RAM, procesos en tiempo real
 htop
-
-# Uso de disco
 df -h
-
-# Uso de RAM
 free -h
-
-# Temperatura CPU (AMD)
-sensors
-# Si no está: sudo pacman -S lm_sensors && sudo sensors-detect
-
-# Carga del sistema (últimos 1, 5, 15 min)
-uptime
-
-# Procesos más pesados
+sensors                          # temperatura CPU AMD
+uptime                           # carga 1/5/15 min
 ps aux --sort=-%cpu | head -10
 ps aux --sort=-%mem | head -10
-
-# Red — tráfico en tiempo real
-nload wlan0
-# Si no está: sudo pacman -S nload
-
-# Conexiones activas
-ss -tuln
-
-# Ver logs del sistema
-journalctl -f                        # en tiempo real
-journalctl -u sshd -f                # solo SSH
-journalctl --since "1 hour ago"      # última hora
-
-# Espacio por carpeta
-du -sh ~/*
-du -sh /var/log/*
+ss -tuln                         # conexiones activas
+journalctl -f                    # logs en tiempo real
+journalctl -u sshd -f
+journalctl --since "1 hour ago"
 ```
 
 ---
@@ -288,20 +238,10 @@ du -sh /var/log/*
 ## 🔒 Seguridad — comandos
 
 ```bash
-# Estado UFW
 sudo ufw status verbose
-
-# Estado fail2ban
 sudo fail2ban-client status
 sudo fail2ban-client status sshd
-
-# IPs baneadas por fail2ban
-sudo fail2ban-client status sshd | grep "Banned IP"
-
-# Ver intentos de login fallidos
 sudo journalctl -u sshd | grep "Failed"
-
-# Tailscale estado
 tailscale status
 tailscale ping 100.91.112.32    # ping a Madre
 ```
@@ -311,29 +251,11 @@ tailscale ping 100.91.112.32    # ping a Madre
 ## ⚙️ Sistema — comandos útiles
 
 ```bash
-# Información hardware completa
 inxi -F
-
-# Versión OS y kernel
 uname -a
-cat /etc/os-release
-
-# Servicios activos
 systemctl list-units --type=service --state=running
-
-# Reiniciar servicio
-sudo systemctl restart <servicio>
-
-# Ver puertos abiertos
-sudo ss -tlnp
-
-# Actualizar sistema
 sudo pacman -Syu
-
-# Limpiar caché pacman
 sudo pacman -Sc
-
-# Ver uso de swap
 swapon --show
 ```
 
@@ -341,15 +263,15 @@ swapon --show
 
 ## Pendiente
 
+- [ ] `sudo systemctl disable --now sddm rtkit-daemon smartd bluetooth` — deshabilitar servicios innecesarios
+- [ ] TLP config avanzada en `/etc/tlp.conf` — límite carga 75-80% + CPU power policy
+- [ ] Aliases de batería añadidos a `~/.zshrc`
 - [ ] tmux instalado y configurado
 - [ ] Alias `acer` en `~/.zshrc` de Madre
-- [ ] TLP instalado y configurado con límite de carga 75-80%
-- [ ] Aliases de batería añadidos a `~/.zshrc`
 - [ ] PostgreSQL (base de datos centralizada)
 - [ ] Pi-hole
 - [ ] Headscale (Tailscale self-hosted)
 - [ ] Script monitorización automática (cron + log)
-- [ ] Obsidian vault sincronizado por git
 
 ---
 
