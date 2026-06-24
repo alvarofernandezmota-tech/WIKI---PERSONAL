@@ -19,12 +19,12 @@ Nunca directamente a su destino final si no está revisado.
 Cuando un fichero del inbox se procesa y mueve a su destino, **actualizar obligatoriamente**:
 
 ```
-☐ 1. Fichero al destino (setup/, docs/, diarios/, agentes/, ollama/...)
+☐ 1. Fichero al destino correcto
 ☐ 2. MASTER-PENDIENTES.md — marcar tarea como ✅ si aplica
-☐ 3. ESTADO-SISTEMA.md — actualizar si cambia algo en el stack
-☐ 4. ROADMAP.md — marcar fase como completa si aplica
-☐ 5. ECOSISTEMA.md — actualizar si cambia la arquitectura
-☐ 6. README.md del directorio destino — añadir enlace
+☐ 3. ESTADO-SISTEMA.md — si cambia algo en el stack
+☐ 4. ROADMAP.md — si se completa una fase
+☐ 5. ECOSISTEMA.md — si cambia la arquitectura
+☐ 6. README.md del directorio destino
 ☐ 7. inbox/ — eliminar o archivar el fichero procesado
 ☐ 8. cierre-sesion.sh — ejecutar para commitear todo
 ```
@@ -47,9 +47,9 @@ Cuando un fichero del inbox se procesa y mueve a su destino, **actualizar obliga
 
 ```
 inbox/     → YYYY-MM-DD-tema-subtema.md
-docs/      → nombre-descriptivo.md          (sin fecha, documento vivo)
+docs/      → nombre-descriptivo.md
 diarios/   → YYYY-MM-DD.md
-setup/     → nombre-tecnologia.yml/.sh       (sin fecha, infraestructura)
+setup/     → nombre-tecnologia.yml/.sh
 agentes/   → nombre-modelo-proposito.md
 ollama/    → Modelfile.nombre o nombre.md
 proyectos/ → nombre-proyecto/README.md
@@ -78,19 +78,6 @@ Tipos:
 
 Cada carpeta principal tiene `README.md` con: para qué sirve, qué hay, cómo se usa.
 
-| Directorio | README |
-|---|---|
-| `inbox/` | ✅ existe |
-| `docs/` | ❌ pendiente |
-| `agentes/` | ❌ pendiente |
-| `ollama/` | ❌ pendiente |
-| `setup/servidor/` | ✅ existe |
-| `diarios/` | ❌ pendiente |
-| `proyectos/` | ❌ pendiente |
-| `formacion/` | ❌ pendiente |
-| `osint/` | ❌ pendiente |
-| `yo/` | ❌ pendiente |
-
 ---
 
 ## Regla 7 — Cierre de sesión obligatorio
@@ -105,7 +92,7 @@ Sin esto, el trabajo existe solo en local. Si Madre muere → se pierde.
 
 ## Regla 8 — Sincronización entre repos
 
-- Todo lo nuevo → `yggdrasil-dew`
+- Todo lo nuevo → `yggdrasil-dew` (hasta que batcueva exista)
 - `personal-v2` → deprecado, no actualizar
 - Repos públicos de proyectos: su README propio + contexto privado en `proyectos/nombre/`
 
@@ -113,75 +100,92 @@ Sin esto, el trabajo existe solo en local. Si Madre muere → se pierde.
 
 ## Regla 9 — Escalamiento de proyectos
 
-Cuando un proyecto crece, sigue este orden:
-
 ```
-Nivel 1 — Idea
-  inbox/YYYY-MM-DD-proyecto-nombre.md
-
-Nivel 2 — Ficha activa
-  proyectos/nombre/README.md
-  proyectos/nombre/decisions.md
-  proyectos/nombre/estado.md
-
-Nivel 3 — Repo propio
-  github.com/alvarofernandezmota-tech/nombre
-  + referencia en ECOSISTEMA.md
-  + contexto privado en proyectos/nombre/
-
-Nivel 4 — Servicio en Madre
-  setup/servidor/nombre.yml
-  + entrada en ESTADO-SISTEMA.md
-  + entrada en batcueva-state.sh
+Nivel 1 — Idea → inbox/
+Nivel 2 — Ficha activa → proyectos/nombre/
+Nivel 3 — Repo propio → github.com/alvarofernandezmota-tech/nombre
+Nivel 4 — Servicio en Madre → setup/servidor/nombre.yml
 ```
 
-Regla: **nunca saltar niveles**. Una idea no pasa a repo público sin tener ficha activa.
+Regla: **nunca saltar niveles**.
 
 ---
 
-## Regla 10 — Planificación de sprints
-
-Cada semana tiene un sprint informal:
+## Regla 10 — Sprints semanales
 
 ```
-Domingo noche → revisar MASTER-PENDIENTES → elegir 3 objetivos de la semana
-Diario        → ejecutar desde MASTER-PENDIENTES, no improvisar
-Viernes       → anotar qué se hizo y qué quedó en diarios/YYYY-MM-DD.md
+Domingo → elegir 3 objetivos máximo
+Diario  → ejecutar desde MASTER-PENDIENTES
+Viernes → anotar en diarios/YYYY-MM-DD.md
 ```
 
-Máximo **3 objetivos por semana**. Si hay más → van a P3/P4 en MASTER-PENDIENTES.
+Máximo 3 objetivos por semana.
 
 ---
 
-## Regla 11 — Formación como parte del sistema
-
-Todo lo que aprendes va documentado:
+## Regla 11 — Formación documentada
 
 ```
-formacion/python/          ← apuntes Python
-formacion/linux/           ← apuntes Linux/Arch
-formacion/ia/              ← apuntes LLM, RAG, agentes
-formacion/pentest/         ← apuntes OSINT, seguridad
-formacion/ingenieria/      ← patrones, arquitectura, diseño de sistemas
+formacion/python/
+formacion/linux/
+formacion/ia/
+formacion/pentest/
+formacion/ingenieria/
 ```
 
-Regla: **si lo estudias y no lo documentas, no lo sabrás en 3 meses**.
-Mínimo una nota por sesión de estudio.
+Si lo estudias y no lo documentas, no lo sabrás en 3 meses.
 
 ---
 
-## Regla 12 — Diseño de sistemas antes de código
+## Regla 12 — Diseño antes de código
 
-Antes de escribir cualquier script o servicio nuevo:
+Antes de escribir cualquier script:
+1. ¿Qué problema resuelve?
+2. ¿Qué entra y qué sale?
+3. ¿Cómo falla y cómo se recupera?
+4. ¿Dónde vive en el repo?
 
-1. ¿Qué problema resuelve? (1 frase)
-2. ¿Qué entra y qué sale? (inputs/outputs)
-3. ¿Cómo falla y cómo se recupera? (idempotencia)
-4. ¿Dónde vive en el repo? (ruta definitiva)
-
-Si no puedes responder las 4 → va al inbox como idea, no se implementa todavía.
+Si no puedes responder las 4 → va al inbox, no se implementa.
 
 ---
 
-_Actualizado: 24 jun 2026 02:56 CEST_
-_Ver: [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [ROADMAP.md](ROADMAP.md)_
+## Regla 13 — Arquitectura multi-repo profesional
+
+Cada repo tiene **una sola responsabilidad**. Así lo hacen los ingenieros senior.
+
+```
+personal          ← VIDA: diarios, metas, reflexiones (siempre privado)
+yggdrasil-dew     ← CONOCIMIENTO: docs, formación, referencias, agentes
+batcueva          ← INFRAESTRUCTURA: scripts, composes, setup Madre
+thdora            ← PROYECTO: código agente IA (público)
+local-brain       ← PROYECTO: código cerebro local (público)
+[futuros]         ← cada proyecto nuevo = repo propio si llega a Nivel 3
+```
+
+Todo conectado por:
+- Wikilinks en Obsidian: `[[tecnico/ESTADO-SISTEMA]]`
+- `ECOSISTEMA.md` como mapa central
+- Etiquetas Obsidian: `#infra` `#proyecto` `#formacion` `#personal`
+
+**Regla:** nada personal en repos técnicos. Nada técnico en personal.
+Si un fichero no encaja claramente en un repo → va al inbox y se decide.
+
+---
+
+## Regla 14 — Infraestructura de red (situación actual)
+
+```
+iPhone (hotspot) → Madre torre (WiFi)
+Acer varopc      → Madre torre (SSH vía Tailscale o red local)
+Móvil            → pendiente Obsidian + Tailscale
+```
+
+- Descargas grandes: móvil enchufado + pantalla apagada
+- Sin router fijo — alternativas documentadas en `docs/sistema/red-alternativas.md`
+- Cuando haya red fija: Tailscale gestiona todo, hotspot innecesario
+- Regla: **nada crítico depende del hotspot** — todo debe poder pausarse y reanudarse
+
+---
+
+_Actualizado: 24 jun 2026 03:39 CEST_
+_Ver: [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [ROADMAP.md](ROADMAP.md) · [ECOSISTEMA.md](ECOSISTEMA.md)_
