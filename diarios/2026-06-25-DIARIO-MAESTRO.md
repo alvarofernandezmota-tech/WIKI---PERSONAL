@@ -1,92 +1,107 @@
 ---
-tags: [diario, sesion, 2026-06-25, docker, fase3, ssh, pentest]
+tags: [diario, sesion, 2026-06-25, docker, fase3, ssh, pentest, gemini]
 fecha: 2026-06-25
 ---
 
 # Diario 25 jun 2026
 
-## Resumen de la sesión
-
-Sesión larga desde el móvil (Redmi A5). Todo por Perplexity + MCP sin terminal directo.
+Sesión completa desde Redmi A5 vía Perplexity + MCP. Sin acceso directo a terminal varopc.
 
 ---
 
 ## ✅ Completado hoy
 
-### Mañana (desde móvil)
-- Stack Fase 1+2 verificado HEALTHY (ollama + open-webui + qdrant)
-- SSH varopc→Madre arreglado (clave instalada, config pendiente de fix)
-- .env generado en Madre con N8N_ENCRYPTION_KEY y LITELLM_MASTER_KEY
-- git remote cambiado a HTTPS en Madre (fix: Permission denied publickey)
-- git stash + pull → Madre al día con main
-- Red Docker `batcueva` creada
-- Carpeta /opt/batcueva en proceso (falta fix sudo)
+| Hora | Tarea |
+|---|---|
+| ~12:10 | Stack Fase 1+2 HEALTHY — ollama + open-webui + qdrant |
+| ~12:10 | Fix: pkill ollama nativo que ocupaba :11434 |
+| ~12:30 | Fix: healthcheck qdrant cambiado a wget |
+| ~12:33 | ESTADO-SISTEMA.md actualizado |
+| ~12:34 | MASTER-PENDIENTES.md auditado y cruzado |
+| ~12:43 | litellm-config.yaml creado (dos instancias Ollama) |
+| ~12:43 | Auditoría Gemini: 10 errores detectados y corregidos |
+| ~12:46 | litellm-config.yaml corregido (16GB RAM, ollama-embeddings:11435) |
+| ~13:00 | git stash + pull — Madre al día |
+| ~13:05 | git remote → HTTPS (fix Permission denied publickey) |
+| ~13:08 | Red batcueva creada en Madre |
+| ~13:08 | .env generado con N8N_ENCRYPTION_KEY + LITELLM_MASTER_KEY |
+| ~13:21 | batcueva-fase3.yml corregido (code-server ruta absoluta) |
+| ~13:21 | Documentación completa: ssh-config, fase3-incidencias, env-madre, diario |
 
-### Documentación generada hoy (Perplexity vía MCP)
-- ESTADO-SISTEMA.md actualizado
-- MASTER-PENDIENTES.md auditado y cruzado
-- setup/servidor/litellm-config.yaml creado y verificado
-- setup/servidor/investigacion/2026-06-25-gemini-bloques-auditados.md
-- setup/servidor/ssh-config-varopc.md
-- setup/servidor/fase3-incidencias.md
-- setup/servidor/env-madre.md
-- diarios/2026-06-25-DIARIO-MAESTRO.md (este archivo)
+## ❌ Pendiente al cerrar sesión
 
----
-
-## ⚠️ Pendiente al cerrar sesión
-
-### Crítico — terminar hoy
-- [ ] Arreglar ~/.ssh/config en varopc (está corrupto — línea `eofcat`)
-- [ ] Crear headscale config.yaml en /opt/batcueva/headscale/
-- [ ] Relanzar Fase 3 completa
+### Crítico — hacer ahora
+- [ ] Arreglar ~/.ssh/config en varopc (corrupto — ver ssh-config-varopc.md)
+- [ ] Relanzar Fase 3: `ssh madre "cd ~/yggdrasil-dew && docker compose -f setup/servidor/batcueva-fase3.yml up -d"`
 - [ ] Levantar Fase 4
 - [ ] Pulls modelos Ollama en background
-- [ ] Rellenar TELEGRAM_BOT_TOKEN y TELEGRAM_USER_ID en ~/.env
-- [ ] Cambiar CODE_SERVER_PASSWORD por valor real
+- [ ] Rellenar TELEGRAM_BOT_TOKEN + TELEGRAM_USER_ID en ~/.env de Madre
 
 ### Esta semana
 - [ ] Tailscale Redmi A5 — Play Store
-- [ ] UFW activar en Madre
-- [ ] Vaciar inbox (~93 archivos)
-- [ ] Handlers THDORA implementar en repo thdora
+- [ ] UFW activar Madre
+- [ ] Inbox vaciar (~93 archivos)
+- [ ] Handlers THDORA en repo thdora
 
 ---
 
-## Incidencias del día
+## Investigaciones realizadas (con Gemini)
 
-| Hora | Incidencia | Solución |
-|---|---|---|
-| ~12:10 | puerto 11434 ocupado por ollama nativo | pkill ollama |
-| ~12:30 | qdrant healthcheck fallaba con curl | cambiado a wget |
-| ~13:00 | git pull fallaba (unstaged changes) | git stash + pull |
-| ~13:05 | git@github.com Permission denied | remote cambiado a HTTPS |
-| ~13:10 | /opt/batcueva Permission denied | falta ssh -t para sudo |
-| ~13:15 | headscale TLS bad record MAC | error transitorio de red, relanzar |
-| ~13:19 | ~/.ssh/config corrupto (eofcat) | reescribir con cat > heredoc correcto |
+### Bloques A-E — dependencias, archivos, handlers, ADB, orden ejecución
+- **10 errores corregidos** en respuesta Gemini
+- Errores clave: 32GB→16GB RAM · host.docker.internal→ollama · Arch→Ubuntu · batcueva_net→batcueva
+- Documentado en: `setup/servidor/investigacion/2026-06-25-gemini-bloques-auditados.md`
+
+### ADB / Android — BFU vs AFU
+- adb-monitor.sh diseñado para varopc (cron cada 5min)
+- scrcpy con --turn-screen-on y -S documentado
+- Limitación BFU: tras reinicio, ADB TCP bloqueado hasta PIN físico
+- Documentado en: `setup/servidor/investigacion/2026-06-25-gemini-bloques-auditados.md`
+
+### Pentest / OSINT — script maestro diseñado
+- Fases 0-3: reconocimiento pasivo → activo → WiFi → integración Qdrant
+- Prompt preparado para Gemini (pendiente enviar)
+- Infraestructura: SpiderFoot en batcueva-osint.yml (pendiente levantar)
+
+### THDORA — handlers diseñados
+- /estado: docker ps + free -h → respuesta Telegram
+- /inbox: append inbox/ + git commit + push
+- /diario: append diario del día + commit
+- /pull: docker exec ollama ollama pull
+- Alerta proactiva: n8n → THDORA → Telegram
+- Código Python documentado, pendiente implementar en repo thdora
 
 ---
 
-## Investigaciones realizadas hoy
+## Arquitectura verificada desde el repo
 
-1. **Gemini Bloques A-E** — dependencias, archivos, handlers, ADB, orden ejecución
-   → 10 errores detectados y corregidos (32GB→16GB RAM, host.docker.internal, etc.)
+```
+Fase 1+2 (HEALTHY):
+  ollama:11434        ← qwen2.5:3b activo
+  ollama-embeddings:11435
+  open-webui:3001
+  qdrant:6333
 
-2. **ADB/Android** — BFU vs AFU, scrcpy, adb-monitor.sh, Tailscale móvil
-   → documentado en setup/servidor/investigacion/
+Fase 3 (YML corregido, pendiente ejecutar):
+  n8n:5678
+  gitea:3003
+  code-server:8443
+  headscale:8085
 
-3. **Prompt pentest maestro** — nmap + SpiderFoot + n8n pipeline + Qdrant
-   → preparado para enviar a Gemini
+Fase 4 (YML + litellm-config.yaml listos, pendiente ejecutar):
+  nginx-proxy-manager:80/443/81
+  watchtower
+  litellm:4000
 
----
+Fase OSINT (pendiente):
+  spiderfoot:5001
+  ivre
 
-## Contexto THDORA
-
-THDORA es separado del stack infra (repo propio) pero se conecta como cliente:
-- Handlers diseñados: /estado /inbox /diario /pull + alerta proactiva n8n→Telegram
-- Código Python documentado en investigacion/
-- Imagen thdora-bot (531MB) ya en Madre
-- Implementación pendiente en repo thdora
+THDORA (pendiente handlers):
+  imagen descargada en Madre (531MB)
+  repo: github.com/alvarofernandezmota-tech/thdora
+```
 
 ---
 _Sesión: 25 jun 2026 · Perplexity vía MCP · Desde Redmi A5_
+_Ver: [[ESTADO-SISTEMA]] · [[MASTER-PENDIENTES]] · [[setup/servidor/fase3-incidencias]]_

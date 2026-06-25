@@ -1,43 +1,21 @@
 ---
-tags: [ssh, config, varopc, madre, acceso]
+tags: [ssh, config, varopc, madre, acceso, fix]
 fecha: 2026-06-25
-estado: problema-activo
+estado: fix-pendiente
 ---
 
 # SSH Config varopc → Madre
 
-## Estado actual (25 jun 13:19)
+## Estado actual (25 jun 13:21)
 
-| Elemento | Estado |
-|---|---|
-| Clave instalada en Madre | ✅ (ssh-copy-id ejecutado, WARNING: already exists) |
-| ~/.ssh/config | ⚠️ CORRUPTO — arreglar ahora |
-| SSH sin contraseña | ❌ sigue pidiendo password |
-| Causa | config con línea `eofcat` inválida |
+| Elemento | Estado | Notas |
+|---|---|---|
+| Clave en Madre | ✅ instalada | ssh-copy-id ejecutado |
+| ~/.ssh/config | ❌ CORRUPTO | línea `eofcat` inválida en línea 16 |
+| SSH sin contraseña | ❌ bloqueado | por config corrupto |
+| nano disponible | ❌ no instalado | usar vi o cat |
 
-## Fix inmediato — editar config a mano
-
-```bash
-nano ~/.ssh/config
-```
-
-Borrar todo y dejar EXACTAMENTE esto (sin líneas extra):
-
-```
-Host madre
-  HostName 100.91.112.32
-  User varopc
-  IdentityFile ~/.ssh/id_ed25519_github
-```
-
-Guardar: `Ctrl+O` → `Enter` → `Ctrl+X`
-
-Verificar:
-```bash
-ssh madre "echo ok"
-```
-
-## Alternativa sin nano
+## Fix — reescribir config con cat (sin heredoc)
 
 ```bash
 cat > ~/.ssh/config << 'SSHEOF'
@@ -47,26 +25,50 @@ Host madre
   IdentityFile ~/.ssh/id_ed25519_github
 SSHEOF
 chmod 600 ~/.ssh/config
+ssh madre "echo ok"
 ```
 
-## Por qué no funciona sudo por SSH sin -t
+> ⚠️ Usar `SSHEOF` como delimitador, no `EOF` — evita el bug de `eofcat`
+
+## Alternativa con vi
 
 ```bash
-# INCORRECTO — falla sin terminal
-ssh madre "sudo mkdir ..."
-
-# CORRECTO — abre pseudo-terminal
-ssh -t madre "sudo mkdir -p /opt/batcueva/headscale && sudo chown -R varopc:varopc /opt/batcueva"
+vi ~/.ssh/config
+# i para insertar, pegar el bloque, ESC :wq para guardar
 ```
 
-## Datos de acceso
+## Config correcto
+
+```
+Host madre
+  HostName 100.91.112.32
+  User varopc
+  IdentityFile ~/.ssh/id_ed25519_github
+```
+
+## Por qué sudo necesita -t
+
+```bash
+# FALLA — sin terminal interactivo
+ssh madre "sudo mkdir ..."
+
+# FUNCIONA — pseudo-terminal
+ssh -t madre "sudo mkdir -p /opt/batcueva && sudo chown -R varopc:varopc /opt/batcueva"
+```
+
+## IMPORTANTE: /opt/batcueva NO hace falta para Fase 3
+
+Headscale usa volúmenes Docker nombrados (`headscale_config`, `headscale_data`).
+El mkdir de /opt era innecesario. **Fase 3 arranca sin tocar /opt.**
+
+## Datos conexión
 
 | Parámetro | Valor |
 |---|---|
 | IP Tailscale Madre | 100.91.112.32 |
 | Usuario | varopc |
-| Clave privada | ~/.ssh/id_ed25519_github |
-| Puerto | 22 (estándar) |
+| Clave | ~/.ssh/id_ed25519_github |
+| Puerto | 22 |
 
 ---
-_Actualizado: 25 jun 2026 13:19 CEST_
+_Actualizado: 25 jun 2026 13:21 CEST_

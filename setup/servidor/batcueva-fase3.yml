@@ -1,7 +1,8 @@
 # =============================================================================
 # batcueva-fase3.yml — Automatización + Dev remoto + Self-hosted infra
 # Ejecutar: docker compose -f batcueva-fase3.yml up -d
-# Requiere: Fases 1 y 2 activas
+# Requiere: Fase 1+2 activas (red batcueva creada)
+# Actualizado: 2026-06-25 — fix code-server path absoluto
 # =============================================================================
 
 services:
@@ -60,7 +61,7 @@ services:
       - DEFAULT_WORKSPACE=/config/workspace/cerebro
     volumes:
       - code_server_config:/config
-      - ~/yggdrasil-dew:/config/workspace/cerebro
+      - /home/varopc/yggdrasil-dew:/config/workspace/cerebro
     labels:
       - "batcueva.fase=3"
       - "batcueva.servicio=vscode-browser"
@@ -91,3 +92,11 @@ networks:
   default:
     name: batcueva
     external: true
+
+# =============================================================================
+# NOTAS:
+# - headscale usa volúmenes Docker nombrados (NO necesita /opt/batcueva)
+# - code-server monta /home/varopc/yggdrasil-dew (ruta absoluta, fix ~ en Docker)
+# - N8N_ENCRYPTION_KEY: definir en ~/.env ANTES del primer up
+# - Red batcueva: crear antes con `docker network create batcueva`
+# =============================================================================
