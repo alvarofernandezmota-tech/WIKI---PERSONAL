@@ -1,0 +1,161 @@
+#!/bin/bash
+# =============================================================
+# bc — Batcueva Commander
+# El comando principal de la Batcueva. Copia a /usr/local/bin/bc
+# o añade alias en ~/.zshrc: alias bc='~/yggdrasil-dew/scripts/bc'
+#
+# USO RÁPIDO:
+#   bc up              → levanta todo
+#   bc up osint        → levanta solo OSINT
+#   bc down            → para todo
+#   bc s               → status rápido
+#   bc logs spiderfoot → logs de un servicio
+#   bc sesion          → inicia sesión (git pull + diario + status)
+#   bc inbox           → procesa inbox (migra ficheros al destino)
+#   bc pentest         → abre Kali en navegador
+#   bc osint <target>  → abre SpiderFoot con target prellenado
+#   bc scan <red>      → nmap rápido (ej: bc scan 192.168.1.0/24)
+# =============================================================
+
+set -e
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || echo ~/yggdrasil-dew)"
+cd "$REPO"
+
+STACKS=(osint pentest siem vuln)
+MOTD="🦇 Batcueva Commander v2.0 — $(date '+%d %b %Y %H:%M')"
+
+status_rapido() {
+  echo ""
+  echo "🔍 CONTENEDORES ACTIVOS:"
+  docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null | head -20
+  echo ""
+  echo "💾 RAM: $(free -h | awk '/^Mem/ {print $3"/"$2}')"
+  echo "💾 DISCO: $(df -h / | awk 'NR==2{print $3"/"$2" ("$5")"}')"
+}
+
+iniciar_sesion() {
+  echo "$MOTD"
+  echo ""
+  echo "🔄 Sincronizando repo..."
+  git pull --rebase --quiet && echo "✅ Repo al día" || echo "⚠️  Pull fallido, continuar manualmente"
+  echo ""
+  FECHA=$(date '+%Y-%m-%d')
+  DIARIO="$REPO/diarios/$FECHA.md"
+  if [ ! -f "$DIARIO" ]; then
+    cat > "$DIARIO" << EOF
+---
+tags: [diario, sesion]
+fecha: $FECHA
+---
+
+# Sesión $FECHA
+
+## Objetivo del día
+
+
+## Log de comandos
+
+
+## Pendientes generados
+
+EOF
+    echo "📄 Diario creado: diarios/$FECHA.md"
+  else
+    echo "📄 Diario ya existe: diarios/$FECHA.md"
+  fi
+  echo ""
+  status_rapido
+}
+
+procesar_inbox() {
+  echo "📥 Procesando inbox..."
+  if [ -f "$REPO/scripts/migrar-inbox.sh" ]; then
+    bash "$REPO/scripts/migrar-inbox.sh"
+  else
+    echo "Sin ficheros en inbox/ o script no encontrado"
+    ls -la "$REPO/inbox/" 2>/dev/null || echo "Inbox vacío ✅"
+  fi
+}
+
+case "${1:-help}" in
+  up)
+    STACK="${2:-all}"
+    if [ "$STACK" = "all" ]; then
+      echo "🚀 Levantando toda la Batcueva..."
+      sudo sysctl -w vm.max_map_count=262144 2>/dev/null || true
+      docker compose -f docker/batcueva-master.yml up -d
+    else
+      echo "🚀 Stack: $STACK"
+      docker compose -f "docker/batcueva-${STACK}.yml" up -d
+    fi
+    ;;
+  down)
+    STACK="${2:-all}"
+    if [ "$STACK" = "all" ]; then
+      docker compose -f docker/batcueva-master.yml down
+    else
+      docker compose -f "docker/batcueva-${STACK}.yml" down
+    fi
+    ;;
+  s|status)
+    status_rapido
+    ;;
+  logs)
+    [ -z "$2" ] && { echo "Uso: bc logs <servicio>"; exit 1; }
+    docker logs -f "$2"
+    ;;
+  restart)
+    [ -z "$2" ] && { echo "Uso: bc restart <servicio>"; exit 1; }
+    docker restart "$2" && echo "✅ $2 reiniciado"
+    ;;
+  sesion|session)
+    iniciar_sesion
+    ;;
+  inbox)
+    procesar_inbox
+    ;;
+  pentest)
+    echo "🔴 Abriendo Kali Desktop..."
+    docker compose -f docker/batcueva-pentest.yml up -d kali-desktop 2>/dev/null || true
+    echo "🌐 https://100.91.112.32:6901 (pass: batcueva2026)"
+    ;;
+  osint)
+    TARGET="${2:-}"
+    echo "🕷️  Levantando SpiderFoot..."
+    docker compose -f docker/batcueva-osint.yml up -d spiderfoot 2>/dev/null || true
+    echo "🌐 http://100.91.112.32:5001"
+    [ -n "$TARGET" ] && echo "🔎 Target: $TARGET"
+    ;;
+  scan)
+    RED="${2:-192.168.1.0/24}"
+    echo "🔍 Escaneando $RED ..."
+    docker exec kali-desktop nmap -sV --open "$RED" 2>/dev/null || \
+      nmap -sV --open "$RED"
+    ;;
+  pull)
+    git pull --rebase
+    ;;
+  push)
+    git add -A && git commit -m "${2:-sync: actualización manual $(date '+%Y-%m-%d %H:%M')}"
+    git push
+    ;;
+  *)
+    echo "$MOTD"
+    echo ""
+    echo "COMANDOS:"
+    echo "  bc sesion          → iniciar sesión (pull + diario + status)"
+    echo "  bc s               → status rápido de contenedores y RAM"
+    echo "  bc up [stack]      → levantar todo o un stack (osint/pentest/siem/vuln)"
+    echo "  bc down [stack]    → parar todo o un stack"
+    echo "  bc logs <svc>      → logs de un contenedor"
+    echo "  bc restart <svc>   → reiniciar contenedor"
+    echo "  bc inbox           → procesar inbox/"
+    echo "  bc pentest         → Kali Desktop en navegador"
+    echo "  bc osint [target]  → SpiderFoot"
+    echo "  bc scan [red]      → nmap rápido"
+    echo "  bc pull            → git pull --rebase"
+    echo "  bc push [msg]      → git add+commit+push"
+    echo ""
+    echo "Stacks: ${STACKS[*]}"
+    ;;
+esac
