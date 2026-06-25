@@ -1,29 +1,92 @@
 version: '3.8'
 
+# ============================================================
+# FASE 1 — Stack base Madre (i5-8400, 16GB RAM, sin GPU)
+# Config validada: 2026-06-24 — Ollama domado
+# Veredicto: ollama-domado-fase1 → llamacpp-fase2 (2-4 semanas)
+# NUNCA cargar qwen2.5:14b con stack activo
+# ============================================================
+
 services:
+
+  # ── OLLAMA CHAT (qwen2.5:7b para THDORA y conversación) ──
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
-    restart: always
+    restart: unless-stopped
     ports:
       - "11434:11434"
     environment:
-      - OLLAMA_NUM_THREADS=6
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_MAX_LOADED_MODELS=2
-      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_NUM_PARALLEL=1        # prohibido procesar 2 cosas a la vez
+      - OLLAMA_MAX_LOADED_MODELS=1   # solo 1 modelo en RAM
+      - OLLAMA_FLASH_ATTENTION=1     # optimización CPU
+      - OLLAMA_NUM_THREADS=3         # max 3 hilos seguros en i5-8400
+      - OLLAMA_KEEP_ALIVE=5m         # liberar RAM cuando no se usa
     volumes:
-      - ollama:/root/.ollama
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '3.5'
+          memory: 7g
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+  # ── OLLAMA EMBEDDINGS (bge-m3 para RAG/Qdrant) ──
+  # Separado de ollama para no solapar RAM
+  # bge-m3 ~ 600MB RAM — no interfiere con qwen2.5:7b
+  ollama-embeddings:
+    image: ollama/ollama:latest
+    container_name: ollama-embeddings
+    restart: unless-stopped
+    ports:
+      - "11435:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_THREADS=2
+      - OLLAMA_KEEP_ALIVE=10m
+    volumes:
+      - ollama_embeddings_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── QDRANT (memoria vectorial RAG) ──
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ── OPEN-WEBUI (interfaz web para Ollama) ──
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
-    restart: always
+    restart: unless-stopped
     ports:
       - "3001:8080"
     environment:
@@ -32,7 +95,12 @@ services:
       - QDRANT_URI=http://qdrant:6333
       - ENABLE_RAG=true
     volumes:
-      - open-webui:/app/backend/data
+      - open_webui_data:/app/backend/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
     depends_on:
       ollama:
         condition: service_healthy
@@ -42,21 +110,25 @@ services:
       timeout: 10s
       retries: 3
 
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: qdrant
-    restart: always
-    ports:
-      - "6333:6333"
-    volumes:
-      - qdrant_storage:/qdrant/storage
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
 volumes:
-  ollama:
-  open-webui:
+  ollama_data:
+  ollama_embeddings_data:
+  open_webui_data:
   qdrant_storage:
+
+# ============================================================
+# RAM TOTAL ESTIMADA con stack activo:
+#   ollama (qwen2.5:7b)   ~6.5 GB
+#   ollama-embeddings     ~0.6 GB
+#   qdrant                ~0.3 GB
+#   open-webui            ~0.3 GB
+#   thdora + thdora-bot   ~1.0 GB
+#   grafana + prometheus  ~0.5 GB
+#   portainer + uptime    ~0.3 GB
+#   SO + sistema          ~2.0 GB
+#   TOTAL ESTIMADO        ~11.5 GB / 16 GB ✅ VIABLE
+#
+# ⚠️  NO cargar qwen2.5:14b con stack activo → OOM Killer
+# ⚠️  NO dos modelos 7B+ simultáneos → swap constante
+# ✅  Próximo paso (Fase 2, 2-4 semanas): migrar a llama.cpp puro
+# ============================================================
