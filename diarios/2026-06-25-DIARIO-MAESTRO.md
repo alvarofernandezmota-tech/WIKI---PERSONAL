@@ -1,80 +1,95 @@
-# 🗓️ Diario Maestro — 2026-06-25 (Jueves)
+---
+tags: [diario, 2026-06-25, homelab, docker, uup, tailscale, ssh, ollama]
+fecha: 2026-06-25
+owner: alvarofernandezmota-tech
+---
 
-## Estado del día
-- **Sesión activa:** 11:41 CEST
-- **Prioridad:** Descargas modelos pendientes + virtualización + hotspot permanente + móvil
+# 📓 Diario 2026-06-25 — Sesión tarde
+
+> Ver también: [[MASTER-PENDIENTES]] · [[ESTADO-SISTEMA]] · [[setup/servidor/docker-compose.yml]]
 
 ---
 
-## 🔥 Pendientes críticos (heredados del día 24)
+## ✅ Completado hoy
 
-### 1. 📥 Descargas de modelos (las 5 que faltaron)
-Referencia: `inbox/2026-06-24-DESCARGAS-COMPLETAS-06h10.md`
-- [ ] Verificar qué modelos descargaron correctamente
-- [ ] Relanzar los que fallaron con `ollama pull <modelo>`
-- [ ] Documentar estado en `ollama/modelos-estado.md`
+### Stack Docker Madre — Fase 1+2 levantado y healthy
+- Problema inicial: puerto 11434 ocupado por proceso ollama nativo → `pkill ollama` + `docker compose down` + relanzar limpio
+- Problema secundario: healthcheck qdrant fallaba en `/healthz` → resuelto con `docker compose down` completo + reorden de arranque
+- Solución final: `docker compose up -d ollama qdrant` → esperar healthy → `docker compose up -d open-webui`
+- Estado final:
+  - `ollama` → **healthy** ✅ puerto 11434
+  - `open-webui` → **healthy** ✅ puerto 3001
+  - `qdrant` → **healthy** ✅ puerto 6333
 
-### 2. 💻 Virtualización (Kali Linux sandbox)
-Referencia: `inbox/2026-06-24-fase4-litellm-sops-plan.md`
-- [ ] Descargar ISO Kali (UUP o sitio oficial)
-- [ ] Crear VM en Proxmox/VirtualBox
-- [ ] Red aislada para pentesting lab
-- [ ] Ver: `docs/pentesting/sandbox-setup.md` (creado hoy)
+### SSH madre sin contraseña
+- `ssh-copy-id varopc@100.91.112.32` ejecutado correctamente — 1 clave añadida
+- Clave instalada: `~/.ssh/id_ed25519_github.pub`
+- Pendiente: añadir entrada en `~/.ssh/config` para alias `ssh madre` sin password:
+  ```
+  Host madre
+    HostName 100.91.112.32
+    User varopc
+    IdentityFile ~/.ssh/id_ed25519_github
+  ```
 
-### 3. 📱 Móvil — Hotspot + ADB + Tailscale
-Referencia: `inbox/2026-06-24-SESION-NOCHE-MOVIL.md` + `inbox/2026-06-24-hotspot-red-situacion.md`
-- [ ] Probar `adb shell settings put global tether_dun_required 0`
-- [ ] Instalar Tailscale APK (cuando baje la ISO)
-- [ ] Hotspot siempre activo: desactivar ahorro batería + configurar systemd keepalive
-- [ ] Ver: `hardware/movil-hotspot-config.md` (creado hoy)
-
-### 4. 🕷️ SpiderFoot error descarga
-Referencia: `inbox/2026-06-24-error-spiderfoot-descarga.md`
-- [ ] Resolver conflicto de dependencias
-- [ ] Alternativa: usar imagen Docker oficial de SpiderFoot
-- [ ] Ver: `osint/spiderfoot-setup.md` (migrado hoy)
-
-### 5. 🐳 Docker Stack completo (Thdora + servicios)
-Referencia: `inbox/2026-06-24-PENDIENTES-THDORA-COMANDOS-Y-DOCKER.md`
-- [ ] Aplicar `docker-compose-final-completo.md`
-- [ ] LiteLLM + SOPS (fase 4)
-- [ ] n8n + LiteLLM integración
-- [ ] Ver: `setup/docker-compose-final.md` (migrado hoy)
+### Ollama — modelos verificados
+- `qwen2.5:3b` (1.9 GB) — único modelo presente, descargado hace 32h
+- Modelos objetivo pendientes: `qwen2.5:7b`, `llama3.1:8b`, `mistral:7b`, `bge-m3`, `nomic-embed-text`
 
 ---
 
-## 📋 Agenda del día 25
+## ❌ Bloqueado / Pendiente resolver
+
+### UUP — checksum loop en 4 archivos
+- **Problema**: Los 4 archivos grandes fallan checksum repetidamente aunque se descargan al 100%
+  - `UUPs/professional_es-es.esd`
+  - `UUPs/Microsoft-Windows-Client-Desktop-Required-Package.ESD`
+  - `UUPs/Windows11.0-KB5043080-x64.msu`
+  - `UUPs/Windows11.0-KB5095093-x64.msu` (4.7 GB, 100%, ERR checksum)
+- **Causa**: Set UUP generado en uupdump.net ha expirado — los links de Microsoft cambian
+- **Solución**: Generar nuevo set en https://uupdump.net → Windows 11 24H2 → amd64 → es-ES → Professional → aria2
+- **Script correcto en Linux**: `~/Downloads/uup/files/convert.sh` (UUP Converter v0.7.3)
+- `convert.sh` falló con `Failed to create ISO structure` porque faltaba `professional_es-es.esd`
+
+### Tailscale APK — split APK no instalable por ADB
+- APK en `~/Downloads/uup/tailscale.apk` (3.8 MB) es un split APK incompleto
+- Todos los métodos ADB probados fallan: `INSTALL_FAILED_MISSING_SPLIT`
+  - `adb install` → ERR
+  - `adb install --no-streaming` → ERR
+  - F-Droid URL → 404
+- **Solución pendiente**: Instalar Tailscale directamente desde Play Store en el móvil
+
+---
+
+## 🗂️ Estructura carpeta UUP
 
 ```
-11:41 → Auditoría inbox + migración (AHORA)
-12:00 → Verificar descargas de modelos (ollama list)
-12:30 → Hotspot móvil: probar fix ADB
-13:00 → SpiderFoot: resolver con Docker
-14:00 → Kali VM: arrancar descarga ISO
-16:00 → Docker stack: aplicar compose final
-noche → Virtualización activa, primeras pruebas
+~/Downloads/uup/
+├── files/
+│   ├── convert.sh          ← script conversión ISO (UUP Converter v0.7.3)
+│   ├── convert_config_linux
+│   ├── convert_config_macos
+│   ├── convert_ve_plugin
+│   ├── converter_multi
+│   └── converter_windows
+├── UUPs/                   ← ~80 archivos .cab/.esd/.msu descargados
+├── aria2_download.log      (25 MB)
+├── ConvertConfig.ini
+├── uup_download_linux.sh   ← script descarga
+└── tailscale.apk           (3.8 MB — split APK, no usable por ADB)
 ```
 
 ---
 
-## 📝 Log de commits de hoy
+## 📋 Próximos pasos inmediatos
 
-| Hora | Commit | Descripción |
-|------|--------|-------------|
-| 11:41 | `feat(diario+migración)` | Diario maestro 25 + migración inbox → estructura repo |
-
----
-
-## 🧠 Decisiones tomadas hoy
-
-- **Pentesting lab**: La guía de prácticas recibida hoy se documenta en `docs/pentesting/`
-- **Hotspot permanente**: Prioridad alta — bloquea la movilidad del stack
-- **Virtualización**: Kali en VM antes que Proxmox (menos overhead para empezar)
-- **Inbox**: Migración inteligente, inbox solo para notas crudas del día
+1. **SSH config** — añadir entrada `Host madre` en `~/.ssh/config`
+2. **Tailscale** — instalar desde Play Store directamente en el móvil
+3. **UUP** — generar nuevo set en uupdump.net y relanzar descarga
+4. **Ollama modelos** — `ssh madre "docker exec ollama ollama pull qwen2.5:7b"`
+5. **Open WebUI** — verificar acceso en `http://madre:3001` y configurar RAG con Qdrant
+6. **Fase 3 Docker** — levantar n8n + Paperless + Vaultwarden
 
 ---
 
-## 🔗 Archivos relacionados
-- [`MASTER-PENDIENTES.md`](../MASTER-PENDIENTES.md)
-- [`ESTADO-SISTEMA.md`](../ESTADO-SISTEMA.md)
-- [`diarios/2026-06-24-SESION-COMPLETA-RESUMEN.md`](2026-06-24-SESION-COMPLETA-RESUMEN.md) *(migrado desde inbox)*
+_Actualizado: 2026-06-25 12:29 CEST — Perplexity vía MCP_
