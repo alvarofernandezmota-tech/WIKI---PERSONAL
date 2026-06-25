@@ -1,6 +1,6 @@
 # ============================================================
 # BATCUEVA OSINT STACK
-# SpiderFoot + IVRE + TheHive (desactivado por RAM)
+# SpiderFoot + MongoDB (IVRE desactivado hasta imagen estable)
 # Uso: docker compose -f docker/batcueva-osint.yml up -d
 # Solo SpiderFoot: docker compose -f docker/batcueva-osint.yml up -d spiderfoot
 # ============================================================
@@ -12,15 +12,13 @@ networks:
 
 volumes:
   spiderfoot-data:
-  ivre-data:
-  ivre-db:
 
 services:
 
-  # ---- SpiderFoot — imagen correcta: smicallef/spiderfoot ----
+  # ---- SpiderFoot — imagen oficial GHCR ----
   # Web UI: http://100.91.112.32:5001
   spiderfoot:
-    image: smicallef/spiderfoot:latest
+    image: ghcr.io/smicallef/spiderfoot:latest
     container_name: spiderfoot
     restart: unless-stopped
     ports:
@@ -33,38 +31,18 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5001"]
       interval: 30s
       timeout: 10s
-      retries: 3
-
-  # ---- IVRE — imagen correcta: ivre/base ----
-  # Web UI: http://100.91.112.32:5002
-  ivre-web:
-    image: ivre/base:latest
-    container_name: ivre-web
-    restart: unless-stopped
-    ports:
-      - "5002:80"
-    volumes:
-      - ivre-data:/var/lib/ivre
-    depends_on:
-      ivre-db:
-        condition: service_healthy
-    networks:
-      - osint-net
-
-  ivre-db:
-    image: mongo:6
-    container_name: ivre-db
-    restart: unless-stopped
-    volumes:
-      - ivre-db:/data/db
-    networks:
-      - osint-net
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
       retries: 5
-      start_period: 20s
+      start_period: 30s
+
+  # IVRE: desactivado temporalmente — imagen no pública en Docker Hub
+  # Alternativa futura: construir desde https://github.com/cea-sec/ivre
+  # ivre-web:
+  #   image: ivre/ivre:latest
+  #   profiles: ["ivre"]
+  #   ports:
+  #     - "5002:80"
+  #   networks:
+  #     - osint-net
 
   # TheHive: DESACTIVADO (1-2GB RAM). Activar con Acer en el stack.
   # thehive:
