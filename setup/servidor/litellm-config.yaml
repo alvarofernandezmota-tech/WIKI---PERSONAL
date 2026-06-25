@@ -1,9 +1,16 @@
 # litellm-config.yaml — Proxy unificado Ollama
 # Ruta: setup/servidor/litellm-config.yaml
 # Referenciado en batcueva-fase4.yml como ./litellm-config.yaml
-# Actualizado: 2026-06-25
+# Actualizado: 2026-06-25 — CORRECTO con arquitectura real del repo
+#
+# ARQUITECTURA REAL:
+#   ollama:11434            → modelos de chat (qwen2.5, llama, mistral)
+#   ollama-embeddings:11435 → modelos de embedding (bge-m3, nomic-embed-text)
+#   RAM Madre: 16GB — NO cargar modelos 7B+ simultáneos
 
 model_list:
+
+  # ── CHAT (ollama:11434) ──
   - model_name: qwen2.5-3b
     litellm_params:
       model: ollama/qwen2.5:3b
@@ -24,16 +31,22 @@ model_list:
       model: ollama/mistral:7b
       api_base: http://ollama:11434
 
+  # ── EMBEDDINGS (ollama-embeddings:11435) ──
   - model_name: bge-m3
     litellm_params:
       model: ollama/bge-m3
-      api_base: http://ollama:11434
+      api_base: http://ollama-embeddings:11435
 
   - model_name: nomic-embed
     litellm_params:
       model: ollama/nomic-embed-text
-      api_base: http://ollama:11434
+      api_base: http://ollama-embeddings:11435
 
 litellm_settings:
   drop_params: true
   set_verbose: false
+
+# ⚠️  AVISO RAM (16GB Madre):
+# Con qwen2.5:7b activo (~6.5GB) + stack completo (~4GB) quedan ~5.5GB libres.
+# NO arrancar llama3.1:8b y mistral:7b a la vez — OOM Killer.
+# LiteLLM carga el modelo solo cuando recibe petición — OLLAMA_KEEP_ALIVE=5m lo libera.
