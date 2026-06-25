@@ -1,0 +1,10 @@
+server_url: http://100.91.112.32:8080
+listen_addr: 0.0.0.0:8080
+private_key_path: /var/lib/headscale/private.key
+db_type: sqlite3
+db_path: /var/lib/headscale/db.sqlite
+ip_prefixes:
+  - 100.64.0.0/10
+dns_config:
+  magic_dns: true
+  base_domain: batcueva.local
