@@ -1,225 +1,64 @@
-# CONVENCIONES — Reglas del ecosistema
-
-> Estas reglas existen para que cualquier IA, cualquier persona, o tú mismo
-> en 6 meses entienda el sistema sin preguntar nada.
-> **Si no está aquí documentado, no existe.**
-> Este fichero es vivo — se añaden reglas cuando se toman decisiones nuevas.
-
 ---
-
-## Regla 1 — Todo entra por inbox primero
-
-Cualquier idea, sesión, script, decisión, investigación → `inbox/YYYY-MM-DD-nombre.md`.
-Nunca directamente a su destino final si no está revisado.
-
+tags: [tipo/meta, estado/activo]
 ---
+# 📐 Convenciones del Repositorio — yggdrasil-dew
 
-## Regla 2 — Sincronización obligatoria al mover de inbox al repo
+> Este documento es la SSOT de todas las reglas que gobiernan este vault.
 
-Cuando un fichero del inbox se procesa y mueve a su destino, **actualizar obligatoriamente**:
+## 🏷️ Taxonomía de Etiquetas
 
-```
-☐ 1. Fichero al destino correcto
-☐ 2. MASTER-PENDIENTES.md — marcar tarea como ✅ si aplica
-☐ 3. ESTADO-SISTEMA.md — si cambia algo en el stack
-☐ 4. ROADMAP.md — si se completa una fase
-☐ 5. ECOSISTEMA.md — si cambia la arquitectura
-☐ 6. README.md del directorio destino
-☐ 7. inbox/ — eliminar o archivar el fichero procesado
-☐ 8. cierre-sesion.sh — ejecutar para commitear todo
-```
-
----
-
-## Regla 3 — Los 5 ficheros maestros siempre sincronizados
-
-| Fichero | Qué contiene | Cuándo actualizar |
+| Etiqueta Principal | Secundarias (Ejemplos) | Uso / Contexto |
 |---|---|---|
-| `ESTADO-SISTEMA.md` | Estado real del stack ahora mismo | Cada vez que un servicio cambia |
-| `MASTER-PENDIENTES.md` | TODO lo pendiente priorizado | Cada sesión |
-| `ROADMAP.md` | Visión + fases | Al completar una fase |
-| `CONVENCIONES.md` | Reglas del sistema | Al tomar decisiones nuevas |
-| `ECOSISTEMA.md` | Mapa completo arquitectura | Al añadir servicios o repos |
+| `#estado/...` | `#estado/draft`, `#estado/activo`, `#estado/archivo` | Ciclo de vida. **Obligatorio** en todo fichero. |
+| `#tipo/...` | `#tipo/adr`, `#tipo/sesion`, `#tipo/moc`, `#tipo/ficha` | Define la plantilla y estructura del documento. |
+| `#ia` | `#ia/llm`, `#ia/rag`, `#ia/prompts` | Modelos locales, Ollama, Qdrant. |
+| `#infra` | `#infra/docker`, `#infra/sops`, `#infra/arch` | Configuración de Madre y despliegues. |
+| `#osint` | `#osint/recon`, `#osint/tools` | Inteligencia de fuentes abiertas. |
+| `#proyecto` | `#proyecto/thdora`, `#proyecto/brain` | Rastreo de estado de repositorios satélite. |
 
----
+> ⚠️ **PROHIBIDO:** La etiqueta `#personal` está **baneada** de este repositorio. Todo lo personal va a `huginn`.
 
-## Regla 4 — Nomenclatura de ficheros
+## 📁 Estructura de Directorios
 
-```
-inbox/     → YYYY-MM-DD-tema-subtema.md
-docs/      → nombre-descriptivo.md
-diarios/   → YYYY-MM-DD.md
-setup/     → nombre-tecnologia.yml/.sh
-agentes/   → nombre-modelo-proposito.md
-ollama/    → Modelfile.nombre o nombre.md
-proyectos/ → nombre-proyecto/README.md
-```
-
----
-
-## Regla 5 — Commits
-
-```
-Formato: <tipo>: <descripción> — <contexto opcional>
-
-Tipos:
-  inbox:    añadir al inbox
-  docs:     documentación
-  setup:    infraestructura
-  agentes:  fichas o prompts de agentes
-  fix:      corrección
-  refactor: reorganización
-  cierre:   commit automático fin de sesión
-  migrate:  mover contenido entre repos
-```
-
----
-
-## Regla 6 — Un README por directorio
-
-Cada carpeta principal tiene `README.md` con: para qué sirve, qué hay, cómo se usa.
-
----
-
-## Regla 7 — Cierre de sesión obligatorio
-
-```bash
-bash ~/Projects/yggdrasil-dew/setup/servidor/scripts/cierre-sesion.sh "descripción"
+```text
+yggdrasil-dew/
+├── HOME.md                      # Dashboard principal
+├── MASTER-PENDIENTES.md         # SSOT de tareas técnicas
+├── ESTADO-SISTEMA.md            # Salud de Madre / Red
+├── ROADMAP.md                   # Visión a medio/largo plazo
+├── CONVENCIONES.md              # Este fichero
+├── ECOSISTEMA.md                # Topología multi-repo
+├── inbox/                       # 📥 Entrada temporal (vaciar cada sesión)
+├── diarios/                     # 📅 Logs técnicos y sesiones IA
+├── mocs/                        # 🗺️ Maps of Content (índices conceptuales)
+├── docs/                        # 📚 Conocimiento cristalizado
+│   ├── adr/                     # ADRs (ADR-001, ADR-002...)
+│   │   └── historico/           # Debates resueltos
+│   ├── ias/                     # Fichas de modelos
+│   ├── os/                      # Linux, Arch, Hyprland
+│   ├── herramientas/            # Docker, SOPS, Git, n8n
+│   └── conceptos/               # Teoría (RAG, embeddings)
+├── proyectos/                   # 🏗️ Fichas de proyectos activos
+├── formacion/                   # 🎓 Cursos, certs, tutoriales
+├── osint/                       # 🔍 Stack y metodologías OSINT
+├── hardware/                    # 🖨️ Hardware, impresión 3D
+├── agentes/                     # 🤖 Prompts maestros, flujos n8n
+├── templates/                   # 📝 Plantillas Obsidian
+├── scripts/                     # ⚙️ Scripts de gestión del repo
+└── assets/                      # 🖼️ Imágenes, diagramas
 ```
 
-Sin esto, el trabajo existe solo en local. Si Madre muere → se pierde.
+## 📏 Reglas de Nomenclatura
 
----
+* **Ficheros de inbox/diarios:** `YYYY-MM-DD-kebab-case.md`
+* **ADRs:** `ADR-NNN-titulo-kebab-case.md` (NNN con padding a 3 dígitos)
+* **Templates:** `tpl-tipo.md`
+* **MOCs:** `MOC-TEMA.md` (mayúsculas)
 
-## Regla 8 — Sincronización entre repos
+## 🔀 Separación de Repositorios (Regla 13)
 
-- Todo lo nuevo → `yggdrasil-dew` (hasta que batcueva exista)
-- `personal-v2` → deprecado, no actualizar
-- Repos públicos de proyectos: su README propio + contexto privado en `proyectos/nombre/`
-
----
-
-## Regla 9 — Escalamiento de proyectos
-
-```
-Nivel 1 — Idea → inbox/
-Nivel 2 — Ficha activa → proyectos/nombre/
-Nivel 3 — Repo propio → github.com/alvarofernandezmota-tech/nombre
-Nivel 4 — Servicio en Madre → setup/servidor/nombre.yml
-```
-
-Regla: **nunca saltar niveles**.
-
----
-
-## Regla 10 — Sprints semanales
-
-```
-Domingo → elegir 3 objetivos máximo
-Diario  → ejecutar desde MASTER-PENDIENTES
-Viernes → anotar en diarios/YYYY-MM-DD.md
-```
-
-Máximo 3 objetivos por semana.
-
----
-
-## Regla 11 — Formación documentada
-
-```
-formacion/python/
-formacion/linux/
-formacion/ia/
-formacion/pentest/
-formacion/ingenieria/
-```
-
-Si lo estudias y no lo documentas, no lo sabrás en 3 meses.
-
----
-
-## Regla 12 — Diseño antes de código
-
-Antes de escribir cualquier script:
-1. ¿Qué problema resuelve?
-2. ¿Qué entra y qué sale?
-3. ¿Cómo falla y cómo se recupera?
-4. ¿Dónde vive en el repo?
-
-Si no puedes responder las 4 → va al inbox, no se implementa.
-
----
-
-## Regla 13 — Arquitectura multi-repo profesional
-
-Cada repo tiene **una sola responsabilidad**. Así lo hacen los ingenieros senior.
-
-```
-huginn            ← VIDA: diarios, metas, reflexiones (siempre privado)
-yggdrasil-dew     ← CONOCIMIENTO: docs, formación, referencias, agentes
-batcueva          ← INFRAESTRUCTURA: scripts, composes, setup Madre
-thdora            ← PROYECTO: código agente IA (público)
-local-brain       ← PROYECTO: código cerebro local (público)
-osint-stack       ← PROYECTO: stack OSINT (público)
-[futuros]         ← cada proyecto nuevo = repo propio si llega a Nivel 3
-```
-
-Todo conectado por:
-- Wikilinks en Obsidian: `[[tecnico/ESTADO-SISTEMA]]`
-- `ECOSISTEMA.md` como mapa central
-- Etiquetas Obsidian: `#infra` `#proyecto` `#formacion` `#personal`
-
-**Regla:** nada personal en repos técnicos. Nada técnico en personal.
-Si un fichero no encaja claramente en un repo → va al inbox y se decide.
-
----
-
-## Regla 14 — Infraestructura de red (situación actual)
-
-```
-iPhone (hotspot) → Madre torre (WiFi)
-Acer varopc      → Madre torre (SSH vía Tailscale o red local)
-Móvil            → pendiente Obsidian + Tailscale
-```
-
-- Descargas grandes: móvil enchufado + pantalla apagada
-- Sin router fijo — alternativas documentadas en `docs/sistema/red-alternativas.md`
-- Cuando haya red fija: Tailscale gestiona todo, hotspot innecesario
-- Regla: **nada crítico depende del hotspot** — todo debe poder pausarse y reanudarse
-
----
-
-## Regla 15 — Revisar el ecosistema antes de actuar
-
-**Antes de crear, mover, decidir o escribir cualquier cosa**, leer obligatoriamente:
-
-```
-☐ CONVENCIONES.md  ← reglas del sistema
-☐ ECOSISTEMA.md    ← mapa de repos y arquitectura
-☐ ESTADO-SISTEMA.md ← estado real del stack ahora
-```
-
-Nunca duplicar lo que ya existe. Si algo ya está documentado → referenciar, no reescribir.
-Si entras en frío (nueva sesión, nueva IA) → estos 3 ficheros son el punto de entrada obligatorio.
-
----
-
-## Regla 16 — Migración entre repos
-
-Cuando un fichero o contenido se mueve de un repo a otro:
-
-```
-☐ 1. Crear en destino (commit tipo migrate:)
-☐ 2. Eliminar en origen (commit tipo migrate:)
-☐ 3. Actualizar referencias en ambos repos
-☐ 4. Actualizar ECOSISTEMA.md si cambia la arquitectura
-```
-
-Formato de commit: `migrate: <descripción> — de <origen> a <destino>`
-
-Nunca copiar sin eliminar el original → genera duplicados y contradicciones.
-
----
-
-_Actualizado: 24 jun 2026 05:08 CEST_
-_Ver: [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [ROADMAP.md](ROADMAP.md) · [ECOSISTEMA.md](ECOSISTEMA.md)_
+| Repositorio | Contiene | NO contiene |
+|---|---|---|
+| `yggdrasil-dew` | Conocimiento, decisiones, docs, contexto | Secretos, configs ejecutables, código |
+| `batcueva` | Docker, scripts, SOPS, infraestructura | Notas personales, decisiones ADR |
+| `huginn` | Diarios personales, reflexiones, metas | Cualquier cosa técnica |
