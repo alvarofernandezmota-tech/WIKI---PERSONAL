@@ -1,8 +1,6 @@
-version: '3.8'
-
 # ============================================================
 # FASE 1 — Stack base Madre (i5-8400, 16GB RAM, sin GPU)
-# Config validada: 2026-06-24 — Ollama domado
+# Config validada: 2026-06-25 — healthcheck fix (sin curl)
 # Veredicto: ollama-domado-fase1 → llamacpp-fase2 (2-4 semanas)
 # NUNCA cargar qwen2.5:14b con stack activo
 # ============================================================
@@ -30,14 +28,13 @@ services:
           cpus: '3.5'
           memory: 7g
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 20s
 
   # ── OLLAMA EMBEDDINGS (bge-m3 para RAG/Qdrant) ──
-  # Separado de ollama para no solapar RAM
-  # bge-m3 ~ 600MB RAM — no interfiere con qwen2.5:7b
   ollama-embeddings:
     image: ollama/ollama:latest
     container_name: ollama-embeddings
@@ -57,10 +54,11 @@ services:
           cpus: '1.5'
           memory: 2g
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 20s
 
   # ── QDRANT (memoria vectorial RAG) ──
   qdrant:
@@ -77,10 +75,11 @@ services:
           cpus: '1.5'
           memory: 2g
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:6333/healthz | grep -q ok"]
       interval: 30s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 15s
 
   # ── OPEN-WEBUI (interfaz web para Ollama) ──
   open-webui:
@@ -105,10 +104,11 @@ services:
       ollama:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health | grep -q ok || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
 
 volumes:
   ollama_data:
