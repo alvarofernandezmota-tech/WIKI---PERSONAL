@@ -1,95 +1,92 @@
 ---
-tags: [diario, 2026-06-25, homelab, docker, uup, tailscale, ssh, ollama]
+tags: [diario, sesion, 2026-06-25, docker, fase3, ssh, pentest]
 fecha: 2026-06-25
-owner: alvarofernandezmota-tech
 ---
 
-# 📓 Diario 2026-06-25 — Sesión tarde
+# Diario 25 jun 2026
 
-> Ver también: [[MASTER-PENDIENTES]] · [[ESTADO-SISTEMA]] · [[setup/servidor/docker-compose.yml]]
+## Resumen de la sesión
+
+Sesión larga desde el móvil (Redmi A5). Todo por Perplexity + MCP sin terminal directo.
 
 ---
 
 ## ✅ Completado hoy
 
-### Stack Docker Madre — Fase 1+2 levantado y healthy
-- Problema inicial: puerto 11434 ocupado por proceso ollama nativo → `pkill ollama` + `docker compose down` + relanzar limpio
-- Problema secundario: healthcheck qdrant fallaba en `/healthz` → resuelto con `docker compose down` completo + reorden de arranque
-- Solución final: `docker compose up -d ollama qdrant` → esperar healthy → `docker compose up -d open-webui`
-- Estado final:
-  - `ollama` → **healthy** ✅ puerto 11434
-  - `open-webui` → **healthy** ✅ puerto 3001
-  - `qdrant` → **healthy** ✅ puerto 6333
+### Mañana (desde móvil)
+- Stack Fase 1+2 verificado HEALTHY (ollama + open-webui + qdrant)
+- SSH varopc→Madre arreglado (clave instalada, config pendiente de fix)
+- .env generado en Madre con N8N_ENCRYPTION_KEY y LITELLM_MASTER_KEY
+- git remote cambiado a HTTPS en Madre (fix: Permission denied publickey)
+- git stash + pull → Madre al día con main
+- Red Docker `batcueva` creada
+- Carpeta /opt/batcueva en proceso (falta fix sudo)
 
-### SSH madre sin contraseña
-- `ssh-copy-id varopc@100.91.112.32` ejecutado correctamente — 1 clave añadida
-- Clave instalada: `~/.ssh/id_ed25519_github.pub`
-- Pendiente: añadir entrada en `~/.ssh/config` para alias `ssh madre` sin password:
-  ```
-  Host madre
-    HostName 100.91.112.32
-    User varopc
-    IdentityFile ~/.ssh/id_ed25519_github
-  ```
-
-### Ollama — modelos verificados
-- `qwen2.5:3b` (1.9 GB) — único modelo presente, descargado hace 32h
-- Modelos objetivo pendientes: `qwen2.5:7b`, `llama3.1:8b`, `mistral:7b`, `bge-m3`, `nomic-embed-text`
+### Documentación generada hoy (Perplexity vía MCP)
+- ESTADO-SISTEMA.md actualizado
+- MASTER-PENDIENTES.md auditado y cruzado
+- setup/servidor/litellm-config.yaml creado y verificado
+- setup/servidor/investigacion/2026-06-25-gemini-bloques-auditados.md
+- setup/servidor/ssh-config-varopc.md
+- setup/servidor/fase3-incidencias.md
+- setup/servidor/env-madre.md
+- diarios/2026-06-25-DIARIO-MAESTRO.md (este archivo)
 
 ---
 
-## ❌ Bloqueado / Pendiente resolver
+## ⚠️ Pendiente al cerrar sesión
 
-### UUP — checksum loop en 4 archivos
-- **Problema**: Los 4 archivos grandes fallan checksum repetidamente aunque se descargan al 100%
-  - `UUPs/professional_es-es.esd`
-  - `UUPs/Microsoft-Windows-Client-Desktop-Required-Package.ESD`
-  - `UUPs/Windows11.0-KB5043080-x64.msu`
-  - `UUPs/Windows11.0-KB5095093-x64.msu` (4.7 GB, 100%, ERR checksum)
-- **Causa**: Set UUP generado en uupdump.net ha expirado — los links de Microsoft cambian
-- **Solución**: Generar nuevo set en https://uupdump.net → Windows 11 24H2 → amd64 → es-ES → Professional → aria2
-- **Script correcto en Linux**: `~/Downloads/uup/files/convert.sh` (UUP Converter v0.7.3)
-- `convert.sh` falló con `Failed to create ISO structure` porque faltaba `professional_es-es.esd`
+### Crítico — terminar hoy
+- [ ] Arreglar ~/.ssh/config en varopc (está corrupto — línea `eofcat`)
+- [ ] Crear headscale config.yaml en /opt/batcueva/headscale/
+- [ ] Relanzar Fase 3 completa
+- [ ] Levantar Fase 4
+- [ ] Pulls modelos Ollama en background
+- [ ] Rellenar TELEGRAM_BOT_TOKEN y TELEGRAM_USER_ID en ~/.env
+- [ ] Cambiar CODE_SERVER_PASSWORD por valor real
 
-### Tailscale APK — split APK no instalable por ADB
-- APK en `~/Downloads/uup/tailscale.apk` (3.8 MB) es un split APK incompleto
-- Todos los métodos ADB probados fallan: `INSTALL_FAILED_MISSING_SPLIT`
-  - `adb install` → ERR
-  - `adb install --no-streaming` → ERR
-  - F-Droid URL → 404
-- **Solución pendiente**: Instalar Tailscale directamente desde Play Store en el móvil
+### Esta semana
+- [ ] Tailscale Redmi A5 — Play Store
+- [ ] UFW activar en Madre
+- [ ] Vaciar inbox (~93 archivos)
+- [ ] Handlers THDORA implementar en repo thdora
 
 ---
 
-## 🗂️ Estructura carpeta UUP
+## Incidencias del día
 
-```
-~/Downloads/uup/
-├── files/
-│   ├── convert.sh          ← script conversión ISO (UUP Converter v0.7.3)
-│   ├── convert_config_linux
-│   ├── convert_config_macos
-│   ├── convert_ve_plugin
-│   ├── converter_multi
-│   └── converter_windows
-├── UUPs/                   ← ~80 archivos .cab/.esd/.msu descargados
-├── aria2_download.log      (25 MB)
-├── ConvertConfig.ini
-├── uup_download_linux.sh   ← script descarga
-└── tailscale.apk           (3.8 MB — split APK, no usable por ADB)
-```
+| Hora | Incidencia | Solución |
+|---|---|---|
+| ~12:10 | puerto 11434 ocupado por ollama nativo | pkill ollama |
+| ~12:30 | qdrant healthcheck fallaba con curl | cambiado a wget |
+| ~13:00 | git pull fallaba (unstaged changes) | git stash + pull |
+| ~13:05 | git@github.com Permission denied | remote cambiado a HTTPS |
+| ~13:10 | /opt/batcueva Permission denied | falta ssh -t para sudo |
+| ~13:15 | headscale TLS bad record MAC | error transitorio de red, relanzar |
+| ~13:19 | ~/.ssh/config corrupto (eofcat) | reescribir con cat > heredoc correcto |
 
 ---
 
-## 📋 Próximos pasos inmediatos
+## Investigaciones realizadas hoy
 
-1. **SSH config** — añadir entrada `Host madre` en `~/.ssh/config`
-2. **Tailscale** — instalar desde Play Store directamente en el móvil
-3. **UUP** — generar nuevo set en uupdump.net y relanzar descarga
-4. **Ollama modelos** — `ssh madre "docker exec ollama ollama pull qwen2.5:7b"`
-5. **Open WebUI** — verificar acceso en `http://madre:3001` y configurar RAG con Qdrant
-6. **Fase 3 Docker** — levantar n8n + Paperless + Vaultwarden
+1. **Gemini Bloques A-E** — dependencias, archivos, handlers, ADB, orden ejecución
+   → 10 errores detectados y corregidos (32GB→16GB RAM, host.docker.internal, etc.)
+
+2. **ADB/Android** — BFU vs AFU, scrcpy, adb-monitor.sh, Tailscale móvil
+   → documentado en setup/servidor/investigacion/
+
+3. **Prompt pentest maestro** — nmap + SpiderFoot + n8n pipeline + Qdrant
+   → preparado para enviar a Gemini
 
 ---
 
-_Actualizado: 2026-06-25 12:29 CEST — Perplexity vía MCP_
+## Contexto THDORA
+
+THDORA es separado del stack infra (repo propio) pero se conecta como cliente:
+- Handlers diseñados: /estado /inbox /diario /pull + alerta proactiva n8n→Telegram
+- Código Python documentado en investigacion/
+- Imagen thdora-bot (531MB) ya en Madre
+- Implementación pendiente en repo thdora
+
+---
+_Sesión: 25 jun 2026 · Perplexity vía MCP · Desde Redmi A5_
