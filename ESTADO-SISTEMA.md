@@ -1,13 +1,14 @@
 ---
 tags: [estado, sistema, operativo, servicios, ahora]
-fecha-actualizacion: 2026-06-24
-hora: 22:22
+fecha-actualizacion: 2026-06-25
+hora: 12:33
 ---
 
-# 📊 ESTADO DEL SISTEMA — 24 jun 2026
+# 📊 ESTADO DEL SISTEMA — 25 jun 2026
 
 > Este archivo refleja el estado REAL operativo ahora mismo.
 > Actualizar cada vez que cambie algo importante.
+> Ver auditoría completa en [[diarios/2026-06-25-DIARIO-MAESTRO]]
 
 ---
 
@@ -15,15 +16,43 @@ hora: 22:22
 
 | Máquina | Estado | Observaciones |
 |---|---|---|
-| **Madre** | 🟡 encendida, sin verificar | Descargando modelos desde noche 23-24 jun · pendiente verificar |
+| **Madre** | ✅ encendida y accesible | SSH funciona por IP (100.91.112.32) · alias `madre` pendiente ~/.ssh/config |
 | **varopc** | ✅ activo | Usando ahora mismo |
-| **Redmi A5** | ✅ activo | Sesión actual desde móvil |
+| **Redmi A5** | ✅ activo | Tailscale pendiente instalar desde Play Store |
 
 ---
 
 ## 🐳 Docker — Estado Madre
 
-### Imágenes descargadas ✅
+### Stack Fase 1+2 — LEVANTADO Y HEALTHY ✅
+
+| Contenedor | Puerto | Estado |
+|---|---|---|
+| `ollama` | 11434 | ✅ healthy |
+| `open-webui` | 3001 | ✅ healthy |
+| `qdrant` | 6333 | ✅ healthy |
+
+> Incidencias resueltas hoy: puerto 11434 ocupado por ollama nativo (pkill) · healthcheck qdrant /healthz (docker compose down completo)
+
+### Stack Fase 3 — YML LISTO, NO EJECUTADO ⏳
+```
+batcueva-fase3.yml → n8n (:5678) + Paperless-ngx (:8010) + Vaultwarden (:8888)
+```
+- Pendiente: verificar dependencias previas antes de `docker compose -f batcueva-fase3.yml up -d`
+- Investigación en curso con Gemini → guardar en `setup/servidor/investigacion/`
+
+### Stack Fase 4 — YML LISTO, NO EJECUTADO ⏳
+```
+batcueva-fase4.yml → LiteLLM + Caddy + Watchtower
+```
+- Pendiente: `litellm-config.yaml` mínimo antes de arrancar
+
+### Stack OSINT — YML LISTO, NO EJECUTADO ⏳
+```
+batcueva-osint.yml → SpiderFoot (:5001) + IVRE
+```
+
+### Imágenes descargadas en Madre ✅
 ```
 ghcr.io/open-webui/open-webui   6.7GB
 ollama/ollama                   8.29GB
@@ -31,7 +60,6 @@ n8nio/n8n                       2.39GB
 ghcr.io/paperless-ngx           2.01GB
 ghcr.io/berriai/litellm         1.53GB
 grafana/grafana                 1.46GB
-ghcr.io/ajnart/homarr           1.5GB
 jc21/nginx-proxy-manager        1.77GB
 lscr.io/linuxserver/code-server 1.08GB
 louislam/uptime-kuma            707MB
@@ -45,33 +73,24 @@ containrrr/watchtower           22.2MB
 thdora-bot                      531MB
 ```
 
-### Imágenes descargando ⏳
-```
-crazymax/fail2ban · crowdsecurity/crowdsec · immauss/openvas
-aquasec/trivy · ghcr.io/goauthentik/server · traefik
-linuxserver/wireguard · hashicorp/vault
-netdata/netdata · nicolargo/glances · prom/alertmanager
-searxng/searxng · itzcrazykns/perplexica · pihole/pihole
-```
-
-### Contenedores activos
-- ⚠️ **Sin verificar** — pendiente `docker ps` al llegar a Madre
-
 ---
 
 ## 🤖 Ollama — Estado modelos
 
 | Modelo | Estado | Verificado |
 |---|---|---|
-| qwen2.5:3b | ✅ listo | 24 jun 06:10 |
-| qwen2.5:14b | ⏳ en descarga | en cola desde 06:00 |
-| qwen2.5:7b | ⏳ en cola | — |
-| llama3.1:8b | ⏳ en cola | — |
-| mistral:7b | ⏳ en cola | — |
-| bge-m3 | ⏳ en cola | — |
-| nomic-embed-text | ⏳ en cola | — |
+| qwen2.5:3b | ✅ listo | 25 jun 12:10 |
+| qwen2.5:14b | ❌ no presente | — verificar si falló descarga |
+| qwen2.5:7b | ❌ no presente | pendiente `ollama pull` |
+| llama3.1:8b | ❌ no presente | pendiente `ollama pull` |
+| mistral:7b | ❌ no presente | pendiente `ollama pull` |
+| bge-m3 | ❌ no presente | pendiente `ollama pull` |
+| nomic-embed-text | ❌ no presente | pendiente `ollama pull` |
 
-> Verificar con: `ssh madre "ollama list"`
+> Comando para tirar pulls en background sin que se corten:
+> ```bash
+> ssh madre "nohup bash -c 'for m in qwen2.5:7b llama3.1:8b mistral:7b bge-m3 nomic-embed-text; do docker exec ollama ollama pull $m; done' > /tmp/ollama-pulls.log 2>&1 &"
+> ```
 
 ---
 
@@ -79,16 +98,11 @@ searxng/searxng · itzcrazykns/perplexica · pihole/pihole
 
 | Repo | Último commit | Estado |
 |---|---|---|
-| yggdrasil-dew | 24 jun 22:22 | ✅ actualizado |
-| thdora | 24 jun 03:12 | 🔧 pendiente handlers |
+| yggdrasil-dew | 25 jun 12:33 | ✅ actualizado |
+| thdora | 24 jun 03:12 | 🔧 pendiente handlers /estado /inbox /diario |
 | local-brain | 24 jun 03:13 | ⚠️ pendiente documentar Docker |
 | osint-stack | 24 jun 03:13 | ⚠️ pendiente documentar Docker |
 | personal | 24 jun 02:19 | ✅ ok |
-
-### Repos pendientes de crear
-- [ ] `ollama-stack`
-- [ ] `chatbot-control`
-- [ ] `terminal-ia`
 
 ---
 
@@ -96,9 +110,9 @@ searxng/searxng · itzcrazykns/perplexica · pihole/pihole
 
 | Estado | Detalle |
 |---|---|
-| ~100 archivos en inbox/ | ⚠️ pendiente migrar |
-| Script migración | ✅ generado — ejecutar `bash migrate-inbox.sh` |
-| MASTER-PENDIENTES.md | ✅ actualizado 22:17 |
+| ~93 archivos en inbox/ | ⚠️ SIN MIGRAR — llevan 2 días pendientes |
+| Script migración | ✅ generado pero NO ejecutado |
+| Regla activa | máx 10 archivos, vida 24h — ver [[inbox/README]] |
 
 ---
 
@@ -106,21 +120,37 @@ searxng/searxng · itzcrazykns/perplexica · pihole/pihole
 
 | Servicio | Estado |
 |---|---|
-| Tailscale varopc | ✅ activo (100.86.119.102) |
-| Tailscale Madre | ⚠️ pendiente autoarranque |
-| SSH Madre→varopc | ⚠️ pendiente configurar sin contraseña |
-| UFW Madre | ⚠️ pendiente activar |
-| Hotspot móvil→Madre | ⚠️ pendiente conectar |
+| Tailscale varopc | ✅ activo |
+| Tailscale Madre | ⚠️ pendiente autoarranque — ver setup/servidor/tailscale-autoarranque.md |
+| Tailscale Redmi A5 | ⚠️ pendiente instalar — Play Store (APK split no funciona por ADB) |
+| SSH varopc→Madre por IP | ✅ funciona (varopc@100.91.112.32) |
+| SSH alias `madre` | ⚠️ pendiente añadir en ~/.ssh/config |
+| SSH sin contraseña | ✅ clave instalada en Madre hoy |
+| UFW Madre | ⚠️ pendiente activar reglas definitivas |
+| SSH hardening | ⚠️ documentado en fase1b-seguridad.md — NO aplicado |
 
 ---
 
-## 📋 Próxima acción inmediata
+## 🪟 Windows 11 ISO (UUP)
 
-1. Desde móvil ahora → thdora handlers con Perplexity
-2. Al llegar al PC → `bash migrate-inbox.sh`
-3. Verificar descargas Madre → `ssh madre "ollama list && docker images"`
-4. Levantar fases → `docker compose up -d`
+| Estado | Detalle |
+|---|---|
+| Descarga | ❌ fallida — checksum error en 4 archivos grandes |
+| Causa | Set UUP expirado (links Microsoft caducan) |
+| Solución | Generar nuevo set en uupdump.net → W11 24H2 · amd64 · es-ES · Pro |
+| Script | `~/Downloads/uup/uup_download_linux.sh` |
 
 ---
-_Actualizado: 24 jun 2026 22:22 CEST por Perplexity vía MCP_
-_Ver: [[ECOSISTEMA]] · [[inbox/MASTER-PENDIENTES]] · [[HOME]]_
+
+## 📋 Próximas acciones inmediatas (orden de prioridad)
+
+1. `~/.ssh/config` → añadir entrada `Host madre` para alias sin password
+2. Tailscale Redmi A5 → instalar desde Play Store
+3. Modelos Ollama → lanzar pulls en background (comando arriba)
+4. Fase 3 Docker → revisar respuesta Gemini → ejecutar en Madre
+5. Inbox → vaciar 93 archivos a sus carpetas definitivas
+6. UFW + SSH hardening en Madre
+
+---
+_Actualizado: 25 jun 2026 12:33 CEST — Perplexity vía MCP_
+_Ver: [[MASTER-PENDIENTES]] · [[diarios/2026-06-25-DIARIO-MAESTRO]] · [[inbox/README]]_
