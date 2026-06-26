@@ -1,6 +1,15 @@
 # Red LAN — Mapa de red y puertos
 
-> Última actualización: 12 junio 2026
+> Última actualización: 26 junio 2026
+
+---
+
+## Hardware — Números de serie
+
+| Máquina | Número de serie |
+|---|---|
+| **Acer** | `NXA82EB00D21212C8F7600` |
+| **Madre** | pendiente |
 
 ---
 
