@@ -1,13 +1,13 @@
 # Sesión debug: MadreAP WiFi — 2026-06-27
 
-**Estado:** 🔄 En progreso — AP emite y autentica, DHCP pendiente de fix final  
+**Estado:** ✅ RESUELTO — AP funciona completo, persistente tras reboot  
 **Máquina:** `madre` (varpc, Arch Linux)  
 **Adaptador WiFi:** RTL8188FTV (rtl8xxxu) — USB, 2.4GHz only  
 **Objetivo:** madre emite AP `MadreAP`, da internet por NAT a clientes WiFi
 
 ---
 
-## Arquitectura de red
+## Arquitectura de red final
 
 ```
 Internet
@@ -21,54 +21,66 @@ Internet
 
 ---
 
-## Lo que funciona ✅
+## Estado final ✅
 
-- `hostapd` arranca y emite el SSID `MadreAP`
-- Clientes se autentican correctamente (WPA2/RSN handshake completo):
-  ```
-  wlan0: AP-STA-CONNECTED e0:0a:f6:b6:02:13
-  wlan0: EAPOL-4WAY-HS-COMPLETED e0:0a:f6:b6:02:13
-  wlan0: WPA: pairwise key handshake completed (RSN)
-  ```
-- `systemd-networkd` aplica config `10-wlan0-ap.network`
-- Puerto DHCP escuchando en `wlan0:67`:
-  ```
-  UNCONN 0  0   0.0.0.0%wlan0:67   0.0.0.0:*   users:(("systemd-network"...))
-  ```
-- IP `192.168.72.1` asignada a `wlan0`
-- `IPMasquerade=ipv4` configurado (NAT hacia `enp0s20f0u3`)
+- `hostapd` arranca automáticamente y emite `MadreAP` tras cada reboot
+- Clientes reciben IP `192.168.72.x` vía DHCP de `systemd-networkd`
+- NAT funciona — clientes tienen internet a través de madre
+- UFW configurado con reglas permanentes para `wlan0`
+- Acer (theodora) conecta a MadreAP y recibe `192.168.72.26`
+- Ping a `192.168.72.1` y a `1.1.1.1` OK desde el Acer
 
 ---
 
-## Lo que falla ❌
+## Problemas encontrados y soluciones
 
-### Fallo principal: `Offered DHCP leases: none`
-El servidor DHCP de madre está activo pero **ningún cliente recibe IP**.
-
-### Causa raíz identificada
-`iwd` en el Acer (theodora) gestiona la conexión WiFi pero **no dispara el cliente DHCP** de `systemd-networkd` al conectar. La interfaz `wlan0` queda en estado "conectada a nivel WiFi" pero sin petición DHCP.
-
-Evidencia:
-- El Acer conecta a MadreAP (`AP-STA-CONNECTED` en hostapd)
-- `ip addr show wlan0` en el Acer muestra solo IPv6 link-local, sin IPv4
-- En los logs de madre: cero peticiones DHCP recibidas en `wlan0`
-- Al hacer `networkctl reconfigure wlan0` en el Acer, vuelve a coger IP del iPhone (`172.20.10.3`) en vez de pedir al AP
-
-### Problema secundario: MAC `00:00:00:00:00:00`
+### 1. `iwd` conflicto con hostapd en madre
+**Síntoma:** `No default interface for wiphy 0` — `iwd` tomaba el hardware WiFi e impedía que hostapd creara `wlan0`  
+**Solución:**
+```bash
+sudo systemctl stop iwd
+sudo systemctl disable iwd
 ```
-Wi-Fi access point: MadreAP (00:00:00:00:00:00)
-```
-Indica que `iwd` interfiere con `wlan0` incluso en Madre — no suelta completamente la interfaz a hostapd.
+`iwd` no hace falta en madre — madre es AP, no cliente WiFi.
 
-### Warning deprecado en `.network` (menor)
+### 2. `wlan0` desaparecía tras deshabilitar `iwd`
+**Síntoma:** `Device "wlan0" does not exist` — `iwd` era quien creaba la interfaz  
+**Solución:** Crear la interfaz manualmente y luego dejar que hostapd la gestione:
+```bash
+sudo iw phy phy0 interface add wlan0 type __ap
+sudo ip link set wlan0 up
+sudo systemctl restart systemd-networkd
+sudo systemctl start hostapd
 ```
-IPForward= setting is deprecated
+Tras verificar que hostapd crea `wlan0` solo, el servicio `create-wlan0.service` fue eliminado — no necesario.
+
+### 3. UFW bloqueaba DHCP
+**Síntoma:** El Acer se asociaba a MadreAP (`State: connected`, `ConnectedBss: 04:0c:73:16:05:46`) pero no recibía IP — `Offered DHCP leases: none` en madre  
+**Diagnóstico:** `ss -ulnp | grep :67` confirmó que el servidor DHCP escuchaba, pero UFW tenía:
 ```
-→ Corregido usando `IPv4Forwarding=yes` en el `.network`
+udp dport 67 counter packets 53 bytes 17139 jump ufw-skip-to-policy-input → DROP
+```
+**Solución:**
+```bash
+sudo iptables -I INPUT -i wlan0 -p udp --dport 67 -j ACCEPT
+sudo iptables -I FORWARD -i wlan0 -j ACCEPT
+sudo iptables -I FORWARD -o wlan0 -j ACCEPT
+
+# Permanente con UFW
+sudo ufw allow in on wlan0 to any port 67 proto udp
+sudo ufw route allow in on wlan0
+sudo ufw route allow out on wlan0
+sudo ufw reload
+```
+
+### 4. `iwd` en el Acer no disparaba DHCP
+**Síntoma:** `iwctl station wlan0 show` mostraba `State: connected / Connected network: MadreAP` pero sin IP (`No IP addresses — Is DHCP client configured?`)  
+**Causa:** `iwd` en el Acer gestionaba la conexión WiFi pero no cedía el control DHCP a `systemd-networkd`  
+**Solución final:** El problema se resolvió al arreglar el UFW en madre — una vez que madre respondía DHCP, el Acer recibía IP correctamente.
 
 ---
 
-## Ficheros de configuración actuales
+## Ficheros de configuración finales
 
 ### `/etc/systemd/network/10-wlan0-ap.network` (en madre)
 ```ini
@@ -102,57 +114,54 @@ wpa_key_mgmt=WPA-PSK
 rsn_pairwise=CCMP
 ```
 
+### UFW rules añadidas (permanentes)
+```bash
+ufw allow in on wlan0 to any port 67 proto udp
+ufw route allow in on wlan0
+ufw route allow out on wlan0
+```
+
 ---
 
-## Fix pendiente de aplicar
+## Verificación post-reboot
 
-### En el Acer (theodora) — fix iwd
-El problema del Acer es que `iwd` tiene `EnableNetworkConfiguration` activo por defecto, lo que hace que intente gestionar la IP él solo y falla. Fix:
-
-```bash
-sudo mkdir -p /etc/iwd
-sudo tee /etc/iwd/main.conf > /dev/null << 'EOF'
-[General]
-EnableNetworkConfiguration=false
-
-[Network]
-NameResolvingService=systemd
-EOF
-
-sudo systemctl restart iwd
-sudo systemctl restart systemd-networkd
-sleep 2
-iwctl station wlan0 connect "MadreAP" --passphrase "MadreClaveFuerte123"
-sleep 5
-ip addr show wlan0
+```
+hostapd:           AP-ENABLED ✅
+systemd-networkd:  wlan0 routable, 192.168.72.1 ✅
+DHCP leases:       192.168.72.26 (Acer/theodora) ✅
+UFW:               Firewall reloaded, reglas activas ✅
 ```
 
-### NAT permanente (en madre)
-Las reglas iptables no sobreviven reboot. Hacer permanente:
-```bash
-sudo iptables -t nat -A POSTROUTING -s 192.168.72.0/24 -o enp0s20f0u3 -j MASQUERADE
-# Guardar con iptables-persist o nftables
-```
+---
+
+## Sesión secundaria — Seguridad del Acer (theodora)
+
+### Rastreo y protección antirrobo
+- **Prey Project** — herramienta recomendada para rastreo en Linux/Windows/Android
+  - Instalar: `sudo apt install prey` o desde preyproject.com
+  - Funciones: localización, foto webcam, captura pantalla, IP pública
+  - Limitación: no sobrevive a formateo completo del disco
+- **Computrace/Absolute** — si está en BIOS sobrevive a reinstalaciones
+  - Verificar: `sudo dmidecode -t bios | grep -i computrace`
+- **Cifrado LUKS** — protege datos aunque reinstalen el SO
+- **Contraseña BIOS + Secure Boot** — impide boot desde USB
+
+### Sobre dispositivos robados
+- No existe base de datos pública de portátiles robados en España
+- Consulta policial: **091** o comisaría con el número de serie (`sudo dmidecode -t system | grep Serial`)
+- Fabricante (Acer soporte) también puede verificar si fue reportado
+
+### Número de serie del Acer
+- Pendiente de extraer: `sudo dmidecode -t system | grep Serial`
+- No encontrado en el repo yggdrasil-dew
 
 ---
 
 ## Próximos pasos
 
-1. [ ] Aplicar fix `iwd` en el Acer → confirmar que recibe `192.168.72.x`
-2. [ ] Probar con móvil Android/iOS → confirmar DHCP funciona
-3. [ ] Hacer NAT permanente (sobrevive reboot)
-4. [ ] **Seguridad completa:**
-   - UFW: solo Tailscale para SSH, bloquear acceso externo a servicios
-   - Proteger `enp0s20f0u3` (el iPhone que da ethernet)
-   - Aislar clientes WiFi del AP entre sí
-   - Fail2ban
-   - Revisar exposición de servicios Yggdrasil desde la red del AP
-
----
-
-## Notas técnicas
-
-- El adaptador RTL8188FTV (rtl8xxxu) es 2.4GHz only → solo channels 1-13
-- `iwd` versión 3.12 en el Acer
-- SSH a madre SIEMPRE por Tailscale (`100.91.112.32`) — independiente del WiFi
-- El Acer (theodora) tiene `20-wlan.network` con `DHCP=yes` y `Name=wl*` — config correcta, el problema es iwd no el networkd
+- [ ] Optimizar velocidad AP: activar HT40 en hostapd (`ht_capab=[HT40+]`)
+- [ ] Instalar Prey en el Acer para rastreo antirrobo
+- [ ] Verificar Computrace en BIOS del Acer
+- [ ] Extraer y documentar número de serie del Acer
+- [ ] Interceptación de tráfico: mitmproxy / tcpdump en wlan0
+- [ ] DNS personalizado para clientes del AP
