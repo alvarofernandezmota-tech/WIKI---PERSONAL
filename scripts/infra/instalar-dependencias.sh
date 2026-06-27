@@ -3,7 +3,7 @@
 # yggdrasil-dew/scripts/infra/instalar-dependencias.sh
 # Propósito: Instalar stack de seguridad, monitorización y dependencias OSINT
 # OS: Arch Linux
-# Generado: Sesión Gemini 2026-06-27
+# Generado: Sesión Gemini 2026-06-27 (ajustado para AUR)
 # ==============================================================================
 
 set -euo pipefail
@@ -24,7 +24,7 @@ echo -e "${BLUE}[*] Sincronizando bases de datos de pacman...${NC}"
 pacman -Sy
 
 PACKAGES=(
-    "fail2ban" "ufw" "suricata" "zeek"
+    "fail2ban" "ufw" "suricata"
     "restic" "sops" "age"
     "nmap" "net-tools" "arp-scan" "tcpdump" "wireshark-cli"
     "htop" "btop" "iotop" "nvtop"
@@ -33,6 +33,14 @@ PACKAGES=(
 
 echo -e "${BLUE}[*] Instalando paquetes (omitiendo los ya instalados)...${NC}"
 pacman -S --needed --noconfirm "${PACKAGES[@]}"
+
+# Instalación de paquetes AUR (Zeek) — requiere yay
+if command -v yay >/dev/null 2>&1; then
+  echo -e "${BLUE}[*] Instalando paquetes AUR (zeek)...${NC}"
+  sudo -u "$(logname)" yay -S --needed --noconfirm zeek || echo -e "${YELLOW}[!] No se pudo instalar zeek desde AUR. Revisa manualmente.${NC}"
+else
+  echo -e "${YELLOW}[!] yay no está instalado. Zeek no se instalará automáticamente.${NC}"
+fi
 
 echo -e "${BLUE}[*] Habilitando servicios base...${NC}"
 systemctl enable --now fail2ban.service
