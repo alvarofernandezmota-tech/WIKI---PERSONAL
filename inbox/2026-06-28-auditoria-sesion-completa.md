@@ -1,52 +1,85 @@
 ---
-tags: [inbox, auditoria, sesion, plan, osint, pentest, docker, fases]
+tags: [inbox, auditoria, sesion, plan, osint, pentest, docker, fases, fase1, seguridad]
 fecha: 2026-06-28
-hora: 22:43
+hora: 23:11
 estado: procesado
 ---
 
 # 📥 Auditoría sesión completa — 28 jun 2026
 
-> Documentado por Perplexity vía MCP durante sesión nocturna 22:30-22:45 CEST
+> Documentado por Perplexity vía MCP durante sesión nocturna 22:30–23:11 CEST
 > Para procesar: mover contenido relevante a `docs/` o `diarios/`
 
 ---
 
-## ✅ Completado esta sesión (madrugada 00:37–01:00 + noche 22:00-22:45)
+## ✅ Completado esta sesión
 
-### Infraestructura
-- **fail2ban jail sshd** activo — Madre + Acer (`maxretry:5` `bantime:86400`)
-- **dnsmasq DHCP** activo en wlan0 — pool `192.168.72.50-150` · lease 12h
+### Bloque nocturno tardío 23:00–23:11 — **FASE 1 COMPLETADA EN MADRE** 🎉
+
+- **git pull --rebase** en Madre — 16 archivos sincronizados, 33 objetos ✅
+- **fail2ban sshd** activo en Madre — `maxretry:5` `bantime:86400` ✅
+- **SSH hardening** — `PasswordAuthentication no` · `PubkeyAuthentication yes` ✅
+- **UFW completo** — deny incoming · allow outgoing · 15 puertos LAN + Tailscale `100.64.0.0/10` ✅
+- **tailscaled** habilitado para autoarranque ✅
+- **Suspensión enmascarada** — `sleep.target` + `suspend.target` + `hibernate.target` ✅
+- **Madre rebooteada** — sistema arrancando limpio post-Fase 1 ✅
+- **dnsmasq DHCP** activo en wlan0 — pool `192.168.72.50-150` · lease 12h ✅
+- **Puerto 53 UFW wlan0** abierto — clientes AP pueden resolver DNS ✅
+
+### Bloque previo 22:00–22:45
+- **fail2ban jail sshd** activo — Madre + Acer
 - **Puerto 53317** cerrado UFW — Madre + Acer
 - **Netdata Acer** activo · puerto 19999 restringido a Madre
-- **UFW puerto 53 wlan0** — clientes AP pueden resolver DNS
+- Repo yggdrasil-dew auditado y actualizado completo vía MCP
 
-### Repo yggdrasil-dew — actualizado vía MCP
-- `MASTER-PENDIENTES.md` — sesión 28-jun documentada ✅
-- `ESTADO-SISTEMA.md` — estado real 28-jun ✅
-- `ECOSISTEMA.md` — IPs corregidas, red AP documentada, stack completo ✅
-- `CHANGELOG.md` — toda la semana 22-28 jun ✅
-- Issues #5 (AP hostapd) + #6 (DIARY 28-jun) creados ✅
-- Auditoría completa de carpetas y archivos root del repo ✅
+### Scripts creados esta sesión (en `scripts/`)
+- `01-fix-driver-rtl8188ftu.sh` — fix driver AP RTL8188FTV
+- `02-git-pull-rebase.sh` — sync repo en Madre
+- `03-fase1-seguridad.sh` — **YA EJECUTADO ✅**
+- `04-fase2-start-batcueva.sh` — próxima sesión
+- `05-fase7-ollama-pull.sh` — próxima sesión
+- `06-verificacion-post-reboot.sh` — verificación estado sistema
 
 ---
 
-## 📍 Estado real del plan — 28 jun 2026
+## 📍 Estado real del plan — 28 jun 2026 23:11
 
 ### Plan completo: `PLAN-SEGURIDAD-Y-DESPLIEGUE.md` — 10 fases
 
 | Fase | Nombre | Estado |
 |---|---|---|
-| **0** | Repo y docs al día | 🟡 95% — solo falta `git pull --rebase` en Madre |
-| **1** | Seguridad de red | 🔴 0% — SSH hardening, UFW completo, Tailscale autoarranque, no suspensión |
-| **2** | Script `start-batcueva.sh` | 🔴 0% — crear y subir al repo |
+| **0** | Repo y docs al día | ✅ 100% — git pull hecho, repo sincronizado |
+| **1** | Seguridad de red | ✅ 100% — SSH hardening + UFW + Tailscale + no suspensión |
+| **2** | Script `start-batcueva.sh` | 🔴 0% — script preparado en repo, falta ejecutar |
 | **3** | Backup Restic | 🔴 0% — bucket cloud + scripts + timer |
 | **4** | Monitorización completa | 🟡 50% — Grafana dashboards, Uptime Kuma→THDORA, Wazuh pendiente |
 | **5** | Seguridad avanzada contenedores | 🔴 0% — SOPS, Rootless Docker, VLANs |
 | **6** | Handlers THDORA | 🔴 0% — `/estado` `/inbox` `/diario` `/pull` |
 | **7** | Modelos Ollama + RAG | 🔴 20% — `llama3.1:8b`, `bge-m3`, `nomic-embed-text` pendientes |
 | **8** | Seguridad Acer (theodora) | 🔴 0% — Prey, Computrace, número de serie |
-| **9** | Pentest + OSINT real | 🔴 0% — **BLOQUEADO hasta Fase 1** |
+| **9** | Pentest + OSINT real | 🔴 0% — desbloqueado ahora que Fase 1 ✅ |
+
+---
+
+## 🔴 Único pendiente crítico — verificación post-reboot
+
+Madre está arrancando ahora mismo. Cuando conecte:
+
+```bash
+ssh madre
+cd ~/yggdrasil-dew/scripts
+bash 06-verificacion-post-reboot.sh
+```
+
+**Checks que deben estar todos ✅ tras el reboot:**
+- UFW activo
+- Tailscale conectado (100.91.112.32)
+- hostapd (MadreAP) activo
+- dnsmasq activo
+- SSH sin password auth
+- fail2ban activo
+- sleep.target masked
+- Driver 8188fu config presente
 
 ---
 
@@ -71,74 +104,26 @@ SearXNG         → buscador privado
 PiHole          → DNS + bloqueador ads
 ```
 
-Archivo listo: `osint-stack/docker-compose.kali.yml` — solo falta ejecutar `docker compose up -d`
-
----
-
-## 🔎 OSINT vs Pentest — diferencia clara
-
-| | OSINT | Pentest |
-|---|---|---|
-| **Qué es** | Inteligencia de fuentes abiertas — información pública | Pruebas de penetración — atacar sistemas con permiso |
-| **Herramientas** | SpiderFoot, SearXNG, Maltego | Kali, Bettercap, nmap, Metasploit |
-| **Cómo** | Pasivo — no tocas el objetivo | Activo — lanzas ataques controlados |
-| **Para qué** | Reconocimiento previo | Encontrar vulnerabilidades reales |
-| **En el stack** | SpiderFoot (puerto 5001) | Kali Desktop (puerto 6901) |
-
----
-
-## 📱 Móvil (Redmi A5) — SSH y Tailscale
-
-### Estado actual
-- **Tailscale**: ❌ pendiente instalar desde Play Store
-- **SSH desde móvil**: posible via **Termux** (app Android)
-
-### Cuando esté Tailscale instalado podrás:
-```bash
-# Desde Termux en el móvil:
-ssh varopc@100.91.112.32      # SSH a Madre
-ssh varo@100.86.119.102       # SSH a Acer
-```
-- Ver dashboards en navegador: Grafana, Netdata, Portainer, Open WebUI
-- Controlar THDORA desde Telegram
-- Acceder a Kali Desktop desde navegador móvil (`http://100.91.112.32:6901`)
-
----
-
-## 🚨 Problema pendiente crítico — AP inestable
-
-Driver **RTL8188FTV** cae solo — `INTERFACE-DISABLED` en logs hostapd.
-
-**Fix preparado** (pendiente ejecutar en Madre):
-```bash
-echo "options 8188fu rtw_power_mgnt=0 rtw_enusbss=0" | sudo tee /etc/modprobe.d/8188fu.conf
-sudo modprobe -r 8188fu 2>/dev/null; sudo modprobe 8188fu
-sudo systemctl restart hostapd
-systemctl is-active hostapd
-```
-
 ---
 
 ## 🗓️ Próximas sesiones — orden de ejecución
 
 ```
-Sesión siguiente:
-  1. Fix driver RTL8188FTV → AP estable
-  2. git pull --rebase en Madre → Fase 0 cerrada
-  3. Fase 1: SSH hardening + UFW completo + Tailscale enable + mask suspend
-  4. Fase 2: script start-batcueva.sh
+Sesión siguiente (inmediata):
+  1. Verificar 06-verificacion-post-reboot.sh → todos los checks ✅
+  2. Ejecutar 04-fase2-start-batcueva.sh → levantar stack Docker completo
+  3. Ejecutar 05-fase7-ollama-pull.sh → modelos llama3.1:8b, bge-m3, nomic
 
 Esta semana:
-  5. Modelos Ollama (llama3.1:8b, bge-m3, nomic-embed-text)
-  6. THDORA handlers (/estado /inbox /diario /pull)
-  7. Tailscale Redmi A5 → móvil como nodo
+  4. THDORA handlers (/estado /inbox /diario /pull)
+  5. Tailscale Redmi A5 → móvil como nodo
+  6. Fase 3 Restic backup
 
 Siguiente semana:
-  8. Fase 3 Restic backup
-  9. Fase 4 Grafana + Wazuh
-  10. Fase 9 Kali + SpiderFoot → primer scan OSINT real
+  7. Fase 4 Grafana + Wazuh
+  8. Fase 9 Kali + SpiderFoot → primer scan OSINT real (ya desbloqueado)
 ```
 
 ---
-_Creado: 28 jun 2026 22:43 CEST — Perplexity vía MCP_
+_Actualizado: 28 jun 2026 23:11 CEST — Perplexity vía MCP_
 _Ver: [[PLAN-SEGURIDAD-Y-DESPLIEGUE]] · [[MASTER-PENDIENTES]] · [[ESTADO-SISTEMA]]_
