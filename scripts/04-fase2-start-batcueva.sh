@@ -1,70 +1,43 @@
 #!/bin/bash
-# FASE 2 — Crear scripts/start-batcueva.sh y subirlo al repo
-# Prerequisito: Fase 1 completada y Madre rebooted
+# ==============================================================================
+# SCRIPT: 04-fase2-start-batcueva.sh
+# OBJETIVO: Inicializar redes, volúmenes y levantar el stack de 13 contenedores.
+# ==============================================================================
 
-set -euo pipefail
+set -e
 
-REPO_DIR="$HOME/yggdrasil-dew"
-SCRIPT_PATH="$REPO_DIR/scripts/start-batcueva.sh"
+echo "[+] Iniciando Fase 2: Despliegue de la Batcueva Docker en Madre..."
 
-echo "🔴 [04] FASE 2 — Script levantamiento seguro"
+# 1. Crear redes Docker para aislamiento de servicios
+echo "[+] Configurando redes virtuales..."
+docker network create batcueva-net 2>/dev/null || echo "[*] Red batcueva-net ya existe."
+docker network create ai-net 2>/dev/null || echo "[*] Red ai-net ya existe."
+docker network create monitor-net 2>/dev/null || echo "[*] Red monitor-net ya existe."
 
-echo ""
-echo "→ Verificando Fase 1..."
-FASE1_OK=true
+# 2. Asegurar directorios de persistencia
+echo "[+] Verificando directorios de datos locales..."
+mkdir -p ./data/{ollama,qdrant,gitea,open-webui,uptime-kuma,grafana,prometheus,n8n,code-server}
 
-sudo ufw status | grep -q "Status: active" && echo "✅ UFW activo" || { echo "❌ UFW inactivo"; FASE1_OK=false; }
-tailscale status 2>/dev/null | grep -q "100\." && echo "✅ Tailscale conectado" || { echo "❌ Tailscale no conectado"; FASE1_OK=false; }
-
-[ "$FASE1_OK" = true ] || { echo "❌ Completa Fase 1 primero."; exit 1; }
-
-mkdir -p "$REPO_DIR/scripts"
-
-cat > "$SCRIPT_PATH" << 'STARTSCRIPT'
-#!/bin/bash
-# start-batcueva.sh — Levantamiento seguro del stack Batcueva
-set -euo pipefail
-
-echo "🛡️ Verificando seguridad antes de levantar..."
-
-if ! sudo ufw status | grep -q "Status: active"; then
-  echo "❌ UFW inactivo. Abortando."; exit 1
-fi
-echo "✅ UFW activo"
-
-if ! tailscale status | grep -q "100\."; then
-  echo "❌ Tailscale no conectado. Abortando."; exit 1
-fi
-echo "✅ Tailscale activo"
-
-if ! systemctl is-active hostapd > /dev/null 2>&1; then
-  echo "⚠️ hostapd no activo (MadreAP caído)"
+# 3. Validar sintaxis del archivo de composición
+if [ -f "docker-compose.yml" ]; then
+    echo "[+] Validando configuración de docker-compose.yml..."
+    docker compose config > /dev/null
+else
+    echo "[!] Error: No se encuentra docker-compose.yml en el directorio actual."
+    exit 1
 fi
 
-echo "🚀 Levantando stack principal..."
-docker compose -f ~/docker/docker-compose.yml up -d
+# 4. Levantar el stack en segundo plano
+echo "[+] Levantando los 13 contenedores principales..."
+docker compose up -d
 
-echo "✅ Stack levantado."
-echo "   Portainer:   http://100.91.112.32:9000"
-echo "   Open WebUI:  http://100.91.112.32:3000"
-echo "   Uptime Kuma: http://100.91.112.32:3002"
-echo ""
-docker compose -f ~/docker/docker-compose.yml ps
-STARTSCRIPT
+# 5. Verificación rápida del estado
+echo "[+] Esperando inicialización de servicios críticos..."
+sleep 5
+docker compose ps
 
-chmod +x "$SCRIPT_PATH"
-echo "✅ $SCRIPT_PATH creado"
-
-bash -n "$SCRIPT_PATH" && echo "✅ Sintaxis OK"
-
-cd "$REPO_DIR"
-git add scripts/start-batcueva.sh
-git commit -m "feat: add start-batcueva.sh — levantamiento seguro [Fase 2]"
-git push origin main
-echo "✅ Subido a GitHub"
-
-echo ""
-echo "✅ COMPLETADO — $(date '+%d-%m-%Y %H:%M CEST')"
-echo "📝 Marca en PLAN: [x] scripts/start-batcueva.sh creado"
-echo ""
-echo "🚀 Para levantar el stack: bash $SCRIPT_PATH"
+echo "[+] Fase 2 ejecutada correctamente. Contenedores en proceso de estabilización."
+echo "    Portainer:   http://100.91.112.32:9000"
+echo "    Open WebUI:  http://100.91.112.32:3001"
+echo "    Uptime Kuma: http://100.91.112.32:3002"
+echo "    Grafana:     http://100.91.112.32:3000"

@@ -1,57 +1,48 @@
 #!/bin/bash
-# Fase 3 — Backup Restic offsite
+# ==============================================================================
+# SCRIPT: 07-fase3-restic-backup.sh
+# OBJETIVO: Automatizar snapshot de ./data/ hacia Cloudflare R2 usando Restic.
+# ==============================================================================
 
-set -euo pipefail
+set -e
 
-REPO_DIR="$HOME/yggdrasil-dew"
-RESTIC_ENV_FILE="$REPO_DIR/.env.restic"
-EXCLUDES_FILE="$REPO_DIR/infra/restic-excludes.txt"
+echo "[+] Iniciando Fase 3: Respaldo de seguridad con Restic..."
 
-echo "🔄 [07] Fase 3 — Backup Restic"
-
-# Comprobaciones básicas
-if ! command -v restic >/dev/null 2>&1; then
-  echo "❌ restic no está instalado. Instálalo antes de ejecutar esta fase."
-  exit 1
+# 1. Cargar variables de entorno
+if [ -f ".env.restic" ]; then
+    source .env.restic
+else
+    echo "[!] Error: No se encuentra el archivo .env.restic con las credenciales."
+    echo "    Crea .env.restic a partir de infra/restic-excludes.txt y .env.restic.template"
+    exit 1
 fi
 
-if [ ! -f "$RESTIC_ENV_FILE" ]; then
-  echo "❌ Falta $RESTIC_ENV_FILE con configuración Restic (RESTIC_REPOSITORY, RESTIC_PASSWORD_FILE, RESTIC_BACKUP_PATHS)."
-  echo "   Crea este archivo siguiendo docs/infra/backup-restic.md."
-  exit 1
+# 2. Inicializar repo en R2 si no existe
+echo "[+] Comprobando conectividad con el repositorio R2..."
+if ! restic stats >/dev/null 2>&1; then
+    echo "[*] Repositorio no detectado. Inicializando por primera vez en Cloudflare R2..."
+    restic init
+else
+    echo "[+] Repositorio listo y accesible."
 fi
 
-# Cargar variables de entorno de Restic
-# Esperado: RESTIC_REPOSITORY, RESTIC_PASSWORD_FILE, RESTIC_BACKUP_PATHS
-# Ejemplo de .env.restic:
-#   export RESTIC_REPOSITORY="rclone:remote:bucket/path"
-#   export RESTIC_PASSWORD_FILE="$HOME/.config/restic/password.txt"
-#   export RESTIC_BACKUP_PATHS="$HOME $HOME/docker"
-source "$RESTIC_ENV_FILE"
+# 3. Ejecutar backup con exclusiones
+echo "[+] Ejecutando copia de seguridad del directorio ./data/..."
+restic backup ./data/ \
+    --exclude-file=infra/restic-excludes.txt \
+    --tag "madre-core" \
+    --verbose
 
-if [ -z "${RESTIC_REPOSITORY:-}" ] || [ -z "${RESTIC_PASSWORD_FILE:-}" ] || [ -z "${RESTIC_BACKUP_PATHS:-}" ]; then
-  echo "❌ Variables RESTIC_REPOSITORY / RESTIC_PASSWORD_FILE / RESTIC_BACKUP_PATHS incompletas en $RESTIC_ENV_FILE"
-  exit 1
-fi
+# 4. Política de retención
+echo "[+] Aplicando política de retención..."
+restic forget \
+    --keep-last 7 \
+    --keep-weekly 4 \
+    --keep-monthly 12 \
+    --prune
 
-if [ ! -f "$RESTIC_PASSWORD_FILE" ]; then
-  echo "❌ RESTIC_PASSWORD_FILE no existe: $RESTIC_PASSWORD_FILE"
-  exit 1
-fi
+# 5. Verificación de integridad
+echo "[+] Verificando consistencia de los datos en la nube..."
+restic check --read-data-subset=10%
 
-RESTIC_CMD=(restic backup $RESTIC_BACKUP_PATHS)
-if [ -f "$EXCLUDES_FILE" ]; then
-  echo "→ Usando archivo de exclusiones: $EXCLUDES_FILE"
-  RESTIC_CMD+=(--exclude-file "$EXCLUDES_FILE")
-fi
-
-echo "→ Lanzando backup Restic al repositorio: $RESTIC_REPOSITORY"
-"${RESTIC_CMD[@]}"
-
-echo ""
-echo "→ Snapshots recientes:"
-restic snapshots | tail -n 10 || true
-
-echo ""
-echo "✅ Fase 3 — backup Restic ejecutado: $(date '+%d-%m-%Y %H:%M CEST')"
-echo "📝 Recuerda documentar en ESTADO-SISTEMA.md que Fase 3 está ejecutándose correctamente."
+echo "[+] Fase 3 completada. Datos protegidos en Cloudflare R2."
