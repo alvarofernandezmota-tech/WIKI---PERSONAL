@@ -1,29 +1,53 @@
-# yggdrasil-dew/osint-stack/docker-compose.kali.yml
-# Entorno ofensivo Kali con red macvlan VLAN 66
-
-networks:
-  pentest_vlan:
-    driver: macvlan
-    driver_opts:
-      parent: eno1.66
-    ipam:
-      config:
-        - subnet: 192.168.66.0/24
-          gateway: 192.168.66.1
-          ip_range: 192.168.66.128/25
+# osint-stack/docker-compose.kali.yml
+# ✅ VALIDADO: pendiente levantar en varopc (01-jul-2026)
+# Kali Desktop vía navegador web — KasmWeb
+#
+# CAMBIO vs versión anterior:
+#   ❌ macvlan VLAN66 (eno1.66 no existe en varopc, enp4s0 DOWN)
+#   ✅ bridge normal — acceso directo vía puerto 6901
+#
+# Acceso: https://100.91.112.32:6901
+# Usuario: kasm_user
+# Password: definida en .env o por defecto batcueva2026
+#
+# Uso:
+#   cd ~/yggdrasil-dew/osint-stack
+#   docker compose -f docker-compose.kali.yml up -d
 
 services:
   kali-pentest:
-    image: kasmweb/kali-rolling-desktop:latest
+    image: kasmweb/kali-rolling-desktop:1.16.0
     container_name: kali-pentest
     hostname: kali-batcueva
+    restart: unless-stopped
     privileged: true
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    networks:
-      pentest_vlan:
-        ipv4_address: 192.168.66.100
+    shm_size: '512m'            # requerido por KasmWeb para navegador
+    ports:
+      - "6901:6901"             # HTTPS WebUI — acceso: https://varopc:6901
     environment:
       - VNC_PW=${KALI_VNC_PASSWORD:-batcueva2026}
-    restart: unless-stopped
+    volumes:
+      - kali_data:/home/kasm-user  # persistencia home usuario kali
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4g
+
+volumes:
+  kali_data:
+
+# ==============================================================================
+# RAM ESTIMADA:
+#   kali-pentest (KasmWeb desktop)  ~1.5-2.0 GB activo
+#   Stack base ya corriendo         ~11.5 GB
+#   ─────────────────────────────────
+#   TOTAL ESTIMADO                  ~13.5 GB / 16 GB ⚠️ JUSTO
+#
+# ⚠️  Levantar Kali solo cuando RAM libre > 3 GB
+#       Verificar: free -h
+# ⚠️  NO levantar Wazuh simultáneamente con Kali sin revisar RAM
+# ==============================================================================
