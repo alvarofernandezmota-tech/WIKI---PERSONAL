@@ -1,10 +1,10 @@
 ---
 tags: [estado, sistema, operativo, servicios, ahora]
-fecha-actualizacion: 2026-06-30
-hora: 21:30
+fecha-actualizacion: 2026-07-01
+hora: 01:12
 ---
 
-# 📊 ESTADO DEL SISTEMA — 30 jun 2026 (21:30)
+# 📊 ESTADO DEL SISTEMA — 01 jul 2026 (01:12)
 
 > Este archivo refleja el estado REAL operativo ahora mismo.
 > Actualizar cada vez que cambie algo importante.
@@ -15,77 +15,90 @@ hora: 21:30
 
 | Máquina | Estado | Observaciones |
 |---|---|---|
-| **Madre (varpc)** | ✅ encendida y accesible | SSH OK · AP MadreAP activo · Tailscale `100.91.112.32` |
-| **Acer (theodora / varo12f)** | ✅ operativo | Tailscale `100.86.119.102` · Netdata activo · relay `mad` activo |
+| **varopc (Madre)** | ✅ encendida y accesible | SSH OK · AP MadreAP activo · Tailscale `100.91.112.32` |
+| **Acer (theodora)** | ✅ operativo | Tailscale `100.86.119.102` · Netdata activo |
 | **iPhone 11** | ✅ Tailscale activo | `100.81.187.99` |
-| **Redmi A5** | ⚠️ sin Tailscale | Tailscale pendiente instalar desde Play Store |
+| **Redmi A5** | ⚠️ sin Tailscale | Pendiente instalar desde Play Store |
 
 ---
 
-## 🛜 Red
+## 🛠 Red
 
 | Servicio | Estado | Detalle |
 |---|---|---|
-| Tailscale Madre | ✅ activo | `100.91.112.32` |
+| Tailscale varopc | ✅ activo | `100.91.112.32` |
 | Tailscale Acer | ✅ activo | `100.86.119.102` · relay `mad` |
 | Tailscale iPhone 11 | ✅ activo | `100.81.187.99` |
 | Tailscale Redmi A5 | ❌ pendiente | Instalar desde Play Store |
-| **MadreAP (hostapd)** | ✅ activo y estable | SSID: MadreAP · WPA2 · canal 6 · wlan0 RTL8188FTV · sin caídas |
-| **dnsmasq DHCP** | ✅ activo | `192.168.72.50-150` · 12h lease · wlan0 |
-| **NAT/IP Masquerade** | ✅ activo | Clientes WiFi tienen internet |
-| **UFW Madre** | ✅ activo | Reglas completas activas |
-| **UFW Acer** | ✅ activo | Reglas completas activas |
-| ⚠️ Driver RTL8188FTV | ✅ estable hoy | Sin INTERFACE-DISABLED en sesión 30-jun · módulo real pendiente identificar |
+| **MadreAP (hostapd)** | ✅ estable | SSID: MadreAP · WPA2 · canal 6 · sin caídas |
+| **dnsmasq DHCP** | ✅ activo | `192.168.72.50-150` · wlan0 |
+| **UFW varopc** | ✅ activo | Reglas completas |
+| **UFW Acer** | ✅ activo | Reglas completas |
 | SSH hardening | ⚠️ parcial | `PasswordAuthentication no` ✅ · clave pública pendiente |
 
 ---
 
-## 🐳 Docker — Estado Madre
+## 🐳 Docker — Estado varopc
 
-### Stack — 13/13 CONTENEDORES UP ✅ (validado 30-jun 21:15)
+### Stack base — 13/13 CONTENEDORES UP ✅ (validado 01-jul 01:10 CEST)
 
-| Contenedor | Puerto | Estado |
-|---|---|---|
-| `ollama` | 11434 | ✅ healthy |
-| `ollama-embeddings` | 11435 | ✅ healthy |
-| `open-webui` | 3001 | ✅ healthy |
-| `qdrant` | 6333 | ✅ healthy |
-| `uptime-kuma` | 3002 | ✅ healthy |
-| `thdora` | 8000 | ✅ healthy — FastAPI v0.12.1 |
-| `thdora-bot` | — | ✅ healthy |
-| `grafana` | 3000 | ✅ up |
-| `prometheus` | 9090 | ✅ up |
-| `portainer` | 9000 | ✅ up |
-| `code-server` | 8443 | ✅ up |
-| `n8n` | 5678 | ✅ up |
-| `gitea` | 3003 | ✅ up |
+| Contenedor | Puerto | Estado | Bloque |
+|---|---|---|---|
+| `ollama` | 11434 | ✅ healthy | IA |
+| `ollama-embeddings` | 11435 | ✅ healthy | IA |
+| `qdrant` | 6333 | ✅ healthy | IA |
+| `open-webui` | 3001 | ✅ healthy | IA |
+| `thdora` | 8000 | ✅ healthy | Bot |
+| `thdora-bot` | — | ✅ healthy | Bot |
+| `uptime-kuma` | 3002 | ✅ healthy | Obs |
+| `portainer` | 9000 | ✅ up | Obs |
+| `grafana` | 3000 | ✅ up | Obs |
+| `prometheus` | 9090 | ✅ up | Obs |
+| `n8n` | 5678 | ✅ up | Dev |
+| `gitea` | 3003 | ✅ up | Dev |
+| `code-server` | 8443 | ✅ up | Dev |
 
-### Pendiente levantar (Fases 5-6)
-- [ ] Kali Desktop (puerto 6901) — pentest
-- [ ] Wazuh SIEM — prereq `vm.max_map_count=262144`
-- [ ] Suricata IDS pasivo
-- [ ] SpiderFoot OSINT
-- [ ] PiHole DNS
+### 🔜 Pendiente levantar — Bloque Pentest/OSINT/SIEM
+
+| Contenedor | Puerto | Prereq | Prioridad |
+|---|---|---|---|
+| `kali-desktop` | 6901 | ninguno | 🔴 Alta |
+| `spiderfoot` | 5001 | ninguno | 🔴 Alta |
+| `wazuh` | 1514/55000 | `vm.max_map_count=262144` | 🟡 Media |
+| `suricata` | — | modo pasivo en wlan0 | 🟡 Media |
+| `defectdojo` | 8080 | wazuh activo | 🟢 Baja |
+
+**Para levantar Kali + SpiderFoot ahora mismo:**
+```bash
+# prereq Wazuh (solo para wazuh, no para kali/spiderfoot):
+sudo sysctl -w vm.max_map_count=262144
+
+# levantar solo pentest:
+docker compose -f docker/batcueva-pentest.yml up -d
+
+# levantar solo OSINT:
+docker compose -f docker/batcueva-osint.yml up -d
+```
 
 ### Modelos Ollama
 
 | Modelo | Tamaño | Estado |
 |---|---|---|
-| `qwen2.5-coder:7b` | 4.7GB | ✅ descargado · Q4_K_M · ctx 32k · tools |
-| `qwen2.5:3b` | 1.9GB | ✅ descargado · Q4_K_M · ctx 32k · tools |
-| `llama3.1:8b` | 4.7GB | ✅ descargado 30-jun · chat general · tools |
-| `nomic-embed-text` | ~274MB | ✅ descargado 30-jun · embeddings RAG → Qdrant |
-| `bge-m3` | — | ❌ pendiente pull |
+| `qwen2.5-coder:7b` | 4.7 GB | ✅ descargado |
+| `qwen2.5:3b` | 1.9 GB | ✅ descargado |
+| `llama3.1:8b` | 4.7 GB | ✅ descargado |
+| `nomic-embed-text` | 274 MB | ✅ descargado |
+| `bge-m3` | 1.2 GB | ✅ descargado |
 
 ---
 
 ## 🔐 Seguridad
 
-| Servicio | Madre | Acer |
+| Servicio | varopc | Acer |
 |---|---|---|
-| fail2ban | ✅ activo · jail sshd ✅ | ✅ activo · jail sshd ✅ |
-| UFW | ✅ activo y limpio | ✅ activo y limpio |
-| SSH PasswordAuth | ✅ `no` — confirmado 30-jun | ✅ contraseña |
+| fail2ban | ✅ activo · jail sshd | ✅ activo · jail sshd |
+| UFW | ✅ activo | ✅ activo |
+| SSH PasswordAuth | ✅ `no` | ✅ `no` |
 | Puerto 53317 | ✅ cerrado | ✅ cerrado |
 | Clave pública SSH | ❌ pendiente | ❌ pendiente |
 
@@ -95,51 +108,45 @@ hora: 21:30
 
 | Servicio | Estado | URL |
 |---|---|---|
-| Netdata Madre | ✅ activo | `http://localhost:19999` · `http://100.91.112.32:19999` |
+| Netdata varopc | ✅ activo | `http://100.91.112.32:19999` |
 | Netdata Acer | ✅ activo | `http://100.86.119.102:19999` |
-| Netdata streaming | ✅ activo | Acer → Madre vía stream.conf UUID |
 | Grafana | ✅ up | `http://100.91.112.32:3000` |
 | Uptime Kuma | ✅ up | `http://100.91.112.32:3002` |
 | Portainer | ✅ up | `http://100.91.112.32:9000` |
 
 ---
 
-## 🤖 THDORA — Bot Telegram
+## 🤖 THDORA
 
 | Componente | Estado |
 |---|---|
 | thdora (FastAPI) | ✅ healthy · v0.12.1 |
 | thdora-bot | ✅ healthy |
-| Endpoint `/health` | ✅ `{"status":"ok","service":"thdora","version":"0.12.1"}` |
-| Endpoint `/docs` | ✅ Swagger UI accesible |
-| Handlers Telegram | ⚠️ básicos — mapear endpoints pendiente |
-| Uptime Kuma → THDORA webhook | ❌ pendiente |
+| Handlers Telegram | ⚠️ básicos — no tocar hasta stack pentest estable |
 
 ---
 
-## 🗂️ Git — Estado repos
+## 📂 Git
 
 | Repo | Estado |
 |---|---|
-| yggdrasil-dew (GitHub) | ✅ sincronizado — sesión 30-jun committed |
-| yggdrasil-dew (Madre local) | ✅ sincronizado — `git pull --rebase` hecho 30-jun |
-| thdora | 🔧 handlers pendientes |
-| local-brain | 🔧 en desarrollo |
-| osint-stack | 🔧 en desarrollo |
+| yggdrasil-dew | ✅ sincronizado — 01-jul commit |
+| docker/madre/docker-compose.fase1.yml | ✅ subido — compose real validado |
+| docker/README.md | ✅ estructura documentada |
+| CONVENCIONES.md | ✅ Regla 14 añadida |
 
 ---
 
 ## 📋 Próximas acciones (orden prioridad)
 
-1. **Fix driver RTL8188FTV** — identificar módulo real (`sudo modinfo` + dkms) y documentar
-2. **THDORA handlers** — mapear endpoints via `/docs`, implementar handlers Telegram
-3. **Pull `bge-m3`** — modelo embeddings avanzado
-4. **Pipeline RAG** — nomic-embed-text → Qdrant → Open WebUI
-5. SSH hardening — clave pública ambos nodos
-6. Tailscale Redmi A5
-7. Uptime Kuma → THDORA alertas Telegram
-8. Wazuh prereq + levantar SIEM
+1. 🔴 **Levantar Kali Desktop** — `docker compose -f docker/batcueva-pentest.yml up -d`
+2. 🔴 **Levantar SpiderFoot** — primer scan OSINT real
+3. 🟡 **Prereq Wazuh** — `sudo sysctl -w vm.max_map_count=262144`
+4. 🟡 **Levantar Wazuh SIEM** — `docker compose -f docker/batcueva-siem.yml up -d`
+5. 🟢 Pipeline RAG — bge-m3 → Qdrant → Open WebUI
+6. 🟢 SSH clave pública ambos nodos
+7. 🟢 Tailscale Redmi A5
 
 ---
-_Actualizado: 30 jun 2026 21:30 CEST — Perplexity vía MCP_
+_Actualizado: 01 jul 2026 01:12 CEST — Perplexity vía MCP_
 _Ver: [[MASTER-PENDIENTES]] · [[ECOSISTEMA]] · [[diarios/]]_
