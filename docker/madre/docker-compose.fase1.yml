@@ -1,0 +1,149 @@
+# ==============================================================================
+# docker-compose.fase1.yml — Stack base Madre
+# Máquina: Madre (i5-8400, 16 GB RAM, sin GPU)
+# Fase: 1 — Stack IA validado
+# Validado: 2026-06-25 — healthcheck fix (sin curl)
+# Veredicto: ollama-fase1 → llama.cpp-fase2 (2-4 semanas)
+#
+# REGLAS CRÍTICAS:
+#   ❌ NUNCA cargar qwen2.5:14b con stack activo → OOM Killer
+#   ❌ NO dos modelos 7B+ simultáneos → swap constante
+#   ✅ Próximo paso Fase 2: migrar a llama.cpp puro
+# ==============================================================================
+
+services:
+
+  # ── OLLAMA CHAT ──────────────────────────────────────────────────────────────
+  # Modelo: qwen2.5:7b — para THDORA y conversación general
+  # Puerto: 11434
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=1        # prohibido procesar 2 cosas a la vez
+      - OLLAMA_MAX_LOADED_MODELS=1   # solo 1 modelo en RAM
+      - OLLAMA_FLASH_ATTENTION=1     # optimización CPU
+      - OLLAMA_NUM_THREADS=3         # max 3 hilos seguros en i5-8400
+      - OLLAMA_KEEP_ALIVE=5m         # liberar RAM cuando no se usa
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '3.5'
+          memory: 7g
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ── OLLAMA EMBEDDINGS ─────────────────────────────────────────────────────────
+  # Modelo: bge-m3 — para RAG + Qdrant
+  # Puerto: 11435 (mapeado desde 11434 interno)
+  ollama-embeddings:
+    image: ollama/ollama:latest
+    container_name: ollama-embeddings
+    restart: unless-stopped
+    ports:
+      - "11435:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_THREADS=2
+      - OLLAMA_KEEP_ALIVE=10m
+    volumes:
+      - ollama_embeddings_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ── QDRANT ───────────────────────────────────────────────────────────────────
+  # Memoria vectorial para RAG
+  # Puerto: 6333 (REST API)
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:6333/healthz | grep -q ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ── OPEN-WEBUI ───────────────────────────────────────────────────────────────
+  # Interfaz web para Ollama + RAG integrado con Qdrant
+  # Puerto: 3001 → acceso: http://madre:3001
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3001:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - VECTOR_DB=qdrant
+      - QDRANT_URI=http://qdrant:6333
+      - ENABLE_RAG=true
+    volumes:
+      - open_webui_data:/app/backend/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+    depends_on:
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health | grep -q ok || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  ollama_data:
+  ollama_embeddings_data:
+  open_webui_data:
+  qdrant_storage:
+
+# ==============================================================================
+# PRESUPUESTO RAM CON STACK ACTIVO:
+#   ollama (qwen2.5:7b)      ~6.5 GB
+#   ollama-embeddings        ~0.6 GB
+#   qdrant                   ~0.3 GB
+#   open-webui               ~0.3 GB
+#   thdora + thdora-bot      ~1.0 GB  (externos a este compose)
+#   grafana + prometheus     ~0.5 GB  (externos a este compose)
+#   portainer + uptime       ~0.3 GB  (externos a este compose)
+#   SO + sistema             ~2.0 GB
+#   ─────────────────────────────────
+#   TOTAL ESTIMADO          ~11.5 GB / 16 GB ✅ VIABLE
+#
+# PRÓXIMOS PASOS (Fase 2):
+#   → Migrar ollama a llama.cpp para mejor gestión de memoria
+#   → Ver docker/madre/docker-compose.fase2.yml (pendiente)
+# ==============================================================================
