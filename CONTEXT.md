@@ -1,6 +1,6 @@
 ---
 tags: [contexto, estado, sistema, agentes]
-fecha-actualizacion: 2026-06-28T22:47+02:00
+fecha-actualizacion: 2026-06-30T04:41+02:00
 revision: cada-sesion
 ruta-obsidian: CONTEXT.md
 ---
@@ -15,7 +15,7 @@ ruta-obsidian: CONTEXT.md
 
 ## 🕐 Última actualización
 
-**2026-06-28 22:47 CEST** — Sesión noche iPhone — auditoría completa repo + alineación total
+**2026-06-30 04:41 CEST** — Sesión noche móvil — Fase 1 completada + reboot ejecutado + scripts 07-10 creados
 
 ---
 
@@ -29,7 +29,7 @@ ruta-obsidian: CONTEXT.md
 
 | Repo | Privado | Estado | Notas |
 |---|---|---|---|
-| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ❌ | ✅ activo | Último commit 28-jun 22:47 |
+| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ❌ | ✅ activo | Último commit 30-jun 04:41 |
 | [personal](https://github.com/alvarofernandezmota-tech/personal) | ❌ | ✅ activo | — |
 | [thdora](https://github.com/alvarofernandezmota-tech/thdora) | ❌ | 🔧 handlers pendientes | FastAPI + bot corriendo en Docker |
 | [local-brain](https://github.com/alvarofernandezmota-tech/local-brain) | ✅ | 🔧 en desarrollo | Ollama, RAG, Qdrant |
@@ -47,7 +47,7 @@ ruta-obsidian: CONTEXT.md
 
 | Máquina | Hostname | Rol | IP Tailscale | Estado |
 |---|---|---|---|---|
-| PC torre | **varpc (Madre)** | Servidor Docker + Ollama + AP WiFi | `100.91.112.32` | ✅ encendida |
+| PC torre | **varpc (Madre)** | Servidor Docker + Ollama + AP WiFi | `100.91.112.32` | ✅ encendida · post-reboot Fase 1 |
 | Portátil | **varo12f (theodora/Acer)** | Dev + Obsidian | `100.86.119.102` | ✅ activo |
 | Móvil Android | Redmi A5 | Control remoto + Telegram | ⚠️ Tailscale pendiente | Sesión actual |
 | Móvil iPhone | iPhone | Control remoto remoto | ⚠️ Tailscale + Termius pendiente | — |
@@ -74,9 +74,11 @@ ruta-obsidian: CONTEXT.md
 | n8n | 5678 | ✅ up |
 | gitea | 3003 | ✅ up |
 
+> ⚠️ Pendiente verificar post-reboot Fase 1 que todos siguen healthy (bash 06-verificacion-post-reboot.sh)
+
 ### ⏳ Pendiente levantar
 - Kali Desktop (6901) · SpiderFoot (5001) · Bettercap · Wazuh · Suricata · PiHole
-- **Bloqueado:** Fase 9 (pentest/OSINT) requiere Fase 1 completada primero
+- **Fase 9** requiere verificación Fase 1 completa en Madre
 
 ---
 
@@ -86,9 +88,9 @@ ruta-obsidian: CONTEXT.md
 |---|---|
 | qwen2.5-coder:7b | ✅ descargado (4.7GB) |
 | qwen2.5:3b | ✅ descargado (1.9GB) |
-| llama3.1:8b | ❌ pendiente pull |
-| bge-m3 | ❌ pendiente pull |
-| nomic-embed-text | ❌ pendiente pull |
+| llama3.1:8b | ❌ pendiente pull — script 05 listo |
+| bge-m3 | ❌ pendiente pull — script 05 listo |
+| nomic-embed-text | ❌ pendiente pull — script 05 listo |
 
 ---
 
@@ -103,10 +105,10 @@ ruta-obsidian: CONTEXT.md
 | Tailscale Redmi A5 | ❌ pendiente | Play Store |
 | Tailscale iPhone | ❌ pendiente | App Store |
 | fail2ban sshd | ✅ activo | Madre + Acer · maxretry:5 · bantime:86400 |
-| UFW Madre | ✅ activo | Reglas completas wlan0 + tailscale0 |
+| UFW Madre | ✅ activo | Reglas completas wlan0 + tailscale0 · Fase 1 ✅ |
 | UFW Acer | ✅ activo | — |
-| SSH hardening | ⚠️ documentado, no aplicado | PasswordAuthentication pendiente |
-| Driver RTL8188FTV | ⚠️ inestable | AP cae solo — fix pendiente modprobe.d |
+| SSH hardening | ✅ Fase 1 ejecutada | PasswordAuthentication — Fase 1 completada 28-jun |
+| Driver RTL8188FTV | ⚠️ inestable | fix modprobe.d pendiente verificar post-reboot (script 01) |
 
 ---
 
@@ -120,20 +122,37 @@ ruta-obsidian: CONTEXT.md
 
 ---
 
-## 📋 Plan de fases — estado 28-jun
+## 📋 Plan de fases — estado 30-jun-2026
 
 | Fase | Nombre | Estado |
 |---|---|---|
-| 0 | Repo y docs | 🟡 95% — solo falta git pull en Madre |
-| 1 | Seguridad red | 🔴 0% — **PRÓXIMA SESIÓN** |
-| 2 | Script start-batcueva.sh | 🔴 0% |
-| 3 | Backup Restic | 🔴 0% |
-| 4 | Monitorización completa | 🟡 50% |
-| 5 | Seguridad avanzada | 🔴 0% |
-| 6 | Handlers THDORA | 🔴 0% |
-| 7 | Modelos Ollama + RAG | 🔴 20% |
-| 8 | Seguridad Acer | 🔴 0% |
-| 9 | Pentest + OSINT real | 🔴 0% — bloqueado hasta Fase 1 |
+| 0 | Repo y docs | ✅ 100% — docs + scripts + CONTEXT actualizados |
+| 1 | Seguridad red | ✅ 100% — SSH + UFW + Tailscale + suspensión + reboot ejecutado |
+| 2 | Script start-batcueva.sh | 🟡 50% — script 04 listo, pendiente ejecutar y verificar en Madre |
+| 3 | Backup Restic | 🟡 30% — script 07 listo, pendiente configurar .env.restic + ejecutar |
+| 4 | Monitorización completa | 🟡 50% — stack up, dashboards y webhook THDORA pendientes |
+| 5 | Seguridad avanzada | 🔴 0% — SOPS, rootless Docker, VLANs pendientes |
+| 6 | Handlers THDORA | 🟡 30% — script 08 listo, wiring handlers pendiente |
+| 7 | Modelos Ollama + RAG | 🟡 20% — script 05 listo, pull pendiente en Madre |
+| 8 | Seguridad Acer | 🟡 30% — script 09 listo, ejecutar en theodora |
+| 9 | Pentest + OSINT real | 🟡 20% — script 10 listo, Fase 1 ✅ desbloqueada |
+
+---
+
+## 📁 Scripts disponibles en scripts/
+
+| Script | Fase | Estado |
+|---|---|---|
+| `01-fix-driver-rtl8188ftu.sh` | Fix AP WiFi | ✅ listo |
+| `02-git-pull-rebase.sh` | Sync repo | ✅ listo |
+| `03-fase1-seguridad.sh` | Fase 1 | ✅ ejecutado 28-jun |
+| `04-fase2-start-batcueva.sh` | Fase 2 | ✅ listo — pendiente ejecutar |
+| `05-fase7-ollama-pull.sh` | Fase 7 | ✅ listo — pendiente ejecutar |
+| `06-verificacion-post-reboot.sh` | Verificación | ✅ listo — ejecutar al entrar en Madre |
+| `07-fase3-restic-backup.sh` | Fase 3 | ✅ creado 30-jun — pendiente .env.restic |
+| `08-fase6-thdora-handlers.sh` | Fase 6 | ✅ creado 30-jun — pendiente wiring |
+| `09-fase8-seguridad-acer.sh` | Fase 8 | ✅ creado 30-jun — ejecutar en Acer |
+| `10-fase9-osint-stack.sh` | Fase 9 | ✅ creado 30-jun — pendiente docker-compose reales |
 
 ---
 
@@ -149,11 +168,15 @@ ruta-obsidian: CONTEXT.md
 
 ---
 
-## 📌 Próxima acción
+## 📌 Próximas acciones (al entrar en Madre)
 
-1. **Ahora desde iPhone** → instalar Tailscale + Termius
-2. **Próxima sesión** → Fix RTL8188FTV + git pull + **Fase 1 completa**
-3. **Esta semana** → Modelos Ollama + THDORA handlers + Fase 2
+1. `bash 06-verificacion-post-reboot.sh` — verificar estado post-reboot Fase 1
+2. `bash 01-fix-driver-rtl8188ftu.sh` — estabilizar AP MadreAP
+3. `bash 04-fase2-start-batcueva.sh` — levantar batcueva Docker
+4. `bash 05-fase7-ollama-pull.sh` — descargar llama3.1:8b + bge-m3 + nomic-embed-text
+5. Configurar `.env.restic` → `bash 07-fase3-restic-backup.sh`
+6. Wiring THDORA handlers → `bash 08-fase6-thdora-handlers.sh`
+7. En Acer: `bash 09-fase8-seguridad-acer.sh`
 
 ---
 
@@ -168,4 +191,4 @@ ruta-obsidian: CONTEXT.md
 
 ---
 _Ver: [[HOME]] · [[ECOSISTEMA]] · [[ESTADO-SISTEMA]] · [[MASTER-PENDIENTES]] · [[filosofia]]_
-_Actualizado: 28 jun 2026 22:47 CEST — Perplexity vía MCP_
+_Actualizado: 30 jun 2026 04:41 CEST — Perplexity vía MCP_
