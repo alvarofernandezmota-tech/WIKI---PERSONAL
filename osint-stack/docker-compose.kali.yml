@@ -1,18 +1,20 @@
 # osint-stack/docker-compose.kali.yml
-# ✅ VALIDADO: pendiente levantar en varopc (01-jul-2026)
+# ✅ VALIDADO Y CORRIENDO en varopc desde 01-jul-2026
 # Kali Desktop vía navegador web — KasmWeb
 #
-# CAMBIO vs versión anterior:
-#   ❌ macvlan VLAN66 (eno1.66 no existe en varopc, enp4s0 DOWN)
-#   ✅ bridge normal — acceso directo vía puerto 6901
-#
 # Acceso: https://100.91.112.32:6901
-# Usuario: kasm_user
-# Password: definida en .env o por defecto batcueva2026
+# Password: definida en KALI_VNC_PASSWORD o por defecto batcueva2026
+#
+# HARDENING:
+#   ✅ Puerto solo en 100.91.112.32 (Tailscale), nunca 0.0.0.0
+#   ⚠️  privileged: true necesario para herramientas de red (NET_ADMIN, NET_RAW)
 #
 # Uso:
 #   cd ~/yggdrasil-dew/osint-stack
-#   docker compose -f docker-compose.kali.yml up -d
+#   docker compose -f docker-compose.kali.yml up -d kali-pentest
+#
+# RAM: ~1.5-2.0 GB activo. NO levantar junto a Wazuh (RAM insuficiente).
+# Verificar antes: free -h (necesita >3GB disponibles)
 
 services:
   kali-pentest:
@@ -24,13 +26,13 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    shm_size: '512m'            # requerido por KasmWeb para navegador
+    shm_size: '512m'
     ports:
-      - "6901:6901"             # HTTPS WebUI — acceso: https://varopc:6901
+      - "100.91.112.32:6901:6901"   # SOLO via Tailscale, nunca 0.0.0.0
     environment:
       - VNC_PW=${KALI_VNC_PASSWORD:-batcueva2026}
     volumes:
-      - kali_data:/home/kasm-user  # persistencia home usuario kali
+      - kali_data:/home/kasm-user
     deploy:
       resources:
         limits:
@@ -41,13 +43,14 @@ volumes:
   kali_data:
 
 # ==============================================================================
-# RAM ESTIMADA:
-#   kali-pentest (KasmWeb desktop)  ~1.5-2.0 GB activo
-#   Stack base ya corriendo         ~11.5 GB
-#   ─────────────────────────────────
-#   TOTAL ESTIMADO                  ~13.5 GB / 16 GB ⚠️ JUSTO
+# ESTADO: CORRIENDO desde 01-jul-2026
+# RAM REAL (medida):
+#   Stack base                      ~5.6 GB usados
+#   kali-pentest activo             ~1.5-2.0 GB
+#   buff/cache disponible           ~9 GB
+#   Swap disponible                 16 GB
+#   Situacion: ESTABLE
 #
-# ⚠️  Levantar Kali solo cuando RAM libre > 3 GB
-#       Verificar: free -h
-# ⚠️  NO levantar Wazuh simultáneamente con Kali sin revisar RAM
+# ⚠️  NO levantar wazuh simultaneamente con Kali
+# ⚠️  Wazuh necesita ~4GB adicionales → revisar RAM antes
 # ==============================================================================
