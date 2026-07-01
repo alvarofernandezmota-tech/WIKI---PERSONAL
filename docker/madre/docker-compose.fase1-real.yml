@@ -1,7 +1,6 @@
-# ✅ ACTIVO — VALIDADO: 2026-06-25
+# ✅ ACTIVO — VALIDADO: 2026-07-01
 # Stack base Madre (i5-8400, 16GB RAM, sin GPU)
-# Config validada: 2026-06-25 — healthcheck fix (sin curl)
-# Veredicto: ollama-domado-fase1 → llamacpp-fase2 (2-4 semanas)
+# HARDENING: puertos bindeados a Tailscale 100.91.112.32 — 2026-07-01
 # FUENTE REAL: ~/docker-compose.yml en madre
 # NUNCA cargar qwen2.5:14b con stack activo
 
@@ -13,7 +12,7 @@ services:
     container_name: ollama
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "100.91.112.32:11434:11434"  # 🔒 solo Tailscale
     environment:
       - OLLAMA_NUM_PARALLEL=1
       - OLLAMA_MAX_LOADED_MODELS=1
@@ -40,7 +39,7 @@ services:
     container_name: ollama-embeddings
     restart: unless-stopped
     ports:
-      - "11435:11434"
+      - "100.91.112.32:11435:11434"  # 🔒 solo Tailscale
     environment:
       - OLLAMA_NUM_PARALLEL=1
       - OLLAMA_MAX_LOADED_MODELS=1
@@ -66,7 +65,7 @@ services:
     container_name: qdrant
     restart: unless-stopped
     ports:
-      - "6333:6333"
+      - "100.91.112.32:6333:6333"  # 🔒 solo Tailscale
     volumes:
       - qdrant_storage:/qdrant/storage
     deploy:
@@ -87,7 +86,7 @@ services:
     container_name: open-webui
     restart: unless-stopped
     ports:
-      - "3001:8080"
+      - "100.91.112.32:3001:8080"  # 🔒 solo Tailscale
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - VECTOR_DB=qdrant
