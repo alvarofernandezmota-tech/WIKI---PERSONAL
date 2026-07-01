@@ -1,6 +1,6 @@
 ---
 tags: [ecosistema, repos, docker, arquitectura, mapa]
-fecha-actualizacion: 2026-06-28
+fecha-actualizacion: 2026-07-01
 ---
 
 # 🌳 ECOSISTEMA — Mapa completo del sistema
@@ -10,34 +10,95 @@ fecha-actualizacion: 2026-06-28
 
 ---
 
-## 📦 Repos GitHub — Estado actual
+## ⚠️ REGLA FIJA — Nombres de máquinas (NO confundir)
 
-| Repo | Descripción | Privado | Estado | Docker/stack |
+| Nombre | Hostname real | Hardware | Quién accede a quién |
+|---|---|---|---|
+| **madre** | `varopc` | PC torre i5-8400 | Servidor principal — al que se hace SSH desde theodora |
+| **theodora** | `varo12f` | Acer portátil | Máquina de trabajo — desde donde se lanza `ssh madre` |
+
+> **Regla:** `ssh madre` se ejecuta SIEMPRE desde **theodora**. Madre es el servidor. Theodora es el cliente.
+> Los comandos ADB, docker, etc. corren en **madre** (después de hacer SSH).
+
+---
+
+## 📱 Dispositivos Tailscale — Red mesh completa
+
+| Dispositivo | Hostname | IP Tailscale | Estado | Notas |
 |---|---|---|---|---|
-| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | 🧠 Second brain — base conocimiento + diarios | ❌ público | ✅ activo | — |
-| [personal](https://github.com/alvarofernandezmota-tech/personal) | Vida personal — finanzas, gym, salud, diario | ❌ público | ✅ activo | — |
-| [thdora](https://github.com/alvarofernandezmota-tech/thdora) | Bot Telegram + FastAPI + Ollama local | ❌ público | 🔧 handlers pendientes | thdora-bot, Ollama |
-| [local-brain](https://github.com/alvarofernandezmota-tech/local-brain) | Cerebro cognitivo — Ollama, RAG, embeddings | ✅ privado | 🔧 en desarrollo | Ollama, Open WebUI, LiteLLM, Qdrant |
-| [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) | Stack OSINT — SpiderFoot, investigación | ✅ privado | 🔧 en desarrollo | SpiderFoot, SearXNG, Perplexica |
-| [ai-toolkit](https://github.com/alvarofernandezmota-tech/ai-toolkit) | Open source AI dev stack | ❌ público | ✅ activo | Claude Code, OpenRouter |
-| [thea-ia](https://github.com/alvarofernandezmota-tech/thea-ia) | Proyecto IA anterior (thea) | ❌ público | 🟡 mantenimiento | — |
-| [image-calculator](https://github.com/alvarofernandezmota-tech/image-calculator) | OCR + calculadora Python | ❌ público | ✅ estable | — |
-| [impresion-3d](https://github.com/alvarofernandezmota-tech/impresion-3d) | Anycubic Photon V1 — diarios y configs | ❌ público | ✅ estable | — |
+| PC torre | **madre** (`varopc`) | `100.91.112.32` | ✅ activo | Servidor principal |
+| Portátil Acer | **theodora** (`varo12f`) | `100.86.119.102` | ✅ activo | Máquina de trabajo |
+| iPhone 11 | iPhone de varo | `100.81.187.99` | ✅ activo | Móvil personal |
+| Redmi A5 | redmi-a5 | ⏳ pendiente asignar | ⚠️ instalado — falta login | App instalada vía ADB ✅ |
 
-### Repos pendientes de crear
-- [ ] `ollama-stack` — stack Ollama independiente + modelos
-- [ ] `chatbot-control` — bots y automatizaciones
-- [ ] `terminal-ia` — CLI tools + scripts IA
+> Cuando el Redmi haga login en Tailscale aparecerá aquí con su IP asignada.
 
 ---
 
 ## 🖥️ Hardware del ecosistema
 
-| Máquina | Hostname | Specs | Rol | IP Tailscale |
-|---|---|---|---|---|
-| PC torre | **varpc (Madre)** | i5-8400 · 16GB RAM · HDD 1TB · GTX 1060 6GB | Servidor principal · Docker · Ollama · AP WiFi | `100.91.112.32` |
-| Portátil | **varo12f (theodora/Acer)** | Arch Linux · Hyprland · AMD Ryzen 5 | Desarrollo · Obsidian · terminal | `100.86.119.102` |
-| Móvil | **Redmi A5** | Android | Control remoto · thdora · Telegram | ⚠️ pendiente instalar |
+### madre — PC torre (servidor principal)
+| Parámetro | Valor |
+|---|---|
+| CPU | i5-8400 |
+| RAM | 16GB |
+| Disco | HDD 1TB |
+| GPU | GTX 1060 6GB |
+| OS | Linux |
+| IP local | `10.48.234.18` (interfaz `enp0s20f0u3`) |
+| IP Tailscale | `100.91.112.32` |
+| Rol | Docker · Ollama · AP WiFi · servidor principal |
+
+### theodora — Acer portátil (máquina de trabajo)
+| Parámetro | Valor |
+|---|---|
+| CPU | AMD Ryzen 5 |
+| OS | Arch Linux · Hyprland |
+| IP Tailscale | `100.86.119.102` |
+| Rol | Desarrollo · Obsidian · terminal · SSH a madre |
+
+### Redmi A5 — móvil Android (hotspot + control remoto)
+| Parámetro | Valor |
+|---|---|
+| OS | Android 13 · MIUI |
+| IP Tailscale | ⏳ pendiente login |
+| Conectado a madre por | USB (ADB) · MadreAP WiFi |
+| Rol principal | **Hotspot 4G** → da internet a madre · control remoto Telegram |
+
+#### 🔋 Gestión batería Redmi (hotspot 24/7)
+> El Redmi da internet a madre vía USB tethering/hotspot. Para proteger la batería:
+
+```bash
+# Ver nivel batería actual:
+adb shell dumpsys battery | grep level
+
+# Forzar modo carga lenta (protege batería si está conectado USB):
+adb shell dumpsys battery set ac 1
+
+# Ver temperatura batería (evitar >40°C):
+adb shell dumpsys battery | grep temperature
+```
+
+> **Recomendación:** mantener cargado pero no al 100% constante. Si es posible, limitar carga a 80% desde ajustes MIUI (Ajustes → Batería → Modo de carga).
+
+#### 📶 Forzar subida de datos hotspot (cuando la conexión va lenta)
+```bash
+# Ver interfaz de red activa en madre:
+ip route | head -3
+# Normalmente enp0s20f0u3 = USB tethering del Redmi
+
+# Reiniciar tethering desde ADB si va lento:
+adb shell svc usb setFunctions rndis
+# O desde hotspot:
+adb shell svc wifi disable && sleep 2 && adb shell svc wifi enable
+```
+
+### iPhone 11 — móvil iOS
+| Parámetro | Valor |
+|---|---|
+| IP Tailscale | `100.81.187.99` |
+| Estado | ✅ Tailscale activo |
+| Rol | Acceso remoto · Telegram · monitoring |
 
 ---
 
@@ -47,7 +108,7 @@ fecha-actualizacion: 2026-06-28
 |---|---|---|
 | `wlan0` (RTL8188FTV USB) | `192.168.72.1/24` | AP WiFi MadreAP |
 | `tailscale0` | `100.91.112.32` | VPN mesh |
-| `enp0s20f0u3` (Xiaomi USB tethering) | `10.204.17.34/24` | Internet upstream (4G ~20Mbps) |
+| `enp0s20f0u3` (USB tethering Redmi) | `10.48.234.18` | Internet upstream (4G) |
 | `enp4s0` (Ethernet Gigabit) | — | DOWN / sin cable |
 
 ### MadreAP WiFi
@@ -62,9 +123,27 @@ fecha-actualizacion: 2026-06-28
 
 ---
 
+## 🔐 Seguridad del ecosistema
+
+### Por dispositivo
+| Dispositivo | Tailscale | Firewall | SSH hardening | Notas |
+|---|---|---|---|---|
+| madre | ✅ | UFW + fail2ban | ⚠️ parcial (clave pública pendiente) | PasswordAuth desactivado |
+| theodora | ✅ | UFW + fail2ban | ⚠️ parcial | PasswordAuth desactivado |
+| iPhone 11 | ✅ | iOS nativo | — | Solo acceso Tailscale |
+| Redmi A5 | ⚠️ pendiente login | Android nativo | ADB habilitado | Instalar vía USB activo |
+
+### Pendientes seguridad
+- [ ] **SEC-001** — Cerrar FTP puerto 21 router Digi (`79.116.247.44`)
+- [ ] SSH clave pública madre y theodora
+- [ ] Desactivar ADB en Redmi cuando no se use
+- [ ] Auditar APIs sin auth: Ollama `:11434`, Qdrant `:6333`
+
+---
+
 ## 🐳 Docker Stack completo — Madre
 
-### ✅ Levantado y healthy (desde 25-jun-2026)
+### ✅ Levantado y healthy
 | Contenedor | Puerto | Rol |
 |---|---|---|
 | ollama | 11434 | Motor LLM local |
@@ -80,23 +159,15 @@ fecha-actualizacion: 2026-06-28
 | code-server | 8443 | VSCode web |
 | n8n | 5678 | Automatización workflows |
 | gitea | 3003 | Git self-hosted |
+| spiderfoot | 5001 | OSINT automatizado |
 
-### ⏳ Pendiente levantar — Fase 5 Seguridad
-| Contenedor | Imagen | Rol |
-|---|---|---|
-| Wazuh | wazuh/wazuh | SIEM — prereq `vm.max_map_count=262144` |
-| Suricata | jasonish/suricata | IDS pasivo en wlan0 |
-| CrowdSec | crowdsecurity/crowdsec | IDS/IPS |
-| Traefik | traefik | Proxy alternativo |
-| Vault | hashicorp/vault | Secretos |
-
-### ⏳ Pendiente levantar — Fase 6 OSINT
-| Contenedor | Puerto | Rol |
-|---|---|---|
-| Kali Desktop | 6901 | Pentest |
-| SpiderFoot | 5001 | OSINT automatizado |
-| SearXNG | 8080 | Buscador privado |
-| PiHole | 53/80 | DNS + bloqueador ads |
+### ⏳ Pendiente levantar
+| Contenedor | Puerto | Estado | Notas |
+|---|---|---|---|
+| kali-pentest | 6901 | ⏳ Descargando (`tmux -t kali`) | `kasmweb/kali-rolling-desktop:1.16.0` 3.7GB |
+| wazuh | 1514/55000 | 🔜 pendiente | prereq `vm.max_map_count=262144` |
+| suricata | — | 🔜 pendiente | IDS pasivo wlan0 |
+| defectdojo | 8080 | 🔜 pendiente | depende de wazuh |
 
 ---
 
@@ -106,9 +177,9 @@ fecha-actualizacion: 2026-06-28
 |---|---|---|---|
 | qwen2.5-coder:7b | 4.7GB | ✅ descargado | Código · thdora |
 | qwen2.5:3b | 1.9GB | ✅ descargado | Chat rápido |
-| llama3.1:8b | 4.7GB | ❌ pendiente pull | Chat general |
-| bge-m3 | 1.2GB | ❌ pendiente pull | Embeddings RAG |
-| nomic-embed-text | 0.3GB | ❌ pendiente pull | Embeddings rápidos |
+| llama3.1:8b | 4.7GB | ✅ descargado | Chat general |
+| bge-m3 | 1.2GB | ✅ descargado | Embeddings RAG |
+| nomic-embed-text | 0.3GB | ✅ descargado | Embeddings rápidos |
 
 ---
 
@@ -116,12 +187,24 @@ fecha-actualizacion: 2026-06-28
 
 | Servicio | URL | Estado |
 |---|---|---|
-| Netdata Madre | `http://100.91.112.32:19999` | ✅ activo |
-| Netdata Acer | `http://100.86.119.102:19999` | ✅ activo |
-| Netdata streaming | Acer → Madre stream.conf | ✅ 2 nodos · 4400+ métricas |
+| Netdata madre | `http://100.91.112.32:19999` | ✅ activo |
+| Netdata theodora | `http://100.86.119.102:19999` | ✅ activo |
 | Grafana | `http://100.91.112.32:3000` | ✅ up |
 | Uptime Kuma | `http://100.91.112.32:3002` | ✅ up |
 | Portainer | `http://100.91.112.32:9000` | ✅ up |
+
+---
+
+## 📦 Repos GitHub
+
+| Repo | Descripción | Privado | Estado |
+|---|---|---|---|
+| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Second brain — conocimiento + diarios | ❌ público | ✅ activo |
+| [personal](https://github.com/alvarofernandezmota-tech/personal) | Vida personal — finanzas, gym, salud | ❌ público | ✅ activo |
+| [thdora](https://github.com/alvarofernandezmota-tech/thdora) | Bot Telegram + FastAPI + Ollama local | ❌ público | 🔧 handlers pendientes |
+| [local-brain](https://github.com/alvarofernandezmota-tech/local-brain) | Ollama, RAG, embeddings | ✅ privado | 🔧 en desarrollo |
+| [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) | SpiderFoot, investigación OSINT | ✅ privado | 🔧 en desarrollo |
+| [ai-toolkit](https://github.com/alvarofernandezmota-tech/ai-toolkit) | Open source AI dev stack | ❌ público | ✅ activo |
 
 ---
 
@@ -132,8 +215,6 @@ fecha-actualizacion: 2026-06-28
 - [[ESTADO-SISTEMA]] — estado operativo ahora mismo
 - [[MASTER-PENDIENTES]] — tareas pendientes
 - [[filosofia]] — principios del sistema
-- [[setup/servidor/README]] — guía setup Madre
 
 ---
-_Actualizado: 28 jun 2026 22:37 CEST — Perplexity vía MCP_
-_Ver commit history para cambios anteriores_
+_Actualizado: 01 jul 2026 05:12 CEST — Perplexity vía MCP_
