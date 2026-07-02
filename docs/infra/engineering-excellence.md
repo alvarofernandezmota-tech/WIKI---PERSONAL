@@ -1,28 +1,31 @@
----
-tags: [infra, arquitectura, roadmap, seguridad, mlops]
-fecha-actualizacion: 2026-07-02
+# Auditoría Infraestructura — Engineering Excellence
+#infra #seguridad #backups #roadmap #mlops #pendiente
+
+**Fecha:** 2026-06-25
+**Estado:** 🔴 Pendiente de implementar
+**Origen:** Sesión de arquitectura de sistemas
+
 ---
 
-# 🏗️ Engineering Excellence — Auditoría 4 Pilares
+## Resumen
 
-> Auditoría desde perspectiva de ingeniero senior. Riesgos reales en producción del stack Batcueva.
-> Fecha auditoría: 25-jun-2026
+Auditoría completa de los 4 pilares críticos del stack Batcueva desde perspectiva de ingeniero senior. Todos son riesgos reales en producción.
 
 ---
 
 ## 1. Reproducibilidad e Infraestructura Inmutable
+#infra #ansible
 
-**Riesgo:** Si Madre muere, no hay recuperación rápida documentada.
+- **Riesgo:** Si Madre muere, no hay recuperación rápida documentada
+- **Fix:** Ansible Playbooks para levantar todo el stack desde cero en <15 min
+- **Fix:** Script Restic con regla 3-2-1 (3 copias, 2 medios, 1 offsite)
+- **Destino backup sugerido:** Cloudflare R2 o Backblaze B2
+- **Estado:** 🔴 Sin implementar
 
-| Fix | Herramienta | Estado |
-|---|---|---|
-| IaC completo | Ansible Playbooks (stack desde cero en <15 min) | 🔴 Sin implementar |
-| Backup 3-2-1 | Restic → Cloudflare R2 o Backblaze B2 | 🔴 Sin implementar |
+### Script Restic base (pendiente de añadir a scripts/backup/)
 
-### Script Restic base
 ```bash
 #!/bin/bash
-# scripts/backup/run-backup.sh
 export $(grep -v '^#' $(dirname "$0")/.env | xargs)
 BACKUP_PATHS="/home/alvaro/yggdrasil-dew /var/lib/docker/volumes"
 restic backup $BACKUP_PATHS --tag homelab-auto
@@ -33,49 +36,48 @@ restic check
 ---
 
 ## 2. Seguridad — Privilege Explosion
+#seguridad #docker #secrets
 
-**Riesgo:** Contenedores corriendo como root + acceso al socket Docker.
-
-| Fix | Estado |
-|---|---|
-| Rootless Docker | 🔴 Sin implementar |
-| Secrets con SOPS o Vault (nunca `.env` en git) | 🔴 Sin implementar |
-| VLANs pentest separadas de LAN doméstica | 🟡 En proceso (VLAN 66) |
+- **Riesgo:** Contenedores corriendo como root + acceso al socket Docker
+- **Fix 1:** Rootless Docker
+- **Fix 2:** Mozilla SOPS o HashiCorp Vault para secrets (nunca en `.env` en git)
+- **Fix 3:** VLANs para separar red pentest de red doméstica/cámaras
+- **Estado:** 🔴 Sin implementar
 
 ---
 
 ## 3. Integridad de Datos RAG
+#mlops #qdrant #ollama
 
-**Riesgo:** Vectores corruptos o modelo actualizado sin tracking → alucinaciones sin baseline.
-
-| Fix | Estado |
-|---|---|
-| Pipeline validación antes de ingest Qdrant | 🔴 Sin implementar |
-| Versionar Modelfile exacto en ADRs | 🟡 Parcial |
+- **Riesgo:** Vectores corruptos o modelo actualizado sin tracking = alucinaciones sin baseline
+- **Fix 1:** Pipeline de validación antes de ingest a Qdrant (chunking + schema check)
+- **Fix 2:** Versionar Modelfile exacto (ej: `qwen2.5:3b-v1.0`) en ADRs
+- **Estado:** 🟡 Parcial (modelo no versionado)
 
 ---
 
 ## 4. Observabilidad
+#grafana #prometheus #thdora
 
-**Stack actual:** Grafana + Prometheus + Uptime Kuma ✅ (corriendo)
-
-| Fix | Estado |
-|---|---|
-| Uptime Kuma → THDORA → alertas Telegram | 🔴 Sin implementar |
-| Dashboard CPU temp + latencia Ollama | 🔴 Sin implementar |
+- **Stack actual:** Grafana + Prometheus + Uptime Kuma ✅ (ya corriendo)
+- **Falta:** Integrar Uptime Kuma con THDORA-bot para alertas Telegram
+- **Falta:** Dashboard de temperatura CPU + latencia Ollama en Grafana
+- **Estado:** 🟡 Infraestructura lista, alertas sin configurar
 
 ---
 
-## Roadmap por pilares
+## Roadmap — 4 Pilares
 
 | Pilar | Objetivo | Herramienta | Prioridad |
 |---|---|---|---|
-| IaC | 0% config manual | Ansible Playbooks | 🔴 Alta |
-| SecOps | Zero Trust | Tailscale ACLs + UFW | 🔴 Alta |
-| CI/CD | 0 errores en push | GitHub Actions + yamllint + hadolint | 🟡 Media |
-| MLOps | RAG reproducible | LangChain + evaluación precisión | 🟡 Media |
+| Automatización (IaC) | 0% config manual | Ansible Playbooks | 🔴 Alta |
+| Seguridad (SecOps) | Zero Trust | Tailscale ACLs + UFW | 🔴 Alta |
+| Calidad (CI/CD) | 0 errores sintaxis en push | GitHub Actions + yamllint + hadolint | 🟡 Media |
+| IA Engineering (MLOps) | RAG reproducible | LangChain/LlamaIndex + evaluación precisión | 🟡 Media |
 
-## Estado Docker — 25-jun-2026
+---
+
+## Estado Docker (2026-06-25 15:19)
 
 | Contenedor | Estado | Puerto |
 |---|---|---|
@@ -89,4 +91,12 @@ restic check
 | prometheus | ✅ up | 9090 |
 
 ---
-_Documentado: 25-jun-2026 / Actualizado: 02-jul-2026 — Perplexity vía MCP_
+
+## Próximos pasos
+
+- [ ] Configurar almacenamiento externo (R2/B2) para Restic
+- [ ] Escribir script `scripts/backup/run-backup.sh`
+- [ ] Crear systemd timer `batcueva-backup.timer`
+- [ ] **Probar restore** (lo que separa usuario de SysAdmin)
+- [ ] Integrar Uptime Kuma → THDORA alertas Telegram
+- [ ] Reintentar pull modelo atascado
