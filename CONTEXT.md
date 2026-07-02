@@ -1,7 +1,7 @@
 # CONTEXT.md — Estado actual del ecosistema
 #context #estado #navegacion
 
-**Última actualización:** 2026-07-03 00:25 CEST  
+**Última actualización:** 2026-07-03 01:00 CEST  
 **Próxima revisión obligatoria:** 2026-07-10 (Milestone Fase 0)
 
 ---
@@ -26,14 +26,14 @@
 ### Acer (Toledo)
 - **Online:** cuando está encendido
 - **Tailscale:** ✅ activo
-- **Cursor:** ✅ instalado, token `repo` full pendiente
-- **Bluetooth:** ✅ resuelto
-- **MCP Cursor:** ❌ pendiente (token full + config)
+- **Cursor:** ✅ instalado
+- **MCP Cursor:** ❌ pendiente (token `repo` full + `~/.cursor/mcp.json`)
+- **Perplexity web:** ⚠️ sin MCP — usar Cursor en su lugar
 
 ### iPhone
 - **Perplexity MCP GitHub:** ✅ ACTIVO — gestión repo completa
-- **a-Shell:** ⏳ pendiente instalar
-- **Tailscale iOS:** ⏳ pendiente instalar
+- **a-Shell:** ⏳ pendiente instalar (App Store)
+- **Tailscale iOS:** ⏳ pendiente instalar (App Store)
 
 ### Red
 - **Tailscale:** ✅ Madre + Acer conectados
@@ -45,16 +45,33 @@
 ## Fase actual
 
 ### ✅ COMPLETADO
-- **Fase 1 — Tailscale:** ✅ 100% — Madre + Acer en red privada
-- **Fase 0 — Repo limpio:** 85% — 4 pilares GitHub activos, inbox limpia
+- **Fase 1 — Tailscale:** ✅ 100%
+- **Fase 0 — Repo:** 90% — 4 pilares GitHub, inbox limpia, docs completa, limpieza raíz hecha
 
 ### ⏳ EN PROGRESO
-- **Fase 0 — Pendiente:** Labels (22), milestones, branch protection
+- **Fase 0 — Pendiente cierre:** Labels (22), milestones, branch protection
 - **Fase 2 — SSH Hardening:** iniciado, falta `PasswordAuthentication no`
 
 ### 🕑 SIGUIENTE
+- iPhone terminal (a-Shell + Tailscale iOS)
+- Cursor + MCP Acer (Fase 6)
 - Fase 3 — Docker hardening
-- Fase 4 — Monitoring (Grafana + alertas)
+
+---
+
+## Herramientas GitHub activas ✅
+
+| Herramienta | Estado |
+|---|---|
+| CODEOWNERS | ✅ activo |
+| PR template | ✅ activo |
+| Issue forms (4 tipos) | ✅ activos |
+| Actions: context-reminder | ✅ activo |
+| Actions: lint-commits | ✅ activo |
+| Actions: inbox-health | ✅ activo |
+| Labels personalizados (22) | ❌ pendiente |
+| Milestones | ❌ pendiente |
+| Branch protection | ❌ pendiente |
 
 ---
 
@@ -62,18 +79,20 @@
 
 | IA | Acceso | MCP GitHub | Estado |
 |---|---|---|---|
-| **Perplexity** | iPhone + Acer | ✅ ACTIVO | Principal |
-| Gemini CLI | Acer / Madre | pendiente config | En setup |
-| Cursor | Acer | token parcial | Token full pendiente |
-| Ollama | Madre | — local | Activo |
+| **Perplexity** | iPhone app | ✅ ACTIVO | Principal |
+| Gemini CLI | Madre | ⏳ config pendiente | Doc: `docs/arquitectura/gemini-fase1-investigacion.md` |
+| Cursor | Acer | ⏳ token full pendiente | Issue #15 |
+| Ollama | Madre local | — | ✅ activo |
 
 ---
 
-## Operativa sin ordenador (iPhone)
+## Raíz del repo — estado
 
-- **Gestión repo:** Perplexity app + MCP ✅
-- **Terminal SSH a Madre:** a-Shell (pendiente instalar)
-- **VPN a red privada:** Tailscale iOS (pendiente instalar)
+**✅ LIMPIA** (2026-07-03 01:00)
+- `ly` — borrado ✅
+- `tailscale-full.apk` — borrado ✅  
+- `filosofia.md` — movida a `docs/filosofia/FILOSOFIA.md` ✅
+- `diarios/` raíz — pendiente migrar contenido + borrar (needs-terminal)
 
 ---
 
@@ -83,21 +102,12 @@
 
 ---
 
-## Ficheros basura en raíz — pendiente limpiar
-
-| Fichero | Tipo | Acción |
-|---|---|---|
-| `ly` | fichero vacío | borrar (GitHub web) |
-| `tailscale-full.apk` | fichero vacío | borrar (GitHub web) |
-| `diarios/` | carpeta duplicada de `docs/diarios/` | migrar contenido + borrar (needs-terminal) |
-| `filosofia.md` | fichero en raíz | mover a `docs/filosofia.md` (GitHub web) |
-
----
-
 ## Referencias rápidas
 
-- Diario hoy: [`docs/diarios/2026-07-02.md`](docs/diarios/2026-07-02.md)
+- Diario hoy: [`docs/diarios/2026-07-03.md`](docs/diarios/2026-07-03.md)
 - Pendientes: [`MASTER-PENDIENTES.md`](MASTER-PENDIENTES.md)
 - Plan: [`PLAN-SEGURIDAD-Y-DESPLIEGUE.md`](PLAN-SEGURIDAD-Y-DESPLIEGUE.md)
 - iPhone terminal: [`docs/operativa/iphone-terminal.md`](docs/operativa/iphone-terminal.md)
-- MCP setup: [`docs/operativa/mcp-setup-multi-ia.md`](docs/operativa/mcp-setup-multi-ia.md)
+- Filosofía: [`docs/filosofia/FILOSOFIA.md`](docs/filosofia/FILOSOFIA.md)
+- Gemini investigación: [`docs/arquitectura/gemini-fase1-investigacion.md`](docs/arquitectura/gemini-fase1-investigacion.md)
+- Health-check script: [`scripts/maintenance/health-check.sh`](scripts/maintenance/health-check.sh)
