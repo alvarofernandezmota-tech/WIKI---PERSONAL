@@ -7,7 +7,7 @@ fecha-actualizacion: 2026-07-02
 
 > Fuente única de verdad de TODO lo pendiente.
 > Sincronizado con Issues GitHub.
-> Última actualización: **02-jul-2026 17:30 CEST**
+> Última actualización: **02-jul-2026 19:45 CEST**
 
 ---
 
@@ -29,6 +29,7 @@ fecha-actualizacion: 2026-07-02
 - [ ] Crear labels GitHub: `security`, `bug`, `infra`, `docs`, `pentest`, `bot`
 - [ ] Profile README GitHub profesional (Fase 2)
 - [ ] Pinear repos: yggdrasil-dew, thdora, yggdrasil-secops, osint-stack, ai-toolkit → Issue dew #9
+- [ ] **Automatizar actualización docs con GitHub Actions** → Issue dew #11
 
 ### Configuración móvil (Issue dew #8)
 - [ ] Instalar Blink Shell (App Store o compilar Xcode)
@@ -88,6 +89,7 @@ fecha-actualizacion: 2026-07-02
 | ECOSISTEMA.md auditado | 2026-07-02 | — |
 | Inbox vaciado (22 ficheros) | 2026-07-02 | — |
 | Blink Shell — decisión tomada | 2026-07-02 | Issue dew #8 |
+| Investigación GitHub Actions docs | 2026-07-02 | Issue dew #11 |
 
 ---
-_Actualizado: 02-jul-2026 17:30 CEST — Perplexity vía MCP_
+_Actualizado: 02-jul-2026 19:45 CEST — Perplexity vía MCP_
