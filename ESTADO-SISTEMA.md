@@ -1,108 +1,96 @@
-# Estado del Sistema — Yggdrasil
+---
+tags: [estado, sistema, real-time]
+fecha-actualizacion: 2026-07-02T21:05
+---
 
-> Última actualización: 2026-07-02 02:30 CEST
+# 📊 ESTADO-SISTEMA.md — Estado real 02-jul-2026 21:05
+
+> ⚠️ Este fichero se actualiza manualmente cada sesión.
+> Para automatizarlo: ver Fase 5 (GitHub Actions) y Fase 6 (Thdora Guardián).
 
 ---
 
-## Nodos activos
+## Madre (servidor principal)
 
-| Nodo | Rol | Estado | IP Tailscale | Conectividad |
-|------|-----|--------|--------------|--------------|
-| **madre** | Servidor principal / AP | ✅ ON | `100.91.112.32` | LAN + MadreAP + Tailscale |
-| **theodora** | Workstation dev | ✅ ON | `100.86.119.102` | Hotspot Redmi A5 |
-| **Redmi A5** | Hotspot 4G | ✅ ON | ⏳ pendiente login | DIGI ES LTE CA |
-| **iPhone** | Cliente móvil | ✅ ON | `100.81.187.99` | MadreAP + Tailscale |
-| **Xiaomi** | Dispositivo adicional | ✅ ON | `100.106.133.70` | Tailscale |
-
----
-
-## Servicios en madre
-
-### ✅ Corriendo
-- **Ollama** — systemd service activo
-  - `qwen2.5-coder:7b` ✅
-  - `qwen2.5:3b` ✅
-  - `llama3.1:8b` ✅
-  - `bge-m3` ✅
-  - `nomic-embed-text` ✅
-- **hostapd** — MadreAP en wlan0 (192.168.72.0/24) ✅
-- **dnsmasq** — DHCP para MadreAP ✅
-- **Tailscale** — nodo activo, 4 nodos conectados ✅
-- **SSH** — hardened (ed25519 only, no password, no root) ✅
-
-### Docker Stack principal ✅
-- open-webui (3001) · qdrant (6333) · uptime-kuma (3002)
-- thdora (8000) · thdora-bot · grafana (3000) · prometheus (9090)
-- portainer (9000) · code-server (8443) · n8n (5678)
-- gitea (3003) · spiderfoot (5001)
-- ollama (11434) · ollama-embeddings (11435)
-
-### Bots de seguridad — yggdrasil-secops ✅/⚠️
-| Bot | Estado | Issues |
+| Servicio | Estado | Notas |
 |---|---|---|
-| Watchdog | ✅ Activo | — |
-| Tailscale Monitor | ✅ Activo | ⚠️ Crash-loop cada ~10min (healthcheck timeout) |
-| Network Radar | ✅ Activo | — |
-| Log Guardian | ✅ Activo | ⚠️ Crash-loop cada ~8min (healthcheck estricto) |
-| Local Tripwire | ⚠️ Activo | 🔴 0 archivos vigilados — sin rutas configuradas |
-| Guardian Bot (Telegram) | ✅ Activo | — |
-
-### Pendiente de levantar ⏳
-- Wazuh Manager + Dashboard (4.7.0)
-- Suricata IDS
-- Kali KasmWeb (descargando)
-- Pihole + SearXNG
-
----
-
-## Seguridad
-
-### Hardening completado ✅
-- SSH: solo ed25519, passphrase, sin root login, sin password auth
-- `sleep.target suspend.target hibernate.target` — maskeados
-- Fail2ban activo
-- Watchdog + Log Guardian monitorizando
-
-### Hallazgos pendientes 🔴
-- **Puerto 21 FTP abierto en router** — CRÍTICO, cerrar en Digi
-- **local_tripwire sin rutas** — 0 archivos vigilados
-- **Healthchecks de bots** — ajustar timeouts (log_guardian_bot, tailscale_monitor)
-- **APIs sin auth**: Ollama `:11434`, Qdrant `:6333` — auditar exposición
+| Sistema operativo | ✅ Arch Linux | Operativo |
+| UFW | ✅ Activo | Reglas configuradas |
+| fail2ban | ✅ Activo | Jail sshd |
+| Tailscale | ✅ Autoarranque | VPN activa |
+| SSH | ⚠️ Parcial | Hardening pendiente (solo clave pública) |
+| Docker | ✅ Instalado | Compose disponible |
+| n8n | ⚠️ Corriendo | Escuchando 0.0.0.0 — hardening urgente |
+| Thdora (FastAPI) | ✅ Corriendo | Base funcional, handlers pendientes |
+| Batcueva stack | ❌ Detenido | start-batcueva.sh no ejecutado |
+| Wazuh | ❌ Bloqueado | vm.max_map_count no configurado |
+| Suricata | ❌ No instalado | Fase 4 |
+| Kali KasmWeb | ❌ No instalado | Fase 4 |
+| Pihole | ❌ No instalado | Fase 4 |
+| SearXNG | ❌ No instalado | Fase 4 |
+| Ollama | ✅ Instalado | qwen2.5:7b + qwen2.5:3b listos |
+| llama3.1:8b | ❌ No descargado | Fase 7 |
+| bge-m3 | ❌ No descargado | Fase 7 |
+| Qdrant | ❌ No instalado | Fase 7 |
 
 ---
 
-## Fases del plan
+## Thdora (workstation / varpc)
 
-| Fase | Descripción | Estado |
-|------|-------------|--------|
-| 1 | SSH Hardening madre | ✅ Completada |
-| 2 | Ollama + modelos | ✅ Completada |
-| 3 | Pentest inicial red local | ✅ Completada |
-| 4 | MadreAP WiFi | ✅ Completada |
-| 5 | Docker stack principal (thdora, RAG, grafana…) | ✅ Completada |
-| 6 | Bots watchdog y monitorización (yggdrasil-secops) | 🔄 Activo — con issues a corregir |
-| 7 | Wazuh + Suricata IDS | ⏳ Pendiente |
-| 8 | Pihole + SearXNG privacidad | ⏳ Pendiente |
-| 9 | Kali KasmWeb pentest lab | ⏳ Descargando |
-| 10 | AlertManager + Loki — cadena de alertas completa | ⏳ Planeado |
-| 11 | CrowdSec + DefectDojo | ⏳ Planeado |
+| Servicio | Estado | Notas |
+|---|---|---|
+| Sistema operativo | ✅ Arch Linux | Operativo |
+| Tailscale | ✅ Activo | |
+| Cursor IDE | ❌ No instalado | Pendiente + MCP config |
+| Obsidian | ✅ Instalado | Vault sincronizado |
+| GitHub CLI | ✅ Disponible | |
+| Docker | ✅ Disponible | |
+| Workflows Actions | ❌ Sin desplegar | 5 drafts en inbox/ |
+| inbox/ pendiente migrar | ⚠️ 32 ficheros | Script listo en inbox/ |
 
 ---
 
-## Red
+## Móviles
 
-- **LAN:** 192.168.1.0/24 (router doméstico)
-- **MadreAP:** 192.168.72.0/24 (hostapd en madre)
-- **Tailscale:** 100.x.x.x (red privada — 4 nodos activos)
-- **Hotspot Redmi:** 4G DIGI ES, LTE Carrier Aggregation
+| Dispositivo | Tailscale | SSH a Madre | Estado |
+|---|---|---|---|
+| iPhone | ✅ Activo | ❌ Termius pendiente | Issue #8 |
+| Redmi A5 | ❌ Pendiente | ❌ | Fase 9 |
 
 ---
 
-## Tmux sessions en madre
+## GitHub repo
 
-```
-fase5:      1 windows
-kali:       1 windows
-wazuh:      1 windows
-descargas:  1 windows
-```
+| Área | Estado | Notas |
+|---|---|---|
+| Issues abiertos | 9 (#2,3,5,6,8,9,10,11,12) | |
+| Issues por crear | 3 (#13,14,15) | Fases 6d, 7, 8MCP |
+| CONVENCIONES.md | ✅ Nivel senior | Actualizado 02-jul |
+| AGENT.md | ✅ Actualizado | 02-jul |
+| CONTRIBUTING.md | ✅ Creado | 02-jul |
+| Issue templates | ✅ Activos | .github/ISSUE_TEMPLATE/ |
+| PR template | ❌ Pendiente | |
+| Labels personalizados | ❌ Pendiente | |
+| Milestones | ❌ Pendiente | |
+| CODEOWNERS | ❌ Pendiente | |
+| Branch protection | ❌ Pendiente | |
+| GitHub Actions | ❌ Sin desplegar | 5 drafts |
+| Profile README | ❌ Sin crear | |
+| Archivos basura en raíz | ⚠️ 2 | `tailscale-full.apk` + `ly` (git rm pendiente) |
+| `filosofia.md` en raíz | ⚠️ Duplicado | Ya en docs/, borrar de raíz (needs-terminal) |
+| `.obsidian/` en repo | ⚠️ Trackeado | `git rm -r --cached .obsidian/` pendiente |
+
+---
+
+## Hallazgos seguridad activos
+
+| Hallazgo | Severidad | Estado |
+|---|---|---|
+| Puerto FTP 21 abierto | 🔴 Alta | Documentado, fix pendiente |
+| n8n escuchando 0.0.0.0 | 🔴 Alta | Fix urgente (bind Tailscale) |
+| SSH sin hardening completo | 🟡 Media | Fase 1 pendiente |
+| .obsidian/ en git | 🟡 Media | Privacidad, git rm pendiente |
+
+---
+
+_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_

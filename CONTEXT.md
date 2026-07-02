@@ -1,122 +1,127 @@
 ---
-tags: [contexto, estado, ssot]
-fecha-actualizacion: 2026-07-02T20:36
-agente: Perplexity MCP + Gemini
-dispositivo: iPhone 11
+tags: [contexto, ssot, referencia]
+fecha-actualizacion: 2026-07-02T21:05
 ---
 
-# 🧠 CONTEXT.md — Estado real del sistema
+# 🧪 CONTEXT.md — Contexto activo del ecosistema
 
-> SSOT de estado. Leer siempre antes de actuar.
-> Última actualización: 02-jul-2026 20:36 CEST
-> Sesión: iPhone 11 · Perplexity MCP + Gemini
+> Fichero de arranque para cualquier IA. Lee esto primero.
+> Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP
 
 ---
 
-## 🖥️ Infraestructura
+## El proyecto
 
-| Máquina | Rol | Estado |
-|---|---|---|
-| **Madre** | Torre Docker — servidor principal | ✅ Encendida |
-| **Thdora** | Portátil Arch — terminal de trabajo | ⚠️ Offline esta sesión |
-| **iPhone 11** | Mobile — agentes IA + SSH | ✅ Activo (sesión actual) |
+**yggdrasil-dew** es el repositorio central de Álvaro Fernández Mota.
+Documenta y controla el ecosistema tecnológico personal: infraestructura, seguridad, IA, automatización y formación.
 
 ---
 
-## 📦 Stack Docker activo en Madre
+## Máquinas del ecosistema
 
-| Servicio | Puerto | Estado |
-|---|---|---|
-| Ollama | 11434 | ✅ Corriendo |
-| n8n | 5678 (0.0.0.0) | ⚠️ Hardening pendiente |
-| TOKI FastAPI | 8000 | ✅ Base lista, handlers pendientes |
-| Wazuh | — | ❌ Prereq pendiente |
-| Suricata | — | ❌ No iniciado |
-| Pihole | — | ❌ No iniciado |
-| SearXNG | — | ❌ No iniciado |
-| KasmWeb Kali | — | ❌ No iniciado |
+| Nombre | Rol | OS | Estado |
+|---|---|---|---|
+| **Madre** | Servidor principal home lab | Arch Linux | ✅ Operativa |
+| **Thdora** (varpc) | Workstation / terminal diario | Arch Linux | ✅ Operativa |
+| **MacBook** | Secundario / creatividad | macOS | ✅ Operativo |
+| **iPhone** | Móvil principal | iOS | ✅ Activo |
+| **Redmi A5** | Android secundario | Android 14 | ⚠️ Tailscale pendiente |
+| **Acer** | Portatil auxiliar | Linux | ⚠️ Bluetooth/Chromium issues |
 
 ---
 
-## 🤖 Modelos Ollama descargados
+## Bots del ecosistema — Naming SSOT
 
-- ✅ qwen2.5:7b
-- ✅ qwen2.5:3b
-- ❌ llama3.1:8b — pendiente pull
-- ❌ bge-m3 — pendiente pull
-- ❌ nomic-embed-text — pendiente pull
+> Decisión definitiva 02-jul-2026. No usar nombres anteriores (TOKI-*).
 
----
-
-## 📊 Estado de fases
-
-| Fase | Descripción | Estado |
-|---|---|---|
-| **Fase 0** | Repo limpio y documentado | 🟡 95% — labels/milestones pendientes UI |
-| **Fase 1** | Seguridad base Madre | 🟡 90% — SSH hardening pendiente |
-| **Fase 2** | GitHub profesional | 🟡 80% — Profile README pendiente |
-| **Fase 3** | Governance repo | 🟡 60% — archivos docs pendientes |
-| **Fase 4** | Stack técnico Madre | 🔴 10% — hardening batcueva urgente |
-| **Fase 5** | GitHub Actions | 🟡 70% — workflows draftados, desplegar en Thdora |
-| **Fase 6** | TOKI + n8n | 🔴 20% — base lista, handlers pendientes |
-| **Fase 7** | Ollama + RAG | 🔴 15% — modelos parciales |
-| **Fase 8** | Mobile completo | 🟡 50% — Tailscale OK, Termius pendiente |
+| Bot | Nombre | Función | Estado |
+|---|---|---|---|
+| Bot personal | **Thdora** | Diario, notas, tareas, Obsidian | ✅ Corriendo |
+| Bot infra | **Thdora Guardián** | Docker, Wazuh, Suricata, alertas Madre | ❌ En desarrollo |
+| Bot repo | **Thdora Dev** | GitHub commits, issues, inbox, audit, MCP | ❌ En desarrollo |
 
 ---
 
-## ✅ Lo completado HOY (02-jul-2026)
+## Stack tecnológico activo
 
-### Mañana — Thdora
-- Problema Chromium/Perplexity documentado
-- `docs/herramientas/chromium-perplexity.md` creado
+### Seguridad (Madre)
+- UFW ✅ activo
+- fail2ban ✅ jail sshd activo
+- Tailscale ✅ autoarranque
+- SSH hardening ❌ pendiente (clave pública, deshabilitar password)
+- Wazuh ❌ pendiente (vm.max_map_count bloqueante)
+- Suricata IDS ❌ pendiente
 
-### Tarde/Noche — iPhone + Perplexity MCP + Gemini
-- CONVENCIONES.md reescrito nivel senior
-- AGENT.md actualizado (fases, stack, iPhone)
-- CONTRIBUTING.md creado
-- Auditoría herramientas GitHub completada
-- `.github/CODEOWNERS` creado ✅
-- `.github/PULL_REQUEST_TEMPLATE.md` creado ✅
-- `CHANGELOG.md` formato Keep a Changelog ✅
-- `scripts/maintenance/audit-repo.sh` creado ✅
-- `.github/workflows/repo-health-check.yml` desplegado ✅
-- MASTER-PENDIENTES.md con 8 fases completas ✅
-- Análisis productividad sesión documentado
-- Roadmap bots y scripts documentado
+### Docker / Servicios (Madre)
+- n8n ⚠️ corriendo pero escuchando 0.0.0.0 (hardening pendiente)
+- Thdora (FastAPI) ✅ corriendo base
+- Batcueva ❌ sin levantar (hardening pendiente)
+- Pihole ❌ pendiente
+- SearXNG ❌ pendiente
+- Kali KasmWeb ❌ pendiente
 
-### Pendiente de UI (no automatizable por MCP)
-- Labels 20+ → crear en github.com/yggdrasil-dew/labels
-- Milestones → crear en github.com/yggdrasil-dew/milestones
-- Profile README repo → crear repo público `alvarofernandezmota-tech`
-- Pinear repos en perfil
+### IA Local (Madre)
+- Ollama ✅ instalado
+- qwen2.5:7b ✅ descargado
+- qwen2.5:3b ✅ descargado
+- llama3.1:8b ❌ pendiente pull
+- bge-m3 ❌ pendiente pull
+- nomic-embed-text ❌ pendiente pull
+- RAG + Qdrant ❌ no iniciado
 
----
-
-## 🔴 Urgente próxima sesión Thdora
-
-1. `git rm --cached tailscale-full.apk ly .obsidian/` — limpiar archivos sensibles
-2. Hardening batcueva — n8n puerto 0.0.0.0 → solo Tailscale
-3. Desplegar workflows Actions restantes (lint-commits, context-reminder, update-diario-index)
-4. Instalar Cursor + MCP GitHub en Thdora
-5. Procesar inbox (27+ ficheros → mover a docs/)
-
----
-
-## 🤖 División de trabajo agentes IA
-
-| Agente | Rol | Cuándo |
-|---|---|---|
-| **Perplexity** | Documenta, MCP GitHub, commits | Siempre / iPhone |
-| **Gemini** | Auditorías masivas, tareas bulk | Sesiones planificadas |
-| **Claude** | Código complejo, terminal, debug | Thdora con Cursor |
+### GitHub / Herramientas
+- MCP GitHub activo vía Perplexity Space ✅
+- Issues #2 al #12 abiertos ✅
+- CONVENCIONES.md nivel senior ✅
+- AGENT.md actualizado ✅
+- CONTRIBUTING.md ✅
+- Issue templates ✅
+- GitHub Actions (5 workflows) ❌ draftados, sin desplegar
+- Cursor + MCP local ❌ pendiente instalar
 
 ---
 
-## 📱 Herramientas Perplexity
+## Fases del proyecto
 
-- **@GitHub**: ✅ funciona en web (Chrome/Firefox/Brave/Edge/Safari/Arc)
-- **Comet**: ⚠️ sin soporte oficial Linux — usar web en Thdora
-- **Chromium Arch**: ⚠️ problema conector detectado — usar Firefox/Brave
+| Fase | Nombre | Estado | Issue |
+|---|---|---|---|
+| 1 | Seguridad base Madre | 🔴 90% | #3 |
+| 2 | GitHub profesional | 🔴 70% | #10 |
+| 3 | Governance repo | 🔴 50% | #10 |
+| 4 | Stack técnico Madre | 🔴 10% | #9 |
+| 5 | GitHub Actions automatización | 🟡 30% | #11 |
+| 6 | Thdora Guardián + n8n | 🟡 20% | #12 |
+| 6d | Multi-IA vía n8n (Gemini, DeepSeek) | ❌ 0% | #13 |
+| 7 | Ollama + RAG + agente autónomo | 🟡 20% | #14 |
+| 8 | MCP server propio en Madre | ❌ 0% | #15 |
+| 9 | Mobile completo | 🟡 30% | #8 |
 
 ---
-_Actualizado: 02-jul-2026 20:36 CEST — Perplexity MCP + Gemini Fase 0 completada_
+
+## Archivos SSOT del repo
+
+| Archivo | Qué es |
+|---|---|
+| `MASTER-PENDIENTES.md` | Lista única de tareas pendientes |
+| `CONTEXT.md` | Este fichero. Contexto de arranque |
+| `ROADMAP.md` | Fases y objetivos |
+| `ECOSISTEMA.md` | Mapa completo del ecosistema |
+| `ESTADO-SISTEMA.md` | Estado real de servicios ahora mismo |
+| `AGENT.md` | Instrucciones para IAs |
+| `CONVENCIONES.md` | Reglas de naming, commits, estructura |
+| `CHANGELOG.md` | Registro de cambios |
+
+---
+
+## Reglas para IAs
+
+1. Leer AGENT.md antes de actuar
+2. Nunca hacer push directo a main sin contexto
+3. Los commits siguen Conventional Commits (ver CONVENCIONES.md)
+4. Inbox = zona de trabajo temporal, no archivo permanente
+5. Naming bots: Thdora / Thdora Guardián / Thdora Dev (nunca TOKI-*)
+6. MASTER-PENDIENTES es el SSOT de tareas
+
+---
+
+_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_

@@ -1,92 +1,150 @@
-#!/usr/bin/env bash
-# =============================================================
-# migrar-inbox.sh — yggdrasil-dew
-# v3 — auditado por Gemini 2026-06-25
-# Uso: bash scripts/migrar-inbox.sh [--dry-run]
-# =============================================================
+#!/bin/bash
+# migrar-inbox.sh
+# Ejecutar desde la raiz del repo en Thdora
+# Creado: 02-jul-2026 por Perplexity via MCP
+# Uso: bash scripts/migrar-inbox.sh
 
-set -euo pipefail
+set -e
 
-VAULT_ROOT="$(git rev-parse --show-toplevel)"
-INBOX="$VAULT_ROOT/inbox"
-DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+echo "📦 Iniciando migracion inbox..."
 
-MOVIDOS=0
-BORRADOS=0
+# Crear estructura de destinos
+mkdir -p docs/diarios docs/infra/madre docs/infra/docker docs/infra/seguridad
+mkdir -p docs/seguridad/pentest docs/seguridad/hallazgos
+mkdir -p docs/herramientas docs/arquitectura docs/dispositivos
 
-mv_file() {
-  local src="$INBOX/$1"
-  local dst="$VAULT_ROOT/$2"
-  if [[ ! -f "$src" ]]; then
-    echo "[SKIP] No encontrado: $1"
-    return
-  fi
-  mkdir -p "$(dirname "$dst")"
-  if $DRY_RUN; then
-    echo "[DRY]  $1 → $2"
-  else
-    git mv "$src" "$dst" 2>/dev/null || mv "$src" "$dst"
-    echo "[OK]   $1 → $2"
-    ((MOVIDOS++))
-  fi
-}
+echo "📁 Estructura de destinos creada"
 
-del_file() {
-  local src="$INBOX/$1"
-  if [[ ! -f "$src" ]]; then return; fi
-  if $DRY_RUN; then
-    echo "[DRY-DEL] $1"
-  else
-    rm "$src"
-    echo "[DEL]  $1"
-    ((BORRADOS++))
-  fi
-}
+# === RENOMBRAR FICHEROS CON NAMING INCORRECTO ===
+[ -f inbox/GEMINI-AUDITORIA-ECOSISTEMA-2026-07-01.md ] && \
+  git mv inbox/GEMINI-AUDITORIA-ECOSISTEMA-2026-07-01.md inbox/2026-07-01-gemini-auditoria-ecosistema.md && \
+  echo "✅ Renombrado GEMINI-AUDITORIA-ECOSISTEMA"
 
-echo "=== MIGRACIÓN INBOX ==="
-$DRY_RUN && echo "[MODO DRY-RUN — no se mueve nada]"
+[ -f inbox/PROCEDIMIENTO-MADRE-HOY.md ] && \
+  git mv inbox/PROCEDIMIENTO-MADRE-HOY.md inbox/2026-07-01-procedimiento-madre.md && \
+  echo "✅ Renombrado PROCEDIMIENTO-MADRE-HOY"
+
+# === 25-JUN ===
+[ -f inbox/2026-06-25-auditoria-infraestructura-engineering-excellence.md ] && \
+  git mv inbox/2026-06-25-auditoria-infraestructura-engineering-excellence.md \
+    docs/arquitectura/auditoria-engineering-excellence.md
+
+[ -f inbox/2026-06-25-sesion-tarde-procesado.md ] && \
+  git mv inbox/2026-06-25-sesion-tarde-procesado.md docs/diarios/2026-06-25.md
+
+# === 27-JUN ===
+[ -f inbox/2026-06-27-madre-ap-wifi-debug.md ] && \
+  git mv inbox/2026-06-27-madre-ap-wifi-debug.md docs/infra/madre/ap-wifi.md
+
+[ -f inbox/2026-06-27-monitoring-pentest-research.md ] && \
+  git mv inbox/2026-06-27-monitoring-pentest-research.md docs/seguridad/pentest/monitoring-research.md
+
+[ -f inbox/2026-06-27-prompt-gemini-sesion-completa.md ] && \
+  git mv inbox/2026-06-27-prompt-gemini-sesion-completa.md docs/diarios/2026-06-27.md
+
+# === 28-JUN ===
+[ -f inbox/2026-06-28-auditoria-sesion-completa.md ] && \
+  git mv inbox/2026-06-28-auditoria-sesion-completa.md docs/diarios/2026-06-28.md
+
+# === 30-JUN ===
+[ -f inbox/2026-06-30-cierre-sesion.md ] && \
+  git mv inbox/2026-06-30-cierre-sesion.md docs/diarios/2026-06-30.md
+
+[ -f inbox/2026-06-30-ollama-modelos-pull.md ] && \
+  git mv inbox/2026-06-30-ollama-modelos-pull.md docs/herramientas/ollama-modelos.md
+
+[ -f inbox/2026-06-30-thdora-auditoria-estado.md ] && \
+  git mv inbox/2026-06-30-thdora-auditoria-estado.md docs/herramientas/thdora-estado.md
+
+# === 01-JUL ===
+[ -f inbox/2026-07-01-auditoria-compose-divergencia.md ] && \
+  git mv inbox/2026-07-01-auditoria-compose-divergencia.md docs/infra/docker/compose-divergencia.md
+
+[ -f inbox/2026-07-01-fase1-completada.md ] && \
+  git mv inbox/2026-07-01-fase1-completada.md docs/diarios/2026-07-01-fase1.md
+
+[ -f inbox/2026-07-01-gemini-auditoria-capas-pentest.md ] && \
+  git mv inbox/2026-07-01-gemini-auditoria-capas-pentest.md docs/seguridad/pentest/capas-pentest.md
+
+[ -f inbox/2026-07-01-gemini-bots-secops-arquitectura.md ] && \
+  git mv inbox/2026-07-01-gemini-bots-secops-arquitectura.md docs/arquitectura/bots-secops.md
+
+[ -f inbox/2026-07-01-hallazgo-ftp-puerto21.md ] && \
+  git mv inbox/2026-07-01-hallazgo-ftp-puerto21.md docs/seguridad/hallazgos/ftp-puerto21.md
+
+[ -f inbox/2026-07-01-modelos-ollama-completos.md ] && \
+  git mv inbox/2026-07-01-modelos-ollama-completos.md docs/herramientas/ollama-modelos-completos.md
+
+[ -f inbox/2026-07-01-redmi-adb-bloqueos.md ] && \
+  git mv inbox/2026-07-01-redmi-adb-bloqueos.md docs/dispositivos/redmi-adb.md
+
+[ -f inbox/2026-07-01-sesion-madrugada-docker-pentest.md ] && \
+  git mv inbox/2026-07-01-sesion-madrugada-docker-pentest.md docs/diarios/2026-07-01-madrugada.md
+
+[ -f inbox/2026-07-01-sesion-pentest-completa.md ] && \
+  git mv inbox/2026-07-01-sesion-pentest-completa.md docs/seguridad/pentest/sesion-01-jul.md
+
+[ -f inbox/2026-07-01-sesion-tarde-docker-stack.md ] && \
+  git mv inbox/2026-07-01-sesion-tarde-docker-stack.md docs/diarios/2026-07-01-tarde.md
+
+[ -f inbox/2026-07-01-ssh-hardening-completo.md ] && \
+  git mv inbox/2026-07-01-ssh-hardening-completo.md docs/infra/seguridad/ssh-hardening.md
+
+[ -f inbox/2026-07-01-gemini-auditoria-ecosistema.md ] && \
+  git mv inbox/2026-07-01-gemini-auditoria-ecosistema.md docs/seguridad/pentest/gemini-auditoria-ecosistema.md
+
+[ -f inbox/2026-07-01-procedimiento-madre.md ] && \
+  git mv inbox/2026-07-01-procedimiento-madre.md docs/infra/madre/procedimiento.md
+
+# === 02-JUL ===
+[ -f inbox/2026-07-02-analisis-productividad-sesion.md ] && \
+  git mv inbox/2026-07-02-analisis-productividad-sesion.md docs/diarios/2026-07-02-productividad.md
+
+[ -f inbox/2026-07-02-arquitectura-bots-telegram.md ] && \
+  git mv inbox/2026-07-02-arquitectura-bots-telegram.md docs/arquitectura/bots-telegram.md
+
+[ -f inbox/2026-07-02-auditoria-herramientas-github.md ] && \
+  git mv inbox/2026-07-02-auditoria-herramientas-github.md docs/herramientas/github-auditoria.md
+
+[ -f inbox/2026-07-02-cierre-sesion.md ] && \
+  git mv inbox/2026-07-02-cierre-sesion.md docs/diarios/2026-07-02-cierre-v1.md
+
+[ -f inbox/2026-07-02-diario-sesion-noche-fase0-github.md ] && \
+  git mv inbox/2026-07-02-diario-sesion-noche-fase0-github.md docs/diarios/2026-07-02-noche.md
+
+[ -f inbox/2026-07-02-github-actions-fase5-draft.md ] && \
+  git mv inbox/2026-07-02-github-actions-fase5-draft.md docs/herramientas/github-actions-draft.md
+
+[ -f inbox/2026-07-02-pendientes-sesion-noche.md ] && \
+  git mv inbox/2026-07-02-pendientes-sesion-noche.md docs/diarios/2026-07-02-pendientes.md
+
+[ -f inbox/2026-07-02-prompt-gemini-fase0-tareas-completas.md ] && \
+  git mv inbox/2026-07-02-prompt-gemini-fase0-tareas-completas.md docs/diarios/2026-07-02-gemini-fase0.md
+
+[ -f inbox/2026-07-02-roadmap-bots-y-scripts.md ] && \
+  git mv inbox/2026-07-02-roadmap-bots-y-scripts.md docs/arquitectura/roadmap-bots.md
+
+[ -f inbox/2026-07-02-sesion-acer-bluetooth-chromium.md ] && \
+  git mv inbox/2026-07-02-sesion-acer-bluetooth-chromium.md docs/diarios/2026-07-02-acer.md
+
+[ -f inbox/2026-07-02-sesion-tarde-auditoria-ecosistema.md ] && \
+  git mv inbox/2026-07-02-sesion-tarde-auditoria-ecosistema.md docs/diarios/2026-07-02-tarde.md
+
+[ -f inbox/2026-07-02-session-cierre-tarde.md ] && \
+  git mv inbox/2026-07-02-session-cierre-tarde.md docs/diarios/2026-07-02-cierre-tarde.md
+
+[ -f inbox/2026-07-02-auditoria-inbox-migracion.md ] && \
+  git mv inbox/2026-07-02-auditoria-inbox-migracion.md docs/diarios/2026-07-02-auditoria-inbox.md
+
+[ -f inbox/2026-07-02-volcado-sesion-completa.md ] && \
+  git mv inbox/2026-07-02-volcado-sesion-completa.md docs/diarios/2026-07-02-volcado.md
+
+# Commit
+git add -A
+git commit -m "refactor(inbox): migracion completa inbox -> docs/ -- 02-jul-2026"
+
+RESTANTES=$(ls inbox/ 2>/dev/null | grep -v README | grep -v .gitkeep | wc -l)
 echo ""
-
-# ---- SETUP — Android / ADB / hotspot ------------------------
-echo "--- setup/ ---"
-mv_file "2026-06-25-ADB-ANDROID-GUIA-COMPLETA.md"        "setup/adb-android-guia.md"
-mv_file "2026-06-25-ADB-MOVIL-EXPERIMENTACION.md"        "setup/adb-android-experimentacion.md"
-mv_file "2026-06-25-AUDITAR-HOTSPOT-RED.md"              "docs/auditoria-hotspot-red.md"
-mv_file "2026-06-25-debug-android-adb-tailscale-uup.md" "setup/android-debug-stack.md"
-mv_file "investigacion-adb-scrcpy-android.md"            "docs/investigacion-adb-scrcpy.md"
-
-# ---- DOCS — seguridad / control móvil ----------------------
-echo "--- docs/ ---"
-mv_file "2026-06-25-OPENSOURCE-CONTROL-MOVIL.md"         "docs/opensource-control-movil.md"
-mv_file "2026-06-25-seguridad-analisis-codigo.md"        "docs/seguridad-analisis-codigo.md"
-
-# ---- AGENTES -----------------------------------------------
-echo "--- agentes/ ---"
-mv_file "2026-06-25-PROMPT-COMPORTAMIENTO-IAS.md"        "agentes/comportamiento-ias.md"
-
-# ---- TEMPORALES — ELIMINAR ---------------------------------
-echo "--- eliminando temporales ---"
-del_file "2026-06-25-ARRANQUE-SESION.md"
-del_file "2026-06-25-AUDITORIA-INBOX-HOY.md"
-del_file "2026-06-25-AUDITORIA-INBOX-HOY.md"
-del_file "2026-06-25-estado-inbox-y-proximos-pasos.md"
-del_file "2026-06-25-ESTADO-INBOX-ZERO.md"
-del_file "2026-06-25-SCRIPT-CONTEXTO-COMPLETO-CLAUDE.md"
-
-# ---- RESUMEN -----------------------------------------------
-echo ""
-echo "=================================="
-RESTANTES=$(find "$INBOX" -name '*.md' ! -name '.gitkeep' | wc -l)
-echo "Movidos : $MOVIDOS"
-echo "Borrados: $BORRADOS"
-echo "Restantes en inbox: $RESTANTES"
-if [[ $RESTANTES -eq 0 ]]; then
-  echo "✓ INBOX ZERO"
-else
-  echo "⚠ Quedan $RESTANTES archivos — revisar manualmente"
-fi
-echo "=================================="
-echo ""
-echo "Siguiente paso:"
-echo "  git add -A && git commit -m 'chore: inbox zero 2026-06-25' && git push"
+echo "✅ Migracion completada."
+echo "📥 Ficheros restantes en inbox/: $RESTANTES"
+[ "$RESTANTES" -eq 0 ] && echo "🎉 Inbox limpia!" || echo "⚠️ Revisar inbox/ manualmente"

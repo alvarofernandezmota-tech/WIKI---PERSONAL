@@ -1,142 +1,184 @@
-# ROADMAP — Yggdrasil Dew
+---
+tags: [roadmap, fases, planificacion]
+fecha-actualizacion: 2026-07-02T21:05
+---
 
-> Plan a largo plazo del ecosistema.
-> No es una lista de tareas — es la visión de hacia dónde vamos.
-> Las tareas concretas están en [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md).
+# 🗺️ ROADMAP — Ecosistema yggdrasil-dew
+
+> Actualizado: 02-jul-2026 21:05 CEST
+> SSOT de fases y objetivos. Para tareas detalladas ver MASTER-PENDIENTES.md
 
 ---
 
 ## Visión
 
-Un ecosistema personal completamente soberano:
-- **Infraestructura propia** — servidores, servicios, datos bajo control total
-- **IA local** — modelos corriendo en Madre, sin depender de APIs externas
-- **Automatización** — agentes que gestionan el sistema, no el humano
-- **Reproducible** — cualquier máquina nueva levanta el ecosistema completo en < 1 hora
-- **Seguro** — hardening, backups, monitorización proactiva
-- **Soberanía ofensiva** — OSINT + pentest propio sin depender de servicios externos
+Construir un ecosistema tecnológico personal soberano:
+- Infraestructura propia y segura (Madre como home lab)
+- IA local y conectada (Ollama + RAG + agentes)
+- Automatización total vía bots y GitHub Actions
+- Acceso móvil completo desde cualquier lugar
+- Documentación viva y automática
 
 ---
 
-## Fase 0 — Fundamentos ✅ COMPLETA
+## 🔴 FASE 1 — Seguridad base Madre
+**Estado: 90% — Issue #3**
 
-- [x] Arch Linux + Hyprland en Madre y Acer
-- [x] Tailscale operativo — red privada entre equipos
-- [x] SSH entre equipos sin contraseña
-- [x] Repo yggdrasil-dew como cerebro central
-- [x] THDORA agente base corriendo en Madre
-- [x] MadreAP WiFi — hostapd + dnsmasq + UFW persistente
-- [x] fail2ban activo — Madre + Acer
+Objetivo: Madre es inaccesible desde el exterior salvo Tailscale.
 
----
-
-## Fase 1 — Stack IA Base ✅ COMPLETA
-
-- [x] Ollama corriendo en Madre (:11434)
-- [x] Open WebUI (:3001) — interfaz web IA
-- [x] Qdrant (:6333) — vector DB para RAG
-- [x] Modelos: qwen2.5-coder:7b, qwen2.5:3b listos
-- [ ] Modelos pendientes: llama3.1:8b, bge-m3, nomic-embed-text
+- [x] UFW activo con reglas estrictas
+- [x] fail2ban jail sshd
+- [x] Tailscale VPN autoarranque
+- [ ] SSH: solo clave pública, password deshabilitado
+- [ ] Auditoría final puertos expuestos
 
 ---
 
-## Fase 2 — Observabilidad ✅ COMPLETA
+## 🔴 FASE 2 — GitHub profesional
+**Estado: 70% — Issue #10**
 
-- [x] Grafana (:3000) — dashboards
-- [x] Prometheus (:9090) — métricas
-- [x] Portainer (:9000) — gestión Docker
-- [x] Uptime Kuma (:3002) — monitorización servicios
-- [x] Netdata multi-nodo — Madre + Acer streaming
+Objetivo: El repo tiene nivel senior real.
 
----
-
-## Fase 3 — Automatización y Productividad ✅ COMPLETA
-
-- [x] n8n (:5678) — workflows y automatización
-- [x] Gitea (:3003) — Git self-hosted
-- [x] code-server (:8443) — VSCode web
-- [ ] Paperless-ngx — pendiente levantar
-- [ ] Vaultwarden — pendiente levantar
-
----
-
-## Fase 4 — Seguridad de Red 🔄 EN PROGRESO
-
-> Correspondencia: PLAN-SEGURIDAD-Y-DESPLIEGUE.md Fases 1-3
-
-- [ ] SSH hardening — `PasswordAuthentication no`
-- [ ] UFW completo — script `setup/servidor/ufw-reglas-completas.sh`
-- [ ] Tailscale `systemctl enable tailscaled`
-- [ ] Script `start-batcueva.sh` — verificación antes de levantar Docker
-- [ ] Restic backup offsite — Cloudflare R2 o Backblaze B2
-- [x] fail2ban activo — Madre + Acer ✅
-- [x] UFW activo básico — Madre + Acer ✅
+- [x] CONVENCIONES.md nivel senior
+- [x] AGENT.md completo
+- [x] CONTRIBUTING.md
+- [x] Issue templates (.github/ISSUE_TEMPLATE/)
+- [ ] PR template
+- [ ] Labels personalizados (20+)
+- [ ] Milestones por fase (0–9)
+- [ ] CODEOWNERS
+- [ ] CHANGELOG.md formato Keep a Changelog
+- [ ] Profile README repo (alvarofernandezmota-tech)
+- [ ] Pinear repos relevantes
 
 ---
 
-## Fase 5 — Proxy IA y Secrets
+## 🔴 FASE 3 — Governance repo
+**Estado: 50% — Issue #10**
 
-- [ ] LiteLLM (:4000) — proxy unificado Ollama + APIs externas
-- [ ] Nginx Proxy Manager (:81) — reverse proxy con SSL
-- [ ] SOPS — gestión segura de secretos (ADR-004)
-- [ ] Rootless Docker — cerrar brecha privilege explosion
-- [ ] VLANs — red pentest aislada de red doméstica
+Objetivo: Todos los archivos del repo están actualizados, enlazados y tienen frontmatter.
 
----
-
-## Fase 6 — Agentes Autónomos
-
-- [ ] THDORA handlers: `/estado` `/inbox` `/diario` `/pull <modelo>`
-- [ ] Uptime Kuma → THDORA webhook — alertas Telegram
-- [ ] Pipeline inbox → procesado automático → repo
-- [ ] Agente de cierre de sesión autónomo
-- [ ] Erika — agente local personalizado en Ollama (Modelfile)
-- [ ] Open WebUI RAG sobre yggdrasil-dew
+- [x] CONVENCIONES.md auditado
+- [x] CONTEXT.md actualizado
+- [x] MASTER-PENDIENTES.md SSOT
+- [ ] HOME.md con árbol visual real
+- [ ] ECOSISTEMA.md referencias cruzadas completas
+- [ ] ESTADO-SISTEMA.md en tiempo real
+- [ ] ROADMAP.md SSOT (este fichero)
+- [ ] Frontmatter en todos los .md (needs-terminal)
+- [ ] Migración estructura: diarios/, cli-tools/, mocs/, setup/, thdora/ → destinos correctos
 
 ---
 
-## Fase 7 — OSINT + Pentest Real
+## 🔴 FASE 4 — Stack técnico Madre
+**Estado: 10% — Issue #9**
 
-> Requiere Fase 4 (seguridad red) completada primero.
+Objetivo: Madre tiene el stack completo corriendo y seguro.
 
-- [ ] Kali Desktop (:6901) — `docker-compose.kali.yml` listo
-- [ ] SpiderFoot (:5001) — OSINT automatizado
-- [ ] Bettercap — `network_mode: host`
-- [ ] Wazuh SIEM — prereq `vm.max_map_count=262144`
-- [ ] Suricata IDS pasivo en wlan0
-- [ ] DefectDojo — gestión de findings
-- [ ] Primer scan Nmap real desde Kali
-- [ ] Primer scan OSINT con SpiderFoot
-
----
-
-## Fase 8 — Soberanía Total
-
-- [ ] Headscale self-hosted (reemplaza Tailscale cloud)
-- [ ] Pi-hole DNS con listas de bloqueo
-- [ ] Backups automáticos cifrados a storage externo
-- [ ] iPhone + Redmi A5 como nodos Tailscale plenos
+- [ ] Hardening batcueva (0.0.0.0 → Tailscale only)
+- [ ] Wazuh: fix vm.max_map_count + despliegue
+- [ ] Suricata IDS activo
+- [ ] Kali KasmWeb accesible vía Tailscale
+- [ ] Pihole DNS privado
+- [ ] SearXNG instancia privada
+- [ ] start-batcueva.sh ejecutado y estable
 
 ---
 
-## Fase 9 — Hardware y Escala
+## 🟡 FASE 5 — GitHub Actions
+**Estado: 30% — Issue #11**
 
-- [ ] RTX 3060 12GB en Madre → modelos 13B sin cuantizar
-- [ ] RAM 16GB en varopc
-- [ ] SSD para Madre — HDD WD en riesgo (28.409h)
-- [ ] Segundo servidor / NAS para backups
+Objetivo: La repo se gestiona sola. Bots automatizan commits, docs e historial.
+
+- [x] lint-commits.yml (draftado)
+- [x] update-diario-index.yml (draftado)
+- [x] context-reminder.yml (draftado)
+- [x] repo-health-check.yml (draftado)
+- [x] update-perplexity-docs.yml (draftado)
+- [ ] Desplegar todos desde Thdora
+- [ ] Configurar branch protection
+
+---
+
+## 🟡 FASE 6 — Thdora Guardián + n8n
+**Estado: 20% — Issue #12**
+
+Objetivo: Thdora Guardián monitoriza Madre y alerta vía Telegram.
+
+- [x] Thdora FastAPI base corriendo
+- [ ] Handlers: /estado, /inbox, /pendientes
+- [ ] n8n hardening (0.0.0.0 → Tailscale)
+- [ ] Flow: commit nuevo → Telegram
+- [ ] Flow: Docker caído → alerta Telegram
+- [ ] Fix httpx==0.27.0 en requirements.txt
+- [ ] Thdora Dev bot GitHub completo
 
 ---
 
-## Principios de diseño
+## 🟡 FASE 6d — Multi-IA vía n8n
+**Estado: 0% — Issue #13 (pendiente crear)**
 
-1. **Todo en código** — si no está en el repo, no existe
-2. **Idempotente** — ejecutar dos veces = mismo resultado
-3. **Inbox primero** — nada se pierde, todo se procesa después
-4. **Una cosa a la vez** — foco, no dispersión
-5. **Documentar mientras se hace** — no después
-6. **Seguridad antes que funcionalidad** — no exponer sin hardenizar
+Objetivo: Gemini, DeepSeek y otras IAs pueden actuar sobre el repo vía n8n.
+
+- [ ] Flow n8n: Gemini → webhook → GitHub API
+- [ ] Flow n8n: DeepSeek → webhook → GitHub API
+- [ ] Token PAT GitHub en n8n secrets
+- [ ] Prueba end-to-end: Gemini crea issue en yggdrasil-dew
 
 ---
-_Actualizado: 28 jun 2026 22:48 CEST — Perplexity vía MCP_
-_Ver: [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) · [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) · [PLAN-SEGURIDAD-Y-DESPLIEGUE.md](PLAN-SEGURIDAD-Y-DESPLIEGUE.md)_
+
+## 🟡 FASE 7 — Ollama + RAG
+**Estado: 20% — Issue #14 (pendiente crear)**
+
+Objetivo: Agente local que lee la repo y responde preguntas sobre el ecosistema.
+
+- [x] qwen2.5:7b descargado
+- [x] qwen2.5:3b descargado
+- [ ] llama3.1:8b pull
+- [ ] bge-m3 pull (embeddings)
+- [ ] nomic-embed-text pull
+- [ ] Qdrant desplegado en Madre
+- [ ] RAG funcional sobre docs/
+- [ ] Agente autónomo v1
+
+---
+
+## 🟡 FASE 8 — MCP server propio en Madre
+**Estado: 0% — Issue #15 (pendiente crear)**
+
+Objetivo: Cualquier IA (Claude, Cursor, Ollama) conecta directamente a Madre vía MCP.
+
+- [ ] Instalar Node.js/Python MCP server en Madre
+- [ ] Configurar github-mcp-server o servidor propio
+- [ ] Conectar Claude Desktop → MCP Madre
+- [ ] Conectar Cursor → MCP Madre
+- [ ] Prueba end-to-end: Claude crea issue desde terminal
+
+---
+
+## 🟡 FASE 9 — Mobile completo
+**Estado: 30% — Issue #8**
+
+Objetivo: SSH desde iPhone a Madre, Tailscale en todos los dispositivos.
+
+- [x] Tailscale iPhone activo
+- [ ] Termius iPhone configurado
+- [ ] SSH funcional iPhone → Madre
+- [ ] Tailscale Redmi A5
+
+---
+
+## Próximos hitos
+
+| Hito | Fases | Cuándo |
+|---|---|---|
+| Madre 100% segura | 1 | Próxima sesión terminal |
+| Repo nivel senior completo | 2+3 | Próxima sesión terminal |
+| Stack completo desplegado | 4+5 | Esta semana |
+| Bots operativos | 6+6d | Esta semana |
+| IA local funcional | 7+8 | Próximo sprint |
+| Mobile completo | 9 | Próximo sprint |
+
+---
+
+_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_
