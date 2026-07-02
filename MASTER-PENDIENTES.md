@@ -1,89 +1,93 @@
-# Master Pendientes — Yggdrasil
+---
+tags: [master, pendientes, tareas, issues]
+fecha-actualizacion: 2026-07-02
+---
 
-> Actualizado: 2026-07-02 17:20 CEST
-> Sincronizado con GitHub Issues — ver [yggdrasil-dew/issues](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues) y [yggdrasil-secops/issues](https://github.com/alvarofernandezmota-tech/yggdrasil-secops/issues)
+# 📋 MASTER-PENDIENTES
+
+> Fuente única de verdad de TODO lo pendiente.
+> Sincronizado con Issues GitHub.
+> Última actualización: **02-jul-2026 17:30 CEST**
 
 ---
 
-## 🔴 CRÍTICO — Acción inmediata
+## 🔥 CRÍTICO — hacer pronto
 
-- [ ] **[SEC-001]** Cerrar puerto 21 FTP en router Digi (`79.116.247.44`) → secops #1
-- [ ] **[INFRA]** Fijar crash-loop `log_guardian_bot` → secops #2
-- [ ] **[INFRA]** Fijar crash-loop `tailscale_monitor` → secops #2
-- [ ] **[REPO]** Borrar ficheros basura raíz: `ly`, `tailscale-full.apk` → dew #3
-- [ ] **[REPO]** Mover `thdora/` raíz → ya existe en `proyectos/thdora/` → dew #3
-- [ ] **[REPO]** Mover `osint-stack/docker-compose.kali.yml` → `docker/` → dew #3
-
----
-
-## 🟡 PRIORITARIO — Esta semana
-
-### Infra / Docker
-- [ ] Levantar Wazuh Manager + Dashboard → dew #4
-- [ ] Levantar Suricata IDS (pasivo wlan0) → dew #4
-- [ ] Levantar Pihole + SearXNG → dew #4
-- [ ] Verificar Kali KasmWeb operativo
-- [ ] Auditar APIs sin auth: Ollama `:11434`, Qdrant `:6333` → dew #5
-
-### SecOps / Bots
-- [ ] Configurar `WATCH_PATHS` en `local_tripwire` (rutas: `/etc`, docker configs, repos) → secops #6
-- [ ] Documentar causa + fix crash-loops en `docs/bots/`
-
-### Integración alertas
-- [ ] Conectar Suricata → Wazuh → AlertManager → Telegram (thdora-bot)
-- [ ] Configurar Grafana con fuente Wazuh/Loki
-- [ ] Wazuh: configurar agentes en theodora e iPhone
-
-### Mobile / Acceso
-- [ ] Instalar Termius en iPhone → dew #7
-- [ ] Configurar SSH madre via Tailscale desde iPhone
-- [ ] Tailscale login en Redmi A5
+- [ ] **SEC-001** — Cerrar FTP puerto 21 router Digi (`79.116.247.44`) → secops #1
+- [ ] Fix crash-loops: `log_guardian_bot` + `tailscale_monitor` → secops #2
+- [ ] Fix `local_tripwire`: configurar `WATCH_PATHS` → secops #2
+- [ ] Login Tailscale en Redmi A5 (tocar pantalla físicamente)
+- [ ] Instalar **Blink Shell** en iPhone + configurar SSH a madre → Issue dew #8
 
 ---
 
-## 🟢 PRÓXIMAS 2 SEMANAS
+## 🟡 ALTA prioridad
 
-- [ ] GitHub Project kanban unificado (dew + secops) → dew #8
-- [ ] Labels profesionales en ambas repos
-- [ ] Script backup automático de configs
-- [ ] Documentar arquitectura red completa en `docs/infra/red-local.md`
-- [ ] Pihole: configurar listas de bloqueo
-- [ ] SearXNG: configurar instancia privada
-- [ ] Wazuh dashboard: primeras alertas
-- [ ] Añadir Loki + Promtail al stack
+### GitHub / Repos (Fase 1 + 2)
+- [ ] Borrar `ly` y `tailscale-full.apk` de raíz yggdrasil-dew (git rm local)
+- [ ] Borrar/mover `thdora/` y `osint-stack/` de raíz yggdrasil-dew
+- [ ] Crear labels GitHub: `security`, `bug`, `infra`, `docs`, `pentest`, `bot`
+- [ ] Profile README GitHub profesional (Fase 2)
+- [ ] Pinear repos: yggdrasil-dew, thdora, yggdrasil-secops, osint-stack, ai-toolkit → Issue dew #9
 
----
+### Configuración móvil (Issue dew #8)
+- [ ] Instalar Blink Shell (App Store o compilar Xcode)
+- [ ] Generar llave ed25519 en Secure Enclave desde Blink
+- [ ] Añadir llave pública a madre `authorized_keys`
+- [ ] Verificar conexión Tailscale iPhone activa antes de SSH
 
-## 📋 BACKLOG
-
-- [ ] CI/CD básico GitHub Actions para las repos
-- [ ] Migrate theodora configs to repo
-- [ ] AddAlertManager (9093) al stack
-- [ ] Evaluar CrowdSec vs fail2ban
-- [ ] DefectDojo para gestión de hallazgos
-- [ ] Ntfy como sistema notificaciones push
-- [ ] `port_scanner_bot` — desarrollar código real
-- [ ] `threat_intel_bot` — OSINT automatizado
-- [ ] `vuln_tracker_bot` — CVE tracking
-- [ ] Fase 2 pentest router Digi (post SEC-001)
-- [ ] Añadir yggdrasil-secops como git submodule en yggdrasil-dew
+### Seguridad infra
+- [ ] Auditar Ollama `:11434` — confirmar solo accesible vía Tailscale
+- [ ] Auditar Qdrant `:6333` — sin auth público
+- [ ] Desactivar ADB Redmi cuando no se use
 
 ---
 
-## ✅ COMPLETADO
+## 🟢 NORMAL
 
-- [x] SSH Hardening madre (ed25519, passphrase, no root, no password)
-- [x] Ollama instalado y modelos descargados (qwen2.5, llama3.1, bge-m3, nomic-embed)
-- [x] Pentest inicial red local — Fase 1 completada (nmap, nikto, hydra)
-- [x] MadreAP hostapd + dnsmasq operativo
-- [x] Suspensión sistema maskeada en madre
-- [x] Docker stack principal levantado (thdora, grafana, prometheus, qdrant, n8n, gitea, spiderfoot…)
-- [x] ADB Redmi A5: optimización hotspot
-- [x] Bots de monitorización activos (7 bots, guardian_bot estable)
-- [x] ECOSISTEMA.md completo con todas las repos y nodos
-- [x] Análisis logs bots — issues detectados y documentados
-- [x] **02-jul** — Inbox vaciada (22 ficheros → `inbox/procesado/`)
-- [x] **02-jul** — 16 ficheros cristalizados en árbol de conocimiento
-- [x] **02-jul** — Diarios 25-jun→02-jul completos
-- [x] **02-jul** — Issues #1 y #2 abiertos en yggdrasil-secops
-- [x] **02-jul** — yggdrasil-secops: diarios + arquitectura bots + SEC-001 ref
+### Infra / Docker (Fase 5)
+- [ ] Levantar wazuh + suricata (IDS)
+- [ ] Levantar pihole (DNS blocker)
+- [ ] Levantar searxng (búsqueda privada)
+- [ ] Sync divergencia composes repos vs disco madre
+- [ ] Configurar `OLLAMA_HOST=127.0.0.1` o bind solo Tailscale
+- [ ] Repo `batcueva` — crear (infra ejecutable)
+- [ ] AlertManager → Telegram (cadena alertas Fase 5)
+- [ ] Loki + Promtail (logs → Grafana)
+
+### THDORA (handlers pendientes)
+- [ ] Implementar handlers thdora-bot
+- [ ] Testing pipeline FastAPI + Ollama
+
+### Pentest
+- [ ] Esperar imagen Kali KasmWeb 3.7GB
+- [ ] Acceder a `http://100.91.112.32:6901` y verificar
+- [ ] Instalar herramientas en Kali
+- [ ] Definir scope primer pentest
+
+---
+
+## 🔜 ROADMAP largo plazo (Fase 4 + 5)
+
+- [ ] Auditoría gobernanza completa repos → Issue dew #10
+- [ ] CrowdSec — complementar fail2ban
+- [ ] BloodHound — mapeado AD si aplica
+- [ ] Ntfy — notificaciones push ligeras
+
+---
+
+## ✅ COMPLETADO (referencias)
+
+| Tarea | Fecha | Issue/PR |
+|---|---|---|
+| SSH hardening madre | 2026-07-01 | — |
+| AP WiFi MadreAP debug | 2026-06-27 | — |
+| Tailscale iOS instalado vía ADB | 2026-07-01 | — |
+| Modelos Ollama inventariados | 2026-07-01 | — |
+| Issue templates GitHub | 2026-07-02 | PR — |
+| ECOSISTEMA.md auditado | 2026-07-02 | — |
+| Inbox vaciado (22 ficheros) | 2026-07-02 | — |
+| Blink Shell — decisión tomada | 2026-07-02 | Issue dew #8 |
+
+---
+_Actualizado: 02-jul-2026 17:30 CEST — Perplexity vía MCP_
