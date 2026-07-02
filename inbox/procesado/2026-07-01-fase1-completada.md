@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: proyectos/pentest/fases.md + diarios/2026-07-01.md
+# PROCESADO → docs/infra/fase1-seguridad.md
+> Movido: 02-jul-2026

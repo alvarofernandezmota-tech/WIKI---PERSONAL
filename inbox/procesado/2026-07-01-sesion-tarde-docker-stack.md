@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: diarios/2026-07-01.md
+# PROCESADO → diarios/2026-07-01.md
+> Movido: 02-jul-2026

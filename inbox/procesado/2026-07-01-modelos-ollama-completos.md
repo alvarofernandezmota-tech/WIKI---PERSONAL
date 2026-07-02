@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: docs/ias/modelos-ollama.md
+# PROCESADO → ollama/modelos-activos.md
+> Movido: 02-jul-2026

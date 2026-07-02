@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: docs/seguridad/hallazgos/SEC-001-ftp-puerto21.md
+# PROCESADO → docs/infra/seguridad-hallazgos.md (pendiente crear)
+> Movido: 02-jul-2026

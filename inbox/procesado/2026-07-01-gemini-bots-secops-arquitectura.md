@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: yggdrasil-secops/docs/arquitectura.md
+# PROCESADO → proyectos/pentest/secops-bots-arquitectura.md
+> Movido: 02-jul-2026

@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: hardware/redmi-a5/adb-bloqueos.md
+# PROCESADO → hardware/redmi-a5-adb.md
+> Movido: 02-jul-2026

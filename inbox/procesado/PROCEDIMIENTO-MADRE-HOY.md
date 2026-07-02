@@ -1,2 +1,2 @@
-# ARCHIVO — procesado 02-jul-2026
-# Destino: docs/infra/procedimientos/madre-arranque.md
+# PROCESADO → docs/infra/procedimiento-madre.md
+> Movido: 02-jul-2026
