@@ -1,0 +1,46 @@
+name: "✅ Tarea"
+description: "Tarea de infraestructura, docs, desarrollo o configuración"
+labels: ["p2-normal"]
+body:
+  - type: markdown
+    attributes:
+      value: "Tarea concreta y accionable. Si no sabes cuándo la harás, ponla en `p3-cuando-pueda`."
+  - type: input
+    id: titulo
+    attributes:
+      label: Tarea
+      placeholder: "Qué hay que hacer exactamente"
+    validations:
+      required: true
+  - type: dropdown
+    id: fase
+    attributes:
+      label: Fase del plan
+      options:
+        - Fase 0 — Repo y docs
+        - Fase 1 — Seguridad red
+        - Fase 2 — SSH hardening
+        - Fase 3 — Backup Restic
+        - Fase 4 — Monitorización
+        - Fase 5 — Seguridad contenedores
+        - Fase 6 — Handlers THDORA
+        - Fase 7 — Ollama + RAG
+        - Fase 8 — Seguridad Acer
+        - Fase 9 — Pentest + OSINT
+        - Sin fase asignada
+  - type: dropdown
+    id: ejecucion
+    attributes:
+      label: Dónde se ejecuta
+      options:
+        - mobile-ok (Perplexity/Gemini MCP)
+        - needs-terminal (Acer con Cursor/SSH)
+        - en-madre (SSH directo)
+        - web-github (Settings/Labels/GitHub UI)
+    validations:
+      required: true
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas adicionales
+      placeholder: "Contexto, dependencias, referencias a docs..."

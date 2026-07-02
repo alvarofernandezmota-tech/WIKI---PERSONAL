@@ -1,2 +1,9 @@
-# Todo el repo — Alvaro es el único owner
+# CODEOWNERS — yggdrasil-dew
+# Todo el repo pertenece a @alvarofernandezmota-tech
+# Referencia: https://docs.github.com/es/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
 * @alvarofernandezmota-tech
+
+# Seguridad — revisión explícita requerida
+docs/seguridad/ @alvarofernandezmota-tech
+.github/ @alvarofernandezmota-tech

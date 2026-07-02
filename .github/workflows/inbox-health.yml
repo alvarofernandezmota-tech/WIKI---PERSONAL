@@ -1,0 +1,47 @@
+name: inbox-health
+
+on:
+  push:
+    paths:
+      - "inbox/**"
+  schedule:
+    # Cada día a las 09:00 UTC
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  check-inbox:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Contar ficheros en inbox
+        id: count
+        run: |
+          COUNT=$(find inbox/ -name "*.md" -not -name ".gitkeep" -not -path "inbox/procesado/*" | wc -l)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "Ficheros pendientes en inbox: $COUNT"
+
+      - name: Alerta si inbox > 10 ficheros
+        if: ${{ fromJson(steps.count.outputs.count) > 10 }}
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "📥 Inbox acumulada — ${{ steps.count.outputs.count }} ficheros pendientes"
+          labels: docs, p1-urgente
+          body: |
+            La **inbox** tiene **${{ steps.count.outputs.count }} ficheros** sin procesar.
+
+            Procesa la inbox antes de continuar con nuevas tareas.
+
+            Pasos:
+            1. `ls inbox/` — revisar ficheros
+            2. Migrar a `docs/` según destino
+            3. Archivar en `inbox/procesado/` con stub `migrado_a:`
+            4. Actualizar `docs/operativa/migraciones-inbox.md`
+
+            → [Ver inbox](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/tree/main/inbox)

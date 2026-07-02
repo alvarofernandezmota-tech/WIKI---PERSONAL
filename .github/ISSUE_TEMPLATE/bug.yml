@@ -1,0 +1,43 @@
+name: "🐛 Bug — Sistema roto"
+description: "Algo falla en producción: contenedor caído, servicio roto, error reproducible"
+labels: ["bug", "p0-critico"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Rellena solo lo que sabes. No dejes campos vacíos por rellenar — es mejor un bug concreto que uno vacío.
+  - type: input
+    id: servicio
+    attributes:
+      label: Servicio/componente afectado
+      placeholder: "ej: thdora-bot, ollama, grafana, SSH..."
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Qué está fallando
+      placeholder: "Describe el error con el mensaje exacto si lo tienes"
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      placeholder: "1. Hice X\n2. Pasó Y\n3. Esperaba Z"
+  - type: dropdown
+    id: maquina
+    attributes:
+      label: Máquina afectada
+      options:
+        - Madre (torre Madrid)
+        - Acer / Thdora
+        - Ambas
+        - Otra
+    validations:
+      required: true
+  - type: input
+    id: fecha
+    attributes:
+      label: Fecha/hora detectado
+      placeholder: "2026-07-03 00:30 CEST"

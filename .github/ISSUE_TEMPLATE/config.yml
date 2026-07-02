@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📋 MASTER-PENDIENTES
+    url: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/MASTER-PENDIENTES.md
+    about: Ver la lista completa de pendientes antes de abrir un issue
+  - name: 📖 CONVENCIONES
+    url: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/CONVENCIONES.md
+    about: Convenciones del repo — leer antes de contribuir

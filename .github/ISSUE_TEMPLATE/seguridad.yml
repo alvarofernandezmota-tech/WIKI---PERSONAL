@@ -1,0 +1,44 @@
+name: "🔒 Hallazgo de seguridad"
+description: "Vulnerabilidad, puerto expuesto, configuración débil o brecha detectada"
+labels: ["security", "p1-urgente"]
+body:
+  - type: markdown
+    attributes:
+      value: "⚠️ No incluyas credenciales reales, contraseñas ni tokens en el issue."
+  - type: input
+    id: componente
+    attributes:
+      label: Componente afectado
+      placeholder: "ej: router Digi, UFW, SSH, contenedor X..."
+    validations:
+      required: true
+  - type: dropdown
+    id: severidad
+    attributes:
+      label: Severidad estimada
+      options:
+        - CRÍTICA — brecha activa o acceso comprometido
+        - ALTA — superficie de ataque expuesta
+        - MEDIA — configuración débil sin explotación inmediata
+        - BAJA — hardening recomendable
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción del hallazgo
+      placeholder: "Qué se detectó, cómo, con qué herramienta"
+    validations:
+      required: true
+  - type: textarea
+    id: accion
+    attributes:
+      label: Acción requerida
+      placeholder: "Qué hay que hacer para cerrarlo"
+    validations:
+      required: true
+  - type: input
+    id: fecha
+    attributes:
+      label: Fecha detección
+      placeholder: "2026-07-01 01:49 CEST"
