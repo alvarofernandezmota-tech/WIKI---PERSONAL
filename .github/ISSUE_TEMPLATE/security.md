@@ -1,41 +1,34 @@
 ---
-name: "Hallazgo de seguridad"
-about: "Vulnerabilidad, exposición o hallazgo SEC-NNN"
-title: "🔴 [SECURITY] SEC-NNN Descripción"
-labels: "security"
-assignees: ""
+name: "🔐 Hallazgo de seguridad"
+about: "Vulnerabilidad, puerto abierto, configuración insegura o riesgo detectado"
+labels: ["security"]
 ---
 
-## 🔥 Severidad
+## Severidad
+<!-- 🔴 Alta / 🟡 Media / 🟢 Baja -->
 
-- [ ] 🔴 CRÍTICO — explotable ahora
-- [ ] 🟠 ALTO — explotable con condiciones
-- [ ] 🟡 MEDIO — riesgo limitado
-- [ ] 🟢 BAJO — informativo
+## Descripción del hallazgo
 
-## 📍 Ubicación
+## Superficie afectada
+- Máquina:
+- Servicio/puerto:
+- Vector de ataque posible:
 
-- Host / IP:
-- Puerto / Servicio:
-- Interfaz expuesta:
+## Evidencia
+```bash
+# Comando / output que revela el problema
+```
 
-## 🔍 Descripción
+## Fix propuesto
+```bash
+# Comandos para resolver
+```
 
-<!-- Qué se detectó, cómo, con qué herramienta -->
+## Estado
+- [ ] Detectado
+- [ ] Investigado
+- [ ] Fix aplicado
+- [ ] Verificado
+- [ ] Documentado en docs/infra/
 
-## 💥 Impacto potencial
-
-<!-- Qué puede hacer un atacante si lo explota -->
-
-## 🛡️ Remediación propuesta
-
-- [ ] Paso 1
-- [ ] Paso 2
-- [ ] Verificar fix
-- [ ] Documentar en `docs/seguridad/hallazgos/SEC-NNN-*.md`
-
-## ✔️ Criterio de cierre
-
-- [ ] Vulnerabilidad cerrada / mitigada
-- [ ] Verificado que el vector ya no está activo
-- [ ] Hallazgo documentado en `docs/seguridad/hallazgos/`
+## Referencias

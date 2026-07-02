@@ -1,39 +1,29 @@
 ---
-name: "Bug / problema"
+name: "🐛 Bug report"
 about: "Algo no funciona como debería"
-title: "🐛 [BUG] Descripción breve"
-labels: "bug"
-assignees: ""
+labels: ["bug"]
 ---
 
-## 🐛 Descripción del problema
+## Descripción
+<!-- Qué pasa exactamente -->
 
-<!-- Qué ocurre, cuándo ocurre -->
+## Pasos para reproducir
+1. 
+2. 
+3. 
 
-## 🔄 Pasos para reproducir
+## Comportamiento esperado
 
-1.
-2.
-3.
+## Comportamiento real
 
-## ✅ Comportamiento esperado
+## Entorno
+- Máquina: <!-- madre / theodora / otro -->
+- OS: <!-- Arch Linux -->
+- Servicio/script afectado:
 
-<!-- Qué debería pasar -->
-
-## 📸 Logs / evidencia
+## Logs relevantes
+```
 
 ```
-<!-- pegar logs aqui -->
-```
 
-## 🧠 Contexto
-
-- Contenedor / servicio:
-- Host: madre / theodora / otro:
-- Fecha detención:
-
-## ✔️ Criterio de cierre
-
-- [ ] Bug reproducido y entendido
-- [ ] Fix aplicado
-- [ ] Verificado en producción
+## Notas adicionales

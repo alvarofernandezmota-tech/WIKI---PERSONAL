@@ -1,31 +1,27 @@
 ---
-name: "Tarea técnica"
-about: "Nueva tarea, mejora o feature"
-title: "[TIPO] Descripción breve"
-labels: ""
-assignees: ""
+name: "⚙️ Tarea técnica"
+about: "Tarea de infraestructura, configuración o desarrollo"
+labels: ["infra"]
 ---
 
-## 🎯 Objetivo
+## Objetivo
+<!-- Qué se quiere conseguir -->
 
-<!-- Qué hay que hacer y por qué -->
+## Contexto
+<!-- Por qué es necesario -->
 
-## ✅ Tareas
+## Checklist
+- [ ] 
+- [ ] 
+- [ ] 
 
-- [ ] Tarea 1
-- [ ] Tarea 2
-- [ ] Documentar en repo
+## Ficheros implicados
+| Fichero | Rol |
+|---|---|
+| | |
 
-## 📌 Contexto
+## Criterio de cierre
+<!-- Cómo sabemos que está hecho -->
 
-<!-- Ficheros relevantes, repos afectadas, decisiones previas -->
-
-## 🔗 Fase del plan
-
-<!-- Fase 1 (repos) / Fase 2 (GitHub) / Fase 3 (docs) / Fase 4 (governance) / Fase 5 (técnica) -->
-
-## ✔️ Criterio de cierre
-
-- [ ] Tarea completada
-- [ ] Documentado en repo según CONVENCIONES.md
-- [ ] MASTER-PENDIENTES.md actualizado si aplica
+## Referencias
+<!-- Issues relacionados, docs, commits -->

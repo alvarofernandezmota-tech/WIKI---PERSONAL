@@ -1,95 +1,126 @@
 ---
-tags: [master, pendientes, tareas, issues]
-fecha-actualizacion: 2026-07-02
+tags: [maestro, pendientes, estado]
+fecha-actualizacion: 2026-07-02T19:52
 ---
 
-# 📋 MASTER-PENDIENTES
+# 📋 MASTER-PENDIENTES — Estado 02-jul-2026
 
-> Fuente única de verdad de TODO lo pendiente.
-> Sincronizado con Issues GitHub.
-> Última actualización: **02-jul-2026 19:45 CEST**
-
----
-
-## 🔥 CRÍTICO — hacer pronto
-
-- [ ] **SEC-001** — Cerrar FTP puerto 21 router Digi (`79.116.247.44`) → secops #1
-- [ ] Fix crash-loops: `log_guardian_bot` + `tailscale_monitor` → secops #2
-- [ ] Fix `local_tripwire`: configurar `WATCH_PATHS` → secops #2
-- [ ] Login Tailscale en Redmi A5 (tocar pantalla físicamente)
-- [ ] Instalar **Blink Shell** en iPhone + configurar SSH a madre → Issue dew #8
+> SSOT de tareas pendientes. Sincronizado con Issues GitHub.
+> Última actualización: 02-jul-2026 19:52 CEST — Perplexity vía MCP
 
 ---
 
-## 🟡 ALTA prioridad
+## 🔴 FASE 1 — Seguridad base Madre — 90% ✅
 
-### GitHub / Repos (Fase 1 + 2)
-- [ ] Borrar `ly` y `tailscale-full.apk` de raíz yggdrasil-dew (git rm local)
-- [ ] Borrar/mover `thdora/` y `osint-stack/` de raíz yggdrasil-dew
-- [ ] Crear labels GitHub: `security`, `bug`, `infra`, `docs`, `pentest`, `bot`
-- [ ] Profile README GitHub profesional (Fase 2)
-- [ ] Pinear repos: yggdrasil-dew, thdora, yggdrasil-secops, osint-stack, ai-toolkit → Issue dew #9
-- [ ] **Automatizar actualización docs con GitHub Actions** → Issue dew #11
-
-### Configuración móvil (Issue dew #8)
-- [ ] Instalar Blink Shell (App Store o compilar Xcode)
-- [ ] Generar llave ed25519 en Secure Enclave desde Blink
-- [ ] Añadir llave pública a madre `authorized_keys`
-- [ ] Verificar conexión Tailscale iPhone activa antes de SSH
-
-### Seguridad infra
-- [ ] Auditar Ollama `:11434` — confirmar solo accesible vía Tailscale
-- [ ] Auditar Qdrant `:6333` — sin auth público
-- [ ] Desactivar ADB Redmi cuando no se use
-
----
-
-## 🟢 NORMAL
-
-### Infra / Docker (Fase 5)
-- [ ] Levantar wazuh + suricata (IDS)
-- [ ] Levantar pihole (DNS blocker)
-- [ ] Levantar searxng (búsqueda privada)
-- [ ] Sync divergencia composes repos vs disco madre
-- [ ] Configurar `OLLAMA_HOST=127.0.0.1` o bind solo Tailscale
-- [ ] Repo `batcueva` — crear (infra ejecutable)
-- [ ] AlertManager → Telegram (cadena alertas Fase 5)
-- [ ] Loki + Promtail (logs → Grafana)
-
-### THDORA (handlers pendientes)
-- [ ] Implementar handlers thdora-bot
-- [ ] Testing pipeline FastAPI + Ollama
-
-### Pentest
-- [ ] Esperar imagen Kali KasmWeb 3.7GB
-- [ ] Acceder a `http://100.91.112.32:6901` y verificar
-- [ ] Instalar herramientas en Kali
-- [ ] Definir scope primer pentest
-
----
-
-## 🔜 ROADMAP largo plazo (Fase 4 + 5)
-
-- [ ] Auditoría gobernanza completa repos → Issue dew #10
-- [ ] CrowdSec — complementar fail2ban
-- [ ] BloodHound — mapeado AD si aplica
-- [ ] Ntfy — notificaciones push ligeras
-
----
-
-## ✅ COMPLETADO (referencias)
-
-| Tarea | Fecha | Issue/PR |
+| Tarea | Estado | Issue |
 |---|---|---|
-| SSH hardening madre | 2026-07-01 | — |
-| AP WiFi MadreAP debug | 2026-06-27 | — |
-| Tailscale iOS instalado vía ADB | 2026-07-01 | — |
-| Modelos Ollama inventariados | 2026-07-01 | — |
-| Issue templates GitHub | 2026-07-02 | PR — |
-| ECOSISTEMA.md auditado | 2026-07-02 | — |
-| Inbox vaciado (22 ficheros) | 2026-07-02 | — |
-| Blink Shell — decisión tomada | 2026-07-02 | Issue dew #8 |
-| Investigación GitHub Actions docs | 2026-07-02 | Issue dew #11 |
+| UFW activo y limpio | ✅ | #3 |
+| fail2ban jail sshd | ✅ | #6 |
+| Tailscale autoarranque | ✅ | — |
+| Suspensión desactivada | ✅ | — |
+| **SSH hardening (clave pública + deshabilitar password)** | **❌ PENDIENTE** | #3 |
+
+Ver: `docs/infra/fase1-seguridad.md`
 
 ---
-_Actualizado: 02-jul-2026 19:45 CEST — Perplexity vía MCP_
+
+## 🔴 FASE 2 — GitHub profesional — EN PROCESO 🟡
+
+| Tarea | Estado | Issue |
+|---|---|---|
+| Issue templates (bug, task, security) | ✅ 02-jul | #10 |
+| PR template | ✅ 02-jul | #10 |
+| Labels doc + script gh | ✅ 02-jul | #10 |
+| **Crear labels en GitHub UI o via gh CLI** | **❌ PENDIENTE** | #10 |
+| Profile README profesional | ❌ PENDIENTE | — |
+| Pinear repos correctos | ❌ PENDIENTE | #9 |
+
+---
+
+## 🔴 FASE 3 — Governance y estructura repo — #10
+
+| Tarea | Estado |
+|---|---|
+| CONVENCIONES.md auditado | ✅ 02-jul |
+| HOME.md árbol visual real | ❌ PENDIENTE |
+| ECOSISTEMA.md referencias cruzadas actualizadas | ❌ PENDIENTE |
+| ESTADO-SISTEMA.md estado real madre | ❌ PENDIENTE |
+| ROADMAP.md SSOT planificado | ❌ PENDIENTE |
+| Verificar frontmatter en todos los .md | ❌ PENDIENTE |
+
+---
+
+## 🔴 FASE 4 — Stack técnico Madre — #9
+
+| Tarea | Estado |
+|---|---|
+| Wazuh prereq (vm.max_map_count) | ❌ PENDIENTE |
+| Suricata IDS activo | ❌ PENDIENTE |
+| Suricata → Wazuh → THDORA → Telegram | ❌ PENDIENTE |
+| Kali KasmWeb operativo | ❌ PENDIENTE |
+| Pihole DNS | ❌ PENDIENTE |
+| SearXNG instancia privada | ❌ PENDIENTE |
+| start-batcueva.sh ejecutado | ❌ PENDIENTE |
+
+Ver: `docs/infra/procedimiento-madre.md`
+
+---
+
+## 🟡 FASE 5 — Mobile + acceso remoto — #8
+
+| Tarea | Estado |
+|---|---|
+| Tailscale en iPhone | ❌ PENDIENTE |
+| Termius configurado | ❌ PENDIENTE |
+| SSH desde iPhone verificado | ❌ PENDIENTE |
+
+---
+
+## 🟡 FASE 6 — THDORA fix + observabilidad
+
+| Tarea | Estado |
+|---|---|
+| httpx==0.27.0 en requirements.txt | ❌ PENDIENTE |
+| Uptime Kuma → THDORA → alertas Telegram | ❌ PENDIENTE |
+| Dashboard CPU temp + latencia Ollama | ❌ PENDIENTE |
+
+---
+
+## 🟡 FASE 7 — Automatización docs (GitHub Actions) — #11
+
+| Tarea | Estado |
+|---|---|
+| Workflow update-perplexity-docs.yml | ❌ PENDIENTE |
+| Script scripts/update_perplexity_docs.py | ❌ PENDIENTE |
+| Probar con workflow_dispatch | ❌ PENDIENTE |
+
+---
+
+## ✅ Chromium / Perplexity conectores
+
+| Tarea | Estado |
+|---|---|
+| Problema detectado y documentado | ✅ 02-jul |
+| Probar Firefox | ❌ PENDIENTE |
+| Probar Comet | ❌ PENDIENTE |
+
+Ver: `docs/herramientas/chromium-perplexity.md`
+
+---
+
+## Issues GitHub abiertos
+
+| # | Título | Fase |
+|---|---|---|
+| #11 | Automatizar actualización docs (GitHub Actions) | Fase 7 |
+| #10 | Governance — auditar reglas, naming, estructura | Fase 3 |
+| #9 | Stack completo: Wazuh + Suricata + Pihole + SearXNG | Fase 4 |
+| #8 | Terminal iPhone → madre via Termius + Tailscale | Fase 5 |
+| #6 | DIARY sesión 28-06-2026 | Archivo |
+| #5 | AP WiFi hostapd varpc | Fase 4 |
+| #4 | DIARY sesión 22-06-2026 | Archivo |
+| #3 | Setup varpc (Madre) | Fase 1 |
+| #2 | ROADMAP ecosistema | Referencia |
+
+---
+_Actualizado: 02-jul-2026 19:52 CEST — Perplexity vía MCP_

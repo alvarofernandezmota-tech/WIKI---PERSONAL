@@ -1,24 +1,21 @@
-## 📝 Descripción
+## Descripción
+<!-- Qué hace este PR y por qué -->
 
-<!-- Qué hace este PR -->
+## Tipo de cambio
+- [ ] 🐛 Bug fix
+- [ ] ⚙️ Infra / configuración
+- [ ] 📄 Documentación
+- [ ] 🔐 Seguridad
+- [ ] 🤖 Bot / automatización
+- [ ] 🧪 Pentest / investigación
 
-## 🔗 Issue relacionado
+## Checklist
+- [ ] Los ficheros nuevos tienen frontmatter con `tags` y `fecha`
+- [ ] Se ha actualizado `MASTER-PENDIENTES.md` si aplica
+- [ ] No hay secrets ni credenciales en el diff
+- [ ] El título del commit sigue la convención (`feat:`, `fix:`, `docs:`, `sec:`, `infra:`)
 
+## Issues relacionados
 Closes #
 
-## 📊 Tipo de cambio
-
-- [ ] 🧹 Limpieza / refactor
-- [ ] 📚 Documentación
-- [ ] 🐳 Infra / Docker
-- [ ] 🔒 Seguridad
-- [ ] ➕ Nueva funcionalidad
-- [ ] 🐛 Fix
-
-## ✅ Checklist
-
-- [ ] Sigue CONVENCIONES.md (naming, frontmatter, estructura)
-- [ ] Documentado si es conocimiento nuevo
-- [ ] MASTER-PENDIENTES.md actualizado si aplica
-- [ ] No hay ficheros basura (0 bytes, APKs, dirs vacíos sin sentido)
-- [ ] Commit message descriptivo con prefijo `feat:` / `fix:` / `docs:` / `chore:`
+## Notas para el revisor
