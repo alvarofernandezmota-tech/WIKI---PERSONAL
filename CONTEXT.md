@@ -1,6 +1,6 @@
 ---
 tags: [contexto, estado, sistema, agentes]
-fecha-actualizacion: 2026-07-01T19:51+02:00
+fecha-actualizacion: 2026-07-02T20:23+02:00
 revision: cada-sesion
 ruta-obsidian: CONTEXT.md
 ---
@@ -8,20 +8,19 @@ ruta-obsidian: CONTEXT.md
 # CONTEXT.md — Estado actual del sistema
 
 > ⚠️ ARCHIVO CRÍTICO — los agentes leen esto para entender el ecosistema.
-> Debe estar SIEMPRE alineado con MASTER-PENDIENTES, ESTADO-SISTEMA y ECOSISTEMA.
 > Actualizar al inicio Y al final de cada sesión importante.
 
 ---
 
 ## 🕐 Última actualización
 
-**2026-07-01 19:51 CEST** — Sesión tarde — Hardening Docker completo fase1 + satélite yggdrasil-secops creado
+**2026-07-02 20:23 CEST** — Sesión noche (iPhone 11 · Escalona) — Fase 0: CONVENCIONES reescrito + AGENT.md + CONTRIBUTING.md + auditoría herramientas GitHub
 
 ---
 
 ## 👤 Perfil del dueño
 
-Álvaro — dev Python · pentest Linux · ingeniero IA local · homelab
+Álvaro — ingeniero de sistemas autodidacta · Python · Docker · Linux · IA local · OSINT · homelab
 
 ---
 
@@ -29,10 +28,11 @@ ruta-obsidian: CONTEXT.md
 
 | Repo | Privado | Estado | Notas |
 |---|---|---|---|
-| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ❌ | ✅ activo | Cerebro + infra |
-| [yggdrasil-secops](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) | ✅ | ✅ nuevo 01-jul | Tripwire + OSINT defensivo |
-| [personal](https://github.com/alvarofernandezmota-tech/personal) | ❌ | ✅ activo | — |
-| [thdora](https://github.com/alvarofernandezmota-tech/thdora) | ❌ | 🔧 handlers pendientes | FastAPI + bot |
+| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ❌ público | ✅ activo | Cerebro + infra + docs — Fase 0 en progreso |
+| [yggdrasil-secops](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) | ✅ | ✅ activo | Tripwire + OSINT defensivo |
+| [alvarofernandezmota-tech](https://github.com/alvarofernandezmota-tech) | ❌ | ❌ pendiente crear | Profile README — Fase 0 pendiente |
+| [personal](https://github.com/alvarofernandezmota-tech/personal) | ❌ | ✅ activo | Histórico |
+| [thdora](https://github.com/alvarofernandezmota-tech/thdora) | ❌ | 🔧 handlers pendientes | FastAPI + bot TOKI |
 | [local-brain](https://github.com/alvarofernandezmota-tech/local-brain) | ✅ | 🔧 en desarrollo | Ollama + RAG + Qdrant |
 | [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) | ✅ | 🔧 Kali descargándose | docker-compose.kali.yml listo |
 | [ai-toolkit](https://github.com/alvarofernandezmota-tech/ai-toolkit) | ❌ | ✅ estable | — |
@@ -45,14 +45,15 @@ ruta-obsidian: CONTEXT.md
 
 | Máquina | Hostname | Rol | IP Tailscale | Estado |
 |---|---|---|---|---|
-| PC torre | **varpc (Madre)** | Servidor Docker + Ollama + AP WiFi | `100.91.112.32` | ✅ encendida |
-| Portátil | **varo12f (Acer)** | Dev + Obsidian | `100.86.119.102` | ✅ activo |
-| Móvil Android | Redmi A5 | Control remoto | ⚠️ Tailscale pendiente | — |
-| Móvil iPhone | iPhone | Control remoto | ⚠️ Tailscale + Termius pendiente | — |
+| PC torre | **Madre** (varpc) | Servidor Docker 24/7 + Ollama + AP WiFi | `100.91.112.32` | ✅ encendida |
+| Portátil Acer | **Thdora** (varo12f) | Dev + Obsidian + terminal | `100.86.119.102` | ✅ disponible |
+| iPhone 11 | móvil | Control remoto · Perplexity MCP | Tailscale activo | ✅ activo (sesión actual) |
+| Redmi A5 | Android | Control remoto | ⚠️ Tailscale pendiente | — |
+| HP TouchSmart | HP | Dashboard / visualización | — | ⏳ pendiente configurar |
 
 ---
 
-## 🐳 Docker — Madre — ESTADO 2026-07-01
+## 🐳 Docker — Madre — estado 2026-07-02
 
 ### ✅ Stack Fase 1 — HARDENED (puertos Tailscale only)
 
@@ -63,21 +64,18 @@ ruta-obsidian: CONTEXT.md
 | qdrant | 100.91.112.32:6333 | ✅ healthy |
 | open-webui | 100.91.112.32:3001 | ✅ healthy |
 
-### ⚠️ Stack batcueva + THDORA — AÚN 0.0.0.0 — HARDENING PENDIENTE
+### ⚠️ Stack batcueva + THDORA — hardening pendiente
 
 | Contenedor | Puerto actual | Prioridad |
 |---|---|---|
 | grafana | 0.0.0.0:3000 | 🔴 alta |
 | prometheus | 0.0.0.0:9090 | 🔴 alta |
 | n8n | 0.0.0.0:5678 | 🔴 alta |
+| thdora (FastAPI) | 0.0.0.0:8000 | 🔴 alta |
 | gitea | 0.0.0.0:3003 | 🟠 media |
 | code-server | 0.0.0.0:8443 | 🟠 media |
 | portainer | 0.0.0.0:9000 | 🟠 media |
 | uptime-kuma | 0.0.0.0:3002 | 🟡 baja |
-| thdora | 0.0.0.0:8000 | 🔴 alta |
-
-### ⏳ Pendiente levantar
-- Kali Desktop (6901) · SpiderFoot (5001) — Kali descargándose en tmux
 
 ---
 
@@ -93,68 +91,77 @@ ruta-obsidian: CONTEXT.md
 
 ---
 
-## 🌐 Red — estado REAL
+## 🌐 Red — estado
 
 | Servicio | Estado |
 |---|---|
-| MadreAP (hostapd) | ✅ activo |
+| MadreAP (hostapd r8852be) | ✅ activo |
 | Tailscale Madre | ✅ 100.91.112.32 |
-| Tailscale Acer | ✅ 100.86.119.102 |
+| Tailscale Thdora | ✅ 100.86.119.102 |
+| Tailscale iPhone | ✅ activo |
 | fail2ban sshd | ✅ activo ambas máquinas |
 | UFW Madre | ✅ activo — reglas Fase 1 |
 | SSH hardening | ✅ Fase 1 completada |
 
 ---
 
-## 📋 Plan de fases — 2026-07-01
+## 🤖 Agentes activos
 
-| Fase | Nombre | Estado |
-|---|---|---|
-| 0 | Repo y docs | ✅ 100% |
-| 1 | Seguridad red | ✅ 100% |
-| 1.5 | Hardening puertos Docker | ✅ fase1 HOY — resto pendiente |
-| 2 | start-batcueva.sh | 🟡 50% |
-| 3 | Backup Restic | 🟡 30% |
-| 4 | Monitoring completo | 🟡 50% |
-| 5 | Seguridad avanzada | 🔴 0% |
-| 6 | Handlers THDORA | 🟡 30% |
-| 7 | Modelos Ollama + RAG | 🟡 20% |
-| 8 | Seguridad Acer | 🟡 30% |
-| 9 | Pentest + OSINT real | 🟡 20% |
+| Agente | Rol | MCP | Estado |
+|---|---|---|---|
+| **Perplexity** | Principal · docs · repo · móvil | ✅ Space yggdrasil | ✅ activo |
+| **Claude** | Código · arquitectura · terminal | ✅ Cursor (pendiente Thdora) | ⏳ pendiente setup |
+| **Gemini 2.5 Pro** | Auditorías masivas · contexto grande | ❌ | ✅ listo para lanzar |
+| **Grok** | Datos frescos · investigación | ❌ | ✅ disponible |
+| **TOKI** | Bot Telegram · FastAPI | — | ⚠️ handlers pendientes |
+| **Ollama local** | LLM local en Madre | local | ✅ 2 modelos activos |
 
 ---
 
-## 🤖 Agentes activos
+## 📋 Plan de fases — estado 2026-07-02
 
-| Agente | Rol | Estado |
+| Fase | Nombre | Estado |
 |---|---|---|
-| Perplexity | Documenta en tiempo real vía MCP GitHub | ✅ activo |
-| Claude | Ejecuta con MCP, código, commits | ✅ listo |
-| Gemini 2.5 Pro | Auditorías masivas — prompt listo en inbox | ✅ listo para lanzar |
-| TOKI (thdora) | Bot Telegram — FastAPI | ⚠️ handlers pendientes |
-| Ollama local | LLM local en Madre | ✅ 2 modelos listos |
+| **0** | Repo limpio + documentado | 🟡 85% — migración estructura + herramientas GitHub pendientes |
+| **1** | Tailscale + red segura | ✅ 100% |
+| **1.5** | Hardening puertos Docker | ✅ Fase 1 done — batcueva pendiente |
+| **2** | SSH hardening completo | 🔴 pendiente |
+| **3** | Wazuh SIEM | 🟡 en progreso |
+| **4** | Suricata IDS | 🟡 en progreso |
+| **5** | GitHub Actions automatización | 🔴 no iniciado — workflows draftados en inbox |
+| **6** | Cursor + MCP Thdora | 🔴 pendiente |
+| **7** | Ollama agentes + RAG | 🟡 20% (modelos base listos) |
 
 ---
 
 ## 📌 Próximas acciones prioritarias
 
-1. **Lanzar Gemini** con `inbox/GEMINI-AUDITORIA-ECOSISTEMA-2026-07-01.md`
-2. **Hardening batcueva + THDORA** — aplicar sed a fases 2+3 y compose THDORA
-3. **Pull modelos** — `bash scripts/05-fase7-ollama-pull.sh`
-4. **Restic backup** — configurar `.env.restic` + ejecutar script 07
-5. **THDORA handlers** — wiring completo con script 08
+### Mobile-ok (ahora mismo — Perplexity)
+1. Crear repo público `alvarofernandezmota-tech` con Profile README
+2. Crear labels personalizados en yggdrasil-dew (ver inbox 2026-07-02-auditoria-herramientas-github.md)
+3. Crear milestones Fase 0 y Fase 2
+4. Crear `.github/CODEOWNERS` y `.github/PULL_REQUEST_TEMPLATE.md`
+5. Actualizar CHANGELOG.md con formato Keep a Changelog
+
+### Needs-terminal (Thdora)
+1. `git rm --cached tailscale-full.apk ly && git rm -r --cached .obsidian/`
+2. `git mv diarios/ docs/diarios/` + mover osint-stack/, cli-tools/, setup/, thdora/, mocs/
+3. Instalar Cursor + configurar MCP GitHub con token
+4. Desplegar GitHub Actions workflows (lint-commits, update-diario-index, context-reminder)
+5. Configurar branch protection en Settings
+6. Hardening batcueva Docker (pasar de 0.0.0.0 a Tailscale IP)
 
 ---
 
 ## 📚 Reglas de alineación
 
-1. **Al abrir sesión** — leer CONTEXT.md antes de hacer nada
-2. **Al cerrar sesión** — actualizar CONTEXT.md + diario del día
-3. **Inbox** — máx 10 archivos · wikilink al diario del día
-4. **Nuevo repo** — añadir a CONTEXT.md + ECOSISTEMA.md mismo commit
-5. **Nuevo Docker** — actualizar tabla en CONTEXT.md + ECOSISTEMA.md
-6. **MASTER-PENDIENTES** — única lista de tareas, no duplicar
+1. Abrir sesión → leer AGENT.md + CONTEXT.md + MASTER-PENDIENTES.md
+2. Cerrar sesión → diario + CONTEXT.md + inbox procesado + commit
+3. Inbox → máx 10 ficheros · siempre con frontmatter + destino
+4. Nuevo repo → añadir a CONTEXT.md + ECOSISTEMA.md en mismo commit
+5. Nuevo Docker → actualizar tabla CONTEXT.md + ECOSISTEMA.md
+6. MASTER-PENDIENTES.md → única lista de tareas, no duplicar en diarios
 
 ---
-_Ver: [[HOME]] · [[ECOSISTEMA]] · [[ESTADO-SISTEMA]] · [[MASTER-PENDIENTES]]_
-_Actualizado: 01 jul 2026 19:51 CEST — Perplexity vía MCP_
+_Ver: HOME.md · ECOSISTEMA.md · ESTADO-SISTEMA.md · MASTER-PENDIENTES.md_
+_Actualizado: 02-jul-2026 20:23 CEST — iPhone 11 — Perplexity vía MCP_
