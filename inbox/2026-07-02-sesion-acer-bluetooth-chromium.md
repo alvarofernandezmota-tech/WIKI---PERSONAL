@@ -1,18 +1,18 @@
 ---
-tags: [tipo/sesion, estado/sin-empezar, infra, hardware]
+tags: [tipo/sesion, estado/en-proceso, infra, hardware]
 fecha: 2026-07-02
 maquina: theodora (Acer)
-actualizado: 2026-07-02
+actualizado: 2026-07-02T19:19
 ---
 
 # 📥 Sesión 02-jul-2026 — Acer Bluetooth + Chromium/Perplexity
 
-> Estado: `sin-empezar` → pendiente de cristalizar en destino definitivo
+> Estado: `en-proceso` → pendiente de cristalizar en destino definitivo
 > Destino probable: `hardware/acer.md` + `docs/infra/bluetooth.md` + `docs/herramientas/chromium.md`
 
 ---
 
-## 1. Bluetooth Acer — Diagnóstico y Resolución ✅
+## 1. Bluetooth Acer — Diagnóstico y Resolución ✅ RESUELTO
 
 ### Problema
 `bluetoothctl` se quedaba en `Waiting to connect to bluetoothd...` en Theodora.
@@ -40,23 +40,21 @@ sudo systemctl status bluetooth
    Active: active (running) since Thu 2026-07-02 19:00:28 CEST
    Main PID: 4449 (bluetoothd)
    Status: "Running"
+   Bluetooth daemon 5.86
+   Controller: E0:0A:F6:B6:02:14 Pairable: yes
+   hci0: powered bondable ssp br/edr le secure-conn wide-band-speech
 ```
 
-`bluetoothctl` detecta:
-- `[NEW] Media /org/bluez/hci0`
-- `[CHG] Controller E0:0A:F6:B6:02:14 Pairable: yes`
-- `hci0 new_settings: powered bondable ssp br/edr le secure-conn ...`
+### Notas importantes
+- El mensaje `Failed to set default system config for hci0` aparece en journalctl pero **no impide el funcionamiento**. Es un warning conocido de bluez 5.86 en Arch → https://github.com/bluez/bluez/issues/1905
+- El servicio estaba `disabled` por defecto en la instalación. Con `enable` queda activo en cada arranque.
 
-### Nota
-El mensaje `Failed to set default system config for hci0` aparece en journalctl pero **no impide el funcionamiento**. Es un warning conocido de bluez 5.86 en Arch.
-→ Ver: https://github.com/bluez/bluez/issues/1905
+### 🟢 Estado final: RESUELTO
+Bluetooth operativo en Theodora. Servicio habilitado para arranque automático.
 
-### Estado final
-🟢 **RESUELTO** — Bluetooth operativo en Theodora. Servicio habilitado para arranque automático.
-
-### Comandos definitivos para Acer/Theodora
+### Comandos definitivos Acer/Theodora
 ```bash
-# Primer setup (ya ejecutado)
+# Setup inicial (ya ejecutado — no repetir)
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 
@@ -64,32 +62,75 @@ sudo systemctl start bluetooth
 systemctl status bluetooth
 rfkill list
 
-# Entrar a gestión Bluetooth
+# Gestión Bluetooth interactiva
 bluetoothctl
-# Dentro: power on → agent on → default-agent → scan on
+# Dentro:
+#   power on
+#   agent on
+#   default-agent
+#   scan on
+#   pair <MAC>
+#   trust <MAC>
+#   connect <MAC>
 ```
 
 ---
 
-## 2. Chromium / Perplexity — Conectores no persisten 🔴
+## 2. Chromium / Perplexity — Conectores no persisten 🔴 EN PROCESO
 
 ### Problema
-En la versión web de Perplexity en Chromium, los conectores (GitHub, Google Drive, Web, etc.) no se guardan entre mensajes; hay que reconectarlos en cada nueva consulta.
+En la versión web de Perplexity en Chromium (Arch Linux), los conectores (GitHub, Google Drive, Web, etc.) **no se guardan entre mensajes**; hay que reconectarlos en cada nueva consulta del chat.
 
-### Hipótesis
-- Sesión o caché corrupta en Chromium
-- Extensión o VPN interfiriendo con WebSocket/SSE de Perplexity
-- Conflicto de cookies/storage en Chromium (posible sandboxing)
+### Datos recogidos
+| Variable | Valor |
+|---|---|
+| Versión Chromium | `148.0.7778.178 Arch Linux` |
+| Modo incógnito | Sigue fallando |
+| Móvil | **Funciona correctamente** |
+| VPN activa | Por verificar |
+| Extensiones | Por revisar |
 
-### Pendiente de investigar
-- [ ] Verificar si el problema ocurre también en modo incógnito de Chromium
-- [ ] Probar en otro navegador (Firefox) para aislar si es de Chromium o de cuenta
-- [ ] Revisar extensiones activas en Chromium que puedan interceptar requests
-- [ ] Comprobar si hay VPN activa que rompa la sesión persistente
-- [ ] Hard refresh: `Ctrl+F5` y borrar caché de perplexity.ai
+### Diagnóstico ejecutado
+```bash
+chromium --version
+# → Chromium 148.0.7778.178 Arch Linux
 
-### Estado
-🔴 **PENDIENTE** — No investigado en profundidad aún. Próximo paso: prueba en incógnito.
+chromium --disable-extensions --incognito --no-first-run
+# → Abre sesión limpia sin extensiones — problema persiste
+```
+
+### Análisis
+- Perplexity soporta oficialmente Chrome 122+ pero documenta comportamiento sobre Chrome 137 como referencia estable.
+- **Chromium 148 en Arch** es una versión muy reciente que puede tener cambios de SameSite, cookies o storage que rompan la persistencia de sesión de conectores.
+- El hecho de que **móvil funcione** y **escritorio no** descarta problema de cuenta/plan y apunta a navegador/entorno.
+- `--disable-extensions` no resuelve → el problema no son extensiones de Chromium.
+
+### Hipótesis activa
+🎯 **Chromium 148 tiene cambios de manejo de cookies/storage** que Perplexity aún no gestiona correctamente en el handshake OAuth de conectores.
+
+### Pendiente de verificar
+- [ ] Probar en **Firefox** para aislar si es específico de Chromium o del entorno desktop
+- [ ] Instalar **app nativa de Perplexity** en Arch Linux (AUR o Flatpak) como alternativa
+- [ ] Crear **perfil nuevo limpio** en Chromium (`chrome://settings/manageProfile`)
+- [ ] Revisar si hay **VPN activa** que rompa el OAuth de conectores
+- [ ] Probar `chrome://flags` → **Reset all** → reiniciar
+
+### 🔴 Estado: EN PROCESO — siguiente paso: Firefox o app nativa Arch
+
+---
+
+## 3. App Perplexity en Arch Linux — Por investigar 🔜
+
+### Opciones conocidas
+- **AUR**: buscar `perplexity` o `perplexity-ai` en AUR
+- **Flatpak**: buscar en Flathub si hay paquete oficial
+- **AppImage**: buscar en releases oficiales de Perplexity
+- **Comet**: el navegador propio de Perplexity (basado en Chromium) — disponible para Linux
+
+### Ventaja de app nativa vs Chromium web
+Una app nativa (o Comet) gestiona la sesión y los conectores en su propio contexto, aislado del perfil de Chromium con posibles conflictos.
+
+### 🔜 Estado: PENDIENTE — investigar AUR/Flatpak + Comet
 
 ---
 
@@ -97,10 +138,11 @@ En la versión web de Perplexity en Chromium, los conectores (GitHub, Google Dri
 
 | Contenido | Destino |
 |---|---|
-| Comandos Bluetooth Acer | `hardware/acer.md` o `docs/infra/bluetooth.md` |
+| Comandos Bluetooth Acer | `hardware/acer.md` + `docs/infra/bluetooth.md` |
 | Warning bluez 5.86 | `docs/infra/bluetooth.md` |
-| Problema Chromium/Perplexity | `docs/herramientas/chromium.md` |
+| Diagnóstico Chromium/Perplexity | `docs/herramientas/chromium.md` |
+| App Perplexity Arch | `docs/herramientas/perplexity.md` |
 
 ---
 
-_Generado por Perplexity vía MCP · 02-jul-2026 19:08 CEST_
+_Actualizado por Perplexity vía MCP · 02-jul-2026 19:19 CEST_
