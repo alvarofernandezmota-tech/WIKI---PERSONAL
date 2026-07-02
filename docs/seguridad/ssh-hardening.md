@@ -1,41 +1,49 @@
-# SSH Hardening — Acer→Madre
-#seguridad #ssh #hardening #clave-publica
+# SSH Hardening — Madre
+#seguridad #ssh #hardening #fase2 #madre
 
-**Fecha:** 2026-07-01 00:53–00:57 CEST
-**Estado:** ✅ Completado (salvo PasswordAuth pendiente)
+**Fecha:** 2026-07-01  
+**Estado:** parcial — falta `PasswordAuthentication no`
 
 ---
 
-## Pasos ejecutados
+## Configuración aplicada
 
-### 1. Generar clave ed25519 en Acer (theodora)
-```bash
-ssh-keygen -t ed25519 -C "varo12f-to-madre" -f ~/.ssh/id_ed25519_madre
-# Passphrase configurada (no vacía)
-# Fingerprint: SHA256:bybYsiSBpjT9Tpur+R8HZajdr7v1nP1Wxoylkgj9s4E
+Fichero: `/etc/ssh/sshd_config` en Madre
+
+```
+PermitRootLogin no
+MaxAuthTries 3
+AllowUsers alvaro
+PasswordAuthentication yes   ← PENDIENTE cambiar a no
 ```
 
-### 2. Copiar clave pública a Madre
-```bash
-ssh-copy-id -i ~/.ssh/id_ed25519_madre.pub varopc@100.91.112.32
-# → 1 key(s) added ✅
-```
+---
 
-### 3. Verificar conexión
-```bash
-ssh -i ~/.ssh/id_ed25519_madre varopc@100.91.112.32 "echo OK"
-# → OK ✅
-```
+## Pendiente crítico
 
-### 4. SSH Agent permanente en Acer (~/.zshrc)
 ```bash
-echo 'eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519_madre 2>/dev/null' >> ~/.zshrc
-```
-
-### 5. Pendiente — desactivar password auth en Madre
-```bash
-# Ejecutar en Madre SOLO después de confirmar que la clave funciona
-sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+# En Madre (requiere sesión SSH activa desde Acer en Toledo):
+sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo systemctl restart sshd
-grep PasswordAuthentication /etc/ssh/sshd_config
+
+# Verificar desde otra terminal ANTES de cerrar la sesión:
+ssh alvaro@madre -p [puerto]
 ```
+
+⚠️ **NO ejecutar sin tener una segunda terminal SSH abierta.** Si falla el test, puedes perder acceso.
+
+---
+
+## Fail2ban
+
+- Instalado: ✅
+- Activo: ✅
+- Configuración por defecto (ban tras 5 intentos fallidos)
+
+---
+
+## Test SSH desde Toledo
+
+- Requiere: Tailscale activo en ambas máquinas
+- Comando: `ssh alvaro@[ip-tailscale-madre] -p [puerto]`
+- Estado: ⏳ pendiente verificar desde Toledo

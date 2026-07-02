@@ -1,8 +1,8 @@
 ---
-archivado: 2026-07-02
-migrado_a: docs/infra/madre/ap-wifi.md
+archivado: 2026-07-03
+migrado_a: docs/infra/madre/wifi-debug.md
 ---
 
 # → ARCHIVADO
 
-Contenido migrado a [`docs/infra/madre/ap-wifi.md`](../../docs/infra/madre/ap-wifi.md)
+Contenido pendiente de migrar a docs/infra/madre/wifi-debug.md en próxima sesión needs-terminal.

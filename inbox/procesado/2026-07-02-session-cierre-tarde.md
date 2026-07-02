@@ -5,4 +5,4 @@ migrado_a: docs/diarios/2026-07-02.md
 
 # → ARCHIVADO
 
-Sesión tarde auditoría ecosistema integrada en diario 2026-07-02.
+Cierre tarde 2026-07-02 integrado en diario.

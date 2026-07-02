@@ -5,4 +5,4 @@ migrado_a: docs/diarios/2026-07-02.md
 
 # → ARCHIVADO
 
-Sesión tarde auditoría ecosistema integrada en diario 2026-07-02.
+Diario sesión noche Fase 0 GitHub integrado en docs/diarios/2026-07-02.md

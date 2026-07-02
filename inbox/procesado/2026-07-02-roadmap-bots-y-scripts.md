@@ -5,4 +5,4 @@ migrado_a: docs/proyectos/thdora/arquitectura-bots.md
 
 # → ARCHIVADO
 
-Contenido integrado en docs/proyectos/thdora/arquitectura-bots.md
+Roadmap bots y scripts integrado en docs/proyectos/thdora/arquitectura-bots.md

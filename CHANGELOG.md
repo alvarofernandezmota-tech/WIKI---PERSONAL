@@ -1,94 +1,75 @@
----
-tags: [changelog]
-fecha-actualizacion: 2026-07-02T21:05
----
+# CHANGELOG — yggdrasil-dew
+#changelog #historial
 
-# Changelog
-
-Todos los cambios relevantes del proyecto. Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
-Versionado: [SemVer](https://semver.org/lang/es/).
+Formato: [Keep a Changelog](https://keepachangelog.com/es/1.1.0/)  
+Versionado: fecha de sesión
 
 ---
 
-## [Unreleased]
+## [2026-07-03] — Fase 0 GitHub completa (85%)
 
-### Por hacer
-- Milestones por fase en GitHub
-- Labels personalizados (20+)
-- PR template
-- CODEOWNERS
-- Branch protection
-- Desplegar 5 GitHub Actions
-- Instalar Cursor + MCP en Thdora
-- Migración inbox → docs/ (script listo)
-- Crear issues #13, #14, #15
-- SSH hardening completo Madre
-- Cerrar puerto FTP 21
-- Fix n8n binding 0.0.0.0 → Tailscale
+### Added
+- `.github/CODEOWNERS` — ownership completo del repo
+- `.github/PULL_REQUEST_TEMPLATE.md` — checklist de calidad
+- `.github/ISSUE_TEMPLATE/bug.yml` — form de bug con máquina y error
+- `.github/ISSUE_TEMPLATE/tarea.yml` — form con fase y mobile-ok/needs-terminal
+- `.github/ISSUE_TEMPLATE/seguridad.yml` — form con severidad
+- `.github/ISSUE_TEMPLATE/config.yml` — deshabilita issues en blanco
+- `.github/workflows/context-reminder.yml` — alerta CONTEXT.md >7 días
+- `.github/workflows/lint-commits.yml` — Conventional Commits forzados
+- `.github/workflows/inbox-health.yml` — alerta inbox >10 ficheros
+- `docs/operativa/workflow-inbox.md` — flujo 6 pasos inbox
+- `docs/operativa/migraciones-inbox.md` — log histórico migraciones
+- `docs/operativa/github-actions.md` — workflows activos y planificados
+- `docs/operativa/github-pillars.md` — los 4 pilares documentados
+- `docs/operativa/mcp-setup-multi-ia.md` — Cursor + Gemini CLI con token full
+- `docs/operativa/pendientes-labels-milestones.md` — spec 22 labels
+- `docs/operativa/pendientes-sesion-2026-07-03.md` — cierre sesión
+- `scripts/migrar-inbox.sh` — script semi-automático migraciones
+- `docs/diarios/2026-07-02.md` — diario completo del día
+- `docs/diarios/2026-07-01.md` — diario del día 01
+- `docs/seguridad/hallazgos/ftp-puerto21.md` — hallazgo puerto 21
+- `docs/seguridad/ssh-hardening.md` — estado hardening SSH Madre
+- `docs/proyectos/thdora/arquitectura-bots.md` — TOKI-DEW + GUARDIAN
+- `docs/herramientas/ollama-modelos.md` — modelos en Madre
+- `docs/infra/acer/setup-bluetooth-chromium.md` — setup Acer
+- `docs/infra/madre/auditoria-compose.md` — divergencias Docker
 
----
+### Changed
+- `CONTEXT.md` — actualizado al cierre de sesión 2026-07-03
+- `docs/herramientas/github-ecosystem.md` — estado post-implementación
 
-## [0.4.0] — 2026-07-02
-
-### Añadido
-- `CONTRIBUTING.md` creado con estándares de contribución
-- Issue templates en `.github/ISSUE_TEMPLATE/` (bug, feature, diary, security)
-- Issues #8 al #12 creados con documentación técnica completa
-- Fases 6d, 7, 8MCP identificadas y documentadas
-- Volcado de sesión completa en `inbox/`
-- Script de migración `inbox/2026-07-02-auditoria-inbox-migracion.md`
-- Arquitectura MCP multi-IA documentada
-
-### Cambiado
-- `CONVENCIONES.md` elevado a nivel senior
-- `AGENT.md` actualizado con naming Thdora y nuevas reglas
-- `MASTER-PENDIENTES.md` reestructurado con todas las fases y SSOT naming
-- `CONTEXT.md` actualizado con estado real del ecosistema
-- `ROADMAP.md` expandido con fases 6d, 7, 8MCP, 9
-- `ESTADO-SISTEMA.md` actualizado con hallazgos reales
-- Naming bots: TOKI-* → Thdora / Thdora Guardián / Thdora Dev
-
-### Deprecado
-- Naming `TOKI-Guardian`, `TOKI-DEW` — reemplazado por Thdora Guardián / Thdora Dev
+### Pending
+- Labels 22 personalizados (needs Cursor con token full)
+- Milestones Fase 0 + Fase 2
+- Branch protection main
 
 ---
 
-## [0.3.0] — 2026-07-01
+## [2026-07-02] — Auditoría ecosistema + arquitectura bots
 
-### Añadido
-- Documentación completa hardening SSH
-- Hallazgo FTP puerto 21 documentado
-- Auditoría Docker Compose divergencias
-- Sesión pentest completa documentada
-- Modelos Ollama completos (qwen2.5:7b, qwen2.5:3b)
-- Arquitectura bots SecOps documentada
-
-### Cambiado
-- Fase 1 elevada a 90% completada
-- Stack Ollama operativo en Madre
+### Added
+- Auditoría herramientas GitHub
+- Diseño arquitectura TOKI-DEW + TOKI-GUARDIAN
+- Roadmap bots y scripts
+- Análisis productividad sesiones
 
 ---
 
-## [0.2.0] — 2026-06-30
+## [2026-07-01] — Fase 1 completada + SSH hardening + hallazgo FTP
 
-### Añadido
-- Thdora FastAPI base corriendo
-- Modelos Ollama: primer pull y configuración
-- Cierre de sesión documentado
-
-### Cambiado
-- Estado Thdora: activa con base funcional
+### Added
+- Tailscale en Madre y Acer — Fase 1 ✅
+- SSH hardening parcial en Madre
+- Hallazgo puerto 21 FTP expuesto
+- Modelos Ollama descargados
+- Auditoría Docker Compose
 
 ---
 
-## [0.1.0] — 2026-06-27
+## [2026-06-28] — Auditoría de sesión completa
 
-### Añadido
-- Repo iniciado y estructurado
-- UFW + fail2ban + Tailscale configurados en Madre
+### Added
+- Estructura inicial del repo
+- CONVENCIONES.md, ECOSISTEMA.md, PLAN-SEGURIDAD-Y-DESPLIEGUE.md
 - Primeras sesiones documentadas
-- Estructura base de carpetas
-
----
-
-_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_

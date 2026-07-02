@@ -1,2 +1,8 @@
-# PROCESADO → docs/infra/procedimiento-madre.md
-> Movido: 02-jul-2026
+---
+archivado: 2026-07-03
+migrado_a: docs/infra/madre/procedimiento-general.md
+---
+
+# → ARCHIVADO
+
+Procedimiento Madre — pendiente doc dedicado en docs/infra/madre/ en próxima sesión.

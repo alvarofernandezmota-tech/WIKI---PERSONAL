@@ -1,2 +1,8 @@
-# PROCESADO → ollama/modelos-activos.md
-> Movido: 02-jul-2026
+---
+archivado: 2026-07-03
+migrado_a: docs/herramientas/ollama-modelos.md
+---
+
+# → ARCHIVADO
+
+Contenido integrado en docs/herramientas/ollama-modelos.md

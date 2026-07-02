@@ -1,2 +1,8 @@
-# PROCESADO → hardware/acer.md + docs/infra/bluetooth-arch.md + docs/herramientas/chromium-perplexity.md
-> Movido: 02-jul-2026
+---
+archivado: 2026-07-03
+migrado_a: docs/infra/acer/setup-bluetooth-chromium.md
+---
+
+# → ARCHIVADO
+
+Contenido integrado en docs/infra/acer/setup-bluetooth-chromium.md

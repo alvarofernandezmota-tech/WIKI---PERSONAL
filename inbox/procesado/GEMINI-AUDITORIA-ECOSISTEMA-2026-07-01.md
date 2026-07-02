@@ -1,2 +1,8 @@
-# PROCESADO → ECOSISTEMA.md
-> Movido: 02-jul-2026
+---
+archivado: 2026-07-03
+migrado_a: docs/herramientas/github-ecosystem.md
+---
+
+# → ARCHIVADO
+
+Auditoría ecosistema Gemini 2026-07-01 integrada en docs/herramientas/github-ecosystem.md

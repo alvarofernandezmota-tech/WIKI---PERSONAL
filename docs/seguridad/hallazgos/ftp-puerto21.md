@@ -1,47 +1,44 @@
-# Hallazgo — Puerto 21 FTP expuesto en IP pública
-#seguridad #hallazgo #pentest #red #router
+# Hallazgo — Puerto 21 FTP expuesto
+#seguridad #hallazgo #p1-urgente #fase2 #router
 
-**Fecha:** 2026-07-01 01:49 CEST
-**Severidad:** 🟡 MEDIA (riesgo actual bajo, potencial alto)
-**Estado:** ❌ Pendiente cerrar
+**Fecha detección:** 2026-07-01  
+**Severidad:** ALTA  
+**Estado:** 🔴 ABIERTO — pendiente acción
 
 ---
 
-## Datos
+## Descripción
 
-```
-IP pública:  79.116.247.44 (Digi/Digimobil, dinámica)
-Puerto:     21/tcp
-Servicio:   FTP
-Banner:     421 Service not available, remote server has closed connection
-Origen:     Router Digi (no es Docker)
-Descubierto: nmap -Pn -sV --open 79.116.247.44
-```
+El router Digi tiene el servicio FTP activo y el puerto 21 expuesto hacia la red local (posiblemente también hacia WAN según configuración).
 
-## Evaluación
+- **Componente:** Router Digi (gateway `192.168.1.1`)
+- **Puerto:** 21/tcp FTP
+- **Detectado con:** nmap / auditoría manual
 
-- **Riesgo actual:** BAJO — router rechaza conexiones externas (421)
-- **Riesgo potencial:** ALTO — puerto visible = bots lo encuentran en minutos
-- **FTP en 2026:** protocolo sin cifrado, credenciales en texto plano
+---
 
-## Buenas noticias del scan
+## Riesgo
 
-```
-Resultado: 999 puertos filtered, 1 puerto abierto
+FTP es un protocolo sin cifrado. Si está expuesto a WAN:
+- Credenciales en claro interceptables
+- Acceso no autorizado al sistema de ficheros del router
+- Vector de entrada a la red interna
 
-PORT   STATE SERVICE
-21/tcp open  ftp?
-```
-
-Todos los servicios Docker (Gitea :2222, Thdora :8000, etc.) NO son accesibles desde internet. Solo vía Tailscale. ✅
+---
 
 ## Acción requerida
 
-- [ ] Acceder panel router Digi: `http://192.168.1.1` o `http://192.168.72.1`
-- [ ] Localizar: `USB Sharing` / `FTP Server` / `Storage` / `NAS`
-- [ ] **Desactivar servidor FTP**
-- [ ] Verificar:
-  ```bash
-  nmap -Pn --open -p 21 79.116.247.44
-  # Resultado esperado: 21/tcp filtered
-  ```
+1. Acceder a panel router: `http://192.168.1.1`
+2. Navegar a configuración avanzada → Servicios → FTP
+3. **Desactivar FTP server**
+4. Guardar y verificar con `nmap -p 21 192.168.1.1`
+
+**Requiere:** presencia física en Madrid o acceso remoto al panel router.
+
+---
+
+## Estado
+
+- [ ] Desactivado en panel router
+- [ ] Verificado con nmap
+- [ ] Issue cerrado

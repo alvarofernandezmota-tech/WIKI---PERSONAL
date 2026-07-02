@@ -1,8 +1,8 @@
 ---
-archivado: 2026-07-02
+archivado: 2026-07-03
 migrado_a: docs/herramientas/github-ecosystem.md
 ---
 
 # → ARCHIVADO
 
-Contenido migrado a [`docs/herramientas/github-ecosystem.md`](../../docs/herramientas/github-ecosystem.md)
+Contenido integrado en docs/herramientas/github-ecosystem.md

@@ -5,4 +5,4 @@ migrado_a: docs/diarios/2026-07-02.md
 
 # → ARCHIVADO
 
-Sesión tarde auditoría ecosistema integrada en diario 2026-07-02.
+Análisis productividad integrado en diario 2026-07-02.
