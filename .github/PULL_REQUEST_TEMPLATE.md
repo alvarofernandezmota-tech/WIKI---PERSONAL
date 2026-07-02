@@ -1,21 +1,16 @@
-## Descripción
-<!-- Qué hace este PR y por qué -->
-
 ## Tipo de cambio
-- [ ] 🐛 Bug fix
-- [ ] ⚙️ Infra / configuración
-- [ ] 📄 Documentación
-- [ ] 🔐 Seguridad
-- [ ] 🤖 Bot / automatización
-- [ ] 🧪 Pentest / investigación
+- [ ] feat — nueva funcionalidad
+- [ ] fix — corrección
+- [ ] docs — solo documentación
+- [ ] chore — mantenimiento
+- [ ] infra — infraestructura
+- [ ] security — seguridad
+
+## ¿Qué hace este PR?
+<!-- Descripción concisa -->
 
 ## Checklist
-- [ ] Los ficheros nuevos tienen frontmatter con `tags` y `fecha`
-- [ ] Se ha actualizado `MASTER-PENDIENTES.md` si aplica
-- [ ] No hay secrets ni credenciales en el diff
-- [ ] El título del commit sigue la convención (`feat:`, `fix:`, `docs:`, `sec:`, `infra:`)
-
-## Issues relacionados
-Closes #
-
-## Notas para el revisor
+- [ ] Sigue CONVENCIONES.md
+- [ ] CONTEXT.md actualizado si procede
+- [ ] Probado en máquina real
+- [ ] Sin secrets ni datos sensibles
