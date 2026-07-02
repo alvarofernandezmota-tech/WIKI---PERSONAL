@@ -6,70 +6,64 @@ Versionado: fecha de sesión
 
 ---
 
-## [2026-07-03] — Fase 0 GitHub completa (85%)
+## [2026-07-03] — Cierre sesión — Fase 0 GitHub 85% + iPhone terminal
 
 ### Added
-- `.github/CODEOWNERS` — ownership completo del repo
-- `.github/PULL_REQUEST_TEMPLATE.md` — checklist de calidad
-- `.github/ISSUE_TEMPLATE/bug.yml` — form de bug con máquina y error
-- `.github/ISSUE_TEMPLATE/tarea.yml` — form con fase y mobile-ok/needs-terminal
-- `.github/ISSUE_TEMPLATE/seguridad.yml` — form con severidad
-- `.github/ISSUE_TEMPLATE/config.yml` — deshabilita issues en blanco
-- `.github/workflows/context-reminder.yml` — alerta CONTEXT.md >7 días
-- `.github/workflows/lint-commits.yml` — Conventional Commits forzados
-- `.github/workflows/inbox-health.yml` — alerta inbox >10 ficheros
-- `docs/operativa/workflow-inbox.md` — flujo 6 pasos inbox
-- `docs/operativa/migraciones-inbox.md` — log histórico migraciones
-- `docs/operativa/github-actions.md` — workflows activos y planificados
-- `docs/operativa/github-pillars.md` — los 4 pilares documentados
-- `docs/operativa/mcp-setup-multi-ia.md` — Cursor + Gemini CLI con token full
-- `docs/operativa/pendientes-labels-milestones.md` — spec 22 labels
-- `docs/operativa/pendientes-sesion-2026-07-03.md` — cierre sesión
-- `scripts/migrar-inbox.sh` — script semi-automático migraciones
-- `docs/diarios/2026-07-02.md` — diario completo del día
-- `docs/diarios/2026-07-01.md` — diario del día 01
-- `docs/seguridad/hallazgos/ftp-puerto21.md` — hallazgo puerto 21
+- `docs/operativa/iphone-terminal.md` — a-Shell + Tailscale iOS, operar sin ordenador
+- `docs/diarios/2026-07-02.md` — diario cerrado definitivo con COMPLETADO/PENDIENTE
+- `docs/diarios/2026-07-01.md` — diario día 01 SSH hardening + FTP + Fase 1
+- `docs/seguridad/hallazgos/ftp-puerto21.md` — hallazgo p0-critico puerto 21
 - `docs/seguridad/ssh-hardening.md` — estado hardening SSH Madre
-- `docs/proyectos/thdora/arquitectura-bots.md` — TOKI-DEW + GUARDIAN
-- `docs/herramientas/ollama-modelos.md` — modelos en Madre
-- `docs/infra/acer/setup-bluetooth-chromium.md` — setup Acer
-- `docs/infra/madre/auditoria-compose.md` — divergencias Docker
+- `docs/proyectos/thdora/arquitectura-bots.md` — TOKI-DEW + GUARDIAN diseño
+- `docs/herramientas/ollama-modelos.md` — modelos Madre + comandos
+- `docs/herramientas/github-ecosystem.md` — estado herramientas GitHub
+- `docs/infra/acer/setup-bluetooth-chromium.md` — setup Acer día 02
+- `docs/infra/madre/auditoria-compose.md` — divergencias Docker Madre
+- `inbox/procesado/` — 30 stubs de ficheros migrados
 
 ### Changed
-- `CONTEXT.md` — actualizado al cierre de sesión 2026-07-03
-- `docs/herramientas/github-ecosystem.md` — estado post-implementación
+- `CONTEXT.md` — estado exacto al cierre, iPhone añadido, ficheros basura documentados
+- `MASTER-PENDIENTES.md` — items completados marcados ✅, p0/p1/p2/p3 actualizados
+- `CHANGELOG.md` — este mismo
 
-### Pending
-- Labels 22 personalizados (needs Cursor con token full)
-- Milestones Fase 0 + Fase 2
-- Branch protection main
+### Deprecated
+- `diarios/` raíz — duplica `docs/diarios/`, pendiente migrar contenido y borrar
 
----
-
-## [2026-07-02] — Auditoría ecosistema + arquitectura bots
-
-### Added
-- Auditoría herramientas GitHub
-- Diseño arquitectura TOKI-DEW + TOKI-GUARDIAN
-- Roadmap bots y scripts
-- Análisis productividad sesiones
+### Pending (needs-terminal o GitHub web)
+- Borrar `ly`, `tailscale-full.apk`, mover `filosofia.md`
+- Labels, milestones, branch protection
+- `PasswordAuthentication no` SSH
 
 ---
 
-## [2026-07-01] — Fase 1 completada + SSH hardening + hallazgo FTP
+## [2026-07-02] — Fase 0 GitHub: 4 pilares implementados
 
 ### Added
-- Tailscale en Madre y Acer — Fase 1 ✅
-- SSH hardening parcial en Madre
-- Hallazgo puerto 21 FTP expuesto
+- `.github/CODEOWNERS`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/ISSUE_TEMPLATE/` (4 forms)
+- `.github/workflows/` (3 actions: context-reminder, lint-commits, inbox-health)
+- `docs/operativa/` (6 docs: workflow-inbox, migraciones, github-actions, github-pillars, mcp-setup, pendientes-labels)
+- `scripts/migrar-inbox.sh`
+
+### Changed
+- `CONTEXT.md`, `CHANGELOG.md` actualizados
+
+---
+
+## [2026-07-01] — Fase 1 Tailscale ✅ + SSH hardening + hallazgo FTP
+
+### Added
+- Tailscale en Madre y Acer — red privada activa
+- SSH hardening parcial (PermitRootLogin, MaxAuthTries, AllowUsers, Fail2ban)
+- Hallazgo FTP puerto 21 (p0-critico)
 - Modelos Ollama descargados
-- Auditoría Docker Compose
 
 ---
 
-## [2026-06-28] — Auditoría de sesión completa
+## [2026-06-28/30] — Estructura base del repo
 
 ### Added
-- Estructura inicial del repo
-- CONVENCIONES.md, ECOSISTEMA.md, PLAN-SEGURIDAD-Y-DESPLIEGUE.md
-- Primeras sesiones documentadas
+- README, CONVENCIONES, ECOSISTEMA, PLAN-SEGURIDAD-Y-DESPLIEGUE
+- Estructura inicial docs/, templates/, scripts/
+- Primeras sesiones documentadas en inbox

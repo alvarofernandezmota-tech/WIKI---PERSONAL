@@ -1,8 +1,16 @@
 # CONTEXT.md — Estado actual del ecosistema
 #context #estado #navegacion
 
-**Última actualización:** 2026-07-03 00:20 CEST  
-**Próxima revisión:** 2026-07-10 (Milestone Fase 0)
+**Última actualización:** 2026-07-03 00:25 CEST  
+**Próxima revisión obligatoria:** 2026-07-10 (Milestone Fase 0)
+
+---
+
+## 🔴 PRIORIDAD MÁXIMA AHORA
+
+> Antes de cualquier otra cosa:
+> **Desactivar FTP puerto 21 en router Digi** → `http://192.168.1.1`
+> Ver: `docs/seguridad/hallazgos/ftp-puerto21.md`
 
 ---
 
@@ -10,70 +18,86 @@
 
 ### Madre (torre Madrid)
 - **Online:** ✅
-- **SSH:** ✅ hardening parcial (falta `PasswordAuthentication no`)
+- **SSH:** ✅ hardening parcial — falta `PasswordAuthentication no`
 - **Tailscale:** ✅ activo
 - **Docker:** ✅ Portainer, Grafana, Ollama activos
-- **FTP puerto 21:** 🔴 EXPUESTO — pendiente desactivar en router Digi
+- **FTP puerto 21:** 🔴 EXPUESTO — p0-critico
 
 ### Acer (Toledo)
-- **Online:** ✅ (cuando está encendido)
+- **Online:** cuando está encendido
 - **Tailscale:** ✅ activo
-- **Cursor:** ✅ instalado
+- **Cursor:** ✅ instalado, token `repo` full pendiente
 - **Bluetooth:** ✅ resuelto
-- **MCP Cursor:** ❌ pendiente configurar token full
+- **MCP Cursor:** ❌ pendiente (token full + config)
+
+### iPhone
+- **Perplexity MCP GitHub:** ✅ ACTIVO — gestión repo completa
+- **a-Shell:** ⏳ pendiente instalar
+- **Tailscale iOS:** ⏳ pendiente instalar
 
 ### Red
-- **Tailscale:** ✅ Madre + Acer en red privada
-- **Router Digi:** FTP puerto 21 🔴 expuesto
+- **Tailscale:** ✅ Madre + Acer conectados
+- **Router Digi:** 🔴 FTP puerto 21 expuesto
 - **UFW Madre:** ✅ activo
 
 ---
 
 ## Fase actual
 
-**Fase 0 — Repo limpio:** 85% completada
-- ✅ Estructura docs, convenciones, CONTEXT, CHANGELOG
-- ✅ CODEOWNERS, PR template, Issue forms
-- ✅ 3 GitHub Actions workflows activos
-- ✅ Operativa inbox documentada
-- ⏳ Labels, milestones, branch protection pendientes
+### ✅ COMPLETADO
+- **Fase 1 — Tailscale:** ✅ 100% — Madre + Acer en red privada
+- **Fase 0 — Repo limpio:** 85% — 4 pilares GitHub activos, inbox limpia
 
-**Próxima fase:** Fase 2 — SSH Hardening (Fase 1 Tailscale ✅ completada)
+### ⏳ EN PROGRESO
+- **Fase 0 — Pendiente:** Labels (22), milestones, branch protection
+- **Fase 2 — SSH Hardening:** iniciado, falta `PasswordAuthentication no`
 
----
-
-## Próximo paso más importante
-
-🔴 **Puerto 21 FTP** — desactivar en panel router Digi (`192.168.1.1`)
-
-Luego:
-1. `PasswordAuthentication no` en Madre (con segunda terminal SSH abierta)
-2. Token GitHub `repo` full + MCP Cursor → desbloquea labels desde IA
-3. Labels + milestones → cierre Fase 0
+### 🕑 SIGUIENTE
+- Fase 3 — Docker hardening
+- Fase 4 — Monitoring (Grafana + alertas)
 
 ---
 
 ## Herramientas IA activas
 
-| IA | Uso | MCP | Estado |
+| IA | Acceso | MCP GitHub | Estado |
 |---|---|---|---|
-| Perplexity | Gestión repo, docs, research | GitHub MCP ✅ | Principal |
-| Gemini CLI | Terminal, automatización | Pendiente config | En Acer |
-| Cursor | Código, filesystem local | Pendiente config | En Acer |
-| Ollama | IA local offline | — | En Madre |
+| **Perplexity** | iPhone + Acer | ✅ ACTIVO | Principal |
+| Gemini CLI | Acer / Madre | pendiente config | En setup |
+| Cursor | Acer | token parcial | Token full pendiente |
+| Ollama | Madre | — local | Activo |
+
+---
+
+## Operativa sin ordenador (iPhone)
+
+- **Gestión repo:** Perplexity app + MCP ✅
+- **Terminal SSH a Madre:** a-Shell (pendiente instalar)
+- **VPN a red privada:** Tailscale iOS (pendiente instalar)
 
 ---
 
 ## Inbox
 
-**Estado:** ✅ LIMPIA — todos los ficheros migrados (2026-07-03 00:20)
+**Estado:** ✅ LIMPIA — todos los ficheros procesados (2026-07-03 00:25)
+
+---
+
+## Ficheros basura en raíz — pendiente limpiar
+
+| Fichero | Tipo | Acción |
+|---|---|---|
+| `ly` | fichero vacío | borrar (GitHub web) |
+| `tailscale-full.apk` | fichero vacío | borrar (GitHub web) |
+| `diarios/` | carpeta duplicada de `docs/diarios/` | migrar contenido + borrar (needs-terminal) |
+| `filosofia.md` | fichero en raíz | mover a `docs/filosofia.md` (GitHub web) |
 
 ---
 
 ## Referencias rápidas
 
-- Plan completo: `PLAN-SEGURIDAD-Y-DESPLIEGUE.md`
-- Pendientes: `MASTER-PENDIENTES.md`
-- Cierre sesión: `docs/operativa/pendientes-sesion-2026-07-03.md`
-- MCP setup: `docs/operativa/mcp-setup-multi-ia.md`
-- Diario hoy: `docs/diarios/2026-07-02.md`
+- Diario hoy: [`docs/diarios/2026-07-02.md`](docs/diarios/2026-07-02.md)
+- Pendientes: [`MASTER-PENDIENTES.md`](MASTER-PENDIENTES.md)
+- Plan: [`PLAN-SEGURIDAD-Y-DESPLIEGUE.md`](PLAN-SEGURIDAD-Y-DESPLIEGUE.md)
+- iPhone terminal: [`docs/operativa/iphone-terminal.md`](docs/operativa/iphone-terminal.md)
+- MCP setup: [`docs/operativa/mcp-setup-multi-ia.md`](docs/operativa/mcp-setup-multi-ia.md)
