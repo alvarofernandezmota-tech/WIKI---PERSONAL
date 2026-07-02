@@ -1,7 +1,7 @@
 # MASTER-PENDIENTES.md
 #pendientes #organizacion #navegacion
 
-**Última actualización:** 2026-07-03 00:25 CEST
+**Última actualización:** 2026-07-03 01:00 CEST
 
 > Fuente única de verdad para pendientes. Los issues de GitHub son el tracker operativo; este fichero es el mapa estratégico.
 
@@ -16,7 +16,7 @@
 - [x] SSH por Tailscale verificado
 - [x] IPs documentadas
 
-### Fase 0 — GitHub (parcial) [✅ 85% 2026-07-02/03]
+### Fase 0 — GitHub (parcial) [✅ 90% 2026-07-03]
 - [x] Estructura docs/ y convenciones
 - [x] CONTEXT.md, CHANGELOG.md, ECOSISTEMA.md, PLAN
 - [x] CODEOWNERS, PR template, Issue forms (4)
@@ -24,7 +24,11 @@
 - [x] docs/operativa/ completa (6 docs)
 - [x] Inbox limpia — 30 ficheros procesados
 - [x] scripts/migrar-inbox.sh
-- [x] Diarios 2026-06-27 al 2026-07-02 iniciados
+- [x] Diarios 2026-06-27 al 2026-07-03 iniciados
+- [x] docs/arquitectura/gemini-fase1-investigacion.md
+- [x] scripts/maintenance/health-check.sh
+- [x] docs/filosofia/FILOSOFIA.md (movida desde raíz)
+- [x] Limpieza raíz: `ly`, `tailscale-full.apk`, `filosofia.md` borrados
 
 ### Seguridad — SSH (parcial) [✅ parcial 2026-07-01]
 - [x] `PermitRootLogin no`
@@ -39,33 +43,32 @@
 
 ---
 
-## 🔴 P0-CRÍTICO — hacer antes de dormir / primera cosa del día
+## 🔴 P0-CRÍTICO
 
 - [ ] **Puerto 21 FTP** — desactivar en panel router Digi `http://192.168.1.1`
   - Ruta: Configuración avanzada → Servicios → FTP → Desactivar
-  - Doc: `docs/seguridad/hallazgos/ftp-puerto21.md`
   - Requiere: acceso físico a Madrid o acceso remoto al panel del router
+  - Doc: `docs/seguridad/hallazgos/ftp-puerto21.md`
 
 ---
 
 ## ⚠️ P1-URGENTE
 
 - [ ] `PasswordAuthentication no` en Madre
-  - Requiere: 2 terminales SSH abiertas simultáneamente + test previo
-  - Doc: `docs/seguridad/ssh-hardening.md`
+  - Requiere: 2 terminales SSH simultáneas + test previo
   - mobile-ok: NO — needs-terminal
 
-- [ ] Token GitHub `repo` full
+- [ ] Token GitHub `repo` full (nuevo, no compartir en chat)
   - Desbloquea: labels, milestones, branch protection desde IA
-  - Dónde: GitHub.com → Settings → Developer settings → Tokens
-  - mobile-ok: SÍ — hacerlo desde iPhone
+  - Meter en Acer `~/.cursor/mcp.json` — nunca en el chat
+  - mobile-ok: SÍ
 
-- [ ] Instalar a-Shell en iPhone
-  - App Store → "a-Shell" (Nicolas Holzschuch)
+- [ ] Instalar **a-Shell** en iPhone
+  - App Store → "a-Shell" (Nicolas Holzschuch) — gratis
   - Doc: `docs/operativa/iphone-terminal.md`
   - mobile-ok: SÍ
 
-- [ ] Instalar Tailscale iOS en iPhone
+- [ ] Instalar **Tailscale iOS** en iPhone
   - App Store → "Tailscale"
   - mobile-ok: SÍ
 
@@ -74,7 +77,7 @@
 ## 🟡 P2-NORMAL — Fase 0 cierre
 
 - [ ] Labels 22 personalizados
-  - Requiere: token `repo` full o GitHub web
+  - Requiere: token `repo` full (Acer) o GitHub web (iPhone ahora)
   - Doc: `docs/operativa/pendientes-labels-milestones.md`
   - mobile-ok: SÍ (GitHub web desde iPhone)
 
@@ -84,38 +87,24 @@
 - [ ] Branch protection main
   - mobile-ok: SÍ (GitHub web)
 
----
-
-## 🟢 P3-LIMPIEZA — cuando haya tiempo
-
-- [ ] Borrar `ly` de raíz (fichero vacío)
-  - mobile-ok: SÍ (GitHub web → editar → borrar)
-
-- [ ] Borrar `tailscale-full.apk` de raíz (fichero vacío)
-  - mobile-ok: SÍ (GitHub web)
-
-- [ ] Mover `filosofia.md` raíz → `docs/filosofia.md`
-  - mobile-ok: SÍ (GitHub web)
-
 - [ ] Limpiar carpeta `diarios/` raíz (duplica `docs/diarios/`)
-  - Primero: verificar si tiene contenido diferente al de `docs/diarios/`
   - needs-terminal: SÍ (o Cursor)
 
 ---
 
 ## 🔄 EN PROCESO
 
-- [ ] MCP Cursor (token full + config en Acer)
+- [ ] MCP Cursor en Acer (token full + `~/.cursor/mcp.json`)
   - Bloquea: automatización local, labels desde IA
-  - Desbloqueado por: token `repo` full (P1)
+  - Issue #15
 
 - [ ] a-Shell + SSH Madre desde iPhone
-  - Desbloqueado por: a-Shell instalado + Tailscale iOS
+  - Desbloqueado por: a-Shell + Tailscale iOS instalados
   - Doc: `docs/operativa/iphone-terminal.md`
 
 - [ ] Gemini CLI en Madre
   - Configurar con API key
-  - Habilita: automatización local gratuita
+  - Doc: `docs/arquitectura/gemini-fase1-investigacion.md`
 
 ---
 
@@ -142,12 +131,17 @@
 - [ ] Deploy script Madre
 - [ ] Backup automatizado repo
 
-### Fase 6 — Bots Telegram
+### Fase 6 — Cursor + MCP Acer
+- [ ] Instalar cursor-bin (AUR)
+- [ ] Configurar ~/.cursor/mcp.json
+- [ ] Test MCP completo desde Acer
+
+### Fase 7 — Bots Telegram
 - [ ] TOKI-GUARDIAN: `/estado` `/docker` `/alertas`
 - [ ] TOKI-DEW básico: consultas repo
 - [ ] Webhook Grafana → Telegram
 
-### Fase 7 — IA local
+### Fase 8 — IA local
 - [ ] RAG sobre repo con nomic-embed-text
 - [ ] Open WebUI accesible por Tailscale
 - [ ] TOKI-DEW + Ollama integrado
