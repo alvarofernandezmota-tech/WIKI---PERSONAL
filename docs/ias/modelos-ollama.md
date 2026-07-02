@@ -7,7 +7,7 @@ estado: completo
 
 # 🤖 Modelos Ollama — madre
 
-## Estado: ✅ 5 modelos descargados (confirmado 01-jul-2026)
+## Estado: ✅ 5 modelos (confirmado 01-jul-2026)
 
 | Modelo | Tamaño | Uso principal | Estado |
 |---|---|---|---|
@@ -21,33 +21,19 @@ estado: completo
 ## Acceso
 
 ```bash
-# Listar modelos
 docker exec ollama ollama list
-
-# Chat directo (terminal)
 docker exec -it ollama ollama run qwen2.5:3b
-
-# API
 curl http://100.91.112.32:11434/api/tags
 ```
 
-## Puertos
-
-| Servicio | Puerto | Auth |
-|---|---|---|
-| Ollama API | 11434 | ⚠️ sin auth — solo red local/Tailscale |
-| Ollama Embeddings | 11435 | ⚠️ sin auth |
-
-> ⚠️ **Pendiente**: Auditar y proteger Ollama API (`:11434`) — actualmente sin autenticación.
+## ⚠️ Pendiente — Seguridad
+- [ ] Proteger Ollama API (`:11434`) — actualmente sin autenticación
+- [ ] Proteger Qdrant (`:6333`) — actualmente sin autenticación
 
 ## Integración con THDORA
 
 THDORA usa `qwen2.5-coder:7b` como modelo principal.
 Conexión: `http://ollama:11434` (red Docker interna).
-
-## Ver también
-- [[proyectos/thdora/estado]]
-- [[ESTADO-SISTEMA]]
 
 ---
 _Creado desde inbox 2026-06-30 / actualizado 2026-07-01 — Perplexity vía MCP_

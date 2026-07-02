@@ -6,38 +6,19 @@ ultima-actualizacion: 2026-07-02
 
 # 📋 Procedimiento — Arranque y verificación de madre
 
-## Verificación rápida del estado
+## Verificación rápida
 
 ```bash
-# Desde theodora
 ssh madre
-
-# Ver todos los contenedores
 docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
-
-# Contar healthy
 docker ps | grep -c healthy
-
-# Ver logs recientes de un bot
-docker logs --tail 50 guardianbot
 ```
 
 ## Stack principal (13 contenedores)
 
 ```bash
-# Levantar stack principal
 cd ~ && docker compose up -d
-
-# Ver estado
 docker compose ps
-```
-
-## Bots secops
-
-```bash
-# Levantar bots de monitorización
-cd ~/yggdrasil-secops/blue_team/guardian_bot
-docker compose up -d
 ```
 
 ## Verificar modelos Ollama
@@ -65,10 +46,8 @@ tailscale status
 | Code Server | `http://100.91.112.32:8443` |
 | n8n | `http://100.91.112.32:5678` |
 | Gitea | `http://100.91.112.32:3003` |
-
-## Ver también
-- [[ESTADO-SISTEMA]]
-- [[docs/infra/docker-compose-mapa]]
+| SpiderFoot | `http://100.91.112.32:5001` |
+| Kali Desktop | `https://100.91.112.32:6901` |
 
 ---
 _Creado desde inbox 2026-07-01 — Perplexity vía MCP_
