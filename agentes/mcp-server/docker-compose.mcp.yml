@@ -1,0 +1,49 @@
+# docker-compose.mcp.yml — MCP Server Gen-3
+# Deploy: docker compose -f docker-compose.mcp.yml up -d
+# Logs:   docker compose -f docker-compose.mcp.yml logs -f mcp-server
+
+version: '3.9'
+
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yggdrasil-mcp-server
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    volumes:
+      # Acceso al repo documental
+      - /srv/yggdrasil-dew:/srv/yggdrasil-dew:ro
+      # Logs persistentes
+      - /srv/logs/mcp-audit:/srv/logs/mcp-audit
+      - /srv/logs/health-agent:/srv/logs/health-agent
+      # Docker socket (para check_docker)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      MCP_PORT: "8765"
+      MCP_HOST: "0.0.0.0"
+      MCP_TOKEN: "${MADRE_MCP_TOKEN}"
+      OLLAMA_URL: "http://host.docker.internal:11434"
+      QDRANT_URL: "http://host.docker.internal:6333"
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
+      YGGDRASIL_DEW_PATH: "/srv/yggdrasil-dew"
+      DRY_RUN_DEFAULT: "true"
+      LOG_LEVEL: "INFO"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - yggdrasil-net
+    labels:
+      - "yggdrasil.service=mcp-server"
+      - "yggdrasil.tier=core"
+      - "yggdrasil.monitored=true"
+
+networks:
+  yggdrasil-net:
+    external: true
+    name: yggdrasil-net

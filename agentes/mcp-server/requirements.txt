@@ -1,0 +1,36 @@
+# MCP Server Gen-3 — dependencias
+# Actualizado: 2026-07-03
+
+# Core MCP + FastAPI
+mcp>=1.0.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+
+# HTTP client (para llamadas a Ollama, n8n, Qdrant, GitHub)
+httpx>=0.27.0
+aiohttp>=3.10.0
+
+# Docker control
+docker>=7.1.0
+
+# GitHub API
+PyGithub>=2.4.0
+
+# Telegram
+python-telegram-bot>=21.0
+
+# Qdrant (RAG)
+qdrant-client>=1.12.0
+
+# OpenTelemetry (trazas de agentes)
+opentelemetry-api>=1.27.0
+opentelemetry-sdk>=1.27.0
+opentelemetry-exporter-otlp-proto-grpc>=1.27.0
+opentelemetry-instrumentation-fastapi>=0.48b0
+
+# Utilidades
+python-dotenv>=1.0.1
+pyyaml>=6.0.2
+rich>=13.9.0
+loguru>=0.7.2
