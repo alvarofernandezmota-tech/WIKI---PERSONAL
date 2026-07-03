@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# deploy.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # ============================================================
 # YGGDRASIL ECOSYSTEM DEPLOY SCRIPT
 # Ejecutar en Madre: bash scripts/deploy.sh
