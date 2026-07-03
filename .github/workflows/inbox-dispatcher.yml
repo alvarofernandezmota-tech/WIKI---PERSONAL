@@ -1,0 +1,86 @@
+# ==============================================================
+# INBOX DISPATCHER
+# Trigger: nuevo fichero .md en inbox/ con status: pending
+# Rol: leer el frontmatter y delegar al agente correcto
+# ==============================================================
+name: inbox-dispatcher
+
+on:
+  push:
+    paths:
+      - 'inbox/**.md'
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detectar ficheros nuevos en inbox/
+        id: detect
+        run: |
+          # Ficheros añadidos o modificados en el último commit dentro de inbox/
+          FILES=$(git diff --name-only HEAD~1 HEAD -- 'inbox/*.md' 2>/dev/null || \
+                  git diff --name-only HEAD -- 'inbox/*.md' 2>/dev/null || echo '')
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+          echo "Ficheros detectados: $FILES"
+
+      - name: Parsear frontmatter y delegar
+        if: steps.detect.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILES: ${{ steps.detect.outputs.files }}
+        run: |
+          for f in $FILES; do
+            [ ! -f "$f" ] && continue
+
+            echo "--- Procesando: $f ---"
+
+            # Extraer campos del frontmatter YAML
+            TYPE=$(grep '^type:' "$f" | head -1 | awk '{print $2}' | tr -d '"')
+            PRIORITY=$(grep '^priority:' "$f" | head -1 | awk '{print $2}' | tr -d '"')
+            STATUS=$(grep '^status:' "$f" | head -1 | awk '{print $2}' | tr -d '"')
+            TITLE=$(grep '^title:' "$f" | head -1 | sed 's/^title: //' | tr -d '"')
+            PROCESSED=$(grep '^processed_by:' "$f" | head -1 | awk '{print $2}' | tr -d '"')
+
+            echo "  type=$TYPE priority=$PRIORITY status=$STATUS processed=$PROCESSED"
+
+            # Solo procesar si status=pending
+            [ "$STATUS" != "pending" ] && echo "  -> Ya procesado, skip" && continue
+            [ "$PROCESSED" != "pending" ] && echo "  -> Ya asignado, skip" && continue
+
+            # Delegar según type y priority
+            case "$TYPE" in
+              alert|report)
+                LABEL="auto-generated"
+                [ "$PRIORITY" = "critical" ] && LABEL="critical,auto-generated"
+                [ "$PRIORITY" = "high" ]     && LABEL="priority-high,auto-generated"
+                echo "  -> Creando issue en GitHub (type=$TYPE priority=$PRIORITY)"
+                gh issue create \
+                  --title "[AUTO] $TITLE" \
+                  --body "$(cat $f)" \
+                  --label "$LABEL" 2>/dev/null || echo "  -> Issue creation failed (label may not exist)"
+                ;;
+              rule)
+                echo "  -> Regla detectada — se archiva sin crear issue"
+                ;;
+              task)
+                echo "  -> Tarea detectada — delegando a roadmap-agent (próximamente)"
+                gh issue create \
+                  --title "[TASK] $TITLE" \
+                  --body "$(cat $f)" \
+                  --label "auto-generated" 2>/dev/null || echo "  -> Issue creation failed"
+                ;;
+              *)
+                echo "  -> Tipo desconocido: $TYPE — skip"
+                ;;
+            esac
+          done
