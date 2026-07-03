@@ -1,175 +1,114 @@
-# =============================================================================
-# REPO HEALTH — Yggdrasil
-# Audita la salud completa del repositorio:
-#   - Ficheros críticos con TTL vencido (no actualizados en X días)
-#   - Islas sin GitHub Action / Dockerfile / README
-#   - Carpetas sin .isla-config o README
-#   - Notifica por Telegram con resumen
-# Se ejecuta: lunes 07:00 UTC + workflow_dispatch
-# =============================================================================
-name: 🏥 Repo Health Check
+name: 🛡️ Repo Health — Nocturno
 
 on:
   schedule:
-    - cron: '0 7 * * 1'  # Lunes 07:00 UTC
+    - cron: '0 3 * * *'  # 03:00 UTC = 05:00 CEST
   workflow_dispatch:
-  push:
-    paths:
-      - 'docs/FICHEROS-CRITICOS.md'
-      - 'docs/ISLAS-ECOSISTEMA.md'
 
 jobs:
-  health-check:
-    name: Auditar salud del repo
+  health:
+    name: Health check ecosistema
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Historial completo para ver fechas de commits
 
-      - name: Instalar dependencias
-        run: pip install requests --quiet
-
-      - name: Auditar ficheros críticos (TTL)
-        id: ttl
+      - name: 📅 Verificar diario del día
+        id: diary
         run: |
-          python3 << 'EOF'
-          import subprocess, json, sys, os
-          from datetime import datetime, timezone
+          TODAY=$(date +%Y-%m-%d)
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          DIARY="diario/$YEAR/$MONTH/$TODAY.md"
+          if [ ! -f "$DIARY" ]; then
+            echo "missing=true" >> $GITHUB_OUTPUT
+            echo "path=$DIARY" >> $GITHUB_OUTPUT
+          else
+            echo "missing=false" >> $GITHUB_OUTPUT
+          fi
 
-          # Ficheros criticos con su TTL en dias
-          # Formato: { "ruta": TTL_dias }
-          CRITICOS = {
-            "ECOSISTEMA.md": 30,
-            "ECOSYSTEM-ARCHITECTURE.md": 30,
-            "ROADMAP.md": 14,
-            "MASTER-PENDIENTES.md": 7,
-            "ESTADO-SISTEMA.md": 7,
-            "docs/SPRINTS.md": 7,
-            "docs/AUDITORIA-ECOSISTEMA.md": 30,
-            "infra/MAPA-FICHEROS-MADRE.md": 14,
-            "docs/ISLAS-ECOSISTEMA.md": 14,
-            "docs/FICHEROS-CRITICOS.md": 30,
-            "CONVENCIONES.md": 60,
-            "CONTRIBUTING.md": 60,
-            "HOME.md": 30,
-            "AGENT.md": 30,
-          }
-
-          vencidos = []
-          ok = []
-          now = datetime.now(timezone.utc)
-
-          for fichero, ttl in CRITICOS.items():
-            if not os.path.exists(fichero):
-              vencidos.append(f"  ⚠️  NO EXISTE: {fichero}")
-              continue
-            # Fecha del ultimo commit que toco este fichero
-            result = subprocess.run(
-              ["git", "log", "-1", "--format=%aI", "--", fichero],
-              capture_output=True, text=True
-            )
-            fecha_str = result.stdout.strip()
-            if not fecha_str:
-              vencidos.append(f"  ⚠️  SIN HISTORIAL GIT: {fichero}")
-              continue
-            fecha = datetime.fromisoformat(fecha_str)
-            dias = (now - fecha).days
-            if dias > ttl:
-              vencidos.append(f"  🔴 VENCIDO ({dias}d > TTL {ttl}d): {fichero}")
-            else:
-              ok.append(f"  ✅ OK ({dias}d / TTL {ttl}d): {fichero}")
-
-          print("\n=== FICHEROS CRITICOS ===")
-          for l in ok:
-            print(l)
-          print("")
-          if vencidos:
-            print(f"VENCIDOS: {len(vencidos)}")
-            for l in vencidos:
-              print(l)
-            # Escribir para siguiente step
-            with open("/tmp/vencidos.txt", "w") as f:
-              f.write("\n".join(vencidos))
-            sys.exit(0)  # No falla el pipeline, solo notifica
-          else:
-            print("Todos los ficheros criticos al dia.")
-          EOF
-
-      - name: Auditar islas (estructura minima)
+      - name: 🏝️ Auditar README por isla
         id: islas
         run: |
-          echo "=== ISLAS SIN README ==="
-          MISSING_README=0
-          for dir in docker/bots/*/; do
-            if [ ! -f "${dir}README.md" ]; then
-              echo "  ⚠️  Sin README: $dir"
-              MISSING_README=$((MISSING_README+1))
+          MISSING=""
+          for isla in thdora osint docker infra ollama hardware secops tools batcueva; do
+            if [ -d "$isla" ] && [ ! -f "$isla/README.md" ]; then
+              MISSING="$MISSING\n- [ ] $isla/README.md"
             fi
           done
-          echo ""
-          echo "=== ISLAS SIN DOCKERFILE ==="
-          for dir in docker/bots/*/; do
-            if [ ! -f "${dir}Dockerfile" ]; then
-              echo "  ⚠️  Sin Dockerfile: $dir"
-            fi
-          done
-          echo "MISSING_README=$MISSING_README" >> $GITHUB_OUTPUT
+          echo "missing<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$MISSING" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Detectar carpetas huerfanas (sin README ni config)
+      - name: 🧟 Auditar zombies globales
+        id: zombies
         run: |
-          echo "=== CARPETAS SIN README ==="
-          for dir in */; do
-            dir="${dir%/}"
-            # Ignorar carpetas de sistema
-            case "$dir" in .git|.github|.obsidian|node_modules) continue ;; esac
-            if [ ! -f "${dir}/README.md" ] && [ ! -f "${dir}/README" ]; then
-              echo "  ⚠️  Sin README: $dir/"
-            fi
-          done
-
-      - name: Generar resumen de salud
-        id: resumen
-        run: |
-          TOTAL_FILES=$(find . -name '*.md' -not -path '*/.git/*' | wc -l)
-          TOTAL_SCRIPTS=$(find ./scripts -name '*.sh' -o -name '*.py' 2>/dev/null | wc -l)
-          TOTAL_ACTIONS=$(find .github/workflows -name '*.yml' 2>/dev/null | wc -l)
-          INBOX=$(find inbox/ -name '*.md' -not -name 'PLANTILLA*' 2>/dev/null | wc -l)
-          VENCIDOS=$(cat /tmp/vencidos.txt 2>/dev/null | wc -l || echo 0)
-
-          echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
-          echo "total_scripts=$TOTAL_SCRIPTS" >> $GITHUB_OUTPUT
-          echo "total_actions=$TOTAL_ACTIONS" >> $GITHUB_OUTPUT
-          echo "inbox=$INBOX" >> $GITHUB_OUTPUT
-          echo "vencidos=$VENCIDOS" >> $GITHUB_OUTPUT
-
-          echo "RESUMEN REPO HEALTH:"
-          echo "  Ficheros .md: $TOTAL_FILES"
-          echo "  Scripts: $TOTAL_SCRIPTS"
-          echo "  GitHub Actions: $TOTAL_ACTIONS"
-          echo "  Inbox pendiente: $INBOX items"
-          echo "  Ficheros criticos vencidos: $VENCIDOS"
-
-      - name: Notificar resumen a Telegram
-        run: |
-          if [ -z "${{ secrets.TELEGRAM_TOKEN }}" ]; then
-            echo "Sin TELEGRAM_TOKEN configurado — skipping notificacion"
-            exit 0
-          fi
-          VENCIDOS=${{ steps.resumen.outputs.vencidos }}
-          INBOX=${{ steps.resumen.outputs.inbox }}
-          FILES=${{ steps.resumen.outputs.total_files }}
-          ACTIONS=${{ steps.resumen.outputs.total_actions }}
-
-          if [ "$VENCIDOS" -gt 0 ]; then
-            ICONO="⚠️"
+          Z=$(find . -not -path './.git/*' \( -name '*.md' -o -name '*.yml' -o -name '*.sh' \) -size 0 2>/dev/null)
+          if [ -n "$Z" ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "list<<EOF" >> $GITHUB_OUTPUT
+            echo "$Z" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
           else
-            ICONO="✅"
+            echo "found=false" >> $GITHUB_OUTPUT
           fi
 
-          VENCIDOS_DETALLE=$(cat /tmp/vencidos.txt 2>/dev/null | head -5 | sed 's/&/\&amp;/g' | tr '\n' '%0A' || echo "Ninguno")
+      - name: 🏝️ Detectar islas sin actividad >7 días
+        id: islands_old
+        run: |
+          STALE=""
+          LIMIT=$(date -d '7 days ago' +%s 2>/dev/null || date -v-7d +%s)
+          for isla in thdora osint docker infra ollama hardware secops tools; do
+            if [ -d "$isla" ]; then
+              LAST=$(git log -1 --format='%ct' -- "$isla/" 2>/dev/null || echo 0)
+              if [ -n "$LAST" ] && [ "$LAST" -lt "$LIMIT" ]; then
+                DAYS=$(( ($(date +%s) - LAST) / 86400 ))
+                STALE="$STALE\n- **$isla** — sin cambios hace ${DAYS}d"
+              fi
+            fi
+          done
+          echo "stale<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$STALE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-            -d parse_mode=Markdown \
-            -d text="${ICONO} *Repo Health — Yggdrasil*%0A%0A📊 ${FILES} ficheros md%0A⚡ ${ACTIONS} GitHub Actions%0A📥 Inbox: ${INBOX} pendientes%0A🔴 Vencidos: ${VENCIDOS}%0A%0A${VENCIDOS_DETALLE}"
+      - name: 🚨 Crear issue health si hay alertas
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().split('T')[0];
+            const title = `🛡️ Health ${today} — Informe nocturno`;
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'health'
+            });
+            if (existing.data.some(i => i.title === title)) return;
+            let problems = false;
+            let body = `## 🛡️ Health Check — ${today}\n\n`;
+            if ('${{ steps.diary.outputs.missing }}' === 'true') {
+              body += `### 📅 Diario faltante\nNo existe: \`${{ steps.diary.outputs.path }}\`\n\n`;
+              problems = true;
+            }
+            if ('${{ steps.islas.outputs.missing }}' !== '') {
+              body += `### 🏝️ Islas sin README.md\n${{ steps.islas.outputs.missing }}\n\n`;
+              problems = true;
+            }
+            if ('${{ steps.zombies.outputs.found }}' === 'true') {
+              body += `### 🧟 Archivos zombie\n\`\`\`\n${{ steps.zombies.outputs.list }}\n\`\`\`\n\n`;
+              problems = true;
+            }
+            if ('${{ steps.islands_old.outputs.stale }}' !== '') {
+              body += `### 🏝️ Islas sin actividad reciente\n${{ steps.islands_old.outputs.stale }}\n\n`;
+              problems = true;
+            }
+            if (!problems) {
+              body += `✅ Todo en orden. Ecosistema sano.\n`;
+            }
+            body += `\n---\n*Generado por repo-health.yml a las 05:00 CEST*`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: problems ? ['health', 'needs-attention'] : ['health']
+            });
