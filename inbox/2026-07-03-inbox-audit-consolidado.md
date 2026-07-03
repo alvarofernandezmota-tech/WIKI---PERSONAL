@@ -1,17 +1,17 @@
 ---
 type: report
 date: 2026-07-03
-hora: 14:51
+hora: 14:52
 source: inbox-audit-cleanup.sh
 priority: medium
 status: pending
 processed_by: pending
-title: Inbox audit consolidado 2026-07-03 14:51
+title: Inbox audit consolidado 2026-07-03 14:52
 ---
 
-# Inbox Audit Consolidado — 2026-07-03 14:51
+# Inbox Audit Consolidado — 2026-07-03 14:52
 
-**Total ficheros antes de limpieza**: 16  
+**Total ficheros antes de limpieza**: 15  
 **Umbral de alerta**: 10  
 **Estado**: ⚠ SUPERA UMBRAL
 
@@ -24,9 +24,10 @@ _Sin micro-audits pendientes._
 
 ---
 
-## Clasificados archivados (1 ficheros)
+## Clasificados archivados (0
+0 ficheros)
 
-- clasificado-2026-07-03-43.md
+_Sin clasificados pendientes._
 
 ---
 
@@ -47,7 +48,7 @@ _Sin docs antiguos._
 - **2026-07-03-fix-madre-setup.md** — 2026-07-03-fix-madre-setup.md
 - **2026-07-03-ideas-bots-agentes-overflow.md** — 2026-07-03-ideas-bots-agentes-overflow.md
 - **2026-07-03-plan-fases-ecosistema.md** — Plan de fases — ecosistema autónomo completo
-- **2026-07-03-reality-check.md** — Reality Check 2026-07-03 16:51
+- **2026-07-03-reality-check.md** — Reality Check 2026-07-03 16:52
 - **2026-07-03-regla-escalado.md** — 2026-07-03-regla-escalado.md
 - **2026-07-03-reglas-orquestacion.md** — Reglas de orquestación Actions + Scripts + Agentes
 - **2026-07-03-repo-research.md** — Investigación mejora repo
@@ -56,4 +57,4 @@ _Sin docs antiguos._
 
 ---
 
-*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 14:51*
+*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 14:52*
