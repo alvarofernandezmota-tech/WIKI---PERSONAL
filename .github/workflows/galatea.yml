@@ -1,0 +1,187 @@
+name: Galatea — Fábrica de Agentes y Bots
+
+on:
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: 'Acción: fabrica-agente | crea-isla | crea-bot | scan'
+        required: true
+        default: 'scan'
+      nombre:
+        description: 'Nombre del agente/isla/bot'
+        required: false
+        default: ''
+      descripcion:
+        description: 'Rol/objetivo/descripción'
+        required: false
+        default: ''
+      scope:
+        description: 'Scope (solo para agentes)'
+        required: false
+        default: 'general'
+      tags:
+        description: 'Tags (solo para agentes)'
+        required: false
+        default: 'galatea'
+
+  schedule:
+    # Scan Galatea todos los días a las 05:00 UTC
+    - cron: '0 5 * * *'
+
+jobs:
+  galatea:
+    name: Galatea — ${{ github.event.inputs.accion || 'scan' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Git
+        run: |
+          git config user.name "thdora-guardian[bot]"
+          git config user.email "thdora@yggdrasil-dew.local"
+
+      - name: Crear estructura base Galatea
+        run: |
+          mkdir -p reports/galatea agentes/bots islas docs
+
+      - name: Ejecutar acción Galatea
+        env:
+          ACCION: ${{ github.event.inputs.accion || 'scan' }}
+          NOMBRE: ${{ github.event.inputs.nombre || '' }}
+          DESCRIP: ${{ github.event.inputs.descripcion || '' }}
+          SCOPE: ${{ github.event.inputs.scope || 'general' }}
+          TAGS: ${{ github.event.inputs.tags || 'galatea' }}
+        run: |
+          ROOT="$(pwd)"
+          TIMESTAMP=$(date +"%Y%m%d-%H%M")
+
+          case "$ACCION" in
+            fabrica-agente)
+              echo "[Galatea] Creando agente: $NOMBRE"
+              mkdir -p "agentes/$NOMBRE"
+              cat > "agentes/$NOMBRE/DISENO.md" <<EOF
+          # $NOMBRE
+
+          ## Rol
+          $DESCRIP
+
+          ## Scope
+          $SCOPE
+
+          ## Entradas
+          - Archivos relevantes en el scope: $SCOPE
+          - Estado actual del ecosistema
+
+          ## Salidas
+          - Reportes en reports/$NOMBRE
+
+          ## Límites
+          - No modifica CORE-ECOSISTEMA directamente
+          - No borra sin pasar por inbox/archive
+
+          ## Triggers
+          - Workflow dedicado
+          - Orquestador total
+          - MCP tool \`$NOMBRE\`
+
+          ## Tags
+          $TAGS
+          EOF
+              mkdir -p "scripts"
+              cat > "scripts/$NOMBRE.sh" <<'SCRIPTEOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          ROOT="/srv/yggdrasil-dew"
+          TIMESTAMP=$(date +"%Y%m%d-%H%M")
+          NAME="$(basename "$0" .sh)"
+          REPORT_DIR="$ROOT/reports/$NAME"
+          mkdir -p "$REPORT_DIR"
+          REPORT="$REPORT_DIR/$NAME-$TIMESTAMP.md"
+          echo "# $NAME — ejecución — $TIMESTAMP" > "$REPORT"
+          echo "- TODO: implementar lógica específica" >> "$REPORT"
+          echo "Agente $NAME completado: $REPORT"
+          SCRIPTEOF
+              chmod +x "scripts/$NOMBRE.sh"
+              echo "- $NOMBRE: rol=$DESCRIP, scope=$SCOPE, tags=$TAGS" >> "docs/REGISTRO-HERRAMIENTAS.md"
+              ;;
+
+            crea-isla)
+              echo "[Galatea] Creando isla: $NOMBRE"
+              cat > "islas/$NOMBRE.md" <<EOF
+          # $NOMBRE
+
+          ## Objetivo
+          $DESCRIP
+
+          ## Estado
+          EN-DISEÑO
+
+          ## Siguiente-paso
+          - Definir agentes asociados
+          - Definir herramientas MCP necesarias
+          - Conectar con orquestador-total
+
+          ## Contexto
+          Isla creada por Galatea — capa de diseño y evolución.
+          EOF
+              ;;
+
+            crea-bot)
+              echo "[Galatea] Creando bot: $NOMBRE"
+              mkdir -p agentes/bots
+              cat > "agentes/bots/$NOMBRE.md" <<EOF
+          # $NOMBRE
+
+          ## Rol
+          $DESCRIP
+
+          ## Personalidad
+          - Busca huecos en el ecosistema
+          - Propone mejoras incrementales
+
+          ## Entradas
+          - Reports de agent-meta-deep y orquestador-total
+
+          ## Salidas
+          - Propuestas de nuevos agentes, scripts y workflows
+
+          ## Integración
+          - MCP tool \`agent_meta_deep\`
+          - MCP tool \`orquestador_total\`
+          EOF
+              ;;
+
+            scan|*)
+              echo "[Galatea] Scan del ecosistema"
+              mkdir -p reports/galatea
+              REPORT="reports/galatea/galatea-$TIMESTAMP.md"
+              echo "# Galatea — Scan — $TIMESTAMP" > "$REPORT"
+              echo "" >> "$REPORT"
+              echo "## Islas ISLA-*" >> "$REPORT"
+              find islas -maxdepth 1 -name 'ISLA-*.md' 2>/dev/null >> "$REPORT" || echo "- Sin islas" >> "$REPORT"
+              echo "" >> "$REPORT"
+              echo "## Bots" >> "$REPORT"
+              find agentes/bots -maxdepth 1 -type f 2>/dev/null >> "$REPORT" || echo "- Sin bots" >> "$REPORT"
+              echo "" >> "$REPORT"
+              echo "## Agentes registrados" >> "$REPORT"
+              cat docs/REGISTRO-HERRAMIENTAS.md 2>/dev/null >> "$REPORT" || echo "- Sin registro" >> "$REPORT"
+              echo "" >> "$REPORT"
+              echo "## TODO Galatea" >> "$REPORT"
+              echo "- Ejecutar fabrica-agente para huecos detectados" >> "$REPORT"
+              echo "- Revisar islas EN-DISEÑO y avanzar a ACTIVA" >> "$REPORT"
+              ;;
+          esac
+
+      - name: Commit cambios Galatea
+        run: |
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "galatea(${{ github.event.inputs.accion || 'scan' }}): ${{ github.event.inputs.nombre || 'scan-ecosistema' }}"
+            git push
+          else
+            echo "Sin cambios que commitear"
+          fi
