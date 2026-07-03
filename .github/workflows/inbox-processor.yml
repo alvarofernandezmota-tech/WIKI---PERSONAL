@@ -1,0 +1,66 @@
+# =============================================================================
+# INBOX PROCESSOR — Yggdrasil
+# Analiza los ficheros en inbox/ y crea issues de GitHub automáticamente
+# Se ejecuta: al hacer push con ficheros en inbox/, y diariamente
+# =============================================================================
+name: 📥 Inbox Processor
+
+on:
+  push:
+    paths:
+      - 'inbox/**'
+  schedule:
+    - cron: '30 6 * * *'  # 06:30 UTC diario
+  workflow_dispatch:
+
+jobs:
+  process-inbox:
+    name: Procesar inbox
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Contar ficheros en inbox
+        id: inbox
+        run: |
+          COUNT=$(find inbox/ -name '*.md' -not -name 'PLANTILLA*' | wc -l)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "Ficheros en inbox: $COUNT"
+
+      - name: Listar inbox con metadata
+        run: |
+          echo "📥 INBOX ACTUAL:"
+          echo ""
+          find inbox/ -name '*.md' -not -name 'PLANTILLA*' | while read f; do
+            echo "--- $f ---"
+            head -10 "$f" 2>/dev/null | grep -E 'tags:|estado:|destino:|prioridad:' || echo "  (sin metadata YAML)"
+            echo ""
+          done
+
+      - name: Validar estructura YAML de cada fichero
+        run: |
+          INVALID=0
+          find inbox/ -name '*.md' -not -name 'PLANTILLA*' | while read f; do
+            if ! grep -q '^---' "$f"; then
+              echo "⚠️  Sin cabecera YAML: $f"
+              INVALID=$((INVALID+1))
+            fi
+            if ! grep -q 'destino:' "$f"; then
+              echo "⚠️  Sin campo 'destino': $f"
+            fi
+            if ! grep -q 'prioridad:' "$f"; then
+              echo "⚠️  Sin campo 'prioridad': $f"
+            fi
+          done
+          echo "Validación completada"
+
+      - name: Notificar si hay items pendientes
+        if: ${{ steps.inbox.outputs.count > 0 }}
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            COUNT=${{ steps.inbox.outputs.count }}
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+              -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -d text="📥 *Inbox Yggdrasil*%0A%0A${COUNT} fichero(s) pendientes de clasificar%0A%0A_Revisa inbox/ al inicio de la sesión_" \
+              -d parse_mode=Markdown
+          fi
