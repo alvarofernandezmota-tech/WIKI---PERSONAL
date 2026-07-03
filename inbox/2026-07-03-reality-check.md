@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-03
-hora: 16:52
+hora: 15:01
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-03 16:52
+title: Reality Check 2026-07-03 15:01
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-03 16:52
+# 🔍 Ecosystem Reality Check — 2026-07-03 15:01
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-03 16:52
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 70 |
-| Ejecutables (chmod +x) | 52 |
-| Sin permisos ejecución | 18 |
-| En raíz scripts/ (sin organizar) | 28 |
-| En subdirectorios | 42 |
+| Total scripts | 71 |
+| Ejecutables (chmod +x) | 51 |
+| Sin permisos ejecución | 20 |
+| En raíz scripts/ (sin organizar) | 30 |
+| En subdirectorios | 41 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -47,17 +47,18 @@ title: Reality Check 2026-07-03 16:52
 - `inbox-cleanup-jun2026.sh`
 - `inbox-migrate.sh`
 - `inicio-sesion.sh`
+- `issue-creator.sh`
 - `migrar-inbox.sh`
 - `procesar-inbox-masivo.sh`
 - `repo-research.sh`
 - `setup-labels.sh`
+- `task-analyzer.sh`
 - `thdora-handlers.py`
 - `uptime-kuma-webhook.py`
 - `watchdog_adb.sh`
 
 ### Scripts potencialmente duplicados
-- ⚠ `inbox-cleanup-jun2024.sh`
-- ⚠ `migrar-inbox.sh`
+_Ninguno detectado_
 
 ## 2. GitHub Actions — Inventario
 
@@ -65,6 +66,7 @@ title: Reality Check 2026-07-03 16:52
 |----------|---------|--------|
 | `audit-on-push.yml` | push | 🟢 ACTIVO |
 | `auto-investigacion.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
+| `autonomous-cron.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `clasificador.yml` | push | 🟢 ACTIVO |
 | `context-reminder.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `diary-writer.yml` | push workflow_dispatch | 🟢 ACTIVO |
@@ -76,6 +78,7 @@ title: Reality Check 2026-07-03 16:52
 | `inbox-processor.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
 | `isla-context-sync.yml` | push schedule | 🟢 ACTIVO |
 | `islas-health.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
+| `issue-creator.yml` | schedule push workflow_dispatch | 🟢 ACTIVO |
 | `lint-commits.yml` | push pull_request | 🟢 ACTIVO |
 | `mapa-islas-sync.yml` | pull_request push | 🟢 ACTIVO |
 | `new-file-bootstrap.yml` | push | 🟢 ACTIVO |
@@ -95,51 +98,26 @@ title: Reality Check 2026-07-03 16:52
 
 ## 3. Servicios Docker (Madre)
 
-| Contenedores corriendo | 18 |
-| Contenedores parados | 4 |
+| Contenedores corriendo | 0 |
+| Contenedores parados | 0 |
 
 ### Contenedores activos
 ```
-NAMES                STATUS                            IMAGE
-log_guardian_bot     Up 5 minutes (health: starting)   yggdrasil-secops-log_guardian
-tailscale_monitor    Up 6 minutes (unhealthy)          yggdrasil-secops-tailscale_monitor
-radar_backup         Up 27 hours                       alpine:latest
-guardian_bot         Up 27 hours (healthy)             yggdrasil-secops-guardian_bot
-local_tripwire       Up 5 minutes (health: starting)   yggdrasil-secops-local_tripwire
-network_radar        Up 27 hours (healthy)             yggdrasil-secops-network_radar
-yggdrasil_watchdog   Up 27 hours (unhealthy)           yggdrasil-secops-yggdrasil_watchdog
-kali-pentest         Up 27 hours                       kasmweb/kali-rolling-desktop:1.16.0
-spiderfoot           Up 27 hours                       spiderfoot
-code-server          Up 27 hours                       lscr.io/linuxserver/code-server:latest
-n8n                  Up 27 hours                       n8nio/n8n:latest
-gitea                Up 27 hours                       gitea/gitea:latest
-uptime-kuma          Up 27 hours (healthy)             louislam/uptime-kuma:1
-portainer            Up 27 hours                       portainer/portainer-ce:latest
-thdora-bot           Up 27 hours (healthy)             thdora-bot
-thdora               Up 27 hours (healthy)             thdora-thdora
-grafana              Up 27 hours                       grafana/grafana:10.4.2
-prometheus           Up 27 hours                       prom/prometheus:v2.51.2
-```
-### ⚠ Contenedores parados
-```
-open-webui	Exited (255) 27 hours ago
-qdrant	Exited (255) 27 hours ago
-ollama	Exited (255) 27 hours ago
-ollama-embeddings	Exited (255) 27 hours ago
+NAMES     STATUS    IMAGE
 ```
 
 ## 4. Servicios HTTP — Estado
 
 | Servicio | URL | Estado |
 |----------|-----|--------|
-| n8n | `http://localhost:5678` | ✅ UP |
-| Portainer | `http://localhost:9000` | ✅ UP |
+| n8n | `http://localhost:5678` | ❌ DOWN |
+| Portainer | `http://localhost:9000` | ❌ DOWN |
 | Uptime-Kuma | `http://localhost:3001` | ❌ DOWN |
 | Ollama | `http://localhost:11434` | ❌ DOWN |
-| Gitea | `http://localhost:3002` | ✅ UP |
-| health-agent | `http://localhost:8000` | ✅ UP |
+| Gitea | `http://localhost:3002` | ❌ DOWN |
+| health-agent | `http://localhost:8000` | ❌ DOWN |
 | Qdrant | `http://localhost:6333` | ❌ DOWN |
-| Grafana | `http://localhost:3000` | ✅ UP |
+| Grafana | `http://localhost:3000` | ❌ DOWN |
 | Open-WebUI | `http://localhost:8080` | ❌ DOWN |
 
 ## 5. Discordancias detectadas
@@ -149,17 +127,17 @@ ollama-embeddings	Exited (255) 27 hours ago
 ### TODOs/FIXMEs pendientes en scripts
 _12 items encontrados:_
 ```
-/srv/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
-/srv/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:200:# TODOs y FIXMEs en scripts
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:201:echo "### TODOs/FIXMEs pendientes en scripts" >> "$OUTPUT"
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:202:TODOS=$(grep -rn 'TODO\|FIXME\|HACK\|XXX' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | wc -l | tr -d ' ')
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:203:if [ "$TODOS" -gt 0 ]; then
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:204:  log_warn "$TODOS TODOs/FIXMEs en scripts"
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:205:  echo "_$TODOS items encontrados:_" >> "$OUTPUT"
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:207:  grep -rn 'TODO\|FIXME' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | head -20 >> "$OUTPUT" || true
-/srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:210:  log_ok "Sin TODOs/FIXMEs en scripts"
-/srv/yggdrasil-dew/scripts/thdora/thdora-scaffold.sh:60:    # TODO: conectar con Ollama para clasificar y resumir
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/thdora/thdora-scaffold.sh:60:    # TODO: conectar con Ollama para clasificar y resumir
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:200:# TODOs y FIXMEs en scripts
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:201:echo "### TODOs/FIXMEs pendientes en scripts" >> "$OUTPUT"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:202:TODOS=$(grep -rn 'TODO\|FIXME\|HACK\|XXX' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | wc -l | tr -d ' ')
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:203:if [ "$TODOS" -gt 0 ]; then
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:204:  log_warn "$TODOS TODOs/FIXMEs en scripts"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:205:  echo "_$TODOS items encontrados:_" >> "$OUTPUT"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:207:  grep -rn 'TODO\|FIXME' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | head -20 >> "$OUTPUT" || true
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:210:  log_ok "Sin TODOs/FIXMEs en scripts"
 ```
 
 ## 6. Fase actual del ecosistema
@@ -179,11 +157,11 @@ _12 items encontrados:_
 
 | | |
 |--|--|
-| ✅ OK | 7 |
-| ⚠ Warnings | 9 |
-| Total checks | 16 |
-| Scripts totales | 70 |
-| Actions activas | 29 |
+| ✅ OK | 3 |
+| ⚠ Warnings | 12 |
+| Total checks | 15 |
+| Scripts totales | 71 |
+| Actions activas | 31 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 16:52*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 15:01*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
