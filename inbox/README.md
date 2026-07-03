@@ -1,90 +1,59 @@
-# Inbox — Flujo de Captura
+---
+tipo: doc
+author: Perplexity-MCP <alvarofernandezmota@gmail.com>
+creado: 2026-07-03 23:55 CEST
+actualizado: 2026-07-03 23:55 CEST
+ruta: inbox/README.md
+tags: [inbox, estados, tracker, normas]
+status: vigente
+---
 
-El inbox es la **entrada de todo** al ecosistema Yggdrasil.
-Refleja la **misma taxonomía** que la repo principal y las islas: no guarda código productivo, sino contexto, entradas, pendientes, reportes y documentación operativa.
+# 📥 INBOX — Sistema de entrada y estados
 
-## Flujo
+El inbox es el **punto de entrada único** de todos los artefactos del ecosistema.
+Ningún archivo va directamente a `docs/` sin pasar primero por aquí.
 
-```
-📱 Idea / nota / tarea rápida
-        ↓
-   inbox/*.md          ← Captura rápida, sin procesar
-        ↓  (orquestador-inbox.sh)
- inbox/<ecosistema>/   ← Clasificado por isla/dominio
-        ↓  (migrate-inbox.sh)
-   docs/               ← Conocimiento permanente del ecosistema
-        ↓  (si aplica)
- GitHub Issues          ← Tareas accionables con seguimiento
-```
-
-## Estructura de ecosistemas
-
-La inbox refleja las mismas islas que la repo:
+## Estructura
 
 ```
 inbox/
-├── _meta/           ← Reglas, estructura, workflow, reportes del orquestador
-├── agentes/         ← Documentación operativa de agentes y workflows
-├── sesiones/        ← Contexto de sesiones: decisiones, bloqueos, próximo paso
-├── infra/           ← Docker, Ollama, MCP, Tailscale, Madre
-├── proyectos/       ← Roadmaps, planes, sprints
-├── formacion/       ← Python, cursos, aprendizaje
-├── hardware/        ← Routers, drivers, USB, WiFi
-├── osint/           ← Inteligencia, investigación, vigilancia
-├── thdora/          ← Bots Telegram, automatización
-├── yo/              ← Personal, contexto propio
-├── clasificados/    ← Entradas sin ecosistema claro (temporal)
-├── descartados/     ← Entradas descartadas
-└── archive/         ← Histórico
+├── README.md          ← este archivo (normas)
+├── .tracker/          ← estados de artefactos (no commitear .tracker/*.json)
+├── terminal-log/      ← logs de terminal (terminal-logger.sh)
+├── mejorador/         ← reports de agente-mejorador (JSON)
+├── deuda/             ← deuda técnica detectada (JSON + ranking MD)
+└── (otros artefactos directos)
+```
+
+## Estados de artefactos
+
+| Emoji | Estado | Significado | Acción siguiente |
+|---|---|---|---|
+| 🔴 | `por-hacer` | Detectado, sin acción | Asignar, planificar |
+| 🟡 | `en-proceso` | Trabajo activo en curso | Completar |
+| 🟢 | `completado` | Terminado y validado | Archivar a docs/ |
+| ⚪ | `archivado` | Movido a destino final | — |
+| 🔵 | `bloqueado` | Necesita algo externo | Resolver bloqueo |
+
+## Cómo marcar estados
+
+```bash
+# Marcar como en-proceso
+bash scripts/agentes/agente-estado-tracker.sh --mark en-proceso inbox/mi-artefacto.md
+
+# Marcar como completado
+bash scripts/agentes/agente-estado-tracker.sh --mark completado inbox/mi-artefacto.md
+
+# Ver reporte de todos los estados
+bash scripts/agentes/agente-estado-tracker.sh --report
 ```
 
 ## Reglas
 
-1. **Captura rápida**: un archivo = una idea/sesión/tarea
-2. **Nombre**: `YYYY-MM-DD-descripcion-corta.md`
-3. **No procesar en el momento**: captura ahora, clasifica después
-4. **El inbox debe estar vacío** al final de cada sesión de trabajo
-5. **Toda automatización** que escriba en inbox deja traza en `_meta/`
-6. **Si nace una isla nueva** en la repo, nace su espejo en inbox
-7. **Clasificados/** es temporal — se migra o descarta en la siguiente sesión
+- **Todo** lo que produce un agente va a una subcarpeta de `inbox/`
+- **Todo** lo que se ejecuta en terminal relevante va a `inbox/terminal-log/`
+- Los artefactos `completados` se mueven a `docs/` en el cierre de sesión
+- `.tracker/` no se commitea (está en .gitignore)
+- Nunca dejar artefactos en estado `por-hacer` más de 48h sin avanzar
 
-## Scripts relacionados
-
-```bash
-# Orquestar inbox (clasificar entradas por ecosistema)
-bash scripts/orquestador-inbox.sh
-
-# Dry-run (ver qué haría sin ejecutar)
-bash scripts/orquestador-inbox.sh --dry-run
-
-# Migrar procesados a docs/
-bash scripts/maintenance/migrate-inbox.sh
-
-# Auditoría completa
-bash scripts/maintenance/audit-full.sh
-```
-
-## Sesión 2026-07-03 — Temas tratados
-
-Todo lo diseñado en la sesión de hoy está en `inbox/_meta/`:
-
-- `REGLAS-INBOX.md` — reglas operativas de la inbox
-- `ESTRUCTURA-INBOX.md` — inbox como espejo de islas
-- `WORKFLOW-SESION.md` — apertura, trabajo y cierre
-- `ROADMAP-ORQUESTACION.md` — mapa de agentes y conexiones
-- `SESION-2026-07-03.md` — síntesis completa de la sesión
-
-## Bloque Bots & RAG (activo)
-
-- Bot 1: **Centinela** — alertas de red, backups, SSH
-- Bot 2: **Investigador Maestro / Mimir** — RAG local sobre Yggdrasil-dew
-- Bot 3: **Intendente** — n8n, automatización general
-
-Pendiente: mover notas de bots a `docs/bots/` y `docs/infra/` + crear issues GitHub.
-
-## Escalado futuro
-
-Cuando el agente IA esté operativo, leerá inbox, clasificará entradas y las migrará automáticamente.
-El MCP server es la pieza que habilita esa autonomía real.
-
-_Yggdrasil Ecosystem — actualizado 03-jul-2026_
+_Actualizado: 2026-07-03 23:55 CEST · Perplexity-MCP_
