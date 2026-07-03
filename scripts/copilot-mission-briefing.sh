@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# copilot-mission-briefing.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # ============================================================
 # ARCHIVO      : copilot-mission-briefing.sh
 # VERSIÓN      : 1.0.0
