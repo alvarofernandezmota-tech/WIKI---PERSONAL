@@ -37,6 +37,25 @@ bash scripts/maintenance/migrate-inbox.sh
 bash scripts/maintenance/audit-full.sh
 ```
 
+## Bloque Bots & RAG (2026-07-03)
+
+Notas relevantes:
+
+- `2026-07-03-arquitectura-bots-ecosistema.md` — flota de bots, roles y normas de enjambre.
+- `2026-07-03-enjambre-rag-llm-filosofia.md` — filosofía de enjambre, RAG en producción, cuantización LLM.
+- `2026-07-03-bots-telegram-ollama-rag-local.md` — FastAPI + Docker + Ollama, stack self-hosted y RAG local.
+
+Estas notas alimentan el diseño de:
+
+- Bot 2: **Investigador Maestro / Mimir** (RAG local sobre Yggdrasil-dew)
+- Bot 1: **Centinela** (alertas de red, backups, SSH)
+- Bot 3: **Intendente** (n8n, automatización general)
+
+Pendiente:
+
+- Mover estas notas a `docs/bots/` y `docs/infra/` cuando se concrete el diseño.
+- Crear issues en GitHub para implementar cada bot como servicio Docker independiente.
+
 ## Escalado futuro
 
 Cuando llegue el agente IA, el inbox será su entrada principal:
