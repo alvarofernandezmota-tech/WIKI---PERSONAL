@@ -1,180 +1,184 @@
 ---
 type: report
 date: 2026-07-03
-hora: 20:23
+hora: 21:06
 source: inbox-audit-cleanup.sh
 priority: medium
 status: pending
 processed_by: pending
-title: Inbox audit consolidado 2026-07-03 20:23
+title: Inbox audit consolidado 2026-07-03 21:06
 ---
 
-# Inbox Audit Consolidado — 2026-07-03 20:23
+# Inbox Audit Consolidado — 2026-07-03 21:06
 
-**Total ficheros antes de limpieza**: 28  
+**Total ficheros antes de limpieza**: 31  
 **Umbral de alerta**: 10  
 **Estado**: ⚠ SUPERA UMBRAL
 
 ---
 
-## Micro-audits consolidados (3 ficheros → 1)
+## Micro-audits consolidados (6 ficheros → 1)
 
-### audit-2026-07-03-58.md
+### audit-2026-07-03-63.md
 
-# 🔍 Audit Push — 2026-07-03 19:51 UTC
+# 🔍 Audit Push — 2026-07-03 20:27 UTC
 
-**Commit:** `1154702`
+**Commit:** `a380765`
 **Autor:** alvarofernandezmota-tech
 
 ## Archivos modificados
 
-### `.github/workflows/agent-monitor.yml`
-- 📎 Tamaño: 2138 bytes
+### `.github/workflows/session-close.yml`
+- 📎 Tamaño: 2936 bytes
 
-### `.github/workflows/deuda-tecnica.yml`
-- 📎 Tamaño: 2371 bytes
+### `scripts/agentes/agente-cierre-sesion.sh`
+- 📎 Tamaño: 5419 bytes
 
-### `agentes/copilot-orquestador-agent.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 2005 bytes
-
-### `agentes/deuda-tecnica-agent.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 2134 bytes
-
-### `agentes/ghost-detector-agent.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 743 bytes
-
-### `agentes/investigador-agent.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 2217 bytes
-
-### `agentes/struct-auditor-agent.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 829 bytes
-
-### `docs/COPILOT-15-AGENTES.md`
-- 📎 Tamaño: 6733 bytes
-
-### `inbox/2026-07-03-COPILOT-INVESTIGACION.md`
-- 📎 Tamaño: 1480 bytes
-
-### `scripts/agent-monitor.sh`
-- 📎 Tamaño: 3671 bytes
-
-### `scripts/ghost-file-detector.sh`
-- 📎 Tamaño: 3736 bytes
-
-### `scripts/struct-auditor.sh`
-- 📎 Tamaño: 4679 bytes
+### `scripts/cierre-sesion.sh`
+- 📎 Tamaño: 8017 bytes
 
 ## Estado
 - 🤖 Pendiente procesar por Thdora Guardián
 - 📥 Mover a `docs/` cuando esté revisado
 
-### audit-2026-07-03-60.md
+### audit-2026-07-03-64.md
 
-# 🔍 Audit Push — 2026-07-03 20:15 UTC
+# 🔍 Audit Push — 2026-07-03 20:30 UTC
 
-**Commit:** `335e465`
+**Commit:** `4c3b94a`
 **Autor:** alvarofernandezmota-tech
 
 ## Archivos modificados
 
-### `.github/workflows/between-sessions.yml`
-- 📎 Tamaño: 1002 bytes
+### `scripts/agentes/agente-cierre-sesion.sh`
+- 📎 Tamaño: 6581 bytes
 
-### `.github/workflows/cross-ref-checker.yml`
-- 📎 Tamaño: 979 bytes
+### `scripts/cierre-sesion.sh`
+- 📎 Tamaño: 9721 bytes
 
-### `.github/workflows/ghost-file-detector.yml`
-- 📎 Tamaño: 1015 bytes
+## Estado
+- 🤖 Pendiente procesar por Thdora Guardián
+- 📥 Mover a `docs/` cuando esté revisado
 
-### `.github/workflows/isla-sync-validator.yml`
-- 📎 Tamaño: 700 bytes
+### audit-2026-07-03-67.md
 
-### `.github/workflows/orquestador-supremo.yml`
-- 📎 Tamaño: 1021 bytes
+# 🔍 Audit Push — 2026-07-03 20:47 UTC
 
-### `.github/workflows/struct-auditor.yml`
-- 📎 Tamaño: 963 bytes
+**Commit:** `7216960`
+**Autor:** alvarofernandezmota-tech
 
-### `.github/workflows/tool-inventory-auditor.yml`
-- 📎 Tamaño: 1021 bytes
+## Archivos modificados
 
-### `.github/workflows/watchdog-monitor.yml`
-- 📎 Tamaño: 998 bytes
+### `.github/workflows/meta-deep-audit.yml`
+- 📎 Tamaño: 2007 bytes
 
-### `docs/CORE-ECOSISTEMA.md`
-- 📎 Tamaño: 6874 bytes
+### `.github/workflows/orquestador-total.yml`
+- 📎 Tamaño: 1279 bytes
+
+### `.github/workflows/watchdog.yml`
+- 📎 Tamaño: 1986 bytes
+
+### `docs/COPILOT-CONTEXT.md`
+- 📎 Tamaño: 4896 bytes
+
+### `mcp/README.md`
+- ⚠️ **Sin frontmatter** — añadir tags/fecha
+- 📎 Tamaño: 1390 bytes
+
+### `mcp/requirements.txt`
+- 📎 Tamaño: 45 bytes
+- 🚨 **ZOMBIE SOSPECHOSO**: archivo muy pequeño (< 50 bytes)
+
+### `mcp/server.py`
+- 📎 Tamaño: 17384 bytes
+
+### `scripts/agentes/agente-meta-deep.sh`
+- 📎 Tamaño: 3908 bytes
+
+### `scripts/agentes/galatea-fabrica-agentes.sh`
+- 📎 Tamaño: 2881 bytes
+
+### `scripts/agentes/llm-router.sh`
+- 📎 Tamaño: 3193 bytes
+
+### `scripts/orquestador-total.sh`
+- 📎 Tamaño: 5023 bytes
+
+## Estado
+- 🤖 Pendiente procesar por Thdora Guardián
+- 📥 Mover a `docs/` cuando esté revisado
+
+### audit-2026-07-03-68.md
+
+# 🔍 Audit Push — 2026-07-03 20:51 UTC
+
+**Commit:** `36eb4c7`
+**Autor:** alvarofernandezmota-tech
+
+## Archivos modificados
+
+### `docs/GATEWAY-MCP.md`
+- 📎 Tamaño: 1916 bytes
+
+### `docs/PLANTILLA-AGENTE.md`
+- 📎 Tamaño: 2214 bytes
 
 ### `mcp/mcp-config.json`
-- 📎 Tamaño: 727 bytes
+- 📎 Tamaño: 190 bytes
 
 ### `mcp/package.json`
-- 📎 Tamaño: 338 bytes
+- 📎 Tamaño: 328 bytes
 
 ### `mcp/server.js`
-- 📎 Tamaño: 5252 bytes
+- 📎 Tamaño: 12770 bytes
 
-### `scripts/between-sessions.sh`
-- 📎 Tamaño: 1791 bytes
+### `mcp/test-mcp.js`
+- 📎 Tamaño: 1887 bytes
 
-### `scripts/cross-ref-checker.sh`
-- 📎 Tamaño: 1335 bytes
-
-### `scripts/ghost-file-detector.sh`
-- 📎 Tamaño: 2250 bytes
-
-### `scripts/isla-sync-validator.sh`
-- 📎 Tamaño: 1354 bytes
-
-### `scripts/orquestador-supremo.sh`
-- 📎 Tamaño: 2186 bytes
-
-### `scripts/tool-inventory-auditor.sh`
-- 📎 Tamaño: 1606 bytes
-
-### `scripts/watchdog-monitor.sh`
-- 📎 Tamaño: 3446 bytes
+### `scripts/agentes/test-ollama-integration.sh`
+- 📎 Tamaño: 3137 bytes
 
 ## Estado
 - 🤖 Pendiente procesar por Thdora Guardián
 - 📥 Mover a `docs/` cuando esté revisado
 
-### audit-2026-07-03-61.md
+### audit-2026-07-03-69.md
 
-# 🔍 Audit Push — 2026-07-03 20:18 UTC
+# 🔍 Audit Push — 2026-07-03 20:53 UTC
 
-**Commit:** `89eb86a`
+**Commit:** `c2cae81`
 **Autor:** alvarofernandezmota-tech
 
 ## Archivos modificados
 
-### `.github/copilot-mcp.json`
-- 📎 Tamaño: 290 bytes
+### `mcp/README.md`
+- ⚠️ **Sin frontmatter** — añadir tags/fecha
+- 📎 Tamaño: 4313 bytes
 
-### `mcp-config.json`
-- 📎 Tamaño: 1904 bytes
+### `mcp/mcp-config.json`
+- 📎 Tamaño: 253 bytes
 
-### `package.json`
-- 📎 Tamaño: 667 bytes
+### `mcp/package.json`
+- 📎 Tamaño: 318 bytes
 
-### `scripts/ghost-file-detector.sh`
-- 📎 Tamaño: 3116 bytes
+### `mcp/server.js`
+- 📎 Tamaño: 13349 bytes
 
-### `scripts/isla-sync-validator.sh`
-- 📎 Tamaño: 2039 bytes
+## Estado
+- 🤖 Pendiente procesar por Thdora Guardián
+- 📥 Mover a `docs/` cuando esté revisado
 
-### `scripts/struct-auditor.sh`
-- 📎 Tamaño: 3367 bytes
+### audit-2026-07-03-71.md
 
-### `scripts/tool-inventory-auditor.sh`
-- 📎 Tamaño: 1346 bytes
+# 🔍 Audit Push — 2026-07-03 21:04 UTC
 
-### `server.js`
-- 📎 Tamaño: 10564 bytes
+**Commit:** `c5fda22`
+**Autor:** alvarofernandezmota-tech
+
+## Archivos modificados
+
+### `docs/COPILOT-CONTEXT.md`
+- 📎 Tamaño: 9734 bytes
 
 ## Estado
 - 🤖 Pendiente procesar por Thdora Guardián
@@ -185,18 +189,20 @@ title: Inbox audit consolidado 2026-07-03 20:23
 
 ## Clasificados archivados (1 ficheros)
 
-- clasificado-2026-07-03-57.md
+- clasificado-2026-07-03-68.md
 
 ---
 
-## Docs antiguos archivados (1 ficheros)
+## Docs antiguos archivados (0
+0 ficheros)
 
-- BRIEF-2026-07-03.md
+_Sin docs antiguos._
 
 ---
 
-## Docs de sesión activos (22 ficheros — se mantienen)
+## Docs de sesión activos (23 ficheros — se mantienen)
 
+- **2026-07-03-23-05-struct-auditor-output.md** — 2026-07-03-23-05-struct-auditor-output.md
 - **2026-07-03-COPILOT-INVESTIGACION.md** — 2026-07-03-COPILOT-INVESTIGACION.md
 - **2026-07-03-MACRO-SPEC-ECOSISTEMA.md** — 2026-07-03-MACRO-SPEC-ECOSISTEMA.md
 - **2026-07-03-MCP-SERVER-DISEÑO.md** — 2026-07-03-MCP-SERVER-DISEÑO.md
@@ -213,7 +219,7 @@ title: Inbox audit consolidado 2026-07-03 20:23
 - **2026-07-03-ideas-bots-agentes-overflow.md** — 2026-07-03-ideas-bots-agentes-overflow.md
 - **2026-07-03-mcp-universal-llm-router.md** — 2026-07-03-mcp-universal-llm-router.md
 - **2026-07-03-plan-fases-ecosistema.md** — Plan de fases — ecosistema autónomo completo
-- **2026-07-03-reality-check.md** — Reality Check 2026-07-03 15:08
+- **2026-07-03-reality-check.md** — Reality Check 2026-07-03 22:42
 - **2026-07-03-regla-escalado.md** — 2026-07-03-regla-escalado.md
 - **2026-07-03-reglas-orquestacion.md** — Reglas de orquestación Actions + Scripts + Agentes
 - **2026-07-03-repo-research.md** — Investigación mejora repo
@@ -222,4 +228,4 @@ title: Inbox audit consolidado 2026-07-03 20:23
 
 ---
 
-*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 20:23*
+*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 21:06*
