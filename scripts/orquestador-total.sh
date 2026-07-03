@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# orquestador-total.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 set -euo pipefail
 
 ROOT="/srv/yggdrasil-dew"
