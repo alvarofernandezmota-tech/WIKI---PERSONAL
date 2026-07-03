@@ -1,0 +1,42 @@
+# ================================================================
+# REALITY CHECK — Auditoría periódica de estado real vs documentado
+# Cron: cada domingo a las 08:00 UTC + manual + push a scripts/
+# ================================================================
+name: reality-check
+
+on:
+  schedule:
+    - cron: '0 8 * * 0'   # domingos 08:00 UTC
+    - cron: '0 6 * * 1'   # lunes 06:00 UTC (inicio semana)
+  push:
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/**'
+      - 'ROADMAP*.md'
+  workflow_dispatch:
+
+jobs:
+  reality-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ejecutar reality check
+        run: |
+          chmod +x scripts/maintenance/ecosystem-reality-check.sh
+          REPO_DIR="$(pwd)" bash scripts/maintenance/ecosystem-reality-check.sh
+
+      - name: Commit resultado
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action [reality-check]"
+          git add inbox/ || true
+          git diff --staged --quiet || \
+            git commit -m "audit(reality-check): $(date +%Y-%m-%d) [AUTO]" && \
+            git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
