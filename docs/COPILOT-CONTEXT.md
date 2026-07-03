@@ -1,174 +1,116 @@
-# 🤖 COPILOT CONTEXT — yggdrasil-dew
+# COPILOT CONTEXT — yggdrasil-dew
 
-> Pegar este archivo como primer mensaje en Copilot Chat o configurarlo
-> como instrucción de proyecto en GitHub Copilot.
-> Última actualización: 2026-07-03
+> **Archivo clave para GitHub Copilot y cualquier IA que trabaje en este repo.**
+> Lee este archivo primero antes de cualquier tarea en el ecosistema.
 
----
+## Identidad del ecosistema
 
-## QUÉ ES ESTE REPO
+- **Nombre:** yggdrasil-dew
+- **Propósito:** Plataforma operativa y gobernada para automatización IA, scripts, agentes y workflows GitHub.
+- **Madre:** Raspberry Pi / servidor local donde se ejecutan scripts y el MCP server.
+- **Idioma:** Español en docs, inglés en código y nombres de archivos.
 
-yggdrasil-dew es el cerebro central (Madre) de un ecosistema de automatización
-personal. Es un único repo que contiene TODO: documentación, scripts,
-GitHub Actions, agentes IA, diario de sesiones, e islas de proyectos.
-No hay repos separados — todo vive aquí por diseño deliberado.
-
----
-
-## ARQUITECTURA DE CAPAS
+## Estructura sagrada (NO modificar sin auditoría)
 
 ```
-CAPAPA 1 — Humano
-  apertura-sesion.sh → sesión de trabajo → cierre-sesion.sh
-
-CAPA 2 — Actions en cada push (síncronas)
-  audit-on-push.yml       → audita estructura en cada push
-  diary-writer.yml        → escribe entrada diary automáticamente
-  lint-commits.yml        → valida formato de commits
-  tripwire-repo.yml       → detecta cambios estructurales inesperados
-  new-file-bootstrap.yml  → añade cabecera a archivos nuevos
-  clasificador.yml        → clasifica archivos del inbox
-  clasificador-maestro.yml → decisor principal de destino
-
-CAPA 3 — Actions por cron (asíncronas, entre sesiones)
-  autonomous-cron.yml     → ciclos autónomos cada X horas
-  health-check.yml        → pulso de servicios
-  repo-audit.yml          → auditoría profunda semanal
-  inbox-cleanup.yml       → limpia inbox si supera 10 archivos
-  mapa-islas-sync.yml     → actualiza MAPA-ISLAS.md
-  ecosystem-guardian.yml  → vigila comportamiento global
-  resumen-diario.yml      → resumen al final del día
-  orquestador-maestro.yml → coordina otros workflows
-  gestor-estados-inbox.yml → mueve tareas por los 3 estados
-
-CAPA 4 — Agentes IA locales (Ollama en Madre)
-  Modelos: gemma3, llama3, mistral (Ollama en localhost:11434)
-  MCP server: mcp_server.py (socket /tmp/mcp.sock) → expone tools a agentes
-  Thdora: bot GitHub que ejecuta handlers en scripts/thdora/
+yggdrasil-dew/
+├── docs/              ← Fuente de verdad. CORE-ECOSISTEMA.md es la biblia.
+├── scripts/           ← Scripts bash del ecosistema
+│   └── agentes/       ← Agentes especializados (función única cada uno)
+├── mcp/               ← MCP Server Python — expone tools a IAs
+│   └── server.py      ← Punto de entrada MCP
+├── .github/
+│   └── workflows/     ← GitHub Actions
+├── inbox/             ← Logs temporales, pendientes de procesar
+├── diary/             ← Reportes permanentes de sesión
+└── islas/             ← Proyectos específicos (isla-proyectos, isla-hardware...)
 ```
 
----
+## Reglas CORE para Copilot
 
-## ESTRUCTURA DE ISLAS
+1. **Cada script/agente tiene UNA función única** — declarada en cabecera `FUNCIÓN:`
+2. **Plantilla estándar obligatoria** en todos los scripts (ver sección Plantilla)
+3. **Todo cierre de sesión** → documentar en `inbox/` y `diary/`
+4. **Nunca borrar** `docs/CORE-ECOSISTEMA.md`, `inbox/`, `diary/` sin auditoría
+5. **Abre issue** automático si detectas problema crítico (usa `gh issue create`)
+6. **El MCP server** (`mcp/server.py`) es el punto de integración para IAs externas
+7. **llm_router** soporta Ollama (local, preferido) y OpenAI/Anthropic (remoto, fallback)
+8. **Galatea** (`scripts/agentes/galatea-fabrica-agentes.sh`) genera nuevos agentes con plantilla
 
-```
-inbox/           → zona temporal, máx 10 archivos, 24h máx
-diarios/         → un .md por día, TODO lo de esa sesión
-diary/           → DUPLICADO de diarios/ — DEUDA PENDIENTE de merge
-docs/            → documentación permanente
-scripts/         → bash/python ejecutables
-agentes/         → modelfiles y prompts de agentes
-proyectos/       → thdora, local-brain, batcueva, chatbot-control
-investigacion/   → research en proceso
-osint/           → DUPLICADO de osint-stack/ — DEUDA PENDIENTE
-islas/           → placeholder para islas futuras
-```
+## Plantilla estándar de scripts
 
----
-
-## DEUDA TÉCNICA ACTIVA
-
-```
-🔴 MCP socket /tmp/mcp.sock no operativo (docker build OK, socket KO)
-🟠 Carpetas duplicadas: diarios/+diary/, osint/+osint-stack/
-🟠 inbox/ tiene 26 archivos — supera límite de 10
-🟡 Falta: struct-auditor.sh + Action que abra issue automático
-🟡 Falta: ghost-file-detector.sh + Action
-🟡 Falta: between-sessions.yml (cron nocturno con tareas programadas)
-🟡 Falta: agent-monitor.yml (centinela que vigila a todos los agentes)
-🟡 Diary solo usa git log — falta capa de análisis con Ollama
-🟡 script-inicio-sesion.sh no existe todavía
-🟡 script-cierre-sesion.sh no existe todavía
-```
-
----
-
-## REGLAS DE COMMIT
-
-```
-feat:     nueva funcionalidad
-fix:      corrección de bug
-chore:    mantenimiento/scripts/automatización
-docs:     documentación
-refactor: reestructuración sin cambio funcional
-[AUTO]    sufijo para commits generados por Actions
-```
-
----
-
-## ETIQUETAS DE ISSUES
-
-```
-deuda-tecnica, automatizacion, estructura, agentes,
-seguridad, osint, investigacion, urgente, duplicado,
-inbox, clasificacion, centinela, islas
-```
-
----
-
-## SERVICIOS EN MADRE
-
-```
-Ollama:      :11434
-n8n:         :5678
-Portainer:   :9000
-Grafana:     :3000
-Uptime Kuma: :3001
-Qdrant:      :6333
-MCP agent:   :8000 / /tmp/mcp.sock (CAÍDO)
-```
-
----
-
-## FLUJO DEL INBOX (3 ESTADOS)
-
-```
-📥 NUEVO → 🔄 EN-PROCESO → ✅ PROCESADO
-```
-
-El clasificador-maestro.sh decide automáticamente:
-- Si el archivo es documentación → docs/
-- Si es un script → scripts/
-- Si es diseño de agente → agentes/
-- Si es investigación → investigacion/
-- Si es plan de islas → islas/
-- Si es regla/ley → docs/leyes/
-- Si está expirado → inbox/archive/
-
----
-
-## OBJETIVO FINAL
-
-Que el repo trabaje SOLO entre sesiones: detecte problemas,
-abra issues, proponga fixes, ejecute auditorías, actualice docs,
-y cuando el humano vuelva, tenga todo preparado y el contexto cargado.
-Nunca parado. Siempre avanzando.
-
----
-
-## CABECERA ESTÁNDAR PARA SCRIPTS
-
-Todo script debe empezar con:
 ```bash
 #!/usr/bin/env bash
-# =============================================================
-# FUNCIÓN:   [qué hace exactamente]
-# TRIGGER:   [cuándo se ejecuta: manual / push / cron / hook]
-# AGENTE:    [qué agente lo llama, si aplica]
-# ETIQUETAS: [etiquetas de issue si genera uno]
-# RUTAS:     [rutas que lee/escribe]
-# =============================================================
+# ============================================================
+# NOMBRE:   scripts/[nombre].sh
+# VERSION:  1.0.0
+# FUNCIÓN:  [descripción única y específica]
+# TIPO:     auditor | gestor | reporter | orquestador | vigilante
+# AUTOR:    yggdrasil-dew ecosystem
+# REPO:     alvarofernandezmota-tech/yggdrasil-dew
+# USO:      bash scripts/[nombre].sh
+# ============================================================
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}}")/.." && pwd)"
+# ... lógica ...
 ```
 
----
+## Agentes MCP disponibles
 
-## CABECERA ESTÁNDAR PARA ACTIONS (.yml)
+| Tool MCP | Script bash equivalente | Función |
+|---|---|---|
+| `orquestador_total` | `scripts/orquestador-total.sh` | Coordina todo el ecosistema |
+| `galatea_fabrica_agente` | `scripts/agentes/galatea-fabrica-agentes.sh` | Genera agentes nuevos |
+| `agente_meta_deep` | `scripts/agentes/agente-meta-deep.sh` | Auditoría profunda con LLM |
+| `llm_router` | `scripts/agentes/llm-router.sh` | Enruta a Ollama/OpenAI/Anthropic |
+| `struct_auditor` | `scripts/struct-auditor.sh` | Detecta duplicados/fantasmas |
+| `ghost_file_detector` | `scripts/ghost-file-detector.sh` | Archivos huérfanos |
+| `isla_sync_validator` | `scripts/isla-sync-validator.sh` | Valida mapas de islas |
+| `watchdog` | `scripts/watchdog.sh` | Monitor SLAs |
+| `diary_writer` | — | Escribe entradas de diario |
+| `issue_creator` | — | Crea issues GitHub |
+| `health_check` | — | Pulso del ecosistema |
 
-```yaml
-# =============================================================
-# FUNCIÓN:   [qué hace]
-# TRIGGER:   [push / schedule / workflow_dispatch / ...]
-# ETIQUETAS: [etiquetas de issue si genera uno]
-# DEPS:      [scripts que llama, si aplica]
-# =============================================================
+## Inicio rápido en Madre
+
+```bash
+# 1. Instalar dependencias MCP
+cd ~/yggdrasil-dew && pip install -r mcp/requirements.txt
+
+# 2. Iniciar MCP server
+python3 mcp/server.py --port 8080
+
+# 3. O en modo stdio (para Claude CLI / agentes)
+python3 mcp/server.py --stdio
+
+# 4. Ejecutar orquestador completo
+bash scripts/orquestador-total.sh completo
+
+# 5. Crear un agente nuevo (Galatea)
+bash scripts/agentes/galatea-fabrica-agentes.sh "mi-agente" "Función específica" "auditor"
 ```
+
+## Variables de entorno necesarias en Madre
+
+```bash
+export YGGDRASIL_ROOT=/srv/yggdrasil-dew  # o la ruta real
+export OPENAI_API_KEY=sk-...              # opcional
+export ANTHROPIC_API_KEY=sk-ant-...       # opcional
+# Ollama: instalar desde https://ollama.ai (preferido, local)
+```
+
+## Workflows GitHub activos
+
+| Workflow | Trigger | Función |
+|---|---|---|
+| `orquestador-total.yml` | Diario 06:00 UTC + manual | Orquesta todo el ecosistema |
+| `meta-deep-audit.yml` | Domingos 22:00 UTC + manual | Auditoría profunda con LLM |
+| `watchdog.yml` | Cada 6h | Monitor de SLAs |
+
+## Deuda técnica conocida (2026-07-03)
+
+- [ ] `diary/` y `diarios/` duplicados — consolidar en `diary/`
+- [ ] `osint/` y `osint-stack/` duplicados — consolidar
+- [ ] MCP server: HTTP mode requiere `uvicorn` instalado en Madre
+- [ ] Scripts sin cabecera estándar — revisar con `agente-meta-deep.sh`
+- [ ] `cross-ref-checker.sh` — pendiente de implementar lógica completa
