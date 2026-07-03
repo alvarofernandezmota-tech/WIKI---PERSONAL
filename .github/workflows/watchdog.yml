@@ -1,51 +1,19 @@
-name: Watchdog — Monitor de SLAs
-
+name: Watchdog SLA Monitor
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Cada 6 horas
-  workflow_dispatch:
-
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
 jobs:
   watchdog:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Verificar SLA de reportes (24h)
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
+      - name: Setup tools
+        run: sudo apt-get update && sudo apt-get install -y jq bc
+      - name: Run vigilante
+        run: bash scripts/agentes/agente-vigilante.sh --verbose
+      - name: Upload diary
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const fs = require('fs');
-            const now = Date.now();
-            const SLA_MS = 24 * 60 * 60 * 1000;
-            const dirs = ['inbox', 'diary'];
-            const violations = [];
-            for (const dir of dirs) {
-              if (!fs.existsSync(dir)) { violations.push(`${dir}/ no existe`); continue; }
-              const files = fs.readdirSync(dir).filter(f => f.endsWith('.md') || f.endsWith('.log'));
-              if (files.length === 0) { violations.push(`${dir}/ vacío`); continue; }
-              const latest = files.sort().pop();
-              const stat = fs.statSync(`${dir}/${latest}`);
-              const age = now - stat.mtimeMs;
-              if (age > SLA_MS) {
-                const hours = Math.round(age / 3600000);
-                violations.push(`${dir}/${latest} tiene ${hours}h de antigüedad (SLA: 24h)`);
-              }
-            }
-            if (violations.length > 0) {
-              const body = `## ⚠️ SLA Violations detectadas\n\n${violations.map(v => `- ${v}`).join('\n')}\n\n*Generado automáticamente por watchdog*`;
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `⚠️ Watchdog: SLA violation ${new Date().toISOString().split('T')[0]}`,
-                body,
-                labels: ['watchdog', 'sla', 'auto-generated']
-              });
-              core.setFailed(`SLA violations: ${violations.length}`);
-            } else {
-              console.log('✅ Todos los SLAs OK');
-            }
+          name: diary
+          path: diary/
