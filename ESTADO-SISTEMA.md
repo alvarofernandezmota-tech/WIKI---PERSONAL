@@ -1,98 +1,98 @@
----
-tags: [estado, sistema, live]
-fecha-actualizacion: 2026-07-03T06:45
----
+# 🌳 ESTADO DEL SISTEMA — Yggdrasil
 
-# 📊 ESTADO DEL SISTEMA — 2026-07-03 06:45 CEST
-
-> Actualizado al cierre de cada sesión. Ver MASTER-PENDIENTES.md para tareas detalladas.
+> Actualizado: 2026-07-03 07:02 CEST
+> Próxima revisión: inicio de sesión siguiente
 
 ---
 
-## 🔴 Bloqueos activos
+## 💻 MADRE (Acer — 100.91.112.32)
 
-| Bloqueo | Impacto | Desbloqueo |
-|---------|---------|------------|
-| Docker thdora no confirmado arriba | Smoke test Telegram bloqueado | `docker compose up -d` en Madre |
-| Token GitHub `repo` full | Labels, milestones, branch protection | Generar token y meter en MCP |
-| Puerto 21 FTP abierto en router | Riesgo seguridad P0 | Acceso panel router Digi |
-| `PasswordAuthentication` SSH activo | Riesgo seguridad P1 | 2 terminales SSH simultáneas |
+**Estado: ACTIVA — NO APAGAR**
 
----
-
-## 🟢 Servicios activos
-
-| Servicio | Estado | Notas |
-|---------|--------|-------|
-| Tailscale Madre | ✅ Activo | VPN funcional |
-| Tailscale Acer | ✅ Activo | |
-| UFW Madre | ✅ Activo | Reglas estrictas |
-| Fail2ban | ✅ Activo | |
-| Ollama Madre | ✅ Activo | qwen2.5:7b + qwen2.5:3b |
-| Docker thdora | ⏳ En despliegue | Build en progreso 2026-07-03 |
-| n8n | ❌ No activo | Pendiente Fase 6 |
-| Wazuh | ❌ No activo | Pendiente Fase 4 |
+> Madre es el servidor central del ecosistema. Contiene Docker, todos los bots,
+> datos históricos y el estado de los proyectos. Apagarla rompe TODO.
+> Si necesitas reiniciar algo, reinicia contenedores individuales, nunca la máquina.
 
 ---
 
-## 📊 Estado fases (resumen)
+## 🐳 DOCKER — Estado actual
 
-| Fase | Nombre | % | Próximo paso |
-|------|--------|---|---------------|
-| 1 | Seguridad base Madre | 90% | Deshabilitar SSH password |
-| 2 | GitHub profesional | 70% | Labels + milestones |
-| 3 | Governance repo | 50% | Unificar numeración fases |
-| 4 | Stack técnico Madre | 10% | Hardening batcueva |
-| 5 | GitHub Actions | 30% | Deploy desde thdora |
-| **6** | **Thdora Guardián** | **20%** | **⭐ FOCO ACTUAL: handlers /estado /inbox** |
-| 6d | Multi-IA n8n | 0% | Después de Fase 6 |
-| 7 | Ollama + RAG | 20% | Qdrant + bge-m3 |
-| 8 | MCP server Madre | 0% | Después de Fase 7 |
-| 9 | Mobile completo | 30% | a-Shell + SSH iPhone |
+### ✅ Healthy (funcionando)
+
+| Contenedor | Estado | Notas |
+|---|---|---|
+| `thdora` | Up 17h ✅ healthy | Bot principal — OK |
+| `thdora-bot` | Up 17h ✅ healthy | Telegram bot — OK |
+| `guardian_bot` | Up 17h ✅ healthy | Monitoriza el ecosistema |
+| `uptime-kuma` | Up 17h ✅ healthy | Dashboard de uptime |
+| `network_radar` | Up 17h ✅ healthy | Radar de red |
+| `log_guardian_bot` | Up ~1min 🔄 starting | Recién arrancado, normalizar |
+
+### ⚠️ Unhealthy (revisar en próxima sesión)
+
+| Contenedor | Estado | Causa probable | Acción |
+|---|---|---|---|
+| `tailscale_monitor` | Up 5min ❌ unhealthy | Tailscale config/token | `docker logs tailscale_monitor` |
+| `local_tripwire` | Up 11min ❌ unhealthy | Config inicial | `docker logs local_tripwire` |
+| `yggdrasil_watchdog` | Up 17h ❌ unhealthy | Healthcheck falla | `docker logs yggdrasil_watchdog` |
+
+### ℹ️ Sin healthcheck (normal)
+
+| Contenedor | Estado | Notas |
+|---|---|---|
+| `radar_backup` | Up 17h | Sin healthcheck definido |
+| `kali-pentest` | Up 17h | Herramienta, no servicio |
+| `spiderfoot` | Up 17h | OSINT tool |
+| `code-server` | Up 17h | VSCode en navegador |
+| `n8n` | Up 17h | Automatización workflows |
+| `gitea` | Up 17h | Git server local |
+| `grafana` | Up 17h | Dashboards métricas |
+| `prometheus` | Up 17h | Métricas |
+| `portainer` | Up 17h | Gestión Docker |
 
 ---
 
-## 🧟 Deuda técnica pendiente
+## 🚨 ISSUES ACTIVOS
 
-### Thdora (Sprint 6)
-- [ ] `MessageLog` real en scheduler_tasks.py
-- [ ] Tests de regresión handlers
-- [ ] Verificar Docker arriba + smoke test `/start`
-
-### Scripts yggdrasil-dew
-- [ ] Eliminar zombies: `inbox-cleanup-jun2024.sh`, `bc`, `inicio-sesion.sh`
-- [ ] Mover scripts sueltos a subdirectorios
-- [ ] Unificar numeración 01-10 con ROADMAP
-- [ ] Registrar cron night-cron.sh en crontab Madre
-
-### Repo que falta
-- [ ] **Batcueva / IA stack repo** — documentar Ollama + RAG + n8n en repo dedicado
-  o dentro de yggdrasil-dew en carpeta `infra/batcueva/`
-  - Decisión pendiente: ¿repo aparte o dentro de yggdrasil-dew?
+| # | Descripción | Prioridad | Sprint |
+|---|---|---|---|
+| fix unhealthy x3 | tailscale_monitor, local_tripwire, yggdrasil_watchdog | MEDIA | Sprint 7 |
+| Telegram /notify 404 | `{"detail":"Not Found"}` — endpoint no existe aún | BAJA | Sprint 6 |
+| Raiz limpia | macro-noche.sh + bootstrap.sh sueltos | BAJA | Sprint 7 |
+| investigador-maestro | Proyecto no creado aún | MEDIA | Sprint 7 |
 
 ---
 
-## 📝 Acciones de cierre sesión 2026-07-03
+## 📊 REPOS
 
-```bash
-# En Madre ahora mismo:
-bash ~/yggdrasil-dew/scripts/maintenance/close-session.sh
+| Repo | Ruta en Madre | Estado |
+|---|---|---|
+| yggdrasil-dew | `~/yggdrasil-dew` | ✅ Clonado y actualizado |
+| thdora | `~/Projects/thdora` | ✅ Sin cambios |
+| investigador-maestro | `~/Projects/investigador-maestro` | ❌ No creado |
 
-# Cron nocturno (añadir una sola vez):
-crontab -e
-# Añadir: 0 2 * * * bash ~/yggdrasil-dew/scripts/maintenance/night-cron.sh >> /tmp/night-cron.log 2>&1
+---
+
+## 🔑 REGLA: NO APAGAR MADRE
+
+```
+Madre = servidor 24/7
+Si necesitas "reiniciar" algo:
+  docker restart <nombre_contenedor>
+
+Si necesitas parar un contenedor:
+  docker stop <nombre_contenedor>
+
+NUNCA: sudo shutdown / sudo reboot (sin avisar al equipo)
 ```
 
 ---
 
-## 📅 Próxima sesión — foco
+## 📅 HISTORIAL DE SESIONES
 
-1. **Confirmar Docker thdora arriba** (`docker ps` en Madre)
-2. **Smoke test** `/start` en Telegram
-3. **Handlers Fase 6**: implementar `/estado`, `/inbox`, `/pendientes`
-4. **Eliminar zombies** (3 scripts confirmados)
-5. **Decidir**: batcueva/IA — ¿repo aparte o carpeta en yggdrasil-dew?
+| Fecha | Qué se hizo |
+|---|---|
+| 2026-07-03 | Fix close-session.sh (blink compat), ECOSYSTEM-ARCHITECTURE.md, regla escalado, smoke tests, CI scripts, raiz limpia parcial |
+| 2026-07-02 | Regla SINE documentada, scripts de sesión, ruta thdora confirmada |
 
----
-
-_Actualizado: 2026-07-03 06:45 CEST — cierre sesión Perplexity MCP_
+_Actualizado automáticamente al cerrar sesión_
