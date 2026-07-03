@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-03
-hora: 21:40
+hora: 21:41
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-03 21:40
+title: Reality Check 2026-07-03 21:41
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-03 21:40
+# 🔍 Ecosystem Reality Check — 2026-07-03 21:41
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-03 21:40
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 102 |
+| Total scripts | 103 |
 | Ejecutables (chmod +x) | 53 |
-| Sin permisos ejecución | 49 |
+| Sin permisos ejecución | 50 |
 | En raíz scripts/ (sin organizar) | 50 |
-| En subdirectorios | 52 |
+| En subdirectorios | 53 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -206,8 +206,8 @@ _20 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 102 |
+| Scripts totales | 103 |
 | Actions activas | 49 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 21:40*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 21:41*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
