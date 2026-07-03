@@ -1,96 +1,70 @@
----
-tags: [estado, sistema, real-time]
-fecha-actualizacion: 2026-07-02T21:05
----
+# Estado del Sistema — Yggdrasil Ecosystem
 
-# 📊 ESTADO-SISTEMA.md — Estado real 02-jul-2026 21:05
+> Última actualización: 2026-07-03 04:29 CEST
+> Actualizado por: Perplexity MCP (sesión iPhone madrugada)
 
-> ⚠️ Este fichero se actualiza manualmente cada sesión.
-> Para automatizarlo: ver Fase 5 (GitHub Actions) y Fase 6 (Thdora Guardián).
+## 🟢 Infraestructura Activa
 
----
-
-## Madre (servidor principal)
-
-| Servicio | Estado | Notas |
-|---|---|---|
-| Sistema operativo | ✅ Arch Linux | Operativo |
-| UFW | ✅ Activo | Reglas configuradas |
-| fail2ban | ✅ Activo | Jail sshd |
-| Tailscale | ✅ Autoarranque | VPN activa |
-| SSH | ⚠️ Parcial | Hardening pendiente (solo clave pública) |
-| Docker | ✅ Instalado | Compose disponible |
-| n8n | ⚠️ Corriendo | Escuchando 0.0.0.0 — hardening urgente |
-| Thdora (FastAPI) | ✅ Corriendo | Base funcional, handlers pendientes |
-| Batcueva stack | ❌ Detenido | start-batcueva.sh no ejecutado |
-| Wazuh | ❌ Bloqueado | vm.max_map_count no configurado |
-| Suricata | ❌ No instalado | Fase 4 |
-| Kali KasmWeb | ❌ No instalado | Fase 4 |
-| Pihole | ❌ No instalado | Fase 4 |
-| SearXNG | ❌ No instalado | Fase 4 |
-| Ollama | ✅ Instalado | qwen2.5:7b + qwen2.5:3b listos |
-| llama3.1:8b | ❌ No descargado | Fase 7 |
-| bge-m3 | ❌ No descargado | Fase 7 |
-| Qdrant | ❌ No instalado | Fase 7 |
-
----
-
-## Thdora (workstation / varpc)
-
-| Servicio | Estado | Notas |
-|---|---|---|
-| Sistema operativo | ✅ Arch Linux | Operativo |
-| Tailscale | ✅ Activo | |
-| Cursor IDE | ❌ No instalado | Pendiente + MCP config |
-| Obsidian | ✅ Instalado | Vault sincronizado |
-| GitHub CLI | ✅ Disponible | |
-| Docker | ✅ Disponible | |
-| Workflows Actions | ❌ Sin desplegar | 5 drafts en inbox/ |
-| inbox/ pendiente migrar | ⚠️ 32 ficheros | Script listo en inbox/ |
-
----
-
-## Móviles
-
-| Dispositivo | Tailscale | SSH a Madre | Estado |
+| Nodo | IP Tailscale | Estado | Rol |
 |---|---|---|---|
-| iPhone | ✅ Activo | ❌ Termius pendiente | Issue #8 |
-| Redmi A5 | ❌ Pendiente | ❌ | Fase 9 |
+| Madre (varpc) | 100.91.112.32 | ✅ ONLINE | Servidor principal |
+| iPhone 11 | 100.81.187.99 | ✅ ONLINE | Operación móvil |
+| Acer (varo12f) | 100.86.119.102 | ✅ ONLINE | Workstation |
+| Xiaomi | 100.106.133.70 | ✅ ONLINE | Backup móvil |
 
----
+## 🔒 Seguridad
 
-## GitHub repo
-
-| Área | Estado | Notas |
+| Servicio | Estado | Notas |
 |---|---|---|
-| Issues abiertos | 9 (#2,3,5,6,8,9,10,11,12) | |
-| Issues por crear | 3 (#13,14,15) | Fases 6d, 7, 8MCP |
-| CONVENCIONES.md | ✅ Nivel senior | Actualizado 02-jul |
-| AGENT.md | ✅ Actualizado | 02-jul |
-| CONTRIBUTING.md | ✅ Creado | 02-jul |
-| Issue templates | ✅ Activos | .github/ISSUE_TEMPLATE/ |
-| PR template | ❌ Pendiente | |
-| Labels personalizados | ❌ Pendiente | |
-| Milestones | ❌ Pendiente | |
-| CODEOWNERS | ❌ Pendiente | |
-| Branch protection | ❌ Pendiente | |
-| GitHub Actions | ❌ Sin desplegar | 5 drafts |
-| Profile README | ❌ Sin crear | |
-| Archivos basura en raíz | ⚠️ 2 | `tailscale-full.apk` + `ly` (git rm pendiente) |
-| `filosofia.md` en raíz | ⚠️ Duplicado | Ya en docs/, borrar de raíz (needs-terminal) |
-| `.obsidian/` en repo | ⚠️ Trackeado | `git rm -r --cached .obsidian/` pendiente |
+| SSH Madre | ✅ Hardened | No password, no root, pubkey only |
+| Tailscale | ✅ Activo | 4 nodos en tailnet |
+| Puerto 21 FTP | ⚠️ PENDIENTE | Cerrar en router — issue #14 |
+| Blink SSH iPhone | ✅ Operativo | ed25519 blink-madre |
 
----
+## 🤖 IA Local (Madre)
 
-## Hallazgos seguridad activos
-
-| Hallazgo | Severidad | Estado |
+| Herramienta | Estado | Notas |
 |---|---|---|
-| Puerto FTP 21 abierto | 🔴 Alta | Documentado, fix pendiente |
-| n8n escuchando 0.0.0.0 | 🔴 Alta | Fix urgente (bind Tailscale) |
-| SSH sin hardening completo | 🟡 Media | Fase 1 pendiente |
-| .obsidian/ en git | 🟡 Media | Privacidad, git rm pendiente |
+| Ollama | ✅ Instalado | v0.x — descargando modelos |
+| llama3.1:8b | ⏳ Descargando | tmux sesión `trabajo` |
+| mistral:7b | ⏳ Pendiente | en cola pull-modelos.sh |
+| codellama:7b | ⏳ Pendiente | en cola pull-modelos.sh |
+| Thdora | ⚠️ En desarrollo | issue #1 |
+
+## 📁 Repo
+
+| Ítem | Estado |
+|---|---|
+| Git configurado en Madre | ✅ |
+| GitHub SSH funcionando | ✅ |
+| Inbox limpio | ✅ |
+| Scripts mantenimiento | ✅ morning-check.sh, health-check.sh, audit-repo.sh |
+| Diario 2026-07-03 | ✅ |
+
+## 📋 Issues Abiertos Prioritarios
+
+| # | Título | Prioridad |
+|---|---|---|
+| #25 | Verificar modelos Ollama descargados | P1 — mañana |
+| #22 | Labels personalizados | P1 |
+| #14 | Cerrar puerto 21 FTP router | P1 seguridad |
+| #16 | Limpieza git BFG historial | P2 |
+| #17 | Migrar inbox/ → docs/ | P2 |
+| #11 | GitHub Actions agentes IA | P2 |
+| #9 | Docker stack Wazuh+Suricata+Pihole | P3 |
+
+## ✅ Completado Esta Sesión (03-jul-2026)
+
+- iPhone SSH via Blink Shell (issue #23)
+- SSH Hardening Madre (issue #13)
+- Bootstrap Madre
+- Git + GitHub en Madre
+- Inbox limpiado (7 archivos → procesado/)
+- Ollama instalado + modelos en descarga background
+- Tmux configurado con sesión persistente
+- Scripts: morning-check.sh, pull-modelos.sh
+- Docs: iphone-ssh-blink.md, ssh-hardening.md, tmux-background-jobs.md
+- Diario 2026-07-03.md
 
 ---
-
-_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_
+_Próxima sesión: ejecutar `bash scripts/maintenance/morning-check.sh` para ver estado completo_
