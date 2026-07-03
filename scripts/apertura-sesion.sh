@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# apertura-sesion.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # ================================================================
 # apertura-sesion.sh — Apertura oficial de sesión de trabajo
 # Sincroniza repo, audita estado y muestra contexto de la sesión
