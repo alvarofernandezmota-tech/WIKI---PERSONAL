@@ -7,23 +7,5 @@
         "YGGDRASIL_ROOT": "/srv/yggdrasil-dew"
       }
     }
-  },
-  "_comment": "Pega este JSON en: Claude Desktop ~/.claude/claude_desktop_config.json | VS Code settings MCP | Cualquier cliente MCP compatible",
-  "_tools_exposed": [
-    "orquestador_supremo",
-    "watchdog_monitor",
-    "clasificador_maestro",
-    "struct_auditor",
-    "ghost_file_detector",
-    "agent_docs",
-    "agent_islas",
-    "agent_tareas",
-    "agent_investigacion",
-    "agent_ecosistema",
-    "cross_ref_checker",
-    "isla_sync_validator",
-    "tool_inventory_auditor",
-    "core_estado",
-    "run_between_sessions"
-  ]
+  }
 }
