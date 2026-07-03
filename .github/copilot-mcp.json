@@ -1,0 +1,12 @@
+{
+  "_info": "Configuración MCP para GitHub Copilot. En Settings → Copilot → MCP servers del repo.",
+  "mcpServers": {
+    "yggdrasil-ecosistema": {
+      "command": "node",
+      "args": ["server.js"],
+      "env": {
+        "YGGDRASIL_ROOT": "/srv/yggdrasil-dew"
+      }
+    }
+  }
+}

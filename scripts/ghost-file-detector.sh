@@ -1,67 +1,80 @@
 #!/usr/bin/env bash
-# FUNCIÓN:   Detectar archivos vacíos y referencias rotas en docs
-# TRIGGER:   Cron diario, manual, llamada desde MCP
-# AGENTE:    ghost-file-detector
-# ETIQUETAS: estructura, deuda-tecnica
-# RUTAS:     diarios/, docs/
+## FUNCIÓN: Detecta archivos fantasma: vacíos, huérfanos sin referencia,
+##          y documentos que referencian rutas inexistentes en el repo.
+## TRIGGER:  GitHub Action repo-audit, MCP tool ghost_file_detector
+## OUTPUT:   Lista de fantasmas + issue si hay críticos
+
 set -euo pipefail
 
-ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo '.')}"
-REPORT_DIR="$ROOT/diarios"
-DATE=$(date +%Y-%m-%d)
-REPORT="$REPORT_DIR/ghost-files-$DATE.md"
-FOUND=0
+ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo .)}"
+DATE=$(date +"%Y-%m-%d %H:%M")
+GHOSTS=0
+REPORT=""
 
-mkdir -p "$REPORT_DIR"
+log() { REPORT+="$1\n"; echo "$1"; }
 
-echo "# Ghost File Detector — $DATE" > "$REPORT"
-echo "" >> "$REPORT"
+log "# 👻 GHOST FILE DETECTOR — $DATE"
+log ""
 
-# 1. Archivos vacíos (0 bytes)
-echo "## Archivos vacíos (0 bytes)" >> "$REPORT"
+# ── 1. ARCHIVOS COMPLETAMENTE VACÍOS ─────────────────────────────────────────
+log "## Archivos vacíos (0 bytes)"
 while IFS= read -r f; do
-  echo "- 👻 $f" >> "$REPORT"
-  FOUND=$((FOUND+1))
-done < <(find "$ROOT" -type f -size 0 \
-  ! -path "$ROOT/.git/*" \
-  ! -path "$ROOT/node_modules/*" \
-  2>/dev/null)
-
-if [ "$FOUND" -eq 0 ]; then
-  echo "- Sin archivos vacíos" >> "$REPORT"
-fi
-
-# 2. Referencias rotas en markdown (links [texto](ruta) locales)
-echo "" >> "$REPORT"
-echo "## Referencias rotas en docs/" >> "$REPORT"
-BROKEN=0
-while IFS= read -r mdfile; do
-  while IFS= read -r link; do
-    link_path="$(dirname "$mdfile")/$link"
-    if [ ! -e "$link_path" ]; then
-      echo "- 🔗 Roto: \`$mdfile\` → \`$link\`" >> "$REPORT"
-      BROKEN=$((BROKEN+1))
-      FOUND=$((FOUND+1))
-    fi
-  done < <(grep -oP '\(\K[^)]+(?=\))' "$mdfile" | grep -v '^http' | grep -v '^#' || true)
-done < <(find "$ROOT/docs" -name '*.md' 2>/dev/null)
-
-if [ "$BROKEN" -eq 0 ]; then
-  echo "- Sin referencias rotas" >> "$REPORT"
-fi
-
-# 3. Abrir issue si hay fantasmas
-if [ "$FOUND" -gt 0 ] && command -v gh &>/dev/null; then
-  EXISTING=$(gh issue list --label "estructura" --search "[FANTASMAS]" --state open --json number --jq length 2>/dev/null || echo "0")
-  if [ "$EXISTING" -eq 0 ]; then
-    gh issue create \
-      --title "[FANTASMAS] $FOUND archivos vacíos o referencias rotas detectados" \
-      --label "estructura,deuda-tecnica" \
-      --body "Ghost File Detector encontró **$FOUND** problemas el $DATE.\n\nVer reporte: \`diarios/ghost-files-$DATE.md\`" 2>/dev/null || true
+  rel="${f#$ROOT/}"
+  # Ignorar .gitkeep y carpetas .git
+  if [[ "$rel" == *".gitkeep"* ]] || [[ "$rel" == *".git/"* ]]; then
+    continue
   fi
-fi
+  log "  👻 VACÍO: $rel"
+  GHOSTS=$((GHOSTS+1))
+done < <(find "$ROOT" -type f -empty 2>/dev/null | grep -v '.git' || true)
+log ""
 
-echo "" >> "$REPORT"
-echo "## Resumen" >> "$REPORT"
-echo "- Total problemas: **$FOUND**" >> "$REPORT"
-echo "[ghost-file-detector] Completado. Problemas: $FOUND"
+# ── 2. LINKS INTERNOS ROTOS EN MARKDOWN ──────────────────────────────────────
+log "## Links internos rotos en .md"
+while IFS= read -r mdfile; do
+  rel="${mdfile#$ROOT/}"
+  # Extraer links tipo [texto](ruta) que no sean http/https
+  grep -oP '\((?!https?://)[^)]+\.md[^)]*\)' "$mdfile" 2>/dev/null | \
+  sed 's/[()]//g' | \
+  while IFS= read -r link; do
+    # Resolver ruta relativa al directorio del .md
+    dir=$(dirname "$mdfile")
+    target="$dir/$link"
+    if [ ! -f "$target" ] && [ ! -f "$ROOT/$link" ]; then
+      log "  🔗 ROTO: $rel → $link"
+      GHOSTS=$((GHOSTS+1))
+    fi
+  done
+done < <(find "$ROOT" -name '*.md' | grep -v '.git' || true)
+log ""
+
+# ── 3. SCRIPTS REFERENCIADOS EN DOCS PERO INEXISTENTES ───────────────────────
+log "## Scripts referenciados pero no existentes"
+SCRIPTS_DIR="$ROOT/scripts"
+while IFS= read -r mdfile; do
+  grep -oP 'scripts/[a-zA-Z0-9_-]+\.sh' "$mdfile" 2>/dev/null | \
+  while IFS= read -r script_ref; do
+    if [ ! -f "$ROOT/$script_ref" ]; then
+      rel="${mdfile#$ROOT/}"
+      log "  📄 REFERENCIADO PERO FALTA: $script_ref (mencionado en $rel)"
+      GHOSTS=$((GHOSTS+1))
+    fi
+  done
+done < <(find "$ROOT" -name '*.md' | grep -v '.git' || true)
+log ""
+
+# ── RESUMEN ───────────────────────────────────────────────────────────────────
+log "## Resumen"
+if [ "$GHOSTS" -eq 0 ]; then
+  log "✅ GHOST OK — Sin archivos fantasma detectados."
+else
+  log "⚠️  GHOSTS: $GHOSTS elementos problemáticos. Revisar arriba."
+  if command -v gh &>/dev/null && [ -n "${GITHUB_REPOSITORY:-}" ]; then
+    gh issue create \
+      --title "[GHOST-DETECTOR] $GHOSTS archivos fantasma — $DATE" \
+      --body "$(printf '%b' "$REPORT")" \
+      --label "audit,fantasma,automatico" 2>/dev/null || true
+    echo "📋 Issue automático creado."
+  fi
+  exit 1
+fi

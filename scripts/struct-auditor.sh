@@ -1,77 +1,88 @@
 #!/usr/bin/env bash
-# =============================================================
-# FUNCIÓN:   Detectar carpetas duplicadas y abrir issue en GitHub
-# TRIGGER:   Manual o cron semanal (ecosystem-guardian.yml)
-# AGENTE:    thdora-guardian, ecosystem-guardian
-# ETIQUETAS: duplicado, estructura, deuda-tecnica
-# RUTAS:     diarios/, osint/, osint-stack/, diary/, diarios/
-# =============================================================
-# Uso: ./scripts/struct-auditor.sh
-# Requisitos: gh CLI autenticado, git
-# =============================================================
+## FUNCIÓN: Auditoría estructural del repo. Detecta carpetas duplicadas,
+##          carpetas vacías, y desviaciones del mapa oficial de islas.
+## TRIGGER:  GitHub Action repo-audit, MCP tool struct_auditor
+## OUTPUT:   Informe en stdout + issue automático si hay problemas
 
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
-LOG_DIR="${REPO_ROOT}/diarios"
-DATE="$(date +%Y-%m-%d)"
-LOG_FILE="${LOG_DIR}/struct-audit-${DATE}.md"
-FOUND_ISSUES=0
+ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo .)}"
+DATE=$(date +"%Y-%m-%d %H:%M")
+ISSUES_FOUND=0
+REPORT=""
 
-mkdir -p "${LOG_DIR}"
+log() { REPORT+="$1\n"; echo "$1"; }
 
-echo "# Struct Audit — ${DATE}" > "${LOG_FILE}"
-echo "" >> "${LOG_FILE}"
-echo "**Ejecutado:** $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
-echo "" >> "${LOG_FILE}"
+log "# 🔍 STRUCT AUDITOR — $DATE"
+log "ROOT: $ROOT"
+log ""
 
-# ─── PARES DE CARPETAS DUPLICADAS ─────────────────────────────
-declare -A DUPLICATES=(
-  ["diary"]="diarios"
-  ["osint-stack"]="osint"
+# ── 1. CARPETAS DUPLICADAS CONOCIDAS ──────────────────────────────────────────
+log "## Carpetas duplicadas"
+DUPLICADOS=(
+  "diary diarios"
+  "osint osint-stack"
+  "ROADMAP.md ROADMAP-MASTER.md"
 )
 
-echo "## Duplicados detectados" >> "${LOG_FILE}"
-echo "" >> "${LOG_FILE}"
-
-for src in "${!DUPLICATES[@]}"; do
-  dst="${DUPLICATES[$src]}"
-  src_path="${REPO_ROOT}/${src}"
-  dst_path="${REPO_ROOT}/${dst}"
-
-  if [ -d "${src_path}" ] && [ -d "${dst_path}" ]; then
-    src_count=$(find "${src_path}" -type f | wc -l | tr -d ' ')
-    dst_count=$(find "${dst_path}" -type f | wc -l | tr -d ' ')
-
-    echo "- ⚠️ **${src}/** (${src_count} archivos) y **${dst}/** (${dst_count} archivos) son duplicados" >> "${LOG_FILE}"
-    echo "  - Acción: mover contenido de \`${src}/\` → \`${dst}/\` y eliminar \`${src}/\`" >> "${LOG_FILE}"
-    FOUND_ISSUES=$((FOUND_ISSUES + 1))
-
-    # Abrir issue si gh está disponible
-    if command -v gh &>/dev/null; then
-      EXISTING=$(gh issue list --label "duplicado" --search "[DUPLICADO] ${src}" --json number --jq length 2>/dev/null || echo "0")
-      if [ "${EXISTING}" -eq 0 ]; then
-        gh issue create \
-          --title "[DUPLICADO] Consolidar ${src}/ → ${dst}/" \
-          --label "duplicado,estructura,deuda-tecnica" \
-          --body "## Carpeta duplicada detectada por struct-auditor\n\n**Origen:** \`${src}/\` (${src_count} archivos)\n**Destino:** \`${dst}/\` (${dst_count} archivos)\n\n### Acción requerida\n1. Revisar contenido de \`${src}/\`\n2. Mover archivos únicos a \`${dst}/\`\n3. Eliminar carpeta \`${src}/\`\n4. Actualizar referencias en docs y scripts\n\n*Issue generado automáticamente por \`scripts/struct-auditor.sh\` el ${DATE}*" \
-          2>/dev/null && echo "  ✅ Issue creado para ${src}" || echo "  ⚠️ No se pudo crear issue para ${src}"
-      else
-        echo "  ℹ️ Issue ya existe para ${src}/${dst}"
-      fi
-    fi
-  elif [ -d "${src_path}" ] && [ ! -d "${dst_path}" ]; then
-    echo "- ℹ️ **${src}/** existe pero **${dst}/** no — renombrar directamente" >> "${LOG_FILE}"
+for par in "${DUPLICADOS[@]}"; do
+  a=$(echo $par | cut -d' ' -f1)
+  b=$(echo $par | cut -d' ' -f2)
+  if [ -e "$ROOT/$a" ] && [ -e "$ROOT/$b" ]; then
+    log "  ⚠️  DUPLICADO: '$a' y '$b' coexisten. Uno debe eliminarse o consolidarse."
+    ISSUES_FOUND=$((ISSUES_FOUND+1))
+  else
+    log "  ✅  $a / $b — OK (solo existe uno)"
   fi
 done
+log ""
 
-echo "" >> "${LOG_FILE}"
-echo "## Resumen" >> "${LOG_FILE}"
-echo "" >> "${LOG_FILE}"
-echo "- Issues encontrados: **${FOUND_ISSUES}**" >> "${LOG_FILE}"
-echo "- Log guardado en: \`${LOG_FILE}\`" >> "${LOG_FILE}"
+# ── 2. CARPETAS VACÍAS ────────────────────────────────────────────────────────
+log "## Carpetas vacías"
+while IFS= read -r dir; do
+  # Ignorar .git y .obsidian
+  if [[ "$dir" =~ /\.git ]] || [[ "$dir" =~ /\.obsidian ]]; then
+    continue
+  fi
+  # Directorio vacío = no tiene archivos (solo quizás .gitkeep)
+  count=$(find "$dir" -maxdepth 1 -type f | grep -v '.gitkeep' | wc -l)
+  if [ "$count" -eq 0 ]; then
+    subdirs=$(find "$dir" -mindepth 1 -maxdepth 1 -type d | wc -l)
+    if [ "$subdirs" -eq 0 ]; then
+      log "  ⚠️  VACÍA: ${dir#$ROOT/}"
+      ISSUES_FOUND=$((ISSUES_FOUND+1))
+    fi
+  fi
+done < <(find "$ROOT" -mindepth 1 -maxdepth 2 -type d)
+log ""
 
-echo "[struct-auditor] Completado. Issues encontrados: ${FOUND_ISSUES}"
-echo "[struct-auditor] Log: ${LOG_FILE}"
+# ── 3. ISLAS ESPERADAS vs REALES ─────────────────────────────────────────────
+log "## Islas esperadas"
+ISLAS_ESPERADAS=("proyectos" "hardware" "formacion" "osint" "diarios" "sesiones" "inbox" "agentes" "scripts" "docs" "templates" "mcp" "tools" "core")
 
-exit 0
+for isla in "${ISLAS_ESPERADAS[@]}"; do
+  if [ -d "$ROOT/$isla" ]; then
+    log "  ✅  $isla"
+  else
+    log "  ❌  FALTA: $isla — no existe en el repo"
+    ISSUES_FOUND=$((ISSUES_FOUND+1))
+  fi
+done
+log ""
+
+# ── RESUMEN ───────────────────────────────────────────────────────────────────
+log "## Resumen"
+if [ "$ISSUES_FOUND" -eq 0 ]; then
+  log "✅ STRUCT OK — Sin problemas detectados."
+else
+  log "⚠️  STRUCT ISSUES: $ISSUES_FOUND problemas encontrados. Revisar arriba."
+  # Si hay gh CLI disponible, crear issue automático
+  if command -v gh &>/dev/null && [ -n "${GITHUB_REPOSITORY:-}" ]; then
+    gh issue create \
+      --title "[STRUCT-AUDITOR] $ISSUES_FOUND problemas estructurales detectados — $DATE" \
+      --body "$(printf '%b' "$REPORT")" \
+      --label "audit,automatico" 2>/dev/null || true
+    echo "📋 Issue automático creado en GitHub."
+  fi
+  exit 1
+fi
