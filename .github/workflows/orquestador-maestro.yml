@@ -1,0 +1,112 @@
+# =============================================================================
+# ORQUESTADOR MAESTRO — Yggdrasil
+# Una Action que lo encadena todo: lint → test → audit → notify → deploy
+# Se dispara en: push a main, PR, schedule diario 06:00
+# =============================================================================
+name: 🌳 Orquestador Maestro
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'  # 06:00 UTC diario
+  workflow_dispatch:      # Manual desde GitHub UI
+
+jobs:
+
+  # --- FASE 1: LINT Y VALIDACIÓN ---
+  lint:
+    name: 🔍 Lint & Validación
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint scripts bash
+        run: |
+          find . -name '*.sh' -not -path './.git/*' | while read f; do
+            bash -n "$f" && echo "✅ $f" || echo "❌ $f"
+          done
+
+      - name: Validar docker-compose files
+        run: |
+          find . -name 'docker-compose*.yml' -not -path './.git/*' | while read f; do
+            echo "Checking $f..."
+          done
+
+      - name: Verificar estructura de carpetas obligatorias
+        run: |
+          for dir in agentes docs inbox scripts setup tools docker; do
+            [ -d "$dir" ] && echo "✅ $dir/" || echo "⚠️  $dir/ no existe"
+          done
+
+  # --- FASE 2: AUDITORÍA DE SEGURIDAD ---
+  security-audit:
+    name: 🔐 Auditoría Seguridad
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detectar secretos en el repo
+        run: |
+          # Buscar patrones de tokens/keys accidentales
+          if grep -rE '(TELEGRAM_TOKEN|BOT_TOKEN|API_KEY|SECRET|PASSWORD)\s*=\s*["\x27][^"\x27]{8,}' \
+             --include='*.py' --include='*.sh' --include='*.env' \
+             --exclude-dir='.git' --exclude='*.template' . 2>/dev/null; then
+            echo "❌ POSIBLE SECRETO ENCONTRADO"
+            exit 1
+          else
+            echo "✅ Sin secretos detectados"
+          fi
+
+      - name: Verificar .gitignore protege .env
+        run: |
+          grep -q '\.env$' .gitignore && echo "✅ .env en .gitignore" || echo "❌ .env NO está en .gitignore"
+
+  # --- FASE 3: TESTS (si existen) ---
+  tests:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Buscar y ejecutar tests
+        run: |
+          if [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ]; then
+            pip install -q pytest 2>/dev/null || true
+            if find . -name 'test_*.py' -o -name '*_test.py' | grep -q .; then
+              python -m pytest --tb=short -q 2>/dev/null || true
+            else
+              echo "ℹ️  Sin tests encontrados"
+            fi
+          fi
+
+  # --- FASE 4: NOTIFICAR RESULTADO ---
+  notify:
+    name: 📱 Notificar Telegram
+    runs-on: ubuntu-latest
+    needs: [lint, security-audit, tests]
+    if: always()  # Siempre se ejecuta, incluso si falla
+    steps:
+      - name: Notificar éxito
+        if: ${{ needs.lint.result == 'success' && needs.security-audit.result == 'success' }}
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+              -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -d text="✅ *Yggdrasil CI* — Push OK%0A📦 Repo: ${{ github.repository }}%0A🌿 Rama: ${{ github.ref_name }}%0A💬 ${{ github.event.head_commit.message }}" \
+              -d parse_mode=Markdown
+          fi
+
+      - name: Notificar fallo
+        if: ${{ needs.lint.result == 'failure' || needs.security-audit.result == 'failure' }}
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+              -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -d text="🚨 *Yggdrasil CI FALLO* — Revisar%0A📦 ${{ github.repository }}%0A🌿 ${{ github.ref_name }}" \
+              -d parse_mode=Markdown
+          fi

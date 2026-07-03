@@ -1,0 +1,9 @@
+python-telegram-bot>=20.0
+requests>=2.31
+aiohttp>=3.9
+beautifulsoup4>=4.12
+python-whois>=0.9
+dnspython>=2.4
+schedule>=1.2
+fastapi>=0.104
+uvicorn>=0.24
