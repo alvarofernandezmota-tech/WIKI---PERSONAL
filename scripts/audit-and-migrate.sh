@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# audit-and-migrate.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # =============================================================================
 # audit-and-migrate.sh — Script maestro de auditoría y migración del ecosistema
 # Yggdrasil Dew · 2026-07-03

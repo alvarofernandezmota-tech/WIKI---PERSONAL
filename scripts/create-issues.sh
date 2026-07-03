@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# create-issues.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # =============================================================================
 # create-issues.sh — Crea issues GitHub para todas las tareas pendientes
 # Yggdrasil Dew · 2026-07-03
