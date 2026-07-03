@@ -1,0 +1,98 @@
+# audit-on-push.yml
+# Fase 5 — Se dispara en cada push al main
+# Analiza los archivos subidos y deja resultado en inbox/
+
+name: 🔍 Audit on Push
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'inbox/**'
+      - 'diarios/**'
+
+jobs:
+  audit-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detectar archivos cambiados
+        id: changed
+        run: |
+          git diff --name-only HEAD~1 HEAD > /tmp/changed-files.txt
+          echo "Archivos modificados:"
+          cat /tmp/changed-files.txt
+
+      - name: Auditar archivos
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          TIME=$(date +%H:%M)
+          REPORT="inbox/audit-${DATE}-${GITHUB_RUN_NUMBER}.md"
+
+          echo "---" > $REPORT
+          echo "tags: [audit, auto, inbox]" >> $REPORT
+          echo "fecha: ${DATE}" >> $REPORT
+          echo "run: $GITHUB_RUN_NUMBER" >> $REPORT
+          echo "---" >> $REPORT
+          echo "" >> $REPORT
+          echo "# 🔍 Audit Push — ${DATE} ${TIME} UTC" >> $REPORT
+          echo "" >> $REPORT
+          echo "**Commit:** \`${GITHUB_SHA:0:7}\`" >> $REPORT
+          echo "**Autor:** $GITHUB_ACTOR" >> $REPORT
+          echo "" >> $REPORT
+          echo "## Archivos modificados" >> $REPORT
+          echo "" >> $REPORT
+
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then continue; fi
+
+            echo "### \`$file\`" >> $REPORT
+
+            # Verificar ruta correcta
+            if [[ "$file" == *.sh && "$file" != scripts/* ]]; then
+              echo "- ⚠️ **ZOMBIE ALERT**: script fuera de \`scripts/\`" >> $REPORT
+            fi
+
+            if [[ "$file" == *.md && "$file" != docs/* && "$file" != diarios/* && "$file" != inbox/* ]]; then
+              # Verificar frontmatter
+              if [ -f "$file" ]; then
+                if ! head -1 "$file" | grep -q '---'; then
+                  echo "- ⚠️ **Sin frontmatter** — añadir tags/fecha" >> $REPORT
+                else
+                  echo "- ✅ Frontmatter OK" >> $REPORT
+                fi
+              fi
+            fi
+
+            # Tamaño del archivo
+            if [ -f "$file" ]; then
+              SIZE=$(wc -c < "$file")
+              echo "- 📎 Tamaño: ${SIZE} bytes" >> $REPORT
+              if [ "$SIZE" -lt 50 ]; then
+                echo "- 🚨 **ZOMBIE SOSPECHOSO**: archivo muy pequeño (< 50 bytes)" >> $REPORT
+              fi
+            fi
+
+            echo "" >> $REPORT
+          done < /tmp/changed-files.txt
+
+          echo "## Estado" >> $REPORT
+          echo "- 🤖 Pendiente procesar por Thdora Guardián" >> $REPORT
+          echo "- 📥 Mover a \`docs/\` cuando esté revisado" >> $REPORT
+
+          echo "REPORT_PATH=$REPORT" >> $GITHUB_ENV
+
+      - name: Commit audit a inbox
+        run: |
+          git config user.name "thdora-guardian[bot]"
+          git config user.email "thdora@yggdrasil-dew.local"
+          git add inbox/
+          git diff --cached --quiet || git commit -m "bot(audit): audit push $GITHUB_SHA···${GITHUB_RUN_NUMBER} → inbox"
+          git push
