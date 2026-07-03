@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-03
-hora: 16:46
+hora: 16:51
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-03 16:46
+title: Reality Check 2026-07-03 16:51
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-03 16:46
+# 🔍 Ecosystem Reality Check — 2026-07-03 16:51
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,10 +19,10 @@ title: Reality Check 2026-07-03 16:46
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 69 |
+| Total scripts | 70 |
 | Ejecutables (chmod +x) | 52 |
-| Sin permisos ejecución | 17 |
-| En raíz scripts/ (sin organizar) | 27 |
+| Sin permisos ejecución | 18 |
+| En raíz scripts/ (sin organizar) | 28 |
 | En subdirectorios | 42 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
@@ -36,6 +36,7 @@ title: Reality Check 2026-07-03 16:46
 - `08-fase6-thdora-handlers.sh`
 - `09-fase8-seguridad-acer.sh`
 - `10-fase9-osint-stack.sh`
+- `apertura-sesion.sh`
 - `audit-and-migrate.sh`
 - `batcueva-control.sh`
 - `cierre-sesion.sh`
@@ -100,11 +101,11 @@ title: Reality Check 2026-07-03 16:46
 ### Contenedores activos
 ```
 NAMES                STATUS                            IMAGE
-log_guardian_bot     Up 5 minutes (health: starting)   yggdrasil-secops-log_guardian
-tailscale_monitor    Up 6 minutes (unhealthy)          yggdrasil-secops-tailscale_monitor
+log_guardian_bot     Up 3 minutes (health: starting)   yggdrasil-secops-log_guardian
+tailscale_monitor    Up 4 minutes (health: starting)   yggdrasil-secops-tailscale_monitor
 radar_backup         Up 27 hours                       alpine:latest
-guardian_bot         Up 26 hours (healthy)             yggdrasil-secops-guardian_bot
-local_tripwire       Up 12 minutes (unhealthy)         yggdrasil-secops-local_tripwire
+guardian_bot         Up 27 hours (healthy)             yggdrasil-secops-guardian_bot
+local_tripwire       Up 4 minutes (health: starting)   yggdrasil-secops-local_tripwire
 network_radar        Up 27 hours (healthy)             yggdrasil-secops-network_radar
 yggdrasil_watchdog   Up 27 hours (unhealthy)           yggdrasil-secops-yggdrasil_watchdog
 kali-pentest         Up 27 hours                       kasmweb/kali-rolling-desktop:1.16.0
@@ -146,7 +147,7 @@ ollama-embeddings	Exited (255) 27 hours ago
 ### Scripts referenciados en README pero no encontrados
 
 ### TODOs/FIXMEs pendientes en scripts
-_13 items encontrados:_
+_12 items encontrados:_
 ```
 /srv/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
 /srv/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
@@ -159,7 +160,6 @@ _13 items encontrados:_
 /srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:207:  grep -rn 'TODO\|FIXME' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | head -20 >> "$OUTPUT" || true
 /srv/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:210:  log_ok "Sin TODOs/FIXMEs en scripts"
 /srv/yggdrasil-dew/scripts/thdora/thdora-scaffold.sh:60:    # TODO: conectar con Ollama para clasificar y resumir
-/srv/yggdrasil-dew/scripts/cierre-sesion.sh:94:- [ ] TODO: rellenar antes de cerrar
 ```
 
 ## 6. Fase actual del ecosistema
@@ -182,8 +182,8 @@ _13 items encontrados:_
 | ✅ OK | 7 |
 | ⚠ Warnings | 9 |
 | Total checks | 16 |
-| Scripts totales | 69 |
+| Scripts totales | 70 |
 | Actions activas | 29 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 16:46*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 16:51*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
