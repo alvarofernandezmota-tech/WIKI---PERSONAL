@@ -1,0 +1,140 @@
+# whitelist.yaml — Tools permitidas para agentes
+# Solo las tools listadas aquí pueden ser invocadas por agentes autónomos.
+# Actualización: 2026-07-03
+
+# READ — Riesgo 0. Nunca dry-run. Siempre permitidas.
+read:
+  - name: check_docker
+    script: null  # usa docker SDK directamente
+    description: "Estado de contenedores Docker"
+    dry_run: false
+    agents: ["*"]
+
+  - name: get_ecosystem_state
+    script: "scripts/06-verificacion-post-reboot.sh"
+    description: "Estado general del ecosistema (servicios, puertos, red)"
+    dry_run: false
+    agents: ["*"]
+
+  - name: read_roadmap
+    script: null  # lee ROADMAP-MASTER.md directamente
+    description: "Lee el roadmap actual"
+    dry_run: false
+    agents: ["*"]
+
+  - name: list_services
+    script: null  # usa docker SDK
+    description: "Lista servicios activos"
+    dry_run: false
+    agents: ["*"]
+
+  - name: check_ufw_status
+    script: "scripts/hardening-ufw.sh"
+    description: "Estado del firewall UFW (solo lectura)"
+    dry_run: false
+    agents: ["health-agent", "security-agent"]
+
+  - name: get_uptime_status
+    script: "scripts/uptime-kuma-webhook.py"
+    description: "Estado de servicios vía Uptime Kuma"
+    dry_run: false
+    agents: ["health-agent"]
+
+  - name: check_backup_status
+    script: "scripts/backup/"
+    description: "Estado del último backup (read-only)"
+    dry_run: false
+    agents: ["health-agent"]
+
+  - name: query_rag
+    script: null  # usa Qdrant directamente
+    description: "Consulta RAG sobre el second-brain"
+    dry_run: false
+    agents: ["*"]
+
+# WRITE-SAFE — Riesgo bajo. Dry-run disponible.
+write_safe:
+  - name: create_issue
+    script: null  # usa GitHub API
+    description: "Crea un issue en yggdrasil-dew o yggdrasil-secops"
+    dry_run: true
+    agents: ["health-agent", "roadmap-agent", "security-agent"]
+
+  - name: send_telegram
+    script: null  # usa Telegram Bot API
+    description: "Envía notificación por Telegram"
+    dry_run: true
+    agents: ["*"]
+
+  - name: update_roadmap_task
+    script: null  # edita ROADMAP-MASTER.md
+    description: "Marca tarea [AUTO] como completada"
+    dry_run: true
+    agents: ["roadmap-agent"]
+
+  - name: process_inbox
+    script: "scripts/procesar-inbox-masivo.sh"
+    description: "Procesa entradas del inbox"
+    dry_run: true
+    agents: ["gatekeeper-agent"]
+
+  - name: sync_repos
+    script: "scripts/02-git-pull-rebase.sh"
+    description: "Git pull en todos los repos"
+    dry_run: true
+    agents: ["roadmap-agent", "docs-agent"]
+
+  - name: generate_bot_report
+    script: "scripts/thdora/bot-session-report.sh"
+    description: "Genera reporte de sesión del bot"
+    dry_run: true
+    agents: ["docs-agent"]
+
+  - name: run_smoke_tests
+    script: "scripts/tests/smoke-test-scripts.sh"
+    description: "Ejecuta smoke tests de scripts"
+    dry_run: true
+    agents: ["health-agent"]
+
+# EXEC-SAFE — Riesgo medio. Dry-run OBLIGATORIO antes de ejecutar.
+exec_safe:
+  - name: restart_container
+    script: null  # usa docker SDK
+    description: "Reinicia un contenedor específico"
+    dry_run: required
+    agents: ["health-agent"]
+
+  - name: run_backup
+    script: "scripts/07-fase3-restic-backup.sh"
+    description: "Ejecuta backup con Restic"
+    dry_run: required
+    agents: ["health-agent"]
+
+  - name: run_night_cron
+    script: "maintenance/night-cron.sh"
+    description: "Limpieza nocturna"
+    dry_run: required
+    agents: ["health-agent"]
+
+  - name: fix_permissions
+    script: "scripts/fix-permisos.sh"
+    description: "Corrige permisos de ficheros"
+    dry_run: required
+    agents: ["health-agent"]
+
+  - name: trigger_n8n_workflow
+    script: null  # usa n8n API
+    description: "Dispara un workflow n8n específico"
+    dry_run: required
+    agents: ["gatekeeper-agent"]
+
+# BLOQUEADAS — Solo uso humano. Los agentes NO pueden llamarlas.
+human_only:
+  - merge_branch
+  - deploy_production
+  - install_drivers
+  - setup_security_hardening
+  - osint_active_scan
+  - modify_ufw_rules
+  - access_secrets
+  - delete_files
