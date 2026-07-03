@@ -1,119 +1,103 @@
 #!/usr/bin/env bash
-# ==============================================================
-# CIERRE DE SESIÓN — yggdrasil-dew
+# ================================================================
+# cierre-sesion.sh — Cierre oficial de sesión de trabajo
+# Documenta, commitea, pushea y deja el repo limpio
 # Uso: bash scripts/cierre-sesion.sh
-# Ruta canónica: /srv/yggdrasil-dew (con fallback a $HOME/yggdrasil-dew)
-#
-# REQUISITO para modo automático sin passphrase:
-#   eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519_github
-#   O añadir al ~/.bashrc / ~/.zshrc para que se cargue al login.
-# ==============================================================
+# ================================================================
 set -euo pipefail
 
-# ── Ruta canónica ──────────────────────────────────────────────
-if [ -d "/srv/yggdrasil-dew" ]; then
-  REPO="/srv/yggdrasil-dew"
-elif [ -d "$HOME/yggdrasil-dew" ]; then
-  REPO="$HOME/yggdrasil-dew"
-else
-  echo "[ERROR] Repo no encontrado. Ejecuta bootstrap-madre.sh primero."
-  exit 1
-fi
+REPO_DIR="${REPO_DIR:-$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null || pwd)}"
+DATE=$(date +%Y-%m-%d)
+TIME=$(date +%H:%M)
+SESSION_LOG="$REPO_DIR/diary/${DATE}-sesion-cierre.md"
 
-cd "$REPO"
-
-FECHA=$(date +%Y-%m-%d)
-HORA=$(date +%H:%M)
+RED='\033[0;31m'; GRN='\033[0;32m'; YLW='\033[1;33m'; BLU='\033[0;34m'; NC='\033[0m'
 
 echo ""
-echo "╔══════════════════════════════════════════════╗"
-echo "║       🌙 YGGDRASIL-DEW — CIERRE SESIÓN       ║"
-echo "╚══════════════════════════════════════════════╝"
-echo ""
-echo "  Repo : $REPO"
-echo "  Fecha: $FECHA $HORA"
+echo "╔═════════════════════════════════════════════╗"
+echo "║   CIERRE DE SESIÓN — ${DATE} ${TIME}           ║"
+echo "╚═════════════════════════════════════════════╝"
 echo ""
 
-# ── 0. Limpieza de ficheros basura en worktree ─────────────────
-# Elimina ficheros sueltos que no deberían estar en la raíz
-echo "🧹 [0/5] Limpiando worktree..."
-for f in GitHub "GitHub:" cd find; do
-  [ -f "$f" ] && rm -f "$f" && echo "    rm: $f"
-done
-# Limpia symlinks rotos
-find . -maxdepth 1 -type l ! -name '.git*' | while read -r link; do
-  [ ! -e "$link" ] && echo "    rm symlink roto: $link" && rm -f "$link"
-done
+cd "$REPO_DIR"
 
-# ── 1. Estado git ──────────────────────────────────────────────
-echo "📊 [1/5] Estado repo:"
-git status --short | head -20
-
-# ── 2. Commit automático ───────────────────────────────────────
-if ! git diff --quiet || ! git diff --staged --quiet; then
-  echo "💾 [2/5] Cambios detectados — commit automático..."
-  git add -A
-  git commit -m "chore(sesion): auto-commit cierre $FECHA $HORA"
-else
-  echo "✅ [2/5] Nada pendiente de commit."
+# 1. Limpiar inbox si supera umbral
+echo -e "${BLU}[→]${NC} Verificando inbox..."
+INBOX_COUNT=$(find inbox/ -maxdepth 1 -name '*.md' ! -name 'README.md' ! -name 'PLANTILLA*.md' \
+  ! -name 'APLAZADO*.md' ! -name 'SIGUIENTE*.md' ! -name 'PENDIENTES*.md' ! -name 'PLAN-*.md' \
+  | wc -l | tr -d ' ')
+echo -e "${BLU}[→]${NC} Ficheros en inbox/: $INBOX_COUNT"
+if [ "$INBOX_COUNT" -gt 10 ]; then
+  echo -e "${YLW}[⚠]${NC} Supera umbral — limpiando..."
+  bash "$REPO_DIR/scripts/maintenance/inbox-audit-cleanup.sh" || true
 fi
 
-# ── 3. Pull rebase (SIEMPRE antes de push) ────────────────────
-echo "⬇️  [3/5] Pull rebase para sincronizar con remoto..."
-if git pull --rebase --autostash 2>&1 | tee /tmp/ygg-pull.log | grep -q "CONFLICT"; then
-  echo "❌ [3/5] Conflicto de merge — resuelve manualmente:"
-  cat /tmp/ygg-pull.log
-  exit 1
-fi
+# 2. Estado de git
+echo -e "${BLU}[→]${NC} Estado del repo:"
+git status --short 2>/dev/null | head -20 || true
 
-# ── 4. Push ───────────────────────────────────────────────────
-echo "🚀 [4/5] Push al repo..."
-git push 2>&1 | tail -3 || {
-  echo "❌ [4/5] Push fallido. Posibles causas:"
-  echo "   - SSH passphrase no cargada. Ejecuta: ssh-add ~/.ssh/id_ed25519_github"
-  echo "   - Sin conexión. Verifica Tailscale o red."
-  exit 1
-}
+# 3. Resumen de commits de la sesión
+COMMITS_HOY=$(git log --oneline --since="${DATE} 00:00" 2>/dev/null | wc -l | tr -d ' ')
+echo -e "${BLU}[→]${NC} Commits hoy: $COMMITS_HOY"
 
-# ── 5. Diario de cierre ────────────────────────────────────────
-mkdir -p sesiones
-DIARIO="sesiones/${FECHA}-cierre.md"
-if [ ! -f "$DIARIO" ]; then
-  echo "📓 [5/5] Creando diario de cierre..."
-  cat > "$DIARIO" << EOF
+# 4. Generar nota de cierre
+mkdir -p "$(dirname "$SESSION_LOG")"
+cat > "$SESSION_LOG" << EOF
 ---
-fecha: $FECHA
-hora_cierre: $HORA CEST
+date: ${DATE}
+hora-cierre: ${TIME}
 tipo: cierre-sesion
-repo: $REPO
 ---
 
-# Cierre $FECHA $HORA
+# Cierre de Sesión — ${DATE} ${TIME}
 
-## Hecho hoy
-- [ ] TODO: rellenar antes de cerrar
+## Commits de hoy ($COMMITS_HOY)
 
-## Pendiente para mañana
-- Issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues
+\`\`\`
+$(git log --oneline --since="${DATE} 00:00" 2>/dev/null | head -30 || echo 'Sin commits')
+\`\`\`
 
-## Último commit
-$(git log --oneline -1)
+## Estado inbox al cierre
+
+- Ficheros procesados: $INBOX_COUNT → archivados
+- Próxima limpieza automática: 6h (cron)
+
+## Comando para retomar sesión
+
+\`\`\`bash
+cd /srv/yggdrasil-dew && git fetch origin && git reset --hard origin/main
+bash scripts/maintenance/ecosystem-reality-check.sh
+\`\`\`
+
+## Servicios activos al cierre
+
+\`\`\`
+$(curl -sf http://localhost:11434 > /dev/null 2>&1 && echo 'Ollama: UP' || echo 'Ollama: DOWN')
+$(curl -sf http://localhost:5678 > /dev/null 2>&1 && echo 'n8n: UP' || echo 'n8n: DOWN')
+$(curl -sf http://localhost:9000 > /dev/null 2>&1 && echo 'Portainer: UP' || echo 'Portainer: DOWN')
+$(curl -sf http://localhost:3001 > /dev/null 2>&1 && echo 'Uptime-Kuma: UP' || echo 'Uptime-Kuma: DOWN')
+\`\`\`
+
+*Sesión cerrada automáticamente por cierre-sesion.sh [AUTO]*
 EOF
-  git add "$DIARIO"
-  git commit -m "docs(sesion): cierre $FECHA $HORA"
-  git push
-  echo "    Diario: $DIARIO"
+
+echo -e "${GRN}[✓]${NC} Nota de cierre generada: $(basename $SESSION_LOG)"
+
+# 5. Commit y push
+git add -A 2>/dev/null || true
+if ! git diff --staged --quiet; then
+  git commit -m "chore(session): cierre ${DATE} ${TIME} — ${COMMITS_HOY} commits hoy [AUTO]"
+  git push && echo -e "${GRN}[✓]${NC} Push completado" || echo -e "${YLW}[⚠]${NC} Push fallido — push manual"
 else
-  echo "📓 [5/5] Diario ya existe: $DIARIO"
+  echo -e "${BLU}[→]${NC} Sin cambios pendientes"
 fi
 
-# ── Resumen ────────────────────────────────────────────────────
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ SESIÓN CERRADA — $FECHA $HORA"
-echo "   Issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "  Para modo autónomo sin passphrase, añade al ~/.bashrc:"
-echo "  eval \"\$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519_github 2>/dev/null"
+echo "╔═════════════════════════════════════════════╗"
+echo "║   SESIÓN CERRADA ✅                           ║"
+echo "║   Para retomar:                             ║"
+echo "║   git reset --hard origin/main              ║"
+echo "║   bash scripts/maintenance/ecosystem-       ║"
+echo "║        reality-check.sh                    ║"
+echo "╚═════════════════════════════════════════════╝"
 echo ""
