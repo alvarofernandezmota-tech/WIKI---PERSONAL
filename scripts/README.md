@@ -1,46 +1,74 @@
-# ⚙️ Scripts — Batcueva / Madre
+# Scripts — yggdrasil-dew
 
-> Scripts de setup y mantenimiento. Ejecutar en Madre en el orden indicado.
+Directorio raíz de scripts del ecosistema. Los scripts están organizados en subdirectorios por dominio (islas).
 
-## Orden de ejecución — Fases 1 y 2
+## Ruta canónica del repo
 
 ```
-01 → 02 → 03 → REBOOT → 06 → 04 → 05
+/srv/yggdrasil-dew
 ```
 
-| Script | Fase | Qué hace | Req |
-|---|---|---|---|
-| `01-fix-driver-rtl8188ftu.sh` | Pre | Fix driver AP inestable RTL8188FTV | — |
-| `02-git-pull-rebase.sh` | 0 | Sync repo yggdrasil-dew en Madre | — |
-| `03-fase1-seguridad.sh` | 1 | SSH hardening + UFW + Tailscale enable + no-sleep → **REBOOT** | claves SSH |
-| `06-verificacion-post-reboot.sh` | 1 | Verificación completa post-reboot | Fase 1 |
-| `04-fase2-start-batcueva.sh` | 2 | Crea `start-batcueva.sh` y lo sube al repo | Fase 1 |
-| `05-fase7-ollama-pull.sh` | 7 | Pull llama3.1:8b + bge-m3 + nomic-embed-text | Ollama up |
-
-## ⚠️ Importante antes de ejecutar `03`
-
-Verifica que tienes clave SSH en `~/.ssh/authorized_keys`:
+Si no existe, crea un symlink desde home:
 ```bash
-cat ~/.ssh/authorized_keys
-```
-Si está vacío:
-```bash
-# Desde el Acer:
-ssh-copy-id -i ~/.ssh/id_rsa.pub varopc@100.91.112.32
-```
-
-## Ejecución rápida desde Madre
-
-```bash
-cd ~/yggdrasil-dew/scripts
-bash 01-fix-driver-rtl8188ftu.sh
-bash 02-git-pull-rebase.sh
-bash 03-fase1-seguridad.sh
-# → reboot
-bash 06-verificacion-post-reboot.sh
-bash 04-fase2-start-batcueva.sh
-bash 05-fase7-ollama-pull.sh
+ln -s /srv/yggdrasil-dew ~/yggdrasil-dew
 ```
 
 ---
-_Ver: [[PLAN-SEGURIDAD-Y-DESPLIEGUE]] · [[ROADMAP]] · [[MASTER-PENDIENTES]]_
+
+## Scripts de sesión
+
+| Script | Uso | Descripción |
+|---|---|---|
+| `inicio-sesion.sh` | Al arrancar el día | Sincroniza repo, muestra estado |
+| `cierre-sesion.sh` | Al terminar sesión | Auto-commit, push, diario |
+
+```bash
+# Cierre de sesión:
+bash /srv/yggdrasil-dew/scripts/cierre-sesion.sh
+
+# Inicio de sesión:
+bash /srv/yggdrasil-dew/scripts/inicio-sesion.sh
+```
+
+---
+
+## Scripts de auditoría y mejora del repo
+
+| Script | Uso | Descripción |
+|---|---|---|
+| `audit-and-migrate.sh` | Auditoría + migración | Analiza y mueve ficheros mal ubicados |
+| `repo-research.sh` | Investigación de mejora | Genera reporte en `inbox/` con gaps detectados |
+
+```bash
+# Auditoría (siempre dry-run primero):
+bash scripts/audit-and-migrate.sh --dry-run
+bash scripts/audit-and-migrate.sh
+
+# Research del repo:
+bash scripts/repo-research.sh --dry-run  # ver sin escribir
+bash scripts/repo-research.sh            # genera inbox/DATE-repo-research.md
+```
+
+---
+
+## Subdirectorios (islas)
+
+| Directorio | Contenido |
+|---|---|
+| `backup/` | Scripts de backup (restic) |
+| `ci/` | Scripts de CI/CD |
+| `infra/` | Infraestructura Docker / servicios |
+| `maintenance/` | Mantenimiento del sistema |
+| `osint/` | OSINT tools y workflows |
+
+---
+
+## Scripts numerados (legacy)
+
+Los scripts con prefijo numérico (`01-`, `02-`...) son de las fases de setup inicial. No borrar, pero **no añadir nuevos** con ese patrón — usar nombres descriptivos.
+
+---
+
+## Ver auditoría del estado
+
+Ver [`SCRIPTS-AUDITORIA.md`](./SCRIPTS-AUDITORIA.md) para el inventario completo con estado de cada script.

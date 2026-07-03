@@ -2,9 +2,22 @@
 # ==============================================================
 # CIERRE DE SESIÓN — yggdrasil-dew
 # Uso: bash scripts/cierre-sesion.sh
+# Ruta canónica del repo: /srv/yggdrasil-dew
+# Si el repo está en $HOME, crea un symlink:
+#   ln -s /srv/yggdrasil-dew ~/yggdrasil-dew
 # ==============================================================
 set -e
-REPO="$HOME/yggdrasil-dew"
+
+# Ruta canónica: /srv/yggdrasil-dew (con fallback a $HOME/yggdrasil-dew)
+if [ -d "/srv/yggdrasil-dew" ]; then
+  REPO="/srv/yggdrasil-dew"
+elif [ -d "$HOME/yggdrasil-dew" ]; then
+  REPO="$HOME/yggdrasil-dew"
+else
+  echo "[ERROR] No se encuentra el repo. Clona primero con bootstrap-madre.sh"
+  exit 1
+fi
+
 cd "$REPO"
 
 FECHA=$(date +%Y-%m-%d)
@@ -14,6 +27,8 @@ echo ""
 echo "╔══════════════════════════════════════════════╗"
 echo "║       🌙 YGGDRASIL-DEW — CIERRE SESIÓN       ║"
 echo "╚══════════════════════════════════════════════╝"
+echo ""
+echo "  Repo: $REPO"
 echo ""
 
 # 1. Estado git antes de cerrar
@@ -34,6 +49,7 @@ echo "🚀 [3/4] Push al repo..."
 git push 2>&1 | tail -3
 
 # 4. Crear entrada diario de cierre
+mkdir -p sesiones
 DIARIO="sesiones/${FECHA}-cierre.md"
 if [ ! -f "$DIARIO" ]; then
   cat > "$DIARIO" << EOF
@@ -41,6 +57,7 @@ if [ ! -f "$DIARIO" ]; then
 fecha: $FECHA
 hora_cierre: $HORA CEST
 tipo: cierre-sesion
+repo: $REPO
 ---
 
 # Cierre $FECHA $HORA
@@ -49,7 +66,7 @@ tipo: cierre-sesion
 - [ ] TODO: rellenar
 
 ## Pendiente para mañana
-- Ver issue #29
+- Ver issue tracker: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues
 
 ## Último commit
 $(git log --oneline -1)
@@ -65,7 +82,6 @@ fi
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ SESIÓN CERRADA — $FECHA $HORA"
-echo "📋 Próxima sesión: issue #29"
-echo "   https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/29"
+echo "   Repo: $REPO"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
