@@ -1,98 +1,63 @@
-# 🌳 ESTADO DEL SISTEMA — Yggdrasil
+# 📊 Estado del Sistema — Yggdrasil
 
-> Actualizado: 2026-07-03 07:02 CEST
-> Próxima revisión: inicio de sesión siguiente
+> Fichero maestro de estado. Actualizar al inicio y cierre de cada sesión.
 
----
-
-## 💻 MADRE (Acer — 100.91.112.32)
-
-**Estado: ACTIVA — NO APAGAR**
-
-> Madre es el servidor central del ecosistema. Contiene Docker, todos los bots,
-> datos históricos y el estado de los proyectos. Apagarla rompe TODO.
-> Si necesitas reiniciar algo, reinicia contenedores individuales, nunca la máquina.
+**Última actualización:** 03-Jul-2026 13:05 CEST  
+**Sesión activa:** S20260703  
+**Operador:** alvarofernandezmota-tech
 
 ---
 
-## 🐳 DOCKER — Estado actual
+## 🟢 Infraestructura
 
-### ✅ Healthy (funcionando)
-
-| Contenedor | Estado | Notas |
+| Componente | Estado | Nota |
 |---|---|---|
-| `thdora` | Up 17h ✅ healthy | Bot principal — OK |
-| `thdora-bot` | Up 17h ✅ healthy | Telegram bot — OK |
-| `guardian_bot` | Up 17h ✅ healthy | Monitoriza el ecosistema |
-| `uptime-kuma` | Up 17h ✅ healthy | Dashboard de uptime |
-| `network_radar` | Up 17h ✅ healthy | Radar de red |
-| `log_guardian_bot` | Up ~1min 🔄 starting | Recién arrancado, normalizar |
+| madre (servidor) | ✅ Online | IP Tailscale: 100.91.112.32 |
+| SSH madre | ✅ Funciona | clave id_ed25519_github |
+| git pull ygg | ⚠️ Passphrase | Ejecutar ssh-add |
+| GitHub Actions | ✅ Activas | repo-audit + repo-health |
+| Labels Actions | ❌ Pendiente | Crear audit/health/needs-attention |
+| Tailscale | ✅ Activo | Conecta Blink↔madre |
+| GROQ_API_KEY | ❌ Pendiente | Añadir en GitHub Secrets |
 
-### ⚠️ Unhealthy (revisar en próxima sesión)
+---
 
-| Contenedor | Estado | Causa probable | Acción |
+## 🏝️ Islas del ecosistema
+
+| Isla | Repo | README | Estado |
 |---|---|---|---|
-| `tailscale_monitor` | Up 5min ❌ unhealthy | Tailscale config/token | `docker logs tailscale_monitor` |
-| `local_tripwire` | Up 11min ❌ unhealthy | Config inicial | `docker logs local_tripwire` |
-| `yggdrasil_watchdog` | Up 17h ❌ unhealthy | Healthcheck falla | `docker logs yggdrasil_watchdog` |
-
-### ℹ️ Sin healthcheck (normal)
-
-| Contenedor | Estado | Notas |
-|---|---|---|
-| `radar_backup` | Up 17h | Sin healthcheck definido |
-| `kali-pentest` | Up 17h | Herramienta, no servicio |
-| `spiderfoot` | Up 17h | OSINT tool |
-| `code-server` | Up 17h | VSCode en navegador |
-| `n8n` | Up 17h | Automatización workflows |
-| `gitea` | Up 17h | Git server local |
-| `grafana` | Up 17h | Dashboards métricas |
-| `prometheus` | Up 17h | Métricas |
-| `portainer` | Up 17h | Gestión Docker |
+| yggdrasil-dew | [link](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | ✅ | 🟢 Activa |
+| thdora | [link](https://github.com/alvarofernandezmota-tech/thdora) | ❓ | 🟡 Deuda técnica |
+| secops | pendiente | ❌ | 🟡 3 bots rotos |
+| local-brain | en ygg/ollama | ❌ | 🟡 Sin documentar |
+| osint | en ygg/osint | ❌ | ⚪ Duplicado |
+| batcueva | no existe | ❌ | ❌ Sin crear |
+| theodora | dotfiles | ❌ | 🟡 Sin repo |
 
 ---
 
-## 🚨 ISSUES ACTIVOS
+## 🔧 Acciones pendientes (ordenadas)
 
-| # | Descripción | Prioridad | Sprint |
-|---|---|---|---|
-| fix unhealthy x3 | tailscale_monitor, local_tripwire, yggdrasil_watchdog | MEDIA | Sprint 7 |
-| Telegram /notify 404 | `{"detail":"Not Found"}` — endpoint no existe aún | BAJA | Sprint 6 |
-| Raiz limpia | macro-noche.sh + bootstrap.sh sueltos | BAJA | Sprint 7 |
-| investigador-maestro | Proyecto no creado aún | MEDIA | Sprint 7 |
-
----
-
-## 📊 REPOS
-
-| Repo | Ruta en Madre | Estado |
-|---|---|---|
-| yggdrasil-dew | `~/yggdrasil-dew` | ✅ Clonado y actualizado |
-| thdora | `~/Projects/thdora` | ✅ Sin cambios |
-| investigador-maestro | `~/Projects/investigador-maestro` | ❌ No creado |
+1. `ssh-add ~/.ssh/id_ed25519_github` — en madre
+2. Crear labels GitHub: `audit`, `health`, `needs-attention`
+3. Verificar `~/yggdrasil-dew/alvarofernandezmota-tech/`
+4. Deduplicar osint/ + osint-stack/
+5. Deduplicar tools/ + cli-tools/
+6. Añadir GROQ_API_KEY en GitHub Secrets
+7. thdora issue #12 — código zombie
+8. thdora issue #10 — fix /config timeout
 
 ---
 
-## 🔑 REGLA: NO APAGAR MADRE
+## 🛡️ Normas activas
 
-```
-Madre = servidor 24/7
-Si necesitas "reiniciar" algo:
-  docker restart <nombre_contenedor>
-
-Si necesitas parar un contenedor:
-  docker stop <nombre_contenedor>
-
-NUNCA: sudo shutdown / sudo reboot (sin avisar al equipo)
-```
+- **Conventional Commits:** `feat:` `fix:` `docs:` `chore:` `ci:` `refactor:`
+- **Regla SINE:** documentada en repo
+- **Plantilla isla:** `templates/isla-README.md`
+- **Plantilla diario:** `templates/diario-daily.md`
+- **Inbox first:** toda idea va a `inbox/` antes de ejecutarse
 
 ---
 
-## 📅 HISTORIAL DE SESIONES
-
-| Fecha | Qué se hizo |
-|---|---|
-| 2026-07-03 | Fix close-session.sh (blink compat), ECOSYSTEM-ARCHITECTURE.md, regla escalado, smoke tests, CI scripts, raiz limpia parcial |
-| 2026-07-02 | Regla SINE documentada, scripts de sesión, ruta thdora confirmada |
-
-_Actualizado automáticamente al cerrar sesión_
+*Ver `inbox/SIGUIENTE-PASO.md` para la tarea activa ahora mismo.*  
+*Ver `ROADMAP-MASTER.md` para el plan completo F0→F5.*
