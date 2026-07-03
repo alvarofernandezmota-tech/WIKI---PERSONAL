@@ -1,15 +1,15 @@
 ---
 type: report
 date: 2026-07-03
-hora: 19:35
+hora: 19:46
 source: inbox-audit-cleanup.sh
 priority: medium
 status: pending
 processed_by: pending
-title: Inbox audit consolidado 2026-07-03 19:35
+title: Inbox audit consolidado 2026-07-03 19:46
 ---
 
-# Inbox Audit Consolidado — 2026-07-03 19:35
+# Inbox Audit Consolidado — 2026-07-03 19:46
 
 **Total ficheros antes de limpieza**: 20  
 **Umbral de alerta**: 10  
@@ -17,31 +17,10 @@ title: Inbox audit consolidado 2026-07-03 19:35
 
 ---
 
-## Micro-audits consolidados (1 ficheros → 1)
+## Micro-audits consolidados (0
+0 ficheros → 1)
 
-### audit-2026-07-03-56.md
-
-# 🔍 Audit Push — 2026-07-03 16:06 UTC
-
-**Commit:** `d152fbb`
-**Autor:** alvarofernandezmota-tech
-
-## Archivos modificados
-
-### `diary/2026-07-03-sesion-cierre.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 2820 bytes
-
-### `scripts/archive/inbox-cleanup-jun2024.sh`
-- 📎 Tamaño: 6697 bytes
-
-### `scripts/archive/migrar-inbox.sh`
-- 📎 Tamaño: 3204 bytes
-
-## Estado
-- 🤖 Pendiente procesar por Thdora Guardián
-- 📥 Mover a `docs/` cuando esté revisado
-
+_Sin micro-audits pendientes._
 
 ---
 
@@ -59,11 +38,12 @@ _Sin docs antiguos._
 
 ---
 
-## Docs de sesión activos (18 ficheros — se mantienen)
+## Docs de sesión activos (19 ficheros — se mantienen)
 
 - **2026-07-03-MACRO-SPEC-ECOSISTEMA.md** — 2026-07-03-MACRO-SPEC-ECOSISTEMA.md
 - **2026-07-03-MCP-SERVER-DISEÑO.md** — 2026-07-03-MCP-SERVER-DISEÑO.md
 - **2026-07-03-SINTESIS-MAESTRA-SESION.md** — 2026-07-03-SINTESIS-MAESTRA-SESION.md
+- **2026-07-03-VISION-COMPLETA-ECOSISTEMA.md** — 2026-07-03-VISION-COMPLETA-ECOSISTEMA.md
 - **2026-07-03-alerting-inteligente.md** — 2026-07-03-alerting-inteligente.md
 - **2026-07-03-arquitectura-bots-ecosistema.md** — 2026-07-03-arquitectura-bots-ecosistema.md
 - **2026-07-03-auditoria-estructura.md** — 2026-07-03-auditoria-estructura.md
@@ -82,4 +62,4 @@ _Sin docs antiguos._
 
 ---
 
-*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 19:35*
+*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 19:46*
