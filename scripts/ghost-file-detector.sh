@@ -1,106 +1,67 @@
 #!/usr/bin/env bash
-# =============================================================
-# FUNCIÓN:   Detectar archivos fantasma: vacíos, huérfanos,
-#            sin referencias en docs, o referenciados pero
-#            inexistentes. Nivel ingeniero: cero tolerancia
-#            a archivos que no deberían estar.
-# TRIGGER:   cron semanal / tras inbox-cleanup / manual
-# AGENTE:    ghost-detector-agent, ghost-detector.yml
+# FUNCIÓN:   Detectar archivos vacíos y referencias rotas en docs
+# TRIGGER:   Cron diario, manual, llamada desde MCP
+# AGENTE:    ghost-file-detector
 # ETIQUETAS: estructura, deuda-tecnica
-# RUTAS:     Lee: todo el repo
-#            Escribe: diarios/ghost-detector-YYYY-MM-DD.md
-# =============================================================
-
+# RUTAS:     diarios/, docs/
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
-FECHA=$(date +%Y-%m-%d)
-LOG="$REPO_ROOT/diarios/ghost-detector-$FECHA.md"
-FANTASMAS=0
+ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo '.')}"
+REPORT_DIR="$ROOT/diarios"
+DATE=$(date +%Y-%m-%d)
+REPORT="$REPORT_DIR/ghost-files-$DATE.md"
+FOUND=0
 
-mkdir -p "$REPO_ROOT/diarios"
+mkdir -p "$REPORT_DIR"
 
-log() { echo "$*" | tee -a "$LOG"; }
+echo "# Ghost File Detector — $DATE" > "$REPORT"
+echo "" >> "$REPORT"
 
-cat > "$LOG" << EOF
-# 👻 GHOST FILE DETECTOR — $FECHA
+# 1. Archivos vacíos (0 bytes)
+echo "## Archivos vacíos (0 bytes)" >> "$REPORT"
+while IFS= read -r f; do
+  echo "- 👻 $f" >> "$REPORT"
+  FOUND=$((FOUND+1))
+done < <(find "$ROOT" -type f -size 0 \
+  ! -path "$ROOT/.git/*" \
+  ! -path "$ROOT/node_modules/*" \
+  2>/dev/null)
 
-Generado por: ghost-file-detector.sh
-Fecha: $(date '+%Y-%m-%d %H:%M:%S')
-
----
-
-EOF
-
-log "## 1. ARCHIVOS .MD VACÍOS"
-while IFS= read -r -d '' archivo; do
-  [[ "$(basename $archivo)" == '.gitkeep' ]] && continue
-  FANTASMAS=$((FANTASMAS + 1))
-  log "  👻 VACÍO: ${archivo#$REPO_ROOT/}"
-done < <(find "$REPO_ROOT" -name '*.md' -size 0 \
-  -not -path '*/.git/*' -not -name '.gitkeep' -print0 2>/dev/null)
-
-log ""
-log "## 2. SCRIPTS .SH VACÍOS O SIN PERMISOS DE EJECUCIÓN"
-while IFS= read -r -d '' script; do
-  NOMBRE="${script#$REPO_ROOT/}"
-  if [[ ! -s "$script" ]]; then
-    FANTASMAS=$((FANTASMAS + 1))
-    log "  👻 VACÍO: $NOMBRE"
-  elif [[ ! -x "$script" ]]; then
-    log "  ⚠️  SIN +x: $NOMBRE"
-  fi
-done < <(find "$REPO_ROOT/scripts" -name '*.sh' -print0 2>/dev/null)
-
-log ""
-log "## 3. REFERENCIAS ROTAS EN DOCS"
-# Buscar menciones de scripts/ en docs/ y verificar que existen
-while IFS= read -r linea; do
-  archivo_ref=$(echo "$linea" | grep -oE 'scripts/[a-zA-Z0-9._-]+\.sh' | head -1)
-  if [[ -n "$archivo_ref" && ! -f "$REPO_ROOT/$archivo_ref" ]]; then
-    FANTASMAS=$((FANTASMAS + 1))
-    log "  👻 REF ROTA: '$archivo_ref' mencionado pero no existe"
-  fi
-done < <(grep -r 'scripts/.*\.sh' "$REPO_ROOT/docs" 2>/dev/null || true)
-
-log ""
-log "## 4. ARCHIVOS EN INBOX SIN FECHA EN NOMBRE"
-while IFS= read -r -d '' archivo; do
-  NOMBRE=$(basename "$archivo")
-  # Los archivos de inbox deben tener formato YYYY-MM-DD-nombre.md
-  if ! echo "$NOMBRE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}-.*\.md$'; then
-    # Excepciones conocidas
-    case "$NOMBRE" in
-      README.md|PLANTILLA-INBOX.md|APLAZADO-template.md|PENDIENTES-*.md|\
-      PLAN-*.md|SIGUIENTE-PASO.md|.gitkeep) continue ;;
-    esac
-    log "  ⚠️  NAMING INCORRECTO en inbox: $NOMBRE"
-  fi
-done < <(find "$REPO_ROOT/inbox" -maxdepth 1 -name '*.md' -print0 2>/dev/null)
-
-log ""
-log "## 5. WORKFLOWS SIN DESCRIPCIÓN EN CABECERA"
-SIN_DESC=0
-while IFS= read -r -d '' wf; do
-  if ! grep -q 'FUNCIÓN:' "$wf" 2>/dev/null; then
-    SIN_DESC=$((SIN_DESC + 1))
-    log "  ⚠️  SIN CABECERA: ${wf#$REPO_ROOT/}"
-  fi
-done < <(find "$REPO_ROOT/.github/workflows" -name '*.yml' -print0 2>/dev/null)
-
-log ""
-log "## RESUMEN"
-log "  Fantasmas detectados: $FANTASMAS"
-log "  Workflows sin cabecera: $SIN_DESC"
-log ""
-
-if [[ "$FANTASMAS" -gt 0 ]] && command -v gh &>/dev/null; then
-  gh issue create \
-    --title "[GHOST] $FANTASMAS archivos fantasma detectados ($FECHA)" \
-    --body "Ghost-file-detector encontró $FANTASMAS archivos fantasma.\n\nVer log completo: \`diarios/ghost-detector-$FECHA.md\`\n\n**Acción requerida**: revisar y limpiar manualmente." \
-    --label "estructura,deuda-tecnica" \
-    --repo "alvarofernandezmota-tech/yggdrasil-dew" 2>/dev/null || true
+if [ "$FOUND" -eq 0 ]; then
+  echo "- Sin archivos vacíos" >> "$REPORT"
 fi
 
-log "---"
-log "*Generado por ghost-file-detector.sh [AUTO]*"
+# 2. Referencias rotas en markdown (links [texto](ruta) locales)
+echo "" >> "$REPORT"
+echo "## Referencias rotas en docs/" >> "$REPORT"
+BROKEN=0
+while IFS= read -r mdfile; do
+  while IFS= read -r link; do
+    link_path="$(dirname "$mdfile")/$link"
+    if [ ! -e "$link_path" ]; then
+      echo "- 🔗 Roto: \`$mdfile\` → \`$link\`" >> "$REPORT"
+      BROKEN=$((BROKEN+1))
+      FOUND=$((FOUND+1))
+    fi
+  done < <(grep -oP '\(\K[^)]+(?=\))' "$mdfile" | grep -v '^http' | grep -v '^#' || true)
+done < <(find "$ROOT/docs" -name '*.md' 2>/dev/null)
+
+if [ "$BROKEN" -eq 0 ]; then
+  echo "- Sin referencias rotas" >> "$REPORT"
+fi
+
+# 3. Abrir issue si hay fantasmas
+if [ "$FOUND" -gt 0 ] && command -v gh &>/dev/null; then
+  EXISTING=$(gh issue list --label "estructura" --search "[FANTASMAS]" --state open --json number --jq length 2>/dev/null || echo "0")
+  if [ "$EXISTING" -eq 0 ]; then
+    gh issue create \
+      --title "[FANTASMAS] $FOUND archivos vacíos o referencias rotas detectados" \
+      --label "estructura,deuda-tecnica" \
+      --body "Ghost File Detector encontró **$FOUND** problemas el $DATE.\n\nVer reporte: \`diarios/ghost-files-$DATE.md\`" 2>/dev/null || true
+  fi
+fi
+
+echo "" >> "$REPORT"
+echo "## Resumen" >> "$REPORT"
+echo "- Total problemas: **$FOUND**" >> "$REPORT"
+echo "[ghost-file-detector] Completado. Problemas: $FOUND"

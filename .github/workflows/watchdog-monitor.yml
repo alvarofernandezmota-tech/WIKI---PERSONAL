@@ -1,0 +1,36 @@
+# FUNCIÓN:   Watchdog — vigila agentes y orquestador cada 6h
+# TRIGGER:   Cron cada 6h + manual
+# AGENTE:    watchdog-monitor
+# ETIQUETAS: automatizacion, urgente
+name: watchdog-monitor
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run watchdog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YGGDRASIL_ROOT: ${{ github.workspace }}
+        run: |
+          chmod +x scripts/watchdog-monitor.sh
+          bash scripts/watchdog-monitor.sh
+
+      - name: Commit reporte watchdog
+        run: |
+          git config user.name  "watchdog-monitor[bot]"
+          git config user.email "bot@yggdrasil-dew"
+          git add reports/watchdog/ diarios/ || true
+          git diff --cached --quiet || git commit -m "chore: watchdog report $(date +%Y-%m-%d-%H%M) [AUTO]"
+          git push || true

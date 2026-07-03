@@ -1,0 +1,36 @@
+# FUNCIÓN:   Verificar links internos rotos semanalmente
+# TRIGGER:   Cron semanal domingo 06:00 UTC + manual
+# AGENTE:    cross-ref-checker
+# ETIQUETAS: documentacion, estructura
+name: cross-ref-checker
+
+on:
+  schedule:
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+jobs:
+  cross-ref:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run cross-ref-checker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YGGDRASIL_ROOT: ${{ github.workspace }}
+        run: |
+          chmod +x scripts/cross-ref-checker.sh
+          bash scripts/cross-ref-checker.sh
+
+      - name: Commit reporte
+        run: |
+          git config user.name  "cross-ref[bot]"
+          git config user.email "bot@yggdrasil-dew"
+          git add diarios/ || true
+          git diff --cached --quiet || git commit -m "chore: cross-ref $(date +%Y-%m-%d) [AUTO]"
+          git push || true
