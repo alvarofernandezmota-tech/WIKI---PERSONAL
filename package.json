@@ -1,0 +1,24 @@
+{
+  "name": "yggdrasil-ecosistema-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server que expone el ecosistema yggdrasil-dew como toolbox para cualquier IA",
+  "type": "module",
+  "main": "server.js",
+  "bin": {
+    "yggdrasil-mcp": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "YGGDRASIL_ROOT=. node server.js",
+    "inspect": "npx @modelcontextprotocol/inspector node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["mcp", "yggdrasil", "ecosistema", "ia", "automatizacion"],
+  "author": "alvarofernandezmota-tech",
+  "license": "MIT"
+}

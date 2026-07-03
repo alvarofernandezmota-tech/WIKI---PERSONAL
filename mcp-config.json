@@ -1,0 +1,54 @@
+{
+  "_comentario": "Config MCP universal. Pega este bloque en: Claude Desktop (~/.claude/claude_desktop_config.json), VS Code settings, Cursor settings, Continue.dev config",
+  "_doc": "https://modelcontextprotocol.io/docs/tools/inspector",
+  "mcpServers": {
+    "yggdrasil-ecosistema": {
+      "command": "node",
+      "args": ["server.js"],
+      "env": {
+        "YGGDRASIL_ROOT": "/srv/yggdrasil-dew"
+      }
+    }
+  },
+  "_variantes": {
+    "_local_dev": {
+      "command": "node",
+      "args": ["server.js"],
+      "env": {
+        "YGGDRASIL_ROOT": "."
+      }
+    },
+    "_docker": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i",
+        "-e", "YGGDRASIL_ROOT=/srv/yggdrasil-dew",
+        "-v", "/srv/yggdrasil-dew:/srv/yggdrasil-dew:ro",
+        "yggdrasil-mcp"
+      ]
+    },
+    "_npx": {
+      "command": "npx",
+      "args": ["--yes", "yggdrasil-ecosistema-mcp"],
+      "env": {
+        "YGGDRASIL_ROOT": "/srv/yggdrasil-dew"
+      }
+    }
+  },
+  "_tools_disponibles": [
+    "orquestador_supremo  → ciclo completo del ecosistema",
+    "watchdog_monitor     → salud del sistema",
+    "clasificador_maestro → procesa inbox/",
+    "struct_auditor       → detecta duplicados y carpetas fantasma",
+    "ghost_file_detector  → archivos vacíos y links rotos",
+    "isla_sync_validator  → MAPA-ISLAS.md vs realidad",
+    "tool_inventory_auditor → cada script tiene FUNCIÓN declarada",
+    "agent_docs           → sincroniza documentación",
+    "agent_islas          → orquesta islas",
+    "agent_tareas         → gestiona MASTER-PENDIENTES.md",
+    "agent_investigacion  → consolida osint/ y osint-stack/",
+    "agent_ecosistema     → auditoría global",
+    "core_estado          → compara CORE vs realidad (cierra el círculo)",
+    "leer_doc             → lee cualquier .md del repo",
+    "estado_completo      → snapshot rápido de todo"
+  ]
+}

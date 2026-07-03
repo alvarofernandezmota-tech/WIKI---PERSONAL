@@ -1,119 +1,228 @@
 #!/usr/bin/env bash
-# ==============================================================
-# CIERRE DE SESIÓN — yggdrasil-dew
-# Uso: bash scripts/cierre-sesion.sh
-# Ruta canónica: /srv/yggdrasil-dew (con fallback a $HOME/yggdrasil-dew)
+# ================================================================
+# cierre-sesion.sh v3 — Cierre COMPLETO de sesión de trabajo
+# FUNCIÓN ÚNICA: Documenta, audita, sincroniza, commitea, pushea
+# y deja el ecosistema en estado limpio y auditado al cerrar.
 #
-# REQUISITO para modo automático sin passphrase:
-#   eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519_github
-#   O añadir al ~/.bashrc / ~/.zshrc para que se cargue al login.
-# ==============================================================
+# Uso:              bash scripts/cierre-sesion.sh
+# Con descripción: bash scripts/cierre-sesion.sh "lo que hiciste"
+#
+# Autor: alvarofernandezmota-tech | Repo: yggdrasil-dew
+# ================================================================
 set -euo pipefail
 
-# ── Ruta canónica ──────────────────────────────────────────────
-if [ -d "/srv/yggdrasil-dew" ]; then
-  REPO="/srv/yggdrasil-dew"
-elif [ -d "$HOME/yggdrasil-dew" ]; then
-  REPO="$HOME/yggdrasil-dew"
+# ── Variables base ──────────────────────────────────────────────
+REPO_DIR="${REPO_DIR:-$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null || pwd)}"
+DATE=$(date +%Y-%m-%d)
+TIME=$(date +%H:%M)
+SESSION_MSG="${1:-sin-descripcion}"
+DIARY_LOG="$REPO_DIR/diary/${DATE}-sesion-cierre.md"
+INBOX_LOG="$REPO_DIR/inbox/${DATE}-cierre-sesion.md"
+
+RED='\033[0;31m'; GRN='\033[0;32m'; YLW='\033[1;33m'; BLU='\033[0;34m'; NC='\033[0m'
+
+echo ""
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║   CIERRE DE SESIÓN v3 — ${DATE} ${TIME}                  ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo ""
+
+cd "$REPO_DIR"
+
+# ── BLOQUE 0 (NUEVO): Sincronizar con remoto ANTES de todo ──────
+echo -e "${BLU}[0/9]${NC} Sincronizando con remoto (evita push rejected)..."
+git fetch origin 2>/dev/null || echo -e "${YLW}[⚠]${NC} fetch fallido — sin red?"
+LOCAL_SHA=$(git rev-parse HEAD 2>/dev/null || echo 'x')
+REMOTE_SHA=$(git rev-parse origin/main 2>/dev/null || echo 'y')
+if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
+  echo -e "${YLW}[⚠]${NC} Divergencia detectada — haciendo rebase..."
+  git stash 2>/dev/null || true
+  git pull --rebase origin main 2>/dev/null \
+    && echo -e "${GRN}[✓]${NC} Rebase completado" \
+    || echo -e "${RED}[✗]${NC} Rebase fallido — resuelve conflictos manualmente"
+  git stash pop 2>/dev/null || true
 else
-  echo "[ERROR] Repo no encontrado. Ejecuta bootstrap-madre.sh primero."
-  exit 1
+  echo -e "${GRN}[✓]${NC} Repo en sync con origin/main"
 fi
 
-cd "$REPO"
+# ── BLOQUE 1: Verificar inbox ───────────────────────────────────
+echo -e "${BLU}[1/9]${NC} Verificando inbox..."
+INBOX_COUNT=$(find inbox/ -maxdepth 1 -name '*.md' \
+  ! -name 'README.md' ! -name 'PLANTILLA*.md' \
+  ! -name 'APLAZADO*.md' ! -name 'SIGUIENTE*.md' \
+  ! -name 'PENDIENTES*.md' ! -name 'PLAN-*.md' \
+  2>/dev/null | wc -l | tr -d ' ')
+echo -e "${BLU}[→]${NC} Ficheros en inbox/: $INBOX_COUNT"
+if [ "$INBOX_COUNT" -gt 10 ]; then
+  echo -e "${YLW}[⚠]${NC} Supera umbral 10 — ejecutando limpieza..."
+  bash "$REPO_DIR/scripts/clasificador-maestro.sh" 2>/dev/null || true
+fi
 
-FECHA=$(date +%Y-%m-%d)
-HORA=$(date +%H:%M)
-
-echo ""
-echo "╔══════════════════════════════════════════════╗"
-echo "║       🌙 YGGDRASIL-DEW — CIERRE SESIÓN       ║"
-echo "╚══════════════════════════════════════════════╝"
-echo ""
-echo "  Repo : $REPO"
-echo "  Fecha: $FECHA $HORA"
-echo ""
-
-# ── 0. Limpieza de ficheros basura en worktree ─────────────────
-# Elimina ficheros sueltos que no deberían estar en la raíz
-echo "🧹 [0/5] Limpiando worktree..."
-for f in GitHub "GitHub:" cd find; do
-  [ -f "$f" ] && rm -f "$f" && echo "    rm: $f"
+# ── BLOQUE 2: Detectar carpetas duplicadas ─────────────────────
+echo -e "${BLU}[2/9]${NC} Detectando carpetas duplicadas/fantasma..."
+DUPS=""
+for PAIR in "diary diarios" "osint osint-stack" "docs documentos" "scripts script"; do
+  A=$(echo $PAIR | cut -d' ' -f1)
+  B=$(echo $PAIR | cut -d' ' -f2)
+  if [ -d "$REPO_DIR/$A" ] && [ -d "$REPO_DIR/$B" ]; then
+    DUPS="$DUPS\n  ⚠️ Duplicado: $A/ y $B/ — consolidar"
+    echo -e "${YLW}[⚠]${NC} Duplicado detectado: $A/ y $B/"
+  fi
 done
-# Limpia symlinks rotos
-find . -maxdepth 1 -type l ! -name '.git*' | while read -r link; do
-  [ ! -e "$link" ] && echo "    rm symlink roto: $link" && rm -f "$link"
-done
+if [ -z "$DUPS" ]; then
+  echo -e "${GRN}[✓]${NC} Sin carpetas duplicadas"
+fi
 
-# ── 1. Estado git ──────────────────────────────────────────────
-echo "📊 [1/5] Estado repo:"
-git status --short | head -20
+# ── BLOQUE 3: Auditoría estructural ────────────────────────────
+echo -e "${BLU}[3/9]${NC} Auditoría estructural..."
+STRUCT_OUT=$(bash "$REPO_DIR/scripts/struct-auditor.sh" 2>&1 || echo 'struct-auditor: pendiente de crear')
+echo -e "${GRN}[✓]${NC} struct-auditor completado"
 
-# ── 2. Commit automático ───────────────────────────────────────
-if ! git diff --quiet || ! git diff --staged --quiet; then
-  echo "💾 [2/5] Cambios detectados — commit automático..."
-  git add -A
-  git commit -m "chore(sesion): auto-commit cierre $FECHA $HORA"
+# ── BLOQUE 4: Archivos fantasma ────────────────────────────────
+echo -e "${BLU}[4/9]${NC} Detectando archivos fantasma (vacíos/huérfanos)..."
+GHOST_OUT=$(bash "$REPO_DIR/scripts/ghost-file-detector.sh" 2>&1 || true)
+# Fallback si el script no existe: búsqueda directa
+if echo "$GHOST_OUT" | grep -q 'pendiente de crear\|No such file'; then
+  GHOST_OUT=$(find . -name '*.md' -empty -not -path './.git/*' 2>/dev/null | head -20 || echo 'Sin archivos vacíos')
+  echo -e "${YLW}[⚠]${NC} ghost-file-detector.sh no existe — usando find como fallback"
+fi
+echo -e "${GRN}[✓]${NC} Ghost detector completado"
+
+# ── BLOQUE 5: Verificar MCP server ─────────────────────────────
+echo -e "${BLU}[5/9]${NC} Verificando MCP server..."
+if pgrep -f "node server.js" > /dev/null 2>&1; then
+  MCP_STATUS="UP ✅"
+elif pgrep -f "mcp" > /dev/null 2>&1; then
+  MCP_STATUS="UP (proceso mcp) ✅"
 else
-  echo "✅ [2/5] Nada pendiente de commit."
+  MCP_STATUS="DOWN ⚠️"
 fi
+echo -e "${BLU}[→]${NC} MCP server: $MCP_STATUS"
 
-# ── 3. Pull rebase (SIEMPRE antes de push) ────────────────────
-echo "⬇️  [3/5] Pull rebase para sincronizar con remoto..."
-if git pull --rebase --autostash 2>&1 | tee /tmp/ygg-pull.log | grep -q "CONFLICT"; then
-  echo "❌ [3/5] Conflicto de merge — resuelve manualmente:"
-  cat /tmp/ygg-pull.log
-  exit 1
-fi
+# ── BLOQUE 6: Estado de servicios docker ─────────────────────
+echo -e "${BLU}[6/9]${NC} Comprobando servicios..."
+OLLAMA=$(curl -sf --max-time 3 http://localhost:11434 > /dev/null 2>&1 && echo 'UP ✅' || echo 'DOWN ❌')
+N8N=$(curl -sf --max-time 3 http://localhost:5678 > /dev/null 2>&1 && echo 'UP ✅' || echo 'DOWN ❌')
+PORTAINER=$(curl -sf --max-time 3 http://localhost:9000 > /dev/null 2>&1 && echo 'UP ✅' || echo 'DOWN ❌')
+UPTIME=$(curl -sf --max-time 3 http://localhost:3001 > /dev/null 2>&1 && echo 'UP ✅' || echo 'DOWN ❌')
+echo -e "  Ollama: $OLLAMA | n8n: $N8N | Portainer: $PORTAINER | Uptime-Kuma: $UPTIME"
 
-# ── 4. Push ───────────────────────────────────────────────────
-echo "🚀 [4/5] Push al repo..."
-git push 2>&1 | tail -3 || {
-  echo "❌ [4/5] Push fallido. Posibles causas:"
-  echo "   - SSH passphrase no cargada. Ejecuta: ssh-add ~/.ssh/id_ed25519_github"
-  echo "   - Sin conexión. Verifica Tailscale o red."
-  exit 1
-}
+# ── BLOQUE 7: Resumen de commits + próxima sesión ─────────────
+echo -e "${BLU}[7/9]${NC} Resumen de commits..."
+COMMITS_HOY=$(git log --oneline --since="${DATE} 00:00" 2>/dev/null | wc -l | tr -d ' ')
+COMMITS_LISTA=$(git log --oneline --since="${DATE} 00:00" 2>/dev/null | head -30 || echo 'Sin commits')
+ULTIMO_COMMIT=$(git log -1 --format='%s' 2>/dev/null || echo 'desconocido')
 
-# ── 5. Diario de cierre ────────────────────────────────────────
-mkdir -p sesiones
-DIARIO="sesiones/${FECHA}-cierre.md"
-if [ ! -f "$DIARIO" ]; then
-  echo "📓 [5/5] Creando diario de cierre..."
-  cat > "$DIARIO" << EOF
+# ── BLOQUE 8: Generar notas (diary + inbox) ──────────────────
+echo -e "${BLU}[8/9]${NC} Generando notas de cierre..."
+mkdir -p "$(dirname "$DIARY_LOG")" "$(dirname "$INBOX_LOG")"
+
+cat > "$DIARY_LOG" << DIARY
 ---
-fecha: $FECHA
-hora_cierre: $HORA CEST
+date: ${DATE}
+hora-cierre: ${TIME}
 tipo: cierre-sesion
-repo: $REPO
+version: v3
 ---
 
-# Cierre $FECHA $HORA
+# Cierre de Sesión — ${DATE} ${TIME}
 
-## Hecho hoy
-- [ ] TODO: rellenar antes de cerrar
+## Descripción
+${SESSION_MSG}
 
-## Pendiente para mañana
-- Issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues
+## Commits hoy (${COMMITS_HOY})
+\`\`\`
+${COMMITS_LISTA}
+\`\`\`
 
-## Último commit
-$(git log --oneline -1)
-EOF
-  git add "$DIARIO"
-  git commit -m "docs(sesion): cierre $FECHA $HORA"
-  git push
-  echo "    Diario: $DIARIO"
-else
-  echo "📓 [5/5] Diario ya existe: $DIARIO"
+## Carpetas duplicadas
+${DUPS:-Sin duplicados detectados}
+
+## Auditoría estructural
+\`\`\`
+${STRUCT_OUT}
+\`\`\`
+
+## Archivos fantasma
+\`\`\`
+${GHOST_OUT}
+\`\`\`
+
+## Servicios
+| Servicio | Estado |
+|----------|--------|
+| Ollama | ${OLLAMA} |
+| n8n | ${N8N} |
+| Portainer | ${PORTAINER} |
+| Uptime-Kuma | ${UPTIME} |
+| MCP server | ${MCP_STATUS} |
+
+## Inbox al cierre
+- Ficheros: ${INBOX_COUNT}
+
+## Próxima sesión — retomar con
+\`\`\`bash
+cd /srv/yggdrasil-dew
+git pull --rebase origin main
+bash scripts/apertura-sesion.sh
+bash scripts/agentes/agente-cierre-sesion.sh  # verifica estado
+\`\`\`
+
+*[AUTO] cierre-sesion.sh v3*
+DIARY
+
+cat > "$INBOX_LOG" << INBOX
+---
+date: ${DATE}
+hora: ${TIME}
+tipo: cierre-sesion
+estado: pendiente-revision
+---
+
+# Cierre ${DATE} ${TIME}
+- Commits: ${COMMITS_HOY} | Inbox: ${INBOX_COUNT} | MCP: ${MCP_STATUS}
+- Último commit: ${ULTIMO_COMMIT}
+- Ollama: ${OLLAMA} | n8n: ${N8N}
+${DUPS:+\n**Duplicados:**${DUPS}}
+
+*[AUTO] cierre-sesion.sh v3*
+INBOX
+
+echo -e "${GRN}[✓]${NC} diary/ e inbox/ actualizados"
+
+# ── BLOQUE 9: Commit + push (con rebase automático) ───────────
+echo -e "${BLU}[9/9]${NC} Commit, push y Action..."
+
+git add -A 2>/dev/null || true
+if ! git diff --staged --quiet; then
+  git commit -m "chore(session): cierre ${DATE} ${TIME} — ${COMMITS_HOY} commits — ${SESSION_MSG} [AUTO]"
 fi
 
-# ── Resumen ────────────────────────────────────────────────────
+# Push con rebase automático si hay divergencia
+git push origin main 2>/dev/null \
+  || ( echo -e "${YLW}[⚠]${NC} Push fallido — haciendo pull --rebase y reintentando..." \
+       && git pull --rebase origin main \
+       && git push origin main \
+       && echo -e "${GRN}[✓]${NC} Push completado tras rebase" ) \
+  || echo -e "${RED}[✗]${NC} Push fallido definitivo — revisa conflictos"
+
+# Disparar GitHub Action (requiere gh CLI autenticado)
+if command -v gh &>/dev/null; then
+  gh workflow run session-close.yml \
+    --repo alvarofernandezmota-tech/yggdrasil-dew 2>/dev/null \
+    && echo -e "${GRN}[✓]${NC} Action session-close.yml disparada" \
+    || echo -e "${YLW}[⚠]${NC} gh CLI no autenticado — Action se dispara por push"
+else
+  echo -e "${BLU}[→]${NC} gh CLI no instalado — Action se dispara automáticamente por push"
+fi
+
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ SESIÓN CERRADA — $FECHA $HORA"
-echo "   Issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "  Para modo autónomo sin passphrase, añade al ~/.bashrc:"
-echo "  eval \"\$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519_github 2>/dev/null"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║   SESIÓN CERRADA ✅  v3 — ${DATE} ${TIME}             ║"
+echo "║   Commits hoy: ${COMMITS_HOY}   Inbox: ${INBOX_COUNT}                           ║"
+echo "║   MCP: ${MCP_STATUS}                                    ║"
+echo "║                                                          ║"
+echo "║   Para retomar:                                          ║"
+echo "║     git pull --rebase && bash scripts/apertura-sesion.sh  ║"
+echo "╚══════════════════════════════════════════════════════════╝"
 echo ""

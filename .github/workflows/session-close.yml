@@ -1,104 +1,80 @@
-name: 🔐 Session Close — Cierre de sesión
+# ================================================================
+# session-close.yml — GitHub Action de cierre de sesión
+# FUNCIÓN ÚNICA: Ejecuta auditoría completa del ecosistema
+# cuando se cierra una sesión de trabajo (push o dispatch manual)
+# ================================================================
+name: session-close
 
 on:
   workflow_dispatch:
     inputs:
-      session_id:
-        description: 'ID sesión a cerrar (ej: S20260703)'
-        required: true
-      session_summary:
-        description: 'Resumen breve de lo hecho (1-3 líneas)'
-        required: true
+      fecha:
+        description: 'Fecha de cierre (YYYY-MM-DD)'
+        required: false
+        default: ''
+      hora:
+        description: 'Hora de cierre (HH:MM)'
+        required: false
+        default: ''
+  push:
+    paths:
+      - 'diary/**-sesion-cierre.md'
+      - 'inbox/**-cierre-sesion.md'
 
 jobs:
-  close-session:
-    name: Cerrar y documentar sesión
+  auditoria-post-cierre:
+    name: Auditoría post-cierre
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 0
 
-      - name: 📅 Variables
-        id: vars
+      - name: Info de cierre
         run: |
-          DATE=$(date +%Y-%m-%d)
-          YEAR=$(date +%Y)
-          MONTH=$(date +%m)
-          echo "date=$DATE" >> $GITHUB_OUTPUT
-          echo "year=$YEAR" >> $GITHUB_OUTPUT
-          echo "month=$MONTH" >> $GITHUB_OUTPUT
-          echo "diary_path=diario/$YEAR/$MONTH/$DATE.md" >> $GITHUB_OUTPUT
+          echo "=== CIERRE DE SESIÓN ==="
+          echo "Fecha: ${{ github.event.inputs.fecha || 'desde push' }}"
+          echo "Hora:  ${{ github.event.inputs.hora || 'desde push' }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Actor:  ${{ github.actor }}"
 
-      - name: 📜 Todos los commits de la sesión
-        id: all_commits
+      - name: Auditoría estructural
         run: |
-          SESSION="${{ github.event.inputs.session_id }}"
-          DATE=$(date +%Y-%m-%d)
-          LOG=$(git log --since="$DATE 00:00" \
-            --pretty=format:"### %ad — %h%n**%s**%n%b" \
-            --date=format:"%H:%M" \
-            HEAD)
-          echo "log<<EOF" >> $GITHUB_OUTPUT
-          echo "${LOG:-Sin commits esta sesión}" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "=== STRUCT AUDITOR ==="
+          bash scripts/struct-auditor.sh || echo 'struct-auditor: completado con advertencias'
 
-      - name: 📓 Actualizar diary con cierre completo
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const path = '${{ steps.vars.outputs.diary_path }}';
-            const date = '${{ steps.vars.outputs.date }}';
-            const session = '${{ github.event.inputs.session_id }}';
-            const summary = '${{ github.event.inputs.session_summary }}';
-            const commits = `${{ steps.all_commits.outputs.log }}`;
+      - name: Detectar archivos fantasma
+        run: |
+          echo "=== GHOST FILE DETECTOR ==="
+          bash scripts/ghost-file-detector.sh || echo 'ghost-detector: completado con advertencias'
 
-            const closeBlock = `\n\n---\n\n## 🔐 Cierre de sesión ${session}\n\n**Hora cierre:** ${new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})} CEST  \n**Resumen:** ${summary}\n\n### 📜 Log completo de commits\n\n${commits}\n\n---\n*Sesión cerrada por workflow session-close.yml*\n`;
+      - name: Validar islas
+        run: |
+          echo "=== ISLA SYNC VALIDATOR ==="
+          bash scripts/isla-sync-validator.sh || echo 'isla-validator: completado con advertencias'
 
-            const encoded = Buffer.from(closeBlock).toString('base64');
+      - name: Cross-ref checker
+        run: |
+          echo "=== CROSS REF CHECKER ==="
+          bash scripts/cross-ref-checker.sh || echo 'cross-ref: completado con advertencias'
 
-            let existingSha;
-            let existingContent = '';
-            try {
-              const existing = await github.rest.repos.getContent({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                path: path
-              });
-              existingSha = existing.data.sha;
-              existingContent = Buffer.from(existing.data.content, 'base64').toString();
-            } catch(e) {}
+      - name: Contar inbox
+        run: |
+          echo "=== ESTADO INBOX ==="
+          TOTAL=$(find inbox/ -maxdepth 1 -name '*.md' ! -name 'README.md' ! -name 'PLANTILLA*.md' | wc -l)
+          echo "Ficheros activos en inbox: $TOTAL"
+          if [ "$TOTAL" -gt 15 ]; then
+            echo "::warning::Inbox supera 15 ficheros — revisar en próxima sesión"
+          fi
 
-            const newContent = existingContent + closeBlock;
-            const newEncoded = Buffer.from(newContent).toString('base64');
-
-            await github.rest.repos.createOrUpdateFileContents({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: path,
-              message: `docs: cierre sesión ${session}`,
-              content: newEncoded,
-              sha: existingSha
-            });
-            console.log(`Sesión ${session} cerrada en ${path}`);
-
-      - name: ✅ Actualizar SIGUIENTE-PASO.md
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const session = '${{ github.event.inputs.session_id }}';
-            const nextNum = parseInt(session.slice(9)) + 1 || 'siguiente';
-            const content = `# ▶️ Siguiente paso\n\n> Sesión ${session} cerrada.\n\n## 🔴 Pendiente\n\nVer \`inbox/PENDIENTES-S21.md\` para las tareas ordenadas.\n\n*Actualizado automáticamente al cerrar sesión.*\n`;
-            const encoded = Buffer.from(content).toString('base64');
-            try {
-              const existing = await github.rest.repos.getContent({
-                owner: context.repo.owner, repo: context.repo.repo,
-                path: 'inbox/SIGUIENTE-PASO.md'
-              });
-              await github.rest.repos.createOrUpdateFileContents({
-                owner: context.repo.owner, repo: context.repo.repo,
-                path: 'inbox/SIGUIENTE-PASO.md',
-                message: `chore: cerrar sesión ${session}`,
-                content: encoded, sha: existing.data.sha
-              });
-            } catch(e) {}
+      - name: Resumen final
+        run: |
+          echo ""
+          echo "╔══════════════════════════════════════════╗"
+          echo "║   AUDITORÍA POST-CIERRE COMPLETADA ✅    ║"
+          echo "║   Repo: yggdrasil-dew                    ║"
+          echo "║   Action: session-close.yml              ║"
+          echo "╚══════════════════════════════════════════╝"

@@ -1,127 +1,143 @@
-# REGLAS-ISLAS.md — Cuándo separar, cómo documentar, cómo enlazar
+---
+tipo: reglas-islas
+version: 1.0
+fecha: 2026-07-03
+aplicacion: todas las repos del ecosistema Yggdrasil
+---
 
-> **Principio fundamental:** Cuando algo crece, se independiza. Nunca monolitos.
+# Reglas para todas las Islas del Ecosistema
+
+> Una isla = cualquier repo del ecosistema Yggdrasil.
+> Estas reglas son obligatorias en todas. No hay excepciones.
 
 ---
 
-## 1. Cuándo crear una isla
-
-Una isla es un servicio, módulo o agente que se separa del repo principal cuando:
-
-| Señal | Umbral | Acción |
-|-------|--------|--------|
-| **Tamaño** | > 5 ficheros de código | Crear subdirectorio dedicado |
-| **Despliegue** | Necesita su propio Docker | Crear Dockerfile + docker-compose propio |
-| **Dependencias** | Requirements.txt diferente | Isla con su propio entorno |
-| **Ciclo de vida** | Se actualiza independientemente | Potencial repo separado |
-| **Equipo** | Otro agente o humano lo mantiene | Repo separado con README propio |
-| **Secretos** | Necesita variables de entorno propias | .env propio, nunca compartido |
-
----
-
-## 2. Estructura de una isla
-
-Toda isla sigue este patrón:
+## Reglas de estructura (toda isla debe tener)
 
 ```
-isla-nombre/
-├── README.md          ← OBLIGATORIO: qué hace, cómo arranca, qué expone
-├── Dockerfile         ← si se Dockeriza
-├── docker-compose.yml ← si tiene servicios propios
-├── requirements.txt   ← si es Python
-├── .env.example       ← template de secretos (NUNCA el .env real)
-├── config/            ← configuración (yaml, json)
-├── src/ o main.py     ← código
-├── tests/             ← evals o smoke tests
-└── CHANGELOG.md       ← historial de cambios de la isla
+[repo-isla]/
+├── README.md           ← descripcion, rol en el ecosistema, dependencias
+├── CHANGELOG.md        ← historial de cambios
+├── docs/               ← documentacion tecnica
+├── scripts/            ← scripts de la isla (siguen el estandar Yggdrasil)
+├── .github/
+│   └── workflows/
+│       ├── health-check.yml    ← obligatorio en toda isla
+│       ├── audit-on-push.yml   ← obligatorio en toda isla
+│       └── code-drift.yml      ← obligatorio en toda isla
+└── .isla-config.yml    ← metadatos de la isla (ver formato abajo)
 ```
 
 ---
 
-## 3. Cómo documentar una isla
+## Formato .isla-config.yml
 
-### README.md de la isla (obligatorio)
-
-```markdown
-# Nombre de la isla
-
-## Qué hace
-[Una frase. Qué problema resuelve.]
-
-## Cómo arranca
-\`\`\`bash
-docker compose up -d
-\`\`\`
-
-## Qué expone
-- Puerto: XXXX
-- Endpoint principal: /api/v1/...
-- Tools MCP: tool1, tool2
-
-## Dependencias
-- Requiere: [lista de servicios que necesita]
-- Expone a: [lista de agentes que la usan]
-
-## Variables de entorno (.env)
-| Variable | Descripción | Obligatoria |
-|----------|-------------|-------------|
-| TOKEN | Auth token | Sí |
-
-## Enlace con el ecosistema
-- MCP tool: `nombre_tool` en madre-ecosystem MCP
-- Documentación completa: [link]
-- Issues activos: [link a GitHub label]
+```yaml
+# .isla-config.yml — Metadatos de la isla para el ecosistema
+nombre: "nombre-de-la-isla"
+rol: "descripcion de que hace esta isla"
+type: "core|agente|bot|infra|research|personal"  
+dependencias:
+  - "yggdrasil-dew"  # isla de la que depende
+repos_sync:
+  - "yggdrasil-dew"  # repos que deben estar al tanto de cambios
+propietario: alvarofernandezmota-tech
+estado: "activa|desarrollo|deprecated"
+labels_obligatorias:
+  - auto
+  - human-review
+  - drift
+agente_responsable: "health-agent"  # quien monitoriza esta isla
 ```
 
 ---
 
-## 4. Cómo enlazar con las herramientas
+## Reglas de scripts (en cualquier isla)
 
-Cada isla se registra en **tres sitios**:
-
-### 4.1 REGISTRO-ISLAS.md (este repo)
-```markdown
-| Isla | Path | Docker | MCP tools | Estado |
-|------|------|--------|-----------|--------|
-| mcp-server | agentes/mcp-server/ | ✅ | 21 tools | Fase 0 |
-| health-agent | agentes/health-agent/ | pendiente | 0 | Fase 1 |
+1. **Shebang obligatorio:** `#!/usr/bin/env bash` o `#!/usr/bin/env python3`
+2. **Primeras 3 lineas:** `set -euo pipefail` (bash) o equivalente
+3. **Cabecera obligatoria:**
+```bash
+# =============================================================================
+# nombre-script.sh
+# Descripcion: una linea clara
+# Uso: ./nombre-script.sh [opciones]
+# Dependencias: gh, jq, curl
+# =============================================================================
 ```
-
-### 4.2 agentes/mcp-server/config/whitelist.yaml
-Añadir las tools que expone la isla a la whitelist del MCP gatekeeper.
-
-### 4.3 ROADMAP-MASTER.md
-Añadir la isla como tarea con su fase y estado.
+4. **Funcion `log()`** en scripts >30 lineas
+5. **DRY_RUN support** en scripts que crean/modifican recursos
+6. **No hardcodear secrets** — usar variables de entorno o Vault
+7. **Exit codes:** 0=ok, 1=error, 2=warning
 
 ---
 
-## 5. Islas actuales del ecosistema
+## Reglas de workflows (en cualquier isla)
 
-| Isla | Ubicación | Estado | Docker | MCP |
-|------|-----------|--------|--------|-----|
-| **mcp-server** | `agentes/mcp-server/` | 🟡 Fase 0 | ✅ Listo | Gen-3 |
-| **health-agent** | `agentes/health-agent/` | 🔴 Pendiente | ❌ Falta Dockerfile | Pendiente |
-| **ecosystem-snapshot** | `agentes/ecosystem-snapshot/` | 🟡 Parcial | ❌ | ❌ |
-| **osint-stack** | `scripts/osint/` | 🟡 Scripts | ❌ | Pendiente |
-| **secops** | repo `yggdrasil-secops` | 🟢 Activo | ✅ | Pendiente isla |
-| **thdora-bot** | `scripts/thdora/` | 🟢 Activo | ✅ en Madre | Pendiente |
+1. **Cabecera comentada** describiendo qué hace el workflow
+2. **`timeout-minutes`** en todos los jobs
+3. **`permissions`** minimas (principle of least privilege)
+4. **`workflow_dispatch`** en workflows importantes (para ejecucion manual)
+5. **Labels en issues** que cree el workflow: al menos `auto` y uno especifico
+6. **No secrets en logs** — usar `::add-mask::` si es necesario
 
 ---
 
-## 6. Checklist de creación de isla
+## Reglas de issues (en cualquier isla)
+
+| Label | Significado | Quien actua |
+|-------|-------------|-------------|
+| `auto` | Creado por el sistema | Sistema |
+| `[AUTO]` en titulo | Solo puede ejecutar el sistema | Scripts/Actions |
+| `[HUMAN]` en titulo | Requiere decision humana | Alvaro |
+| `[RISKY]` en titulo | Requiere aprobacion explicita | Alvaro |
+| `drift` | Desviacion del estandar | Code-drift-detector |
+| `documentacion` | Falta doc | Copilot/Alvaro |
+| `agentes` | Relacionado con agentes | Alvaro + Cursor |
+| `alerta` | Urgente, revisar hoy | Guardianbot notifica |
+
+---
+
+## Reglas de commits (en cualquier isla)
 
 ```
-[ ] README.md creado con estructura estándar
-[ ] Dockerfile (si aplica)
-[ ] docker-compose.yml (si aplica)
-[ ] .env.example (si usa secretos)
-[ ] Registrada en REGISTRO-ISLAS.md
-[ ] Tools añadidas a whitelist.yaml
-[ ] Issue GitHub creado con label isla
-[ ] Documentada en ROADMAP-MASTER.md
-[ ] Al menos 1 smoke test
+<tipo>(<scope>): <descripcion> [<FLAG>]
+
+Tipos: feat | fix | docs | chore | refactor | test | ci
+Scope: nombre del modulo o area
+Flag obligatorio: [AUTO] si lo hizo el sistema | [HUMAN] si lo hizo Alvaro
+
+Ejemplos:
+feat(agentes): añadir health-agent spec [HUMAN]
+docs(inbox): actualizar guia de procesado [AUTO]
+chore(scripts): chmod +x nuevos scripts [AUTO]
 ```
 
 ---
 
-_Documento vivo · Yggdrasil Dew · 2026-07-03_
+## Reglas de ramas (en cualquier isla)
+
+| Rama | Uso |
+|------|-----|
+| `main` | Produccion. Solo PR aprobado. |
+| `agent/[nombre]` | Cambios propuestos por agentes. Siempre PR. |
+| `copilot/[tarea]` | Cambios propuestos por Copilot. Siempre PR. |
+| `docs/[tema]` | Solo documentacion. Puede mergear Alvaro directamente. |
+| `fix/[issue]` | Correcciones rapidas. PR recomendado. |
+
+---
+
+## Checklist de isla nueva
+
+- [ ] `README.md` con rol en el ecosistema
+- [ ] `.isla-config.yml` rellenado
+- [ ] `health-check.yml` copiado y adaptado
+- [ ] `audit-on-push.yml` copiado y adaptado
+- [ ] `code-drift.yml` copiado y adaptado
+- [ ] Labels creadas con `labels-setup.sh`
+- [ ] Entrada en `REGISTRO-ISLAS.md` de yggdrasil-dew
+- [ ] Notificado al health-agent de la nueva isla
+
+---
+
+*Actualizado: 2026-07-03 [AUTO]*

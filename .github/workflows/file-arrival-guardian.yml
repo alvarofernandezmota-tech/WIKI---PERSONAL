@@ -1,0 +1,71 @@
+name: file-arrival-guardian
+# ============================================================
+# FUNCIÓN ÚNICA: Verificar en cada push que los archivos
+#                nuevos llegaron a su carpeta canónica.
+#                Si hay errores → abre issue automáticamente.
+# ============================================================
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verificar-llegada:
+    name: Verificar llegada de archivos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Mostrar archivos cambiados en este push
+        run: |
+          echo "=== ARCHIVOS CAMBIADOS EN ESTE PUSH ==="
+          git diff --name-status HEAD~1 HEAD || echo "(primer commit)"
+          echo ""
+
+      - name: Ejecutar file-arrival-guardian
+        id: guardian
+        run: |
+          chmod +x scripts/file-arrival-guardian.sh
+          bash scripts/file-arrival-guardian.sh
+        continue-on-error: true
+
+      - name: Abrir issue si hay errores
+        if: steps.guardian.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[file-arrival-guardian] Archivos mal ubicados — ${date}`,
+              body: [
+                '## ⚠️ file-arrival-guardian detectó archivos fuera de lugar',
+                '',
+                `Push: ${context.sha.substring(0,7)} en \`${context.ref}\``,
+                '',
+                '**Acción requerida:** revisa el reporte en `inbox/_meta/arrival-report-*.md`',
+                'y mueve los archivos a su carpeta canónica.',
+                '',
+                '> Abierto automáticamente por file-arrival-guardian.yml'
+              ].join('\n'),
+              labels: ['deuda-tecnica', 'estructura']
+            });
+
+      - name: Resultado final
+        if: always()
+        run: |
+          if [ "${{ steps.guardian.outcome }}" = "success" ]; then
+            echo "✅ Todos los archivos en su sitio correcto"
+          else
+            echo "❌ Hay archivos fuera de lugar — ver issue abierto"
+            exit 1
+          fi

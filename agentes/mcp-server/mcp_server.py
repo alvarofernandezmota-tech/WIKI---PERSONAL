@@ -1,126 +1,106 @@
-# mcp_server.py
-# MCP Server propio de Madre — expone tools del ecosistema a IAs externas
-# Estado: ESQUELETO — Fase 1 MVP
-# Docs: agentes/mcp-server/DISEÑO.md
-# Instalar: pip install mcp fastapi uvicorn
-
-import subprocess
+"""
+MCP Server - Yggdrasil Ecosystem
+Madre runtime | Compatible: Cursor, Claude Desktop, agentes locales
+SIEMPRE dry_run=True por defecto. Audit log obligatorio.
+"""
 import json
+import subprocess
+import datetime
 from pathlib import Path
-from datetime import datetime
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp import types
+from mcp.server.fastmcp import FastMCP
 
-# ─── Config ─────────────────────────────────────────
-# Cargar desde env en producción
-YGGDRASIL_DEW = Path("/srv/yggdrasil-dew")
-AUDIT_LOG = Path("/srv/mcp-server/audit.log")
+AUDIT_LOG = Path("/srv/yggdrasil-dew/logs/mcp-audit.jsonl")
+ROADMAP   = Path("/srv/yggdrasil-dew/ROADMAP-MASTER.md")
+INBOX     = Path("/srv/yggdrasil-dew/inbox")
+DEW_ROOT  = Path("/srv/yggdrasil-dew")
 
-server = Server("madre-ecosystem")
+mcp = FastMCP("yggdrasil-mcp")
 
-
-# ─── Audit log (inmutable, append-only) ──────────────────────
-def audit(tool_name: str, args: dict, caller: str = "unknown"):
+def _audit(tool: str, args: dict, result: str, dry_run: bool):
     AUDIT_LOG.parent.mkdir(parents=True, exist_ok=True)
     entry = {
-        "ts": datetime.utcnow().isoformat(),
-        "tool": tool_name,
+        "ts": datetime.datetime.utcnow().isoformat(),
+        "tool": tool,
         "args": args,
-        "caller": caller
+        "dry_run": dry_run,
+        "result_snippet": result[:200]
     }
     with AUDIT_LOG.open("a") as f:
         f.write(json.dumps(entry) + "\n")
 
+@mcp.tool()
+def check_docker(dry_run: bool = True) -> str:
+    """Lista contenedores Docker y su estado. [AUTO]"""
+    result = subprocess.run(
+        ["docker", "ps", "-a", "--format", "{{.Names}}\t{{.Status}}\t{{.Image}}"],
+        capture_output=True, text=True
+    )
+    out = result.stdout or "Sin contenedores"
+    _audit("check_docker", {"dry_run": dry_run}, out, dry_run)
+    return out
 
-# ─── Tool definitions ──────────────────────────────────
-@server.list_tools()
-async def list_tools():
-    return [
-        types.Tool(
-            name="check_docker",
-            description="Lista todos los contenedores Docker con su estado actual.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "container": {
-                        "type": "string",
-                        "description": "Nombre del contenedor específico (opcional)"
-                    }
-                }
-            }
-        ),
-        types.Tool(
-            name="get_ecosystem_state",
-            description="Lee el estado actual del ecosistema (ECOSYSTEM-STATE.md).",
-            inputSchema={"type": "object", "properties": {}}
-        ),
-        types.Tool(
-            name="read_roadmap",
-            description="Lee el ROADMAP-MASTER.md del ecosistema.",
-            inputSchema={"type": "object", "properties": {}}
-        ),
-        types.Tool(
-            name="list_services",
-            description="Lista los servicios activos del ecosistema con su estado.",
-            inputSchema={"type": "object", "properties": {}}
-        ),
-    ]
+@mcp.tool()
+def get_ecosystem_state(dry_run: bool = True) -> str:
+    """Estado global: contenedores + servicios críticos. [AUTO]"""
+    containers = subprocess.run(
+        ["docker", "ps", "--format", "{{.Names}}:{{.Status}}"],
+        capture_output=True, text=True
+    ).stdout
+    _audit("get_ecosystem_state", {}, containers, dry_run)
+    return f"=== ECOSYSTEM STATE ===\n{containers}"
 
+@mcp.tool()
+def read_roadmap() -> str:
+    """Lee ROADMAP-MASTER.md completo. [AUTO]"""
+    if ROADMAP.exists():
+        content = ROADMAP.read_text(encoding="utf-8")
+        _audit("read_roadmap", {}, content[:100], False)
+        return content
+    return "ROADMAP-MASTER.md no encontrado."
 
-# ─── Tool implementations ────────────────────────────────
-@server.call_tool()
-async def call_tool(name: str, arguments: dict):
-    audit(name, arguments)
+@mcp.tool()
+def list_services(dry_run: bool = True) -> str:
+    """Lista servicios activos en Madre. [AUTO]"""
+    result = subprocess.run(
+        ["docker", "ps", "--filter", "status=running",
+         "--format", "{{.Names}}\t{{.Ports}}"],
+        capture_output=True, text=True
+    )
+    out = result.stdout or "Sin servicios activos"
+    _audit("list_services", {"dry_run": dry_run}, out, dry_run)
+    return out
 
-    if name == "check_docker":
-        try:
-            cmd = ["docker", "ps", "--format",
-                   '{{json .}}']
-            if arguments.get("container"):
-                cmd += ["--filter", f"name={arguments['container']}"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-            lines = [json.loads(l) for l in result.stdout.strip().split("\n") if l]
-            return [types.TextContent(
-                type="text",
-                text=json.dumps(lines, indent=2, ensure_ascii=False)
-            )]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {e}")]
+@mcp.tool()
+def write_inbox(content: str, filename: str, dry_run: bool = True) -> str:
+    """Escribe un mensaje en el inbox del ecosistema. [AUTO] dry_run por defecto."""
+    _audit("write_inbox", {"filename": filename, "dry_run": dry_run}, content[:100], dry_run)
+    if dry_run:
+        return f"[DRY_RUN] Escribiría en inbox/{filename}:\n{content[:200]}"
+    INBOX.mkdir(parents=True, exist_ok=True)
+    target = INBOX / filename
+    target.write_text(content, encoding="utf-8")
+    return f"✅ Escrito en inbox/{filename}"
 
-    elif name == "get_ecosystem_state":
-        path = YGGDRASIL_DEW / "ECOSYSTEM-STATE.md"  # thdora tiene el suyo
-        # Intentar también el de yggdrasil-dew
-        state_path = YGGDRASIL_DEW / "ESTADO-SISTEMA.md"
-        content = ""
-        for p in [path, state_path]:
-            if p.exists():
-                content = p.read_text(encoding="utf-8")
-                break
-        if not content:
-            content = "ECOSYSTEM-STATE.md no encontrado en la ruta configurada."
-        return [types.TextContent(type="text", text=content)]
+@mcp.tool()
+def list_issues(label: str = "") -> str:
+    """Lista issues GitHub de yggdrasil-dew. Requiere gh CLI configurado. [AUTO]"""
+    cmd = ["gh", "issue", "list", "--repo", "alvarofernandezmota-tech/yggdrasil-dew",
+           "--json", "number,title,labels,state", "--limit", "20"]
+    if label:
+        cmd += ["--label", label]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    out = result.stdout or result.stderr
+    _audit("list_issues", {"label": label}, out[:100], False)
+    return out
 
-    elif name == "read_roadmap":
-        path = YGGDRASIL_DEW / "ROADMAP-MASTER.md"
-        if not path.exists():
-            return [types.TextContent(type="text", text="ROADMAP-MASTER.md no encontrado.")]
-        return [types.TextContent(type="text", text=path.read_text(encoding="utf-8"))]
+@mcp.tool()
+def restart_container(name: str, dry_run: bool = True) -> str:
+    """Reinicia un contenedor Docker. [RISKY] dry_run=True por defecto."""
+    _audit("restart_container", {"name": name, "dry_run": dry_run}, "", dry_run)
+    if dry_run:
+        return f"[DRY_RUN] Reiniciaría contenedor: {name}"
+    result = subprocess.run(["docker", "restart", name], capture_output=True, text=True)
+    return result.stdout or result.stderr
 
-    elif name == "list_services":
-        # Lee el ESTADO-SISTEMA.md y extrae sección de servicios
-        path = YGGDRASIL_DEW / "ESTADO-SISTEMA.md"
-        if path.exists():
-            content = path.read_text(encoding="utf-8")
-            # Devolver las primeras 100 líneas con sección de servicios
-            lines = content.split("\n")
-            return [types.TextContent(type="text", text="\n".join(lines[:80]))]
-        return [types.TextContent(type="text", text="Estado del sistema no disponible.")]
-
-    return [types.TextContent(type="text", text=f"Tool '{name}' no implementada.")]
-
-
-# ─── Entry point ───────────────────────────────────────
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(stdio_server(server))
+    mcp.run(transport="stdio")

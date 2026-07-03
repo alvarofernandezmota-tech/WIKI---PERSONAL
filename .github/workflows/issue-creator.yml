@@ -1,0 +1,69 @@
+# Descripcion: Workflow autonomo que analiza el repo y crea issues
+# automaticamente cuando detecta: scripts sin doc, workflows sin descripcion,
+# agentes sin spec, inbox saturado, funciones duplicadas, tareas BLOCKED.
+# Se ejecuta en bucle (cron diario) y en cada push a main.
+# NO genera codigo. Solo analiza y abre issues [AUTO].
+
+name: Issue Creator Autonomo
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # Cada dia a las 7:00 UTC
+    - cron: '0 19 * * *'  # Y a las 19:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - 'inbox/**'
+      - 'scripts/**'
+      - 'agentes/**'
+      - 'ROADMAP-MASTER.md'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Modo simulacion (no crea issues reales)'
+        required: false
+        default: 'false'
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  analyze-and-create-issues:
+    name: Analizar y crear issues automaticos
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar GitHub CLI
+        run: gh auth status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ejecutar issue-creator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          chmod +x scripts/issue-creator.sh
+          bash scripts/issue-creator.sh
+
+      - name: Ejecutar task-analyzer
+        run: |
+          chmod +x scripts/task-analyzer.sh
+          bash scripts/task-analyzer.sh
+
+      - name: Commit report de tareas
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(auto): task-analysis report [AUTO]'
+          file_pattern: 'reports/task-analysis-*.md'
+          commit_user_name: 'yggdrasil-bot'
+          commit_user_email: 'bot@yggdrasil.local'
+          skip_dirty_check: false

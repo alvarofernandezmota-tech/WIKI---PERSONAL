@@ -1,0 +1,19 @@
+name: Watchdog SLA Monitor
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup tools
+        run: sudo apt-get update && sudo apt-get install -y jq bc
+      - name: Run vigilante
+        run: bash scripts/agentes/agente-vigilante.sh --verbose
+      - name: Upload diary
+        uses: actions/upload-artifact@v4
+        with:
+          name: diary
+          path: diary/
