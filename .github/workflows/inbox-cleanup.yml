@@ -1,0 +1,54 @@
+# ============================================================
+# INBOX CLEANUP
+# Trigger: cuando inbox/ supera 10 ficheros (cron) o manual
+# Consolida micro-audits, archiva procesados, genera informe
+# ============================================================
+name: inbox-cleanup
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # cada 6 horas
+  push:
+    paths:
+      - 'inbox/**.md'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Contar ficheros en inbox/
+        id: count
+        run: |
+          COUNT=$(find inbox/ -maxdepth 1 -name '*.md' \
+            ! -name 'README.md' ! -name 'PLANTILLA*.md' \
+            ! -name 'APLAZADO*.md' ! -name 'SIGUIENTE*.md' \
+            ! -name 'PENDIENTES*.md' ! -name 'PLAN-*.md' \
+            | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "Ficheros en inbox/: $COUNT"
+
+      - name: Ejecutar limpieza si supera umbral
+        if: steps.count.outputs.count > 10
+        run: |
+          chmod +x scripts/maintenance/inbox-audit-cleanup.sh
+          REPO_DIR="$(pwd)" bash scripts/maintenance/inbox-audit-cleanup.sh
+
+      - name: Commit y push
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action [inbox-cleanup]"
+          git add inbox/ || true
+          git diff --staged --quiet || \
+            git commit -m "chore(inbox): auto-cleanup $(date +%Y-%m-%d) [AUTO]" && \
+            git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
