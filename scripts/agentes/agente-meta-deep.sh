@@ -1,90 +1,75 @@
 #!/usr/bin/env bash
-# ============================================================
-# NOMBRE:   scripts/agentes/agente-meta-deep.sh
-# VERSION:  1.0.0
-# FUNCIÓN:  Auditoría profunda del ecosistema. Analiza scripts,
-#           docs, workflows y agentes. Usa Ollama si disponible.
-#           Detecta deuda técnica y propone mejoras. Abre issues.
-# TIPO:     auditor
-# REPO:     alvarofernandezmota-tech/yggdrasil-dew
-# USO:      bash scripts/agentes/agente-meta-deep.sh [scope] [modelo]
-# SCOPE:    full | scripts | docs | workflows (default: full)
-# ============================================================
+# scripts/agentes/agente-meta-deep.sh
+# Auditor LLM: analiza el repo y genera propuestas en formato PR/diff (dry-run por defecto)
+# Uso: bash scripts/agentes/agente-meta-deep.sh [--apply]
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}}")/../../" && pwd)"
-SCOPE="${1:-full}"
-MODELO="${2:-llama3}"
-TS="$(date +%Y%m%d-%H%M%S)"
-LOG="$ROOT/inbox/meta-deep-$TS.md"
-mkdir -p "$ROOT/inbox" "$ROOT/diary"
+ROOT="${YGGDRASIL_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
+MODE="dry-run"
+[ "${1:-}" = "--apply" ] && MODE="apply"
+TS=$(date +"%Y%m%d-%H%M%S")
+OUT="$ROOT/reports/agente-meta-deep"
+mkdir -p "$OUT"
+REPORT="$OUT/meta-deep-$TS.md"
 
-log() { echo "[$(date +%H:%M:%S)] [META-DEEP] $*" | tee -a "$LOG"; }
+echo "# Agente Meta-Deep — $TS" > "$REPORT"
+echo "Modo: $MODE" >> "$REPORT"
+echo "" >> "$REPORT"
 
-log "=== AGENTE META-DEEP v1.0 | scope=$SCOPE ==="
-
-# ── INVENTARIO ────────────────────────────────────────────
-log "Inventariando ecosistema..."
-SCRIPT_COUNT=$(find "$ROOT/scripts" -name "*.sh" 2>/dev/null | wc -l | tr -d ' ')
-AGENT_COUNT=$(find "$ROOT/scripts/agentes" -name "*.sh" 2>/dev/null | wc -l | tr -d ' ')
-WF_COUNT=$(find "$ROOT/.github/workflows" -name "*.yml" 2>/dev/null | wc -l | tr -d ' ')
-DOC_COUNT=$(find "$ROOT/docs" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-log "  Scripts: $SCRIPT_COUNT | Agentes: $AGENT_COUNT | Workflows: $WF_COUNT | Docs: $DOC_COUNT"
-
-# ── DETECCIÓN DE PROBLEMAS ────────────────────────────────
-log "Detectando problemas conocidos..."
-PROBLEMAS=()
-
-# Duplicados
-for dup in "diary:diarios" "osint:osint-stack"; do
-  a="${dup%%:*}"; b="${dup##*:}"
-  if [ -d "$ROOT/$a" ] && [ -d "$ROOT/$b" ]; then
-    PROBLEMAS+=("DUPLICADO: $a/ y $b/ coexisten")
+# ── Recopilar contexto ───────────────────────────────────────────────────────
+CONTEXT=""
+for f in README.md ECOSISTEMA.md MASTER-PENDIENTES.md ESTADO-SISTEMA.md; do
+  fp="$ROOT/$f"
+  if [ -f "$fp" ]; then
+    CONTEXT+="\n\n### $f\n"
+    CONTEXT+=$(head -60 "$fp")
   fi
 done
 
-# Scripts sin cabecera estándar
-BAD_HEADER=0
-while IFS= read -r script; do
-  if ! grep -q "FUNCIÓN:" "$script" 2>/dev/null; then
-    BAD_HEADER=$((BAD_HEADER+1))
-  fi
-done < <(find "$ROOT/scripts" -name "*.sh" 2>/dev/null | head -50)
-[ "$BAD_HEADER" -gt 0 ] && PROBLEMAS+=("$BAD_HEADER scripts sin cabecera FUNCIÓN estándar")
+# Listar agentes y su estado
+CONTEXT+="\n\n### Agentes detectados\n"
+for d in "$ROOT/agentes"/*/; do
+  name=$(basename "$d")
+  has_test="NO"
+  [ -f "$d/test.sh" ] && has_test="SÍ"
+  has_diseno="NO"
+  [ -f "$d/DISEÑO.md" ] || [ -f "$d/DISENO.md" ] && has_diseno="SÍ"
+  CONTEXT+="- $name | test.sh: $has_test | DISEÑO: $has_diseno\n"
+done
 
-# MCP server status
-[ -f "$ROOT/mcp/server.py" ] && log "  ✅ MCP server presente" || PROBLEMAS+=("MCP server.py no encontrado")
+# Últimos 10 commits
+CONTEXT+="\n\n### Últimos commits\n"
+CONTEXT+=$(cd "$ROOT" && git log --oneline -10 2>/dev/null || echo "(no git)")
 
-# Reportar problemas
-if [ "${#PROBLEMAS[@]}" -gt 0 ]; then
-  log "Problemas detectados:"
-  for p in "${PROBLEMAS[@]}"; do
-    log "  ⚠️  $p"
-  done
+PROMPT="Eres un auditor técnico senior del ecosistema Yggdrasil-Dew. "
+PROMPT+="Analiza el siguiente contexto y devuelve EXACTAMENTE 3 propuestas de mejora "
+PROMPT+="en formato: PROPUESTA N: <título> | DESCRIPCIÓN: <qué hacer> | IMPACTO: alto|medio|bajo. "
+PROMPT+="Contexto:\n$CONTEXT"
+
+echo "## Prompt enviado al LLM" >> "$REPORT"
+echo '```' >> "$REPORT"
+echo "${PROMPT:0:500}..." >> "$REPORT"
+echo '```' >> "$REPORT"
+echo "" >> "$REPORT"
+
+# ── Llamar al router LLM ─────────────────────────────────────────────────────
+ROUTER="$ROOT/scripts/agentes/llm-router.sh"
+if [ -f "$ROUTER" ]; then
+  echo "## Respuesta LLM" >> "$REPORT"
+  bash "$ROUTER" "$PROMPT" auto >> "$REPORT" 2>&1 || echo "(LLM no disponible)" >> "$REPORT"
 else
-  log "  ✅ Sin problemas críticos detectados"
+  echo "## LLM router no encontrado — propuestas manuales" >> "$REPORT"
+  echo "- PROPUESTA 1: Añadir PROFILE.md a todos los agentes" >> "$REPORT"
+  echo "- PROPUESTA 2: Centralizar logs en logs/agentes/" >> "$REPORT"
+  echo "- PROPUESTA 3: Añadir metric tracking por agente" >> "$REPORT"
 fi
 
-# ── ANÁLISIS LLM (si Ollama disponible) ──────────────────
-if command -v ollama &>/dev/null; then
-  log "Ollama disponible — ejecutando análisis con $MODELO..."
-  CONTEXT="Ecosistema yggdrasil-dew. Scripts: $SCRIPT_COUNT. Agentes: $AGENT_COUNT. Workflows: $WF_COUNT. Problemas: ${PROBLEMAS[*]:-ninguno}"
-  PROMPT="Eres auditor técnico de nivel ingeniero. Contexto: $CONTEXT. En español, propón 3-5 mejoras concretas y accionables para este ecosistema de automatización GitHub."
-  RESPUESTA=$(ollama run "$MODELO" "$PROMPT" 2>/dev/null || echo "[Ollama: sin respuesta]")
-  log "Análisis LLM completado"
-  echo "## Análisis LLM ($MODELO)" >> "$LOG"
-  echo "$RESPUESTA" >> "$LOG"
+echo "" >> "$REPORT"
+echo "## Modo: $MODE" >> "$REPORT"
+if [ "$MODE" = "apply" ]; then
+  echo "TODO: implementar apply automático vía Galatea" >> "$REPORT"
 else
-  log "  ℹ️  Ollama no disponible — análisis LLM omitido"
-  echo "## Análisis LLM" >> "$LOG"
-  echo "Ollama no instalado. Para activar: https://ollama.ai" >> "$LOG"
+  echo "Dry-run: no se aplicó ningún cambio. Revisar reporte y ejecutar con --apply si procede." >> "$REPORT"
 fi
 
-# ── REPORTE FINAL ────────────────────────────────────────
-REPORTE="$ROOT/diary/meta-deep-$TS.md"
-cp "$LOG" "$REPORTE"
-
-log "=== META-DEEP COMPLETADO ==="
-log "  Log:     inbox/meta-deep-$TS.md"
-log "  Reporte: diary/meta-deep-$TS.md"
-log "  Problemas: ${#PROBLEMAS[@]}"
+echo "$REPORT"
