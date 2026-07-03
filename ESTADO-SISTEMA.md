@@ -1,70 +1,98 @@
-# Estado del Sistema — Yggdrasil Ecosystem
+---
+tags: [estado, sistema, live]
+fecha-actualizacion: 2026-07-03T06:45
+---
 
-> Última actualización: 2026-07-03 04:29 CEST
-> Actualizado por: Perplexity MCP (sesión iPhone madrugada)
+# 📊 ESTADO DEL SISTEMA — 2026-07-03 06:45 CEST
 
-## 🟢 Infraestructura Activa
-
-| Nodo | IP Tailscale | Estado | Rol |
-|---|---|---|---|
-| Madre (varpc) | 100.91.112.32 | ✅ ONLINE | Servidor principal |
-| iPhone 11 | 100.81.187.99 | ✅ ONLINE | Operación móvil |
-| Acer (varo12f) | 100.86.119.102 | ✅ ONLINE | Workstation |
-| Xiaomi | 100.106.133.70 | ✅ ONLINE | Backup móvil |
-
-## 🔒 Seguridad
-
-| Servicio | Estado | Notas |
-|---|---|---|
-| SSH Madre | ✅ Hardened | No password, no root, pubkey only |
-| Tailscale | ✅ Activo | 4 nodos en tailnet |
-| Puerto 21 FTP | ⚠️ PENDIENTE | Cerrar en router — issue #14 |
-| Blink SSH iPhone | ✅ Operativo | ed25519 blink-madre |
-
-## 🤖 IA Local (Madre)
-
-| Herramienta | Estado | Notas |
-|---|---|---|
-| Ollama | ✅ Instalado | v0.x — descargando modelos |
-| llama3.1:8b | ⏳ Descargando | tmux sesión `trabajo` |
-| mistral:7b | ⏳ Pendiente | en cola pull-modelos.sh |
-| codellama:7b | ⏳ Pendiente | en cola pull-modelos.sh |
-| Thdora | ⚠️ En desarrollo | issue #1 |
-
-## 📁 Repo
-
-| Ítem | Estado |
-|---|---|
-| Git configurado en Madre | ✅ |
-| GitHub SSH funcionando | ✅ |
-| Inbox limpio | ✅ |
-| Scripts mantenimiento | ✅ morning-check.sh, health-check.sh, audit-repo.sh |
-| Diario 2026-07-03 | ✅ |
-
-## 📋 Issues Abiertos Prioritarios
-
-| # | Título | Prioridad |
-|---|---|---|
-| #25 | Verificar modelos Ollama descargados | P1 — mañana |
-| #22 | Labels personalizados | P1 |
-| #14 | Cerrar puerto 21 FTP router | P1 seguridad |
-| #16 | Limpieza git BFG historial | P2 |
-| #17 | Migrar inbox/ → docs/ | P2 |
-| #11 | GitHub Actions agentes IA | P2 |
-| #9 | Docker stack Wazuh+Suricata+Pihole | P3 |
-
-## ✅ Completado Esta Sesión (03-jul-2026)
-
-- iPhone SSH via Blink Shell (issue #23)
-- SSH Hardening Madre (issue #13)
-- Bootstrap Madre
-- Git + GitHub en Madre
-- Inbox limpiado (7 archivos → procesado/)
-- Ollama instalado + modelos en descarga background
-- Tmux configurado con sesión persistente
-- Scripts: morning-check.sh, pull-modelos.sh
-- Docs: iphone-ssh-blink.md, ssh-hardening.md, tmux-background-jobs.md
-- Diario 2026-07-03.md
+> Actualizado al cierre de cada sesión. Ver MASTER-PENDIENTES.md para tareas detalladas.
 
 ---
-_Próxima sesión: ejecutar `bash scripts/maintenance/morning-check.sh` para ver estado completo_
+
+## 🔴 Bloqueos activos
+
+| Bloqueo | Impacto | Desbloqueo |
+|---------|---------|------------|
+| Docker thdora no confirmado arriba | Smoke test Telegram bloqueado | `docker compose up -d` en Madre |
+| Token GitHub `repo` full | Labels, milestones, branch protection | Generar token y meter en MCP |
+| Puerto 21 FTP abierto en router | Riesgo seguridad P0 | Acceso panel router Digi |
+| `PasswordAuthentication` SSH activo | Riesgo seguridad P1 | 2 terminales SSH simultáneas |
+
+---
+
+## 🟢 Servicios activos
+
+| Servicio | Estado | Notas |
+|---------|--------|-------|
+| Tailscale Madre | ✅ Activo | VPN funcional |
+| Tailscale Acer | ✅ Activo | |
+| UFW Madre | ✅ Activo | Reglas estrictas |
+| Fail2ban | ✅ Activo | |
+| Ollama Madre | ✅ Activo | qwen2.5:7b + qwen2.5:3b |
+| Docker thdora | ⏳ En despliegue | Build en progreso 2026-07-03 |
+| n8n | ❌ No activo | Pendiente Fase 6 |
+| Wazuh | ❌ No activo | Pendiente Fase 4 |
+
+---
+
+## 📊 Estado fases (resumen)
+
+| Fase | Nombre | % | Próximo paso |
+|------|--------|---|---------------|
+| 1 | Seguridad base Madre | 90% | Deshabilitar SSH password |
+| 2 | GitHub profesional | 70% | Labels + milestones |
+| 3 | Governance repo | 50% | Unificar numeración fases |
+| 4 | Stack técnico Madre | 10% | Hardening batcueva |
+| 5 | GitHub Actions | 30% | Deploy desde thdora |
+| **6** | **Thdora Guardián** | **20%** | **⭐ FOCO ACTUAL: handlers /estado /inbox** |
+| 6d | Multi-IA n8n | 0% | Después de Fase 6 |
+| 7 | Ollama + RAG | 20% | Qdrant + bge-m3 |
+| 8 | MCP server Madre | 0% | Después de Fase 7 |
+| 9 | Mobile completo | 30% | a-Shell + SSH iPhone |
+
+---
+
+## 🧟 Deuda técnica pendiente
+
+### Thdora (Sprint 6)
+- [ ] `MessageLog` real en scheduler_tasks.py
+- [ ] Tests de regresión handlers
+- [ ] Verificar Docker arriba + smoke test `/start`
+
+### Scripts yggdrasil-dew
+- [ ] Eliminar zombies: `inbox-cleanup-jun2024.sh`, `bc`, `inicio-sesion.sh`
+- [ ] Mover scripts sueltos a subdirectorios
+- [ ] Unificar numeración 01-10 con ROADMAP
+- [ ] Registrar cron night-cron.sh en crontab Madre
+
+### Repo que falta
+- [ ] **Batcueva / IA stack repo** — documentar Ollama + RAG + n8n en repo dedicado
+  o dentro de yggdrasil-dew en carpeta `infra/batcueva/`
+  - Decisión pendiente: ¿repo aparte o dentro de yggdrasil-dew?
+
+---
+
+## 📝 Acciones de cierre sesión 2026-07-03
+
+```bash
+# En Madre ahora mismo:
+bash ~/yggdrasil-dew/scripts/maintenance/close-session.sh
+
+# Cron nocturno (añadir una sola vez):
+crontab -e
+# Añadir: 0 2 * * * bash ~/yggdrasil-dew/scripts/maintenance/night-cron.sh >> /tmp/night-cron.log 2>&1
+```
+
+---
+
+## 📅 Próxima sesión — foco
+
+1. **Confirmar Docker thdora arriba** (`docker ps` en Madre)
+2. **Smoke test** `/start` en Telegram
+3. **Handlers Fase 6**: implementar `/estado`, `/inbox`, `/pendientes`
+4. **Eliminar zombies** (3 scripts confirmados)
+5. **Decidir**: batcueva/IA — ¿repo aparte o carpeta en yggdrasil-dew?
+
+---
+
+_Actualizado: 2026-07-03 06:45 CEST — cierre sesión Perplexity MCP_

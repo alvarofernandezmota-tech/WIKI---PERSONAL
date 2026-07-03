@@ -1,13 +1,32 @@
-# MASTER-PENDIENTES.md
-#pendientes #organizacion #navegacion
+---
+tags: [pendientes, ssot, organizacion]
+fecha-actualizacion: 2026-07-03T06:45
+---
 
-**Última actualización:** 2026-07-03 01:00 CEST
+# MASTER-PENDIENTES.md
+
+**Última actualización:** 2026-07-03 06:45 CEST
 
 > Fuente única de verdad para pendientes. Los issues de GitHub son el tracker operativo; este fichero es el mapa estratégico.
 
 ---
 
 ## ✅ COMPLETADO — historial
+
+### Sesión 2026-07-03
+- [x] Issue #10 thdora — Fix `/config` timeout ✅
+- [x] Issue #12 thdora — Código zombie eliminado ✅
+- [x] `pytest` añadido a requirements-dev.txt ✅
+- [x] `ai_audit.py` v2 creado ✅
+- [x] `scripts/SCRIPTS.md` índice maestro creado ✅
+- [x] `docs/AUDIT-SCRIPTS-2026-07-03.md` auditoria completa ✅
+- [x] `scripts/maintenance/close-session.sh` creado ✅
+- [x] `scripts/maintenance/night-cron.sh` creado ✅
+- [x] `scripts/thdora/bot-session-report.sh` creado ✅
+- [x] `scripts/infra/docker-health-check.sh` creado ✅
+- [x] ROADMAP.md actualizado con estado real fases ✅
+- [x] ESTADO-SISTEMA.md actualizado ✅
+- [x] Regla SINE documentada en CONVENCIONES.md ✅
 
 ### Fase 1 — Tailscale [✅ COMPLETADO 2026-07-01]
 - [x] Tailscale instalado en Madre
@@ -54,6 +73,14 @@
 
 ## ⚠️ P1-URGENTE
 
+- [ ] **Docker thdora confirmar arriba** — `docker ps` en Madre
+  - Desbloquea: smoke test `/start` Telegram
+  - needs-terminal: SÍ
+
+- [ ] **Smoke test** `/start` en Telegram via thdora
+  - Requiere: Docker arriba
+  - needs-terminal: NO (desde iPhone)
+
 - [ ] `PasswordAuthentication no` en Madre
   - Requiere: 2 terminales SSH simultáneas + test previo
   - mobile-ok: NO — needs-terminal
@@ -74,74 +101,59 @@
 
 ---
 
-## 🟡 P2-NORMAL — Fase 0 cierre
+## 🟡 P2-NORMAL — Fase 6 Thdora (foco actual)
 
-- [ ] Labels 22 personalizados
-  - Requiere: token `repo` full (Acer) o GitHub web (iPhone ahora)
-  - Doc: `docs/operativa/pendientes-labels-milestones.md`
-  - mobile-ok: SÍ (GitHub web desde iPhone)
+- [ ] **Handler `/estado`** en thdora — responde con estado Docker + sistema
+  - Requiere: Docker arriba
+  - needs-terminal: NO (vía MCP thdora)
 
+- [ ] **Handler `/inbox`** en thdora — lista inbox de yggdrasil-dew
+  - needs-terminal: NO
+
+- [ ] **Handler `/pendientes`** en thdora — lista P0+P1 de este fichero
+  - needs-terminal: NO
+
+- [ ] Eliminar zombies scripts:
+  - `scripts/inbox-cleanup-jun2024.sh`
+  - `scripts/bc`
+  - `scripts/inicio-sesion.sh`
+  - mobile-ok: SÍ (vía MCP)
+
+- [ ] Registrar cron nocturno en Madre:
+  ```bash
+  crontab -e
+  # 0 2 * * * bash ~/yggdrasil-dew/scripts/maintenance/night-cron.sh >> /tmp/night-cron.log 2>&1
+  ```
+  - needs-terminal: SÍ
+
+---
+
+## 🔵 P3-BACKLOG
+
+### Scripts — reorganización
+- [ ] Mover scripts sueltos a subdirectorios correctos (ver AUDIT-SCRIPTS-2026-07-03.md)
+- [ ] Unificar numeración 01-10 con ROADMAP fases reales
+- [ ] Labels 22 personalizados (GitHub web)
 - [ ] Milestones: Fase 0 (jul-10) + Fase 2 (jul-15)
-  - mobile-ok: SÍ (GitHub web)
-
 - [ ] Branch protection main
-  - mobile-ok: SÍ (GitHub web)
-
 - [ ] Limpiar carpeta `diarios/` raíz (duplica `docs/diarios/`)
-  - needs-terminal: SÍ (o Cursor)
+
+### Decisión pendiente
+- [ ] **Batcueva/IA stack** — ¿repo aparte o carpeta `infra/batcueva/` en yggdrasil-dew?
+  - Candidatos: Ollama config, n8n flows, Wazuh config, Qdrant config
+  - Ema: integrar como módulo en thdora (NO repo aparte) — decidido
+
+### Fase 7 — Ollama + RAG
+- [ ] `llama3.1:8b` pull
+- [ ] `bge-m3` pull (embeddings)
+- [ ] Qdrant desplegado en Madre
+- [ ] RAG funcional sobre docs/
+
+### Fase 9 — Mobile
+- [ ] Termius iPhone configurado
+- [ ] SSH funcional iPhone → Madre
+- [ ] Tailscale Redmi A5
 
 ---
 
-## 🔄 EN PROCESO
-
-- [ ] MCP Cursor en Acer (token full + `~/.cursor/mcp.json`)
-  - Bloquea: automatización local, labels desde IA
-  - Issue #15
-
-- [ ] a-Shell + SSH Madre desde iPhone
-  - Desbloqueado por: a-Shell + Tailscale iOS instalados
-  - Doc: `docs/operativa/iphone-terminal.md`
-
-- [ ] Gemini CLI en Madre
-  - Configurar con API key
-  - Doc: `docs/arquitectura/gemini-fase1-investigacion.md`
-
----
-
-## 🕑 FUTURO — fases siguientes
-
-### Fase 2 — SSH Hardening completo
-- [ ] `PasswordAuthentication no` (ver P1)
-- [ ] Cambiar puerto SSH (22 → otro)
-- [ ] Fail2ban tuning
-- [ ] Auditoría UFW puertos
-
-### Fase 3 — Docker hardening
-- [ ] Auditar puertos expuestos contenedores
-- [ ] Docker network isolation
-- [ ] Secrets en `.env` — no en compose
-
-### Fase 4 — Monitoring
-- [ ] Grafana dashboards Madre
-- [ ] Alertas Telegram (TOKI-GUARDIAN)
-- [ ] Uptime Kuma o Prometheus
-
-### Fase 5 — GitHub Actions avanzado
-- [ ] Auto-cierre inbox workflow
-- [ ] Deploy script Madre
-- [ ] Backup automatizado repo
-
-### Fase 6 — Cursor + MCP Acer
-- [ ] Instalar cursor-bin (AUR)
-- [ ] Configurar ~/.cursor/mcp.json
-- [ ] Test MCP completo desde Acer
-
-### Fase 7 — Bots Telegram
-- [ ] TOKI-GUARDIAN: `/estado` `/docker` `/alertas`
-- [ ] TOKI-DEW básico: consultas repo
-- [ ] Webhook Grafana → Telegram
-
-### Fase 8 — IA local
-- [ ] RAG sobre repo con nomic-embed-text
-- [ ] Open WebUI accesible por Tailscale
-- [ ] TOKI-DEW + Ollama integrado
+_Actualizado: 2026-07-03 06:45 CEST — cierre sesión Perplexity MCP_
