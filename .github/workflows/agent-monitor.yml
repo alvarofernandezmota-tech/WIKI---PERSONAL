@@ -1,65 +1,115 @@
 # =============================================================
-# FUNCIÓN:   Centinela de centinelas. Vigila que todos los
-#            workflows críticos estén vivos cada 6h.
-#            Si alguno lleva >24h caído, abre issue urgente.
-# TRIGGER:   schedule cada 6h / workflow_dispatch
-# ETIQUETAS: automatizacion, urgente
-# DEPS:      scripts/agent-monitor.sh
+# FUNCIÓN:   Vigilar que todos los workflows tengan runs exitosas recientes
+# TRIGGER:   Cron cada 6h
+# AGENTE:    ecosystem-guardian
+# ETIQUETAS: automatizacion, agentes
+# RUTAS:     .github/workflows/
 # =============================================================
 
-name: 🤖 Agent Monitor — Centinela de Centinelas
+name: agent-monitor
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # cada 6 horas
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
-  vigilar-agentes:
-    name: Vigilar estado de todos los agentes
+  monitor-workflows:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
       issues: write
       actions: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configurar git
-        run: |
-          git config user.name  "thdora-monitor[bot]"
-          git config user.email "thdora-monitor[bot]@users.noreply.github.com"
-
-      - name: Ejecutar agent-monitor
-        run: |
-          chmod +x scripts/agent-monitor.sh
-          bash scripts/agent-monitor.sh
+      - name: Check workflow health
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_SERVER_URL: ${{ github.server_url }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-
-      - name: Commit log de monitoreo
         run: |
-          git add -A
-          if git diff --cached --quiet; then
-            echo "Sin cambios de monitoreo"
+          set -euo pipefail
+
+          # Lista de workflows críticos a monitorizar
+          CRITICAL_WORKFLOWS=(
+            "audit-on-push.yml"
+            "diary-writer.yml"
+            "health-check.yml"
+            "repo-audit.yml"
+            "inbox-cleanup.yml"
+            "ecosystem-guardian.yml"
+          )
+
+          THRESHOLD_HOURS=24
+          NOW=$(date -u +%s)
+          FAILED_AGENTS=()
+
+          for workflow in "${CRITICAL_WORKFLOWS[@]}"; do
+            echo "Checking: ${workflow}"
+
+            # Obtener el último run del workflow
+            LAST_RUN=$(gh api \
+              "repos/${{ github.repository }}/actions/workflows/${workflow}/runs?per_page=1" \
+              --jq '.workflow_runs[0] | {status: .status, conclusion: .conclusion, updated_at: .updated_at}' \
+              2>/dev/null || echo '{"status":"not_found","conclusion":"not_found","updated_at":null}')
+
+            STATUS=$(echo "${LAST_RUN}" | jq -r '.status')
+            CONCLUSION=$(echo "${LAST_RUN}" | jq -r '.conclusion')
+            UPDATED_AT=$(echo "${LAST_RUN}" | jq -r '.updated_at // empty')
+
+            if [ -z "${UPDATED_AT}" ] || [ "${STATUS}" = "not_found" ]; then
+              echo "  ⚠️ No runs found for ${workflow}"
+              FAILED_AGENTS+=("${workflow} (sin runs)")
+              continue
+            fi
+
+            # Calcular antigüedad del último run
+            LAST_RUN_TIME=$(date -u -d "${UPDATED_AT}" +%s 2>/dev/null || date -u -j -f "%Y-%m-%dT%H:%M:%SZ" "${UPDATED_AT}" +%s 2>/dev/null || echo 0)
+            HOURS_AGO=$(( (NOW - LAST_RUN_TIME) / 3600 ))
+
+            if [ "${CONCLUSION}" = "failure" ] || [ "${HOURS_AGO}" -gt "${THRESHOLD_HOURS}" ]; then
+              echo "  ❌ ${workflow}: conclusion=${CONCLUSION}, last_run=${HOURS_AGO}h ago"
+              FAILED_AGENTS+=("${workflow} (conclusion: ${CONCLUSION}, hace ${HOURS_AGO}h)")
+            else
+              echo "  ✅ ${workflow}: OK (hace ${HOURS_AGO}h, ${CONCLUSION})"
+            fi
+          done
+
+          # Abrir issues para agentes caídos
+          if [ ${#FAILED_AGENTS[@]} -gt 0 ]; then
+            for agent in "${FAILED_AGENTS[@]}"; do
+              WORKFLOW_NAME=$(echo "${agent}" | cut -d'(' -f1 | tr -d ' ')
+              EXISTING=$(gh issue list \
+                --label "automatizacion" \
+                --search "[AGENTE-CAÍDO] ${WORKFLOW_NAME}" \
+                --state open \
+                --json number \
+                --jq length 2>/dev/null || echo "0")
+
+              if [ "${EXISTING}" -eq 0 ]; then
+                gh issue create \
+                  --title "[AGENTE-CAÍDO] ${WORKFLOW_NAME}" \
+                  --label "automatizacion,urgente" \
+                  --body "## Agente caído detectado por agent-monitor\n\n**Workflow:** \`${WORKFLOW_NAME}\`\n**Detalle:** ${agent}\n**Detectado:** $(date -u '+%Y-%m-%d %H:%M UTC')\n\n### Acción requerida\n1. Revisar el historial de runs en Actions\n2. Identificar causa del fallo\n3. Corregir y re-ejecutar manualmente\n4. Cerrar este issue cuando esté resuelto\n\n*Issue generado automáticamente por \`.github/workflows/agent-monitor.yml\`*"
+                echo "  📌 Issue creado: [AGENTE-CAÍDO] ${WORKFLOW_NAME}"
+              else
+                echo "  ℹ️ Issue ya abierto para ${WORKFLOW_NAME}"
+              fi
+            done
+            echo "FAILED_COUNT=${#FAILED_AGENTS[@]}" >> "${GITHUB_ENV}"
           else
-            git commit -m "chore: [AUTO] agent-monitor check $(date +%Y-%m-%d-%H%M)"
-            git push
+            echo "✅ Todos los workflows críticos operativos"
+            echo "FAILED_COUNT=0" >> "${GITHUB_ENV}"
           fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Resumen
+      - name: Summary
         run: |
-          echo "### 🤖 Agent Monitor" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Ejecución: $(date '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
-          CAIDOS=$(grep -c '🔴 CAÍDO' diarios/agent-monitor-$(date +%Y-%m-%d).md 2>/dev/null || echo 0)
-          echo "Agentes caídos: $CAIDOS" >> $GITHUB_STEP_SUMMARY
+          echo "### Agent Monitor Report" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- **Timestamp:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- **Agentes caídos:** ${FAILED_COUNT:-0}" >> "${GITHUB_STEP_SUMMARY}"
+          if [ "${FAILED_COUNT:-0}" -eq 0 ]; then
+            echo "- **Estado:** ✅ Todo operativo" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "- **Estado:** ❌ Hay agentes caídos — revisar issues abiertos" >> "${GITHUB_STEP_SUMMARY}"
+          fi

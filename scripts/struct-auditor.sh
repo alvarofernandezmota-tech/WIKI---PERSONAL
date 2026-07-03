@@ -1,133 +1,77 @@
 #!/usr/bin/env bash
 # =============================================================
-# FUNCIÓN:   Auditoría milimétrica de estructura del repo.
-#            Detecta carpetas duplicadas, archivos mal ubicados,
-#            carpetas vacías, naming roto. Abre issues automáticos.
-#            NO modifica nada — solo detecta y reporta.
-# TRIGGER:   cron semanal / workflow_dispatch / post-push estructura
-# AGENTE:    struct-auditor-agent, struct-auditor-agent.yml
-# ETIQUETAS: estructura, duplicado, deuda-tecnica
-# RUTAS:     Lee: todo el repo
-#            Escribe: diarios/struct-audit-YYYY-MM-DD.md
+# FUNCIÓN:   Detectar carpetas duplicadas y abrir issue en GitHub
+# TRIGGER:   Manual o cron semanal (ecosystem-guardian.yml)
+# AGENTE:    thdora-guardian, ecosystem-guardian
+# ETIQUETAS: duplicado, estructura, deuda-tecnica
+# RUTAS:     diarios/, osint/, osint-stack/, diary/, diarios/
+# =============================================================
+# Uso: ./scripts/struct-auditor.sh
+# Requisitos: gh CLI autenticado, git
 # =============================================================
 
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
-FECHA=$(date +%Y-%m-%d)
-LOG="$REPO_ROOT/diarios/struct-audit-$FECHA.md"
-ISSUES_ABIERTOS=0
+LOG_DIR="${REPO_ROOT}/diarios"
+DATE="$(date +%Y-%m-%d)"
+LOG_FILE="${LOG_DIR}/struct-audit-${DATE}.md"
+FOUND_ISSUES=0
 
-mkdir -p "$REPO_ROOT/diarios"
+mkdir -p "${LOG_DIR}"
 
-log() { echo "$*" | tee -a "$LOG"; }
+echo "# Struct Audit — ${DATE}" > "${LOG_FILE}"
+echo "" >> "${LOG_FILE}"
+echo "**Ejecutado:** $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
+echo "" >> "${LOG_FILE}"
 
-crear_issue() {
-  local titulo="$1"
-  local body="$2"
-  local labels="$3"
-  if command -v gh &>/dev/null; then
-    # Verificar si ya existe issue con mismo título
-    EXISTE=$(gh issue list --label "$labels" --state open \
-      --json title --jq ".[].title" 2>/dev/null | grep -F "$titulo" || true)
-    if [[ -z "$EXISTE" ]]; then
-      gh issue create \
-        --title "$titulo" \
-        --body "$body" \
-        --label "$labels" \
-        --repo "alvarofernandezmota-tech/yggdrasil-dew" 2>/dev/null && \
-        ISSUES_ABIERTOS=$((ISSUES_ABIERTOS + 1)) || true
-      log "  🚨 Issue creado: $titulo"
-    else
-      log "  ⚠️  Issue ya existe: $titulo"
+# ─── PARES DE CARPETAS DUPLICADAS ─────────────────────────────
+declare -A DUPLICATES=(
+  ["diary"]="diarios"
+  ["osint-stack"]="osint"
+)
+
+echo "## Duplicados detectados" >> "${LOG_FILE}"
+echo "" >> "${LOG_FILE}"
+
+for src in "${!DUPLICATES[@]}"; do
+  dst="${DUPLICATES[$src]}"
+  src_path="${REPO_ROOT}/${src}"
+  dst_path="${REPO_ROOT}/${dst}"
+
+  if [ -d "${src_path}" ] && [ -d "${dst_path}" ]; then
+    src_count=$(find "${src_path}" -type f | wc -l | tr -d ' ')
+    dst_count=$(find "${dst_path}" -type f | wc -l | tr -d ' ')
+
+    echo "- ⚠️ **${src}/** (${src_count} archivos) y **${dst}/** (${dst_count} archivos) son duplicados" >> "${LOG_FILE}"
+    echo "  - Acción: mover contenido de \`${src}/\` → \`${dst}/\` y eliminar \`${src}/\`" >> "${LOG_FILE}"
+    FOUND_ISSUES=$((FOUND_ISSUES + 1))
+
+    # Abrir issue si gh está disponible
+    if command -v gh &>/dev/null; then
+      EXISTING=$(gh issue list --label "duplicado" --search "[DUPLICADO] ${src}" --json number --jq length 2>/dev/null || echo "0")
+      if [ "${EXISTING}" -eq 0 ]; then
+        gh issue create \
+          --title "[DUPLICADO] Consolidar ${src}/ → ${dst}/" \
+          --label "duplicado,estructura,deuda-tecnica" \
+          --body "## Carpeta duplicada detectada por struct-auditor\n\n**Origen:** \`${src}/\` (${src_count} archivos)\n**Destino:** \`${dst}/\` (${dst_count} archivos)\n\n### Acción requerida\n1. Revisar contenido de \`${src}/\`\n2. Mover archivos únicos a \`${dst}/\`\n3. Eliminar carpeta \`${src}/\`\n4. Actualizar referencias en docs y scripts\n\n*Issue generado automáticamente por \`scripts/struct-auditor.sh\` el ${DATE}*" \
+          2>/dev/null && echo "  ✅ Issue creado para ${src}" || echo "  ⚠️ No se pudo crear issue para ${src}"
+      else
+        echo "  ℹ️ Issue ya existe para ${src}/${dst}"
+      fi
     fi
+  elif [ -d "${src_path}" ] && [ ! -d "${dst_path}" ]; then
+    echo "- ℹ️ **${src}/** existe pero **${dst}/** no — renombrar directamente" >> "${LOG_FILE}"
   fi
-}
+done
 
-# --- INICIO LOG ---
-cat > "$LOG" << EOF
-# 🏗️ STRUCT AUDIT — $FECHA
+echo "" >> "${LOG_FILE}"
+echo "## Resumen" >> "${LOG_FILE}"
+echo "" >> "${LOG_FILE}"
+echo "- Issues encontrados: **${FOUND_ISSUES}**" >> "${LOG_FILE}"
+echo "- Log guardado en: \`${LOG_FILE}\`" >> "${LOG_FILE}"
 
-Generado por: struct-auditor.sh
-Fecha: $(date '+%Y-%m-%d %H:%M:%S')
+echo "[struct-auditor] Completado. Issues encontrados: ${FOUND_ISSUES}"
+echo "[struct-auditor] Log: ${LOG_FILE}"
 
----
-
-EOF
-
-log "## 1. CARPETAS DUPLICADAS"
-
-# diarios/ vs diary/
-if [[ -d "$REPO_ROOT/diarios" && -d "$REPO_ROOT/diary" ]]; then
-  DIARIOS=$(find "$REPO_ROOT/diarios" -name '*.md' | wc -l | tr -d ' ')
-  DIARY=$(find "$REPO_ROOT/diary" -name '*.md' | wc -l | tr -d ' ')
-  log "  🔴 DUPLICADO: diarios/ ($DIARIOS archivos) + diary/ ($DIARY archivos)"
-  crear_issue \
-    "[DEUDA] Carpetas duplicadas: diarios/ y diary/ deben mergearse" \
-    "Las carpetas \`diarios/\` ($DIARIOS archivos) y \`diary/\` ($DIARY archivos) son duplicadas.\n\n**Acción**: Mover todo a \`diarios/\`, deprecar \`diary/\`, actualizar referencias." \
-    "deuda-tecnica,duplicado,estructura"
-else
-  log "  ✅ No hay duplicado diarios/diary/"
-fi
-
-# osint/ vs osint-stack/
-if [[ -d "$REPO_ROOT/osint" && -d "$REPO_ROOT/osint-stack" ]]; then
-  OSINT=$(find "$REPO_ROOT/osint" -name '*.md' | wc -l | tr -d ' ')
-  STACK=$(find "$REPO_ROOT/osint-stack" -name '*.md' | wc -l | tr -d ' ')
-  log "  🔴 DUPLICADO: osint/ ($OSINT archivos) + osint-stack/ ($STACK archivos)"
-  crear_issue \
-    "[DEUDA] Carpetas duplicadas: osint/ y osint-stack/ deben mergearse" \
-    "Las carpetas \`osint/\` ($OSINT archivos) y \`osint-stack/\` ($STACK archivos) son duplicadas.\n\n**Acción**: Mover todo a \`osint/\`, deprecar \`osint-stack/\`." \
-    "deuda-tecnica,duplicado,estructura"
-else
-  log "  ✅ No hay duplicado osint/"
-fi
-
-log ""
-log "## 2. CARPETAS VACÍAS"
-
-while IFS= read -r -d '' dir; do
-  NOMBRE=$(basename "$dir")
-  # Ignorar .git y node_modules
-  [[ "$dir" == *".git"* ]] && continue
-  [[ "$dir" == *"node_modules"* ]] && continue
-  # Ignorar si solo tiene .gitkeep
-  CONTENIDO=$(find "$dir" -not -name '.gitkeep' -not -type d 2>/dev/null | wc -l | tr -d ' ')
-  if [[ "$CONTENIDO" -eq 0 ]]; then
-    log "  🟡 VACÍA: $dir"
-  fi
-done < <(find "$REPO_ROOT" -type d -not -path '*/.git/*' -print0 2>/dev/null)
-
-log ""
-log "## 3. SCRIPTS SIN CABECERA ESTÁNDAR"
-
-SIN_CABECERA=0
-while IFS= read -r -d '' script; do
-  if ! grep -q 'FUNCIÓN:' "$script" 2>/dev/null; then
-    log "  🟡 SIN CABECERA: $script"
-    SIN_CABECERA=$((SIN_CABECERA + 1))
-  fi
-done < <(find "$REPO_ROOT/scripts" -name '*.sh' -print0 2>/dev/null)
-
-if [[ "$SIN_CABECERA" -gt 3 ]]; then
-  crear_issue \
-    "[DEUDA] $SIN_CABECERA scripts sin cabecera estándar" \
-    "$SIN_CABECERA scripts en \`scripts/\` no tienen cabecera con FUNCIÓN/TRIGGER/ETIQUETAS/RUTAS.\n\nVer: \`diarios/struct-audit-$FECHA.md\`" \
-    "deuda-tecnica,estructura"
-fi
-
-log ""
-log "## 4. ARCHIVOS VACÍOS"
-
-while IFS= read -r -d '' archivo; do
-  [[ "$(basename $archivo)" == '.gitkeep' ]] && continue
-  log "  🟡 VACÍO: $archivo"
-done < <(find "$REPO_ROOT" -name '*.md' -size 0 -not -path '*/.git/*' -print0 2>/dev/null)
-
-log ""
-log "## RESUMEN"
-log "  Issues abiertos esta ejecución: $ISSUES_ABIERTOS"
-log "  Fecha: $(date '+%Y-%m-%d %H:%M:%S')"
-log ""
-log "---"
-log "*Generado por struct-auditor.sh [AUTO]*"
+exit 0
