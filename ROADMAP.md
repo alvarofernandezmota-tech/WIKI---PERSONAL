@@ -1,11 +1,11 @@
 ---
 tags: [roadmap, fases, planificacion]
-fecha-actualizacion: 2026-07-02T21:05
+fecha-actualizacion: 2026-07-03T05:49
 ---
 
 # 🗺️ ROADMAP — Ecosistema yggdrasil-dew
 
-> Actualizado: 02-jul-2026 21:05 CEST
+> Actualizado: 03-jul-2026 05:49 CEST
 > SSOT de fases y objetivos. Para tareas detalladas ver MASTER-PENDIENTES.md
 
 ---
@@ -168,6 +168,21 @@ Objetivo: SSH desde iPhone a Madre, Tailscale en todos los dispositivos.
 
 ---
 
+## 🟢 THDORA — Deuda técnica (Sprint actual)
+
+> Auditado 2026-07-03. Cerrado en sesión mañana.
+
+- [x] **#10** — Fix timeout /config: `asyncio.wait_for(timeout=5.0)` + bugs B22-B25 corregidos ✅
+- [x] **#12** — Código zombie: `src/bot/agents/` eliminado, `ollama_router.py` y `llm_backend.py` eliminados ✅
+- [x] Pipeline NLP 3 niveles funcional: regex → Ollama local → Groq cloud ✅
+- [ ] **Sprint 6** — Implementar `MessageLog` real (memoria a largo plazo en scheduler_tasks.py)
+- [ ] **Sprint 6** — Tests de regresión de handlers
+- [ ] `pytest` no instalado en Madre — añadir a requirements-dev.txt
+
+> Ver también: [issue #26 en yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/26) — espejo maestro de deuda thdora
+
+---
+
 ## Próximos hitos
 
 | Hito | Fases | Cuándo |
@@ -181,4 +196,4 @@ Objetivo: SSH desde iPhone a Madre, Tailscale en todos los dispositivos.
 
 ---
 
-_Actualizado: 02-jul-2026 21:05 CEST — Perplexity vía MCP_
+_Actualizado: 03-jul-2026 05:49 CEST — Perplexity vía MCP — deuda thdora cerrada_
