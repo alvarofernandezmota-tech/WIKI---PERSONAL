@@ -1,0 +1,72 @@
+# test-scripts.yml
+# CI: testea todos los scripts en cada push/PR
+# Detecta scripts rotos, sin shebang, incompatibles, antes de llegar a main
+
+name: 🧪 Test Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'scripts/**'
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dar permisos a scripts
+        run: chmod +x scripts/**/*.sh scripts/*.sh 2>/dev/null || true
+
+      - name: Verificar shebang en todos los scripts
+        run: |
+          FAIL=0
+          for f in $(find scripts/ -name '*.sh'); do
+            if ! head -1 "$f" | grep -q '#!/'; then
+              echo "❌ Sin shebang: $f"
+              FAIL=1
+            else
+              echo "✅ $f"
+            fi
+          done
+          exit $FAIL
+
+      - name: Verificar sin set -euo pipefail sin nota blink
+        run: |
+          FAIL=0
+          for f in scripts/maintenance/*.sh scripts/thdora/*.sh; do
+            [ -f "$f" ] || continue
+            if grep -q 'set -euo pipefail' "$f" && ! grep -q 'blink' "$f"; then
+              echo "⚠️ $f: set -euo pipefail sin nota compatibilidad blink"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+      - name: Bash syntax check
+        run: |
+          FAIL=0
+          for f in $(find scripts/ -name '*.sh'); do
+            if ! bash -n "$f" 2>/dev/null; then
+              echo "❌ Syntax error: $f"
+              FAIL=1
+            else
+              echo "✅ $f"
+            fi
+          done
+          exit $FAIL
+
+      - name: Verificar docs obligatorios
+        run: |
+          for f in ROADMAP.md MASTER-PENDIENTES.md ESTADO-SISTEMA.md CONVENCIONES.md scripts/SCRIPTS.md; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Falta: $f"
+              exit 1
+            fi
+            echo "✅ $f"
+          done
