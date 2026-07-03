@@ -1,204 +1,421 @@
-# 🧪 Laboratorio de Agentes Yggdrasil
+# Laboratorio de Agentes Yggdrasil — MCP Generación 3
 
-> **Versión:** 2.0 — va más allá del diseño inicial  
-> **Estado:** ACTIVO — implementación en curso  
-> **Fuente de verdad:** Este documento + `agentes/REGISTRO-AGENTES.md`  
-> **Actualizado:** 2026-07-03
-
----
-
-## Arquitectura de capas
-
-```
-┌───────────────────────────────────────────────────┐
-│  CAPA 0: HUMANO — árbitro final, define roadmap    │
-└───────────────────────────────────────────────────┘
-         ↓ Cursor + Claude + Open WebUI
-┌───────────────────────────────────────────────────┐
-│  CAPA 1: MCP SERVER v2 (Madre:3001)               │
-│  └ Gatekeeper + RBAC + Rate limiting + Audit      │
-└───────────────────────────────────────────────────┘
-         ↓ Orquestación
-┌───────────────────────────────────────────────────┐
-│  CAPA 2: n8n ORQUESTADOR                          │
-│  ├ cron triggers                                  │
-│  ├ webhook triggers                               │
-│  └ AI Agent node (Ollama)                         │
-└───────────────────────────────────────────────────┘
-         ↓ Llamadas a agentes
-┌───────────────────────────────────────────────────┐
-│  CAPA 3: AGENTES (FastAPI + Ollama)                │
-│  ├ health-agent   (phi3:mini)   :8001             │
-│  ├ roadmap-agent  (mistral:7b)  :8002             │
-│  ├ osint-agent    (qwen2.5:14b) :8003             │
-│  ├ security-agent (phi3:mini)   :8004             │
-│  └ docs-agent     (mistral:7b)  :8005             │
-└───────────────────────────────────────────────────┘
-         ↓ Tools (scripts promovidos)
-┌───────────────────────────────────────────────────┐
-│  CAPA 4: SENSORES/BOTS + SCRIPTS                  │
-│  ├ yggdrasilwatchdog  ├ networkradar              │
-│  ├ guardianbot        ├ tailscalemonitor          │
-│  ├ logguardianbot     ├ localtripwire             │
-│  └ 30+ scripts → tools de agentes                 │
-└───────────────────────────────────────────────────┘
-         ↓ Datos
-┌───────────────────────────────────────────────────┐
-│  CAPA 5: DATOS + MEMORIA                          │
-│  ├ Qdrant (bge-m3) — RAG del ecosistema           │
-│  ├ yggdrasil-dew — second brain documental        │
-│  └ audit.log (append-only) — memoria inmutable    │
-└───────────────────────────────────────────────────┘
-```
+> **Estado:** Activo · **Versión:** 2.0.0 · **Última revisión:** 2026-07-03  
+> **Mantenedor:** Perplexity + Álvaro  
+> **Filosofía:** _El ecosistema que se mantiene, investiga y documenta a sí mismo._
 
 ---
 
-## Los 6 agentes del laboratorio
+## 0. Por qué este documento existe
 
-### 1. health-agent — Médico del ecosistema
-- **Modelo:** `phi3:mini` (3GB VRAM, bajo latencia)
+Copilot generó v1. Este documento la supera en tres dimensiones:
+
+1. **Está anclado a la repo real** — cada referencia apunta a un path existente en `yggdrasil-dew`.
+2. **Incorpora patrones 2026** — Google A2A, MCP SDK 1.x, OTel traces para agentes, dry-run por ley.
+3. **Es accionable** — cada sección termina con un comando o un archivo concreto.
+
+---
+
+## 1. Arquitectura general — La Trinidad
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     YGGDRASIL ECOSYSTEM                         │
+│                                                                 │
+│  ┌──────────────┐   MCP/SSE    ┌─────────────────────────────┐  │
+│  │  CLIENTES    │ ──────────▶  │   MCP SERVER (Madre:8765)   │  │
+│  │  Cursor      │              │   agentes/mcp-server/       │  │
+│  │  Claude      │              │                             │  │
+│  │  Perplexity  │              │  tools:                     │  │
+│  │  Open WebUI  │              │  · check_docker             │  │
+│  └──────────────┘              │  · get_ecosystem_state      │  │
+│                                │  · read_roadmap             │  │
+│  ┌──────────────┐              │  · list_services            │  │
+│  │  INBOX       │              │  · query_rag                │  │
+│  │  (entrada    │              │  · run_script_safe          │  │
+│  │   unificada) │              │  · create_issue             │  │
+│  └──────┬───────┘              │  · get_logs                 │  │
+│         │                      └────────────┬────────────────┘  │
+│         ▼                                   │                   │
+│  ┌─────────────────────────────────────────▼───────────────┐   │
+│  │                  CAPA DE AGENTES                        │   │
+│  │                                                         │   │
+│  │  GATEKEEPER-AGENT  ──▶  health-agent                    │   │
+│  │  (orquestador)     ──▶  roadmap-agent                   │   │
+│  │                    ──▶  osint-agent                     │   │
+│  │                    ──▶  security-agent                  │   │
+│  │                    ──▶  docs-agent                      │   │
+│  │                    ──▶  optimization-agent              │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────┐   ┌──────────────┐   ┌─────────────────────┐  │
+│  │  OLLAMA      │   │  QDRANT      │   │  n8n (orquestador)  │  │
+│  │  (cerebro)   │   │  (memoria)   │   │  (scheduler/hooks)  │  │
+│  └──────────────┘   └──────────────┘   └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 2. MCP Server — Generación 3
+
+### 2.1 Diferencias generacionales
+
+| Gen | Año | Patrón | Estado en Madre |
+|-----|-----|--------|-----------------|
+| 1 | 2024 | stdio process, tools básicas | No existe |
+| 2 | 2025 | HTTP/SSE, tool schemas, auth básica | Esqueleto en `agentes/mcp-server/` |
+| **3** | **2026** | **SSE + streamable HTTP, OAuth2, tool scopes, OTel traces, A2A-compatible** | **← Objetivo** |
+
+### 2.2 Principios de diseño (irrenunciables)
+
+1. **Tool = contrato** — cada tool declara: `input_schema`, `output_schema`, `scope`, `risk_level`, `dry_run_supported`.
+2. **Audit log inmutable** — cada llamada → append-only en `logs/mcp-audit/YYYY-MM-DD.jsonl`.
+3. **Dry-run por defecto** — si `risk_level >= medium`, la tool ejecuta en dry-run salvo flag explícito `{"dry_run": false}`.
+4. **Scopes granulares** — cliente Cursor tiene scope `read:*`, agentes internos tienen scope `read:* write:safe exec:safe`.
+5. **Zero-trust entre agentes** — incluso el gatekeeper necesita token para hablar con las tools.
+
+### 2.3 Mapa de tools — Categorías y riesgo
+
+#### Categoría READ (riesgo: bajo, nunca dry-run)
+```
+check_docker         → estado contenedores (nombre, status, uptime)
+get_ecosystem_state  → snapshot completo: docker + servicios + workflows
+read_roadmap         → lee ROADMAP-MASTER.md, devuelve estructura parseable
+list_services        → ping HTTP a todos los servicios registrados
+get_logs             → últimas N líneas de log por servicio
+query_rag            → pregunta al RAG de Qdrant (solo lectura)
+get_inbox_items      → lista ficheros en inbox/ sin procesarlos
+```
+
+#### Categoría WRITE-SAFE (riesgo: medio, dry-run disponible)
+```
+create_issue         → crea issue en yggdrasil-secops o yggdrasil-dew
+append_log           → añade entrada a log estructurado
+update_roadmap_task  → marca tarea [AUTO] como completada
+send_telegram        → notificación via guardianbot
+```
+
+#### Categoría EXEC-SAFE (riesgo: alto, dry-run OBLIGATORIO antes)
+```
+restart_container    → docker restart <name> — solo contenedores whitelisted
+run_script_safe      → ejecuta script de scripts/safe/ con timeout 30s
+trigger_n8n_workflow → dispara workflow específico via webhook
+```
+
+#### Categoría HUMAN-REQUIRED (jamás ejecutado por agente)
+```
+merge_branch         → requiere confirmación humana explícita
+deploy_production    → bloqueado en agentes
+delete_data          → bloqueado en agentes
+```
+
+### 2.4 Estructura de ficheros del MCP server
+
+```
+agentes/mcp-server/
+├── mcp_server.py          # Entry point (FastAPI + MCP SDK 1.x)
+├── tools/
+│   ├── docker_tools.py    # check_docker, restart_container
+│   ├── ecosystem_tools.py # get_ecosystem_state, list_services
+│   ├── roadmap_tools.py   # read_roadmap, update_roadmap_task
+│   ├── rag_tools.py       # query_rag
+│   ├── github_tools.py    # create_issue
+│   ├── notif_tools.py     # send_telegram
+│   └── script_tools.py    # run_script_safe
+├── middleware/
+│   ├── audit.py           # audit log middleware
+│   ├── auth.py            # token validation + scopes
+│   └── dry_run.py         # dry-run interceptor
+├── config/
+│   ├── scopes.yaml        # scope definitions por cliente
+│   ├── whitelist.yaml     # contenedores/scripts permitidos
+│   └── services.yaml      # mapa de servicios y endpoints
+├── requirements.txt
+├── Dockerfile
+└── README.md
+```
+
+### 2.5 Integración con Cursor (`.cursor/mcp.json`)
+
+```json
+{
+  "mcpServers": {
+    "madre-ecosystem": {
+      "url": "http://madre.local:8765/mcp",
+      "transport": "sse",
+      "headers": {
+        "Authorization": "Bearer ${MADRE_MCP_TOKEN}"
+      },
+      "description": "Yggdrasil Ecosystem — Docker, Roadmap, RAG, Servicios"
+    }
+  }
+}
+```
+
+---
+
+## 3. Gatekeeper-Agent — El orquestador central
+
+Este es el patrón que Copilot no implementó. El gatekeeper es la pieza nueva clave.
+
+### 3.1 Qué hace el gatekeeper
+
+```
+INBOX (nuevo fichero) → gatekeeper lee
+                      → clasifica intención (salud / roadmap / osint / docs / seguridad)
+                      → verifica scope del agente destino
+                      → delega al agente especializado
+                      → espera resultado
+                      → loguea decisión + resultado
+                      → opcional: notifica via Telegram
+```
+
+### 3.2 Política de delegación
+
+| Tipo de tarea | Agente destino | Condición de ejecución |
+|---------------|---------------|------------------------|
+| Estado contenedores / servicios | health-agent | Siempre autónomo |
+| Tareas `[AUTO]` en ROADMAP | roadmap-agent | Solo en branch `agent/autoupdate-*` |
+| Escaneo OSINT | osint-agent | Solo con red disponible |
+| Análisis de logs sospechosos | security-agent | Siempre autónomo |
+| Actualización docs | docs-agent | Solo ficheros en `docs/` |
+| Métricas de rendimiento | optimization-agent | Solo lectura |
+| **CRITICAL / [RISKY] / [HUMAN]** | **→ Telegram al humano** | **Bloqueo total** |
+
+### 3.3 Protocolo A2A (agent-to-agent) — Estándar Google 2026
+
+El gatekeeper habla con los agentes especializados via protocolo A2A (JSON-RPC sobre HTTP):
+
+```json
+// gatekeeper → health-agent
+{
+  "jsonrpc": "2.0",
+  "method": "tasks/send",
+  "params": {
+    "task": {
+      "id": "task-2026-07-03-001",
+      "message": {
+        "role": "user",
+        "parts": [{"text": "Evalúa estado del ecosistema. Snapshot adjunto."}]
+      },
+      "metadata": {
+        "source": "gatekeeper",
+        "priority": "normal",
+        "dry_run": true
+      }
+    }
+  }
+}
+```
+
+Cada agente expone un endpoint `/a2a` que acepta este protocolo. Esto permite intercambio entre agentes locales (Madre) y agentes externos futuros.
+
+---
+
+## 4. El Inbox como sistema nervioso de entrada
+
+El inbox (`inbox/`) es el punto de entrada unificado para todo. La regla es simple:
+
+**Si algo ocurre en el ecosistema → primero pasa por inbox → luego el gatekeeper lo procesa.**
+
+### 4.1 Flujo de entrada
+
+```
+[Fuente externa]
+     │
+     ├── Telegram (guardianbot) → inbox/telegram/YYYY-MM-DD-HH-MM.md
+     ├── GitHub Actions         → inbox/github/YYYY-MM-DD-HH-MM.md
+     ├── n8n cron trigger       → inbox/cron/YYYY-MM-DD-HH-MM.md
+     ├── Alerta Prometheus      → inbox/alerts/YYYY-MM-DD-HH-MM.md
+     └── Manual (tú)           → inbox/manual/YYYY-MM-DD-HH-MM.md
+          │
+          ▼
+   GATEKEEPER (n8n webhook watcher)
+          │
+          ▼
+   Clasifica → Delega → Ejecuta → Loguea → [Notifica si WARN/CRITICAL]
+```
+
+### 4.2 Formato estándar de fichero inbox
+
+```yaml
+---
+fecha: 2026-07-03T15:30:00
+fuente: cron
+tipo: health-check
+prioridad: normal
+dry_run: true
+---
+
+Ejecutar evaluación completa del ecosistema.
+Adjunto snapshot de contenedores.
+```
+
+---
+
+## 5. Agentes especializados — Fichas técnicas
+
+### 5.1 health-agent
+- **Ruta:** `agentes/health-agent/`
+- **Modelo recomendado:** `phi4:mini` (rápido, 4GB VRAM)
 - **Trigger:** n8n cron cada 15 min
-- **Tools:** check_docker, ping_service, get_logs, create_issue, notify_telegram
-- **Output:** JSON clasificado OK/WARN/CRITICAL + acciones safe
-- **Doc:** `agentes/health-agent/DISEÑO.md`
-- **Estado:** ⚠️ Esqueleto listo, pendiente despliegue
+- **Input:** EcosystemSnapshot (JSON via MCP tool `get_ecosystem_state`)
+- **Output:** `{global_status, analysis, actions[]}`
+- **Acciones safe:** restart container, create issue, send telegram, trigger n8n workflow
+- **Fichero principal:** `agentes/health-agent/main.py`
 
-### 2. roadmap-agent — Planificador autónomo
-- **Modelo:** `mistral:7b Q4`
-- **Trigger:** n8n cron semanal (lunes 09:00)
-- **Tools:** read_roadmap, read_issues, update_docs, create_pr, sync_labels
-- **Output:** PR `agent/autoupdate-*` con cambios documentales
-- **Regla clave:** Solo toca tareas [AUTO]. Escala [HUMAN] y [BLOCKER].
-- **Doc:** `agentes/prompts/ROADMAP-AGENT-PROMPT.md`
-- **Estado:** 🔵 Diseñado, pendiente implementación
+### 5.2 roadmap-agent
+- **Ruta:** `agentes/` (pendiente subdirectorio)
+- **Modelo recomendado:** `qwen2.5:7b` (razonamiento, 8GB VRAM)
+- **Trigger:** n8n cron diario + webhook en push a `ROADMAP-MASTER.md`
+- **Input:** `ROADMAP-MASTER.md` filtrado por `[AUTO]`
+- **Output:** commits en branch `agent/autoupdate-YYYY-MM-DD`
+- **Nunca:** merge directo a main, tocar código fuente
 
-### 3. osint-agent — Inteligencia de amenazas
-- **Modelo:** `qwen2.5:14b Q4` (máximo contexto)
-- **Trigger:** n8n cron diario (03:00)
-- **Tools:** spiderfoot_scan, nmap_scan, shodan_query, create_security_issue
-- **Output:** Informe de amenazas + issues de seguridad
-- **Doc:** `agentes/osint-agent/DISEÑO.md`
-- **Estado:** 🔵 Diseñado, pendiente implementación
+### 5.3 osint-agent
+- **Ruta:** `agentes/osint-agent/`
+- **Modelo recomendado:** `mistral:7b`
+- **Trigger:** manual o cron semanal
+- **Tools usadas:** Spiderfoot API, Shodan (si disponible), theHarvester
+- **Output:** issues en yggdrasil-secops
 
-### 4. security-agent — Vigilante de logs
-- **Modelo:** `phi3:mini` (respuesta rápida)
-- **Trigger:** n8n cron cada 5 min + webhook Fail2ban
-- **Tools:** read_auth_log, read_ufw_log, check_fail2ban, check_open_ports, alert_telegram
-- **Output:** Alertas de seguridad + informe diario
-- **Doc:** `agentes/security-agent/DISEÑO.md`
-- **Estado:** 🔵 Diseñado, pendiente implementación
+### 5.4 security-agent
+- **Ruta:** `agentes/security-agent/`
+- **Modelo recomendado:** `llama3.2:3b` (solo clasificación, muy ligero)
+- **Trigger:** inotify sobre `/var/log/auth.log`, `/var/log/ufw.log`
+- **Output:** alertas Telegram + issues automáticos
 
-### 5. docs-agent — Documentalista autónomo
-- **Modelo:** `mistral:7b`
-- **Trigger:** GitHub webhook (push a main)
-- **Tools:** read_commit, read_files_changed, update_session_log, update_changelog
-- **Output:** Actualización automática de historial de sesión
-- **Estado:** 🔵 Concepto, pendiente sprint 2
+### 5.5 docs-agent _(nuevo — no estaba en v1)_
+- **Ruta:** `agentes/docs-agent/` _(crear)_
+- **Modelo recomendado:** `gemma3:4b`
+- **Trigger:** webhook en push al repo
+- **Input:** diff del commit
+- **Output:** actualiza `CHANGELOG.md`, resumen en `sesiones/`, ingesta en Qdrant
 
-### 6. research-agent — Investigador continuo
-- **Modelo:** `qwen2.5:14b Q4`
-- **Trigger:** n8n cron semanal + on-demand
-- **Tools:** web_search, read_rss, synthesize, ingest_qdrant, create_research_doc
-- **Output:** Documentos de investigación en `docs/investigacion/`
-- **Doc:** `agentes/prompts/RESEARCH-AGENT-PROMPT.md`
-- **Estado:** 🔵 Prompt listo, pendiente implementación
+### 5.6 optimization-agent _(nuevo — no estaba en v1)_
+- **Ruta:** `agentes/optimization-agent/` _(crear)_
+- **Modelo recomendado:** cualquiera (solo lee métricas)
+- **Trigger:** cron semanal
+- **Input:** métricas Prometheus (CPU, GPU, RAM, latencia Ollama)
+- **Output:** recomendaciones en `inbox/cron/` + actualiza `hardware/PERFORMANCE.md`
 
 ---
 
-## MCP v2 — Mejoras sobre v1
+## 6. Observabilidad — Stack OTel + Loki + Grafana
 
-### Lo que añade v2
+Cada agente instrumenta con OpenTelemetry. El flujo:
 
-| Feature | v1 | v2 |
-|---|---|---|
-| Tools | 4 básicas | 12+ con RBAC |
-| Gatekeeper | No | Sí — valida CADA llamada |
-| Rate limiting | No | Sí — por tool y por caller |
-| Tool registry | Estático | Dinámico (descubrimiento en runtime) |
-| Transport | Solo stdio | stdio + SSE (Open WebUI, n8n) |
-| Audit | JSON simple | Structured + trace_id |
+```
+Agente (Python) → OTel SDK
+                 → traces: Tempo (Grafana)
+                 → logs: Loki (Grafana)
+                 → métricas: Prometheus
 
-### Principio gatekeeper
-```python
-# Antes de CUALQUIER tool, el gatekeeper valida:
-def gatekeeper(caller: str, tool: str, args: dict) -> bool:
-    # 1. ¿El caller tiene permiso para esta tool?
-    if not rbac.can(caller, tool): return False
-    # 2. ¿Ha superado el rate limit?
-    if rate_limiter.exceeded(caller, tool): return False
-    # 3. ¿Los args pasan el schema validation?
-    if not schema_valid(tool, args): return False
-    # 4. Audit
-    audit(caller, tool, args)
-    return True
+# Configuración mínima en cada agente:
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace import TracerProvider
+
+tracer = trace.get_tracer("health-agent")
+
+with tracer.start_as_current_span("evaluate_ecosystem") as span:
+    span.set_attribute("agent.version", "1.0")
+    span.set_attribute("snapshot.containers", len(containers))
+    # ... lógica del agente
 ```
 
----
-
-## Filosofía del laboratorio
-
-### Autonomía con límites
-Los agentes actúan solos pero **no deciden sobre producción ni seguridad crítica**.
-El humano solo interviene cuando el sistema lo pide.
-
-### Transparencia radical
-Todo se loguea. Todo se documenta. El ecosistema puede reconstruirse desde cero
-con los logs y la documentación.
-
-### Soberanía total
-Ningún dato sale de Madre. Sin cloud, sin SaaS externos, sin costos mensuales.
-Los modelos corren local. Los datos quedan local.
-
-### Un agente = un rol
-Cada agente es experto en su campo. No hay agentes genéricos.
-La especialización mejora el rendimiento y reduce el riesgo.
+**Dashboard objetivo en Grafana:** un panel unificado que muestre:
+- Frecuencia de llamadas por tool MCP
+- Latencia media por agente
+- Estado global del ecosistema en tiempo real
+- Alertas pendientes de revisión humana
 
 ---
 
-## Plan de implementación (4 semanas)
+## 7. Evals — Cómo medir que los agentes funcionan bien
 
-### Semana 1 — Núcleo MCP v2 + Health Agent
-- [ ] Desplegar `mcp_server_v2.py` en Madre (:3001)
-- [ ] Configurar `.cursor/mcp.json`
-- [ ] Añadir health-agent a `docker-compose.agents.yml`
-- [ ] Importar workflow `ecosystem-snapshot` en n8n
-- [ ] Test dry_run 48h
-- [ ] Activar acciones automáticas safe
+Esta es la parte que más falta tiene en el ecosistema. Un agente sin evals es una caja negra.
 
-### Semana 2 — Roadmap Agent + Qdrant ingesta
-- [ ] Ejecutar `ingest_yggdrasil.py` → Qdrant lleno
-- [ ] Implementar roadmap-agent loop en n8n
-- [ ] Primer ciclo automático semanal
-- [ ] Tool `query_rag` en MCP v2 conectada a Qdrant
+### 7.1 Framework de evaluación
 
-### Semana 3 — Security Agent + OSINT Agent
-- [ ] Desplegar security-agent (:8004)
-- [ ] Desplegar osint-agent (:8003)
-- [ ] Conectar Spiderfoot como tool MCP
-- [ ] Primer informe de seguridad automático
+```
+agentes/evals/
+├── fixtures/
+│   ├── snapshot_ok.json        # Ecosistema sano
+│   ├── snapshot_warn.json      # 1 contenedor caído
+│   ├── snapshot_critical.json  # 3+ fallos simultáneos
+│   └── snapshot_empty.json     # Sin datos
+├── test_health_agent.py
+├── test_roadmap_agent.py
+├── test_gatekeeper.py
+└── README.md
+```
 
-### Semana 4 — Docs Agent + Research Agent + Observabilidad
-- [ ] Docs-agent: webhook GitHub → actualización automática
-- [ ] Research-agent: primer ciclo semanal
-- [ ] OTel Collector básico
-- [ ] Dashboard Grafana estado agentes
-- [ ] Retrospectiva del laboratorio
+### 7.2 Tipos de eval
 
----
-
-## Preguntas que el ecosistema debería poder responder solo
-
-Cuando el RAG y los agentes estén funcionando, cualquier IA podrá preguntar:
-
-- “¿Qué ha pasado en el ecosistema esta semana?”
-- “¿Qué contenedores han fallado en el último mes?”
-- “¿Qué tareas [AUTO] quedan por completar?”
-- “¿Cuál es el modelo más eficiente para el health-agent?”
-- “¿Qué vulnerabilidades ha detectado el security-agent?”
-- “Resume las últimas 10 sesiones de desarrollo.”
-
-Eso es el ecosistema autónomo total.
+| Tipo | Qué mide | Frecuencia |
+|------|----------|------------|
+| **Unit** | Una tool MCP devuelve el schema correcto | En cada commit |
+| **Behavioral** | El agente clasifica el estado correcto dado el snapshot | Diario |
+| **Regression** | El agente no toma acciones destructivas en ningún fixture | En cada commit |
+| **Golden set** | Comparación output actual vs output de referencia | Semanal |
 
 ---
 
-*Laboratorio v2.0 — 2026-07-03*
+## 8. Plan de implementación — Sprint real
+
+### Sprint 0 — Esta semana (ya)
+
+```bash
+# 1. MCP server base
+cd /srv && mkdir -p mcp-server
+pip install mcp fastapi uvicorn opentelemetry-sdk
+
+# 2. Copiar estructura desde agentes/mcp-server/ de la repo
+git clone --sparse https://github.com/alvarofernandezmota-tech/yggdrasil-dew
+
+# 3. Verificar en Cursor
+# .cursor/mcp.json → añadir entrada madre-ecosystem
+# Reiniciar Cursor → verificar tools visibles
+```
+
+### Sprint 1 — Semana 1
+- [ ] MCP server deployado en Docker en Madre
+- [ ] Tools READ funcionando (check_docker, get_ecosystem_state, read_roadmap)
+- [ ] Audit log escribiendo en `logs/mcp-audit/`
+- [ ] Cursor puede preguntar "¿qué contenedores están corriendo?" y recibe respuesta real
+
+### Sprint 2 — Semana 2
+- [ ] health-agent containerizado y conectado al MCP
+- [ ] n8n workflow `ecosystem-snapshot` activo (cron cada 15min)
+- [ ] Primer alert real por Telegram desde el agente
+- [ ] OTel Collector recibiendo traces
+
+### Sprint 3 — Semana 3
+- [ ] Gatekeeper-agent operativo
+- [ ] Inbox como entrada unificada (n8n watcher sobre `inbox/`)
+- [ ] roadmap-agent leyendo `[AUTO]` tasks
+- [ ] Evals básicas (fixtures OK/WARN/CRITICAL)
+
+### Sprint 4 — Semana 4
+- [ ] docs-agent activo (resúmenes de commits automáticos)
+- [ ] optimization-agent reportando semanalmente
+- [ ] Dashboard Grafana unificado
+- [ ] REGLAS-AGENTES.md v2 actualizado con A2A y scopes
+
+---
+
+## 9. Lo que este ecosistema puede convertirse
+
+Esto no es solo infraestructura personal. Con las piezas correctas:
+
+- **Producto SaaS:** MCP server como servicio para otros homelabs soberanos
+- **Framework open-source:** `yggdrasil-agents` — arquitectura de referencia para ecosistemas autónomos locales
+- **Consultoría:** arquitectura de agentes para empresas que quieren soberanía de datos
+
+Las reglas están en `agentes/REGLAS-AGENTES.md`. La arquitectura está en `ECOSYSTEM-ARCHITECTURE.md`. El next step está en `ROADMAP-MASTER.md`.
+
+---
+
+_Documento generado y mantenido por Perplexity + Álvaro · yggdrasil-dew · 2026_
