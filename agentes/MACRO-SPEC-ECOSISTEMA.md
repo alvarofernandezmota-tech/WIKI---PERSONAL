@@ -1,163 +1,203 @@
----
-tipo: spec-maestra
-version: 1.0
-fecha: 2026-07-03
-tags: [agentes, filosofia, roadmap, bots, mcp, rag, autonomia]
----
+# 🧠 MACRO-SPEC DEL ECOSISTEMA YGGDRASIL
 
-# Macro-Spec: Ecosistema Autónomo Yggdrasil
-
-> Este documento es el **contrato del ecosistema**: cómo debe pensar, actuar, documentar y evolucionar mientras duermes.
+> Versión: 2026-07-03 | Biblia del ecosistema. Copilot debe leer esto antes de actuar.
 
 ---
 
-## 1. Hardware
+## 0. Propósito
 
-| Nodo | CPU | RAM | GPU | OS |
-|------|-----|-----|-----|----|
-| Madre (varpc) | i5-8400 | 16GB | GTX 1060 6GB | Linux |
-| Theodora | Ryzen 5 | - | - | Arch + Hyprland |
-| Móviles | - | - | - | vía Tailscale |
+Este documento define la filosofía, estructura, agentes, MCP server, lenguaje correcto y roadmap del ecosistema Yggdrasil.
+Es la fuente de verdad para cualquier IA que opere en este ecosistema.
 
 ---
 
-## 2. Servicios activos en Madre (Docker)
+## 1. Filosofía
 
-- Ollama (`qwen2.5-coder:7b`, `llama3.1:8b`, `bge-m3`)
-- Qdrant (RAG)
-- Open WebUI
-- n8n
-- Gitea
-- Grafana + Prometheus
-- `thdora` (FastAPI + Telegram)
-- Spiderfoot
-- Portainer, code-server, uptime-kuma
+- **Autonomía con límites** — Agentes actúan solos en tareas `[AUTO]`. NUNCA tocan producción, NUNCA hacen merge, NUNCA borran.
+- **Transparencia radical** — Todo se documenta: Markdown, audit log MCP, RAG (Qdrant + bge-m3).
+- **Responsabilidad humana** — Tareas `[HUMAN]` y `[RISKY]` requieren decisión humana. `CRITICAL` → pausa + Telegram.
+- **Memoria responsable** — El sistema recuerda lo necesario para operar. Sin datos sensibles sin propósito.
+- **Experimentación controlada** — Agentes nuevos se validan en LAB-AGENTES antes de producción.
 
 ---
 
-## 3. Repos clave
+## 2. Lenguaje correcto con la IA
+
+### Etiquetas obligatorias
+
+| Etiqueta | Significado |
+|----------|-------------|
+| `[AUTO]` | El agente puede ejecutarlo sin supervisión |
+| `[HUMAN]` | Requiere decisión humana |
+| `[RISKY]` | Acción con riesgo — dry_run primero |
+| `CRITICAL` | Pausa + notificación Telegram |
+| `[DRIFT]` | Código desviado del estándar |
+
+### Estructura de instrucción
+
+```
+Contexto → Objetivo → Reglas → Acción → Documentación
+```
+
+### Reglas absolutas
+
+- NUNCA tocar producción sin `dry_run` previo
+- SIEMPRE `set -euo pipefail` en Bash
+- SIEMPRE `source scripts/lib/common.sh`
+- SIEMPRE loguear con `log()` de common.sh
+- NUNCA `git add -A` — solo el fichero exacto
+
+### Documentos que definen el lenguaje
+
+- `agentes/REGLAS-AGENTES.md`
+- `agentes/AI-CONTEXT.md`
+- `agentes/COPILOT-CONTEXT.md`
+- `docs/SCRIPT-REGISTRY.md`
+
+---
+
+## 3. Estructura del ecosistema
+
+### 3.1 `yggdrasil-dew` — Cerebro operativo
+
+```
+yggdrasil-dew/
+├── agentes/
+│   ├── MACRO-SPEC-ECOSISTEMA.md   ← este documento
+│   ├── REGLAS-AGENTES.md
+│   ├── COPILOT-CONTEXT.md
+│   ├── AI-CONTEXT.md
+│   ├── PLAN-ESTADO-ACTUAL.md
+│   ├── mcp-server/
+│   │   ├── mcp_server.py          ← FastAPI + 5 tools
+│   │   ├── docker-compose.yml     ← puerto 8002
+│   │   └── requirements.txt
+│   ├── health-agent/
+│   │   ├── health_agent.py        ← FastAPI + Ollama
+│   │   └── docker-compose.yml     ← puerto 8001
+│   ├── alvaro-agent/
+│   ├── docs-agent/
+│   ├── roadmap-agent/
+│   └── obsidian-agent/
+├── scripts/
+│   ├── lib/common.sh              ← librería compartida
+│   ├── inbox-watcher.sh           ← daemon inotify
+│   ├── ecosystem-snapshot.sh      ← genera JSON estado
+│   ├── issue-creator.sh
+│   ├── task-analyzer.sh
+│   └── ...
+├── .github/workflows/             ← 29 workflows activos
+├── inbox/                         ← buzón de entrada
+├── diary/
+├── reports/
+├── ROADMAP-MASTER.md
+└── REGISTRO-AGENTES.md
+```
+
+### 3.2 `yggdrasil-secops` — Seguridad y watchdogs
+
+```
+yggdrasil-secops/
+├── health-agent/
+├── security-agent/
+├── optimize-agent/
+└── watchdogs/
+    ├── yggdrasilwatchdog
+    ├── networkradar
+    ├── tailscalemonitor
+    └── logguardianbot
+```
+
+### 3.3 Otras islas
 
 | Repo | Rol |
 |------|-----|
-| `yggdrasil-dew` | Second brain, ROADMAP, AGENTES, 23 Actions |
-| `yggdrasil-secops` | Salud, seguridad, watchdogs |
-| `local-brain` | RAG + embeddings |
-| `osint-stack` | OSINT |
-| `thdora-personal` | Interfaz humana (Telegram + FastAPI) |
-| `ai-toolkit` | Stack IA open source |
+| `local-brain` | RAG general + embeddings + Qdrant |
+| `osint-stack` | OSINT + Spiderfoot + osint-agent |
+| `thdora-personal` | Interfaz Telegram (bot + API) |
 
 ---
 
-## 4. Filosofía y ética
+## 4. Arquitectura de agentes
 
-### 4.1 Principios
+| Agente | Repo | Runtime | Rol | Estado |
+|--------|------|---------|-----|--------|
+| MCP server | dew | Docker :8002 | Tools + audit + reglas | 🟡 Listo para deploy |
+| Health-agent | dew/secops | Docker :8001 | Salud del ecosistema | 🟡 Listo para deploy |
+| Roadmap-agent | dew | Actions | Ejecuta tareas [AUTO] | 🟠 En desarrollo |
+| Docs-agent | dew | Actions | Documentación automática | 🟠 En desarrollo |
+| OSINT-agent | osint-stack | Docker | Radar externo | 🔴 Pendiente |
+| Security-agent | secops | Docker | Seguridad | 🔴 Pendiente |
+| Obsidian-agent | dew | Docker | RAG sobre Obsidian | 🔴 Pendiente |
+| Álvaro-agent | dew | Docker | Clon operativo | 🔴 Pendiente |
+| inbox-watcher | dew | systemd | Sensor buzón | 🟡 Listo para deploy |
 
-- **Autonomía con límites:** Agentes solo actúan en tareas `[AUTO]`. NUNCA tocan producción, NUNCA hacen merge, NUNCA borran.
-- **Transparencia radical:** Todo se documenta en Markdown + audit log MCP + RAG sobre historial.
-- **Responsabilidad humana:** Tareas `[HUMAN]` y `[RISKY]` requieren tu decisión. CRITICAL → pausa + Telegram.
-- **Memoria responsable:** Solo acumula datos necesarios para operar y aprender.
-- **Laboratorio controlado (LAB-AGENTES):** Agentes nuevos se prueban en entorno de lab antes de producción.
+---
 
-### 4.2 Lenguaje correcto con la IA
+## 5. MCP Server — Tools completas
+
+| Tool | Endpoint | Descripción |
+|------|----------|-------------|
+| `write_inbox` | POST /tools/write_inbox | Escribe .md → dispara bucle |
+| `read_roadmap` | GET /tools/read_roadmap | Lee ROADMAP-MASTER.md |
+| `list_issues` | POST /tools/list_issues | Issues por label |
+| `list_scripts` | GET /tools/list_scripts | Inventario scripts |
+| `run_script` | POST /tools/run_script | Ejecuta script (dry_run default) |
+| `ecosystem_health` | GET /tools/ecosystem_health | Estado rápido del sistema |
+
+---
+
+## 6. Flujo del bucle autónomo completo
 
 ```
-[AUTO]    → el agente puede ejecutar solo
-[HUMAN]   → requiere tu aprobación
-[RISKY]   → pausar + notificar por Telegram
-CRITICAL  → parar todo + Telegram urgente
-OK        → solo log
-WARN      → issue GitHub
-```
-
-Documentos de alineación:
-- `REGLAS-AGENTES.md` → ley del ecosistema
-- `ROADMAP-MASTER.md` → intención y prioridades
-- `Tesis-y-Metodo-Sistema-de-Alineacion-Cognitiva.md` → marco mental
-- `Arquitectura-de-Inteligencia-Artificial-Soberana-y-Open-Source.md` → visión IA soberana
-
----
-
-## 5. Arquitectura de agentes
-
-| Agente | Runtime | Repo | Orquestación |
-|--------|---------|------|--------------|
-| MCP server | Madre (host/Docker) | `yggdrasil-dew/agentes/mcp-server` | Punto central de tools |
-| Health-agent | Docker en Madre | `yggdrasil-secops/health-agent` | n8n + MCP |
-| Roadmap-agent | GitHub Actions | `yggdrasil-dew/agentes/roadmap` | Actions + MCP |
-| Docs-agent | GitHub Actions | `yggdrasil-dew/agentes/docs` | Actions |
-| OSINT-agent | Docker + Spiderfoot | `osint-stack/agentes/osint` | n8n + cron |
-| Security-agent | Docker | `yggdrasil-secops/security` | n8n + logs |
-| Optimization-agent | Docker ligero | `yggdrasil-secops/optimize` | n8n + Prometheus |
-| Obsidian-agent | Docker + vault | `local-brain/obsidian-agent` | MCP + Telegram + n8n |
-| Álvaro-agent | Docker | `yggdrasil-dew/agentes/alvaro` | MCP + RAG + n8n |
-
----
-
-## 6. MCP server
-
-Tools expuestas:
-- `check_docker`
-- `get_ecosystem_state`
-- `read_roadmap`
-- `list_services`
-- `search_obsidian_notes(query)` (futuro)
-- `get_obsidian_note(path)` (futuro)
-- `create_obsidian_note(title, content)` (futuro)
-
-Garantiza:
-- `REGLAS-AGENTES.md` aplicado en cada tool
-- Audit log estructurado (JSON + Markdown)
-- `dry_run: true` por defecto en acciones de riesgo
-- Scopes explícitos por agente
-
----
-
-## 7. Health-agent + n8n (flujo)
-
-```
-n8n cron (15 min)
-  ↓
-ecosystem-snapshot: contenedores + servicios + workflows
-  ↓
-health-agent (FastAPI + LLM local)
-  ↓
-OK → solo log
-WARN → issue GitHub
-CRITICAL → Telegram + pausa
-  ↓
-log Markdown + ingest RAG
+Evento (push / cron / webhook / inotify / LLM)
+         ↓
+   Trigger (GitHub Actions / systemd / cron)
+         ↓
+   Script (sensor / análisis / acción) [set -euo pipefail + common.sh]
+         ↓
+   Agente (LLM Ollama + FastAPI) ← para decisiones
+         ↓
+   Acción safe [AUTO]: issue / push / telegram / docker restart
+         ↓
+   Log → Markdown → Qdrant RAG → memoria del sistema
+         ↓
+   GitHub Actions verifican drift + calidad [AUTO]
 ```
 
 ---
 
-## 8. Modelos y eficiencia (GTX 1060 6GB)
+## 7. Roadmap de 4 semanas
 
-| Modelo | Uso | Cuantización |
-|--------|-----|---------------|
-| `phi3:mini` | Salud, respuestas cortas | Q4_K_M |
-| `qwen2.5-coder:7b` | Código | Q4_K_M |
-| `mistral:7b` | Síntesis general | Q4_K_M |
-| `gemma2:9b` | Razonamiento profundo | Q4_K_M (cuando la GPU lo permita) |
-| `bge-m3` | Embeddings RAG | — |
+### Semana 1 — Base operativa
+- [ ] Deploy MCP server en Madre (`docker compose up -d`)
+- [ ] Deploy inbox-watcher como systemd daemon
+- [ ] `ecosystem-snapshot.sh` generando JSON
+- [ ] Health-agent en Docker conectado a Ollama
 
-Máximo 2 modelos simultáneos.
+### Semana 2 — Agentes GitOps
+- [ ] Roadmap-agent ejecutando tareas [AUTO]
+- [ ] Docs-agent actualizando documentación
+- [ ] n8n workflow `ecosystem-snapshot` importado
+
+### Semana 3 — Seguridad e investigación
+- [ ] OSINT-agent con Spiderfoot
+- [ ] Security-agent (Wazuh lite)
+- [ ] RAG-second-brain-bot funcional
+
+### Semana 4 — Agentes avanzados
+- [ ] Obsidian-agent con ingestión automática
+- [ ] Álvaro-agent (clon operativo)
+- [ ] Optimization-agent (recursos Madre)
 
 ---
 
-## 9. Roadmap 4 semanas
+## 8. Fuentes internas del ecosistema
 
-**Semana 1:** MCP server + audit log + dry_run + health-agent Docker + ecosystem-snapshot n8n  
-**Semana 2:** Roadmap-agent (Actions) + Docs-agent (Actions)  
-**Semana 3:** OSINT-agent + Security-agent (Docker + n8n)  
-**Semana 4:** Obsidian-agent + PERFIL-ALVARO.md + Álvaro-agent + Optimization-agent  
-
----
-
-## 10. Regla de oro
-
-> Los agentes solo pueden ser tan buenos como:
-> - La claridad de tus reglas.
-> - La estructura de tu conocimiento.
-> - La precisión del lenguaje que usas con ellos.
-
-*Última actualización: 2026-07-03 [AUTO]*
+- `agentes/REGLAS-AGENTES.md` — Reglas absolutas de comportamiento
+- `agentes/AI-CONTEXT.md` — Contexto para IAs externas
+- `agentes/COPILOT-CONTEXT.md` — Constitución para GitHub Copilot
+- `docs/SCRIPT-REGISTRY.md` — Mapa de todos los scripts
+- `docs/INSTALACION-MADRE.md` — Guía de despliegue en varpc
+- `ROADMAP-MASTER.md` — Fuente de verdad del plan
+- `REGISTRO-AGENTES.md` — Estado de todos los agentes
