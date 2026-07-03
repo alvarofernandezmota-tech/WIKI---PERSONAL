@@ -1,62 +1,45 @@
----
-tags: [tipo/meta, estado/activo]
----
-# 📥 Inbox
+# Inbox — Flujo de Captura
 
-Zona de aterrizaje para notas crudas de sesión. **Todo entra aquí primero.**
+El inbox es la **entrada de todo** al ecosistema Yggdrasil.
 
----
-
-## 🔄 Ciclo de vida de un fichero
+## Flujo
 
 ```
-ATERRIZAJE → SIN EMPEZAR → EN PROCESO → FINALIZADO → CRISTALIZADO
+📱 Idea / nota / tarea rápida
+        ↓
+   inbox/*.md          ← Captura rápida, sin procesar
+        ↓  (procesar)
+ inbox/procesado/      ← Revisado, clasificado, pendiente de mover
+        ↓  (migrate-inbox.sh)
+   docs/               ← Conocimiento permanente del ecosistema
+        ↓  (si aplica)
+ GitHub Issues          ← Tareas accionables con seguimiento
 ```
 
-| Estado | Etiqueta en frontmatter | Significado |
-|---|---|---|
-| Recién llegado | `estado: sin-empezar` | Nota cruda, aún no revisada |
-| Trabajando en él | `estado: en-proceso` | Se está procesando/moviendo ahora mismo |
-| Procesado | `estado: finalizado` | Listo para cristalizar, aún en inbox |
-| Movido a destino | `estado: cristalizado` | Ya vive en `docs/`, `diarios/`, `proyectos/`... |
+## Reglas
 
----
+- **Captura rápida**: un archivo = una idea/sesión/tarea
+- **Nombre**: `YYYY-MM-DD-descripcion-corta.md`
+- **No procesar en el momento**: captura ahora, procesa después
+- **El inbox debe estar vacío** al final de cada sesión de trabajo
+- **Procesado/** es temporal — migramos a `docs/` con `migrate-inbox.sh`
 
-## 📌 Reglas de uso
+## Scripts relacionados
 
-1. **Todo lo nuevo entra aquí primero** — sin excepción
-2. **Al abrir la sesión** → ver qué hay pendiente, asignar `en-proceso`
-3. **Al cerrar la sesión** → cristalizar todo a su destino final
-4. **El inbox debe quedar limpio** al final de cada sesión
-5. **`inbox/procesado/`** — archivo de ficheros ya migrados, para trazabilidad
+```bash
+# Ver estado del inbox
+ls inbox/
 
----
+# Migrar procesados a docs/
+bash scripts/maintenance/migrate-inbox.sh
 
-## 📂 Destinos de cristalización
-
-| Tipo de nota | Destino |
-|---|---|
-| Log de sesión / trabajo del día | `diarios/YYYY-MM-DD.md` |
-| Conocimiento técnico (docker, infra, ssh...) | `docs/infra/`, `docs/seguridad/`... |
-| Hallazgo de seguridad | `docs/seguridad/hallazgos/SEC-NNN-*.md` |
-| Ficha de IA / modelo | `docs/ias/` |
-| Hardware / dispositivo | `hardware/` |
-| Proyecto activo | `proyectos/nombre/` |
-| OSINT | `osint/` |
-| Tarea pendiente | `MASTER-PENDIENTES.md` + Issue GitHub |
-
----
-
-## 📄 Formato nombre fichero
-
-```
-YYYY-MM-DD-descripcion-kebab-case.md
+# Auditoría completa (incluye inbox)
+bash scripts/maintenance/audit-full.sh
 ```
 
-(Regla 14 — CONVENCIONES.md)
+## Escalado futuro
 
----
+Cuando llegue el agente IA, el inbox será su entrada principal:
+el agente leerá los archivos, los clasificará y los migrará automáticamente.
 
-## 🟢 Estado actual
-
-Inbox limpio ✅ — vaciado 02-jul-2026
+_Yggdrasil Ecosystem — actualizado 03-jul-2026_
