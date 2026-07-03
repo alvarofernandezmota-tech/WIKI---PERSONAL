@@ -1,289 +1,356 @@
 #!/usr/bin/env node
-// ============================================================
-// NOMBRE:   mcp/server.js
-// VERSION:  2.0.0
-// FUNCIÓN:  MCP Server Node.js para yggdrasil-dew.
-//           Expone TODAS las herramientas del ecosistema como
-//           tools MCP via stdio (JSON-RPC 2.0 sobre stdin/stdout).
-//           Compatible con Claude Desktop, Copilot MCP, IA en C.
-// REPO:     alvarofernandezmota-tech/yggdrasil-dew
-// USO:      node mcp/server.js
-//           O via mcp-config.json
-// ============================================================
+/**
+ * MCP Server — Yggdrasil-dew
+ * FUNCIÓN: Exponer todas las herramientas del ecosistema como tools MCP
+ *          (orquestador, watchdog, Galatea, llm_router, agentes, inbox, auditoría)
+ * VERSIÓN: 1.0.0
+ * AUTOR: alvarofernandezmota-tech
+ * REPO: yggdrasil-dew
+ * USO: node mcp/server.js
+ * REQUISITOS: Node 18+, @modelcontextprotocol/sdk
+ *             npm install @modelcontextprotocol/sdk
+ */
 
-import { execSync, exec } from "child_process";
-import { readFileSync, existsSync } from "fs";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { execSync } from "child_process";
+import { readFileSync } from "fs";
 import path from "path";
-import { promisify } from "util";
-import readline from "readline";
 
-const execAsync = promisify(exec);
-const ROOT = process.env.YGGDRASIL_ROOT || path.resolve(process.cwd());
+const ROOT = process.env.YGGDRASIL_ROOT || "/srv/yggdrasil-dew";
 
-// ─── UTILIDADES ──────────────────────────────────────────────
-function runShell(cmd, timeout = 120000) {
+function runShell(cmd) {
   try {
-    return execSync(cmd, { encoding: "utf8", cwd: ROOT, timeout, stdio: ["pipe","pipe","pipe"] });
+    return execSync(cmd, { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 120000 });
   } catch (e) {
-    return `[ERROR] ${e.message}\n${e.stdout || ""}${e.stderr || ""}`;
+    return `ERROR: ${e.stderr || e.message}`;
   }
 }
 
-async function runShellAsync(cmd, timeout = 120000) {
-  try {
-    const { stdout, stderr } = await execAsync(cmd, { cwd: ROOT, timeout });
-    return stdout + (stderr ? `\n[STDERR]\n${stderr}` : "");
-  } catch (e) {
-    return `[ERROR] ${e.message}`;
-  }
-}
-
-function scriptExists(name) {
-  return existsSync(path.join(ROOT, "scripts", name)) ||
-         existsSync(path.join(ROOT, "scripts", "agentes", name));
-}
-
-function runScript(name, args = "") {
-  const p1 = path.join(ROOT, "scripts", name);
-  const p2 = path.join(ROOT, "scripts", "agentes", name);
-  const p = existsSync(p1) ? p1 : existsSync(p2) ? p2 : null;
-  if (!p) return `[WARN] Script no encontrado: ${name} — pendiente de implementar`;
-  return runShell(`bash "${p}" ${args}`);
-}
-
-// ─── DEFINICIÓN DE TOOLS ─────────────────────────────────────
+// -------------------------------------------------------
+// Definición de tools (nombre, descripción, handler)
+// -------------------------------------------------------
 const TOOLS = [
   {
     name: "orquestador_supremo",
-    description: "Ejecuta el orquestador supremo: coordina todos los agentes y genera reporte maestro.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    description: "Ejecuta el orquestador supremo que coordina agentes y auditorías principales",
+    fn: () => runShell(`bash ${ROOT}/scripts/orquestador-supremo.sh`),
   },
   {
     name: "orquestador_total",
-    description: "Ejecuta el orquestador total: audita, sincroniza islas, verifica CORE, genera reporte.",
-    inputSchema: { type: "object", properties: { modo: { type: "string", enum: ["completo","rapido","solo-auditoria"], default: "completo" } }, required: [] }
+    description: "Ejecuta el orquestador total — lanza todos los agentes y genera reporte maestro",
+    fn: () => runShell(`bash ${ROOT}/scripts/orquestador-total.sh`),
   },
   {
     name: "watchdog_monitor",
-    description: "Monitoriza que agentes y orquestador hayan generado reportes dentro del SLA (24h).",
-    inputSchema: { type: "object", properties: { sla_horas: { type: "integer", default: 24 } }, required: [] }
+    description: "Monitoriza que los agentes y el orquestador hayan generado reportes. Detecta cuelgues.",
+    fn: () => runShell(`bash ${ROOT}/scripts/watchdog-monitor.sh`),
+  },
+  {
+    name: "agent_monitor",
+    description: "Monitor secundario de agentes del ecosistema",
+    fn: () => runShell(`bash ${ROOT}/scripts/agent-monitor.sh`),
   },
   {
     name: "clasificador_maestro",
-    description: "Clasifica archivos del inbox y los mueve a destinos adecuados.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    description: "Clasifica archivos del inbox y los mueve a destinos adecuados según tipo y contexto",
+    fn: () => runShell(`bash ${ROOT}/scripts/clasificador-maestro.sh`),
   },
   {
     name: "gestor_estados_inbox",
-    description: "Gestiona estados del inbox: NUEVO → EN-PROCESO → PROCESADO.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    description: "Gestiona estados del inbox: NUEVO → EN-PROCESO → PROCESADO",
+    fn: () => runShell(`bash ${ROOT}/scripts/gestor-estados-inbox.sh`),
+  },
+  {
+    name: "procesar_inbox_masivo",
+    description: "Procesa en lote todos los archivos pendientes del inbox",
+    fn: () => runShell(`bash ${ROOT}/scripts/procesar-inbox-masivo.sh`),
+  },
+  {
+    name: "inbox_watcher",
+    description: "Activa el watcher de inbox para clasificación en tiempo real",
+    fn: () => runShell(`bash ${ROOT}/scripts/inbox-watcher.sh`),
   },
   {
     name: "struct_auditor",
-    description: "Auditoría estructural del repo: detecta duplicados, fantasmas, inconsistencias.",
-    inputSchema: { type: "object", properties: { fix: { type: "boolean", default: false } }, required: [] }
+    description: "Auditoría estructural del repo: detecta carpetas duplicadas, huérfanas y desviaciones",
+    fn: () => runShell(`bash ${ROOT}/scripts/struct-auditor.sh`),
   },
   {
-    name: "agent_docs",
-    description: "Sincroniza y valida la documentación del ecosistema.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "ghost_file_detector",
+    description: "Detecta archivos fantasma: vacíos, huérfanos o referenciados pero inexistentes",
+    fn: () => runShell(`bash ${ROOT}/scripts/ghost-file-detector.sh`),
   },
   {
-    name: "agent_islas",
-    description: "Orquesta islas del ecosistema y detecta bloqueos.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "cross_ref_checker",
+    description: "Comprueba referencias cruzadas entre docs y scripts — detecta links internos rotos",
+    fn: () => runShell(`bash ${ROOT}/scripts/cross-ref-checker.sh`),
   },
   {
-    name: "agent_tareas",
-    description: "Gestiona tareas y detecta pendientes críticos.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "tool_inventory_auditor",
+    description: "Audita que cada script y agente tenga declarada su FUNCIÓN única en la cabecera",
+    fn: () => runShell(`bash ${ROOT}/scripts/tool-inventory-auditor.sh`),
   },
   {
-    name: "agent_investigacion",
-    description: "Indexa y organiza investigación RAG/OSINT.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "isla_sync_validator",
+    description: "Valida que MAPA-ISLAS.md refleja la estructura real del repo",
+    fn: () => runShell(`bash ${ROOT}/scripts/isla-sync-validator.sh`),
   },
   {
-    name: "agent_ecosistema",
-    description: "Auditoría global del ecosistema yggdrasil-dew.",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "ecosystem_snapshot",
+    description: "Genera snapshot completo del estado del ecosistema en un momento dado",
+    fn: () => runShell(`bash ${ROOT}/scripts/ecosystem-snapshot.sh`),
   },
   {
-    name: "agent_meta",
-    description: "Auditoría rápida de agentes y herramientas (inventario + cabeceras).",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    name: "audit_and_migrate",
+    description: "Audita y migra estructuras obsoletas del repo a la arquitectura actual",
+    fn: () => runShell(`bash ${ROOT}/scripts/audit-and-migrate.sh`),
   },
   {
-    name: "agent_meta_deep",
-    description: "Investigación profunda de agentes, scripts y workflows con LLM local. Propone mejoras.",
-    inputSchema: { type: "object", properties: { scope: { type: "string", enum: ["full","scripts","docs","workflows"], default: "full" }, modelo: { type: "string", default: "llama3" } }, required: [] }
+    name: "code_drift_detector",
+    description: "Detecta deriva de código: scripts que se han desalineado de sus plantillas base",
+    fn: () => runShell(`bash ${ROOT}/scripts/code-drift-detector.sh`),
+  },
+  {
+    name: "repo_research",
+    description: "Investigación profunda del repo: mapea dependencias, scripts y workflows",
+    fn: () => runShell(`bash ${ROOT}/scripts/repo-research.sh`),
+  },
+  {
+    name: "task_analyzer",
+    description: "Analiza tareas pendientes e in-progress del ecosistema",
+    fn: () => runShell(`bash ${ROOT}/scripts/task-analyzer.sh`),
+  },
+  {
+    name: "issue_creator",
+    description: "Crea issues en GitHub para deuda técnica, bloqueos o anomalías detectadas",
+    fn: () => runShell(`bash ${ROOT}/scripts/issue-creator.sh`),
+  },
+  {
+    name: "create_issues",
+    description: "Crea batch de issues en GitHub desde plantilla o listado",
+    fn: () => runShell(`bash ${ROOT}/scripts/create-issues.sh`),
+  },
+  {
+    name: "setup_labels",
+    description: "Configura labels de GitHub para el ecosistema (auditoría, islas, deuda, etc.)",
+    fn: () => runShell(`bash ${ROOT}/scripts/setup-labels.sh`),
+  },
+  {
+    name: "apertura_sesion",
+    description: "Ritual de apertura de sesión: carga contexto, estado y pendientes",
+    fn: () => runShell(`bash ${ROOT}/scripts/apertura-sesion.sh`),
+  },
+  {
+    name: "inicio_sesion",
+    description: "Inicio de sesión rápido: carga mínima necesaria para trabajar",
+    fn: () => runShell(`bash ${ROOT}/scripts/inicio-sesion.sh`),
+  },
+  {
+    name: "cierre_sesion",
+    description: "Ritual de cierre de sesión: documenta estado, deuda, diary y sincroniza",
+    fn: () => runShell(`bash ${ROOT}/scripts/cierre-sesion.sh`),
+  },
+  {
+    name: "between_sessions",
+    description: "Tareas automáticas entre sesiones: health-check, limpieza, sincronización",
+    fn: () => runShell(`bash ${ROOT}/scripts/between-sessions.sh`),
+  },
+  {
+    name: "deploy",
+    description: "Despliega el ecosistema o servicios específicos",
+    fn: () => runShell(`bash ${ROOT}/scripts/deploy.sh`),
+  },
+  {
+    name: "deploy_madre",
+    description: "Despliega cambios específicos en Madre (servidor principal)",
+    fn: () => runShell(`bash ${ROOT}/scripts/deploy-madre.sh`),
+  },
+  {
+    name: "batcueva_control",
+    description: "Control del entorno Batcueva: servicios, contenedores y estado",
+    fn: () => runShell(`bash ${ROOT}/scripts/batcueva-control.sh`),
   },
   {
     name: "galatea_fabrica_agente",
-    description: "Crea un nuevo agente con plantilla estándar, DISEÑO.md y script base.",
-    inputSchema: { type: "object", properties: { nombre: { type: "string" }, rol: { type: "string" }, scope: { type: "string" }, tags: { type: "string" } }, required: ["nombre","rol"] }
+    description: "Crea un nuevo agente con DISEÑO.md, PROFILE.md y script base usando la plantilla estándar",
+    inputSchema: {
+      type: "object",
+      properties: {
+        nombre: { type: "string", description: "Nombre del agente (ej: agent-docs-enhancer)" },
+        rol: { type: "string", description: "Rol / misión del agente" },
+        scope: { type: "string", description: "Ámbito: docs, islas, tareas, osint, infra..." },
+        tags: { type: "string", description: "Tags separados por coma" },
+      },
+      required: ["nombre", "rol"],
+    },
+    fn: ({ nombre = "", rol = "", scope = "general", tags = "" } = {}) =>
+      runShell(`bash ${ROOT}/scripts/galatea-fabrica-agentes.sh "${nombre}" "${rol}" "${scope}" "${tags}"`),
   },
   {
     name: "galatea_isla_bot",
-    description: "Crea una isla o bot Galatea con estructura completa.",
-    inputSchema: { type: "object", properties: { tipo: { type: "string", enum: ["isla","bot"] }, nombre: { type: "string" }, descripcion: { type: "string" } }, required: ["tipo","nombre","descripcion"] }
+    description: "Crea una isla o bot Galatea con estructura base",
+    inputSchema: {
+      type: "object",
+      properties: {
+        tipo: { type: "string", description: "isla | bot | servicio" },
+        nombre: { type: "string" },
+        descripcion: { type: "string" },
+      },
+      required: ["tipo", "nombre"],
+    },
+    fn: ({ tipo = "isla", nombre = "", descripcion = "" } = {}) =>
+      runShell(`bash ${ROOT}/scripts/galatea-islas-bots.sh "${tipo}" "${nombre}" "${descripcion}"`),
+  },
+  {
+    name: "galatea_scan",
+    description: "Escanea el repo en busca de agentes y estructuras para que Galatea los catalogue",
+    fn: () => runShell(`bash ${ROOT}/scripts/galatea-scan.sh`),
   },
   {
     name: "llm_router",
-    description: "Enruta prompts al LLM adecuado. Prefijos: ollama:<model>, openai:<model>, anthropic:<model>, http:<url>. Auto-detecta si model='auto'.",
-    inputSchema: { type: "object", properties: { model: { type: "string", default: "auto" }, prompt: { type: "string" }, options: { type: "object" } }, required: ["prompt"] }
+    description: "Router de modelos LLM. Soporta: ollama:<model>, openai:<model>, anthropic:<model>, http:<url>",
+    inputSchema: {
+      type: "object",
+      properties: {
+        model: {
+          type: "string",
+          description: "Prefijo + modelo: 'ollama:llama3', 'openai:gpt-4o', 'anthropic:claude-3-5-sonnet-20241022', 'http://localhost:1234/v1/chat/completions'",
+        },
+        prompt: { type: "string", description: "Prompt a enviar al modelo" },
+        system: { type: "string", description: "System prompt opcional" },
+      },
+      required: ["model", "prompt"],
+    },
+    fn: ({ model = "", prompt = "", system = "" } = {}) => {
+      const safePrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, " ");
+      const safeSystem = system.replace(/"/g, '\\"').replace(/\n/g, " ");
+
+      if (model.startsWith("ollama:")) {
+        const name = model.replace("ollama:", "");
+        return runShell(
+          `curl -s http://localhost:11434/api/chat -d '${JSON.stringify({
+            model: name,
+            messages: [
+              ...(system ? [{ role: "system", content: system }] : []),
+              { role: "user", content: prompt },
+            ],
+            stream: false,
+          })}'`
+        );
+      }
+
+      if (model.startsWith("openai:")) {
+        const name = model.replace("openai:", "");
+        const payload = JSON.stringify({
+          model: name,
+          messages: [
+            ...(system ? [{ role: "system", content: system }] : []),
+            { role: "user", content: prompt },
+          ],
+        });
+        return runShell(
+          `curl -s -X POST https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${process.env.OPENAI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '${payload.replace(/'/g, "'\\''")}'
+          `
+        );
+      }
+
+      if (model.startsWith("anthropic:")) {
+        const name = model.replace("anthropic:", "");
+        const payload = JSON.stringify({
+          model: name,
+          max_tokens: 4096,
+          ...(system ? { system } : {}),
+          messages: [{ role: "user", content: prompt }],
+        });
+        return runShell(
+          `curl -s -X POST https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${process.env.ANTHROPIC_API_KEY}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            -d '${payload.replace(/'/g, "'\\''")}'
+          `
+        );
+      }
+
+      if (model.startsWith("http")) {
+        const payload = JSON.stringify({ prompt, ...(system ? { system } : {}) });
+        return runShell(
+          `curl -s -X POST ${model} -H "Content-Type: application/json" -d '${payload.replace(/'/g, "'\\''")}'
+          `
+        );
+      }
+
+      return `Modelo no soportado: ${model}. Prefijos válidos: ollama: | openai: | anthropic: | http:`;
+    },
   },
   {
     name: "core_estado",
-    description: "Devuelve el contenido de CORE-ECOSISTEMA.md (fuente de verdad del ecosistema).",
-    inputSchema: { type: "object", properties: {}, required: [] }
+    description: "Devuelve el contenido de CORE-ECOSISTEMA.md — fuente de verdad del sistema",
+    fn: () => {
+      try {
+        return readFileSync(path.join(ROOT, "docs", "CORE-ECOSISTEMA.md"), "utf8");
+      } catch {
+        try {
+          return readFileSync(path.join(ROOT, "CORE-ECOSISTEMA.md"), "utf8");
+        } catch {
+          return "CORE-ECOSISTEMA.md no encontrado en docs/ ni en raíz";
+        }
+      }
+    },
   },
   {
-    name: "health_check",
-    description: "Pulso completo: scripts, workflows, MCP, Ollama, APIs remotas.",
-    inputSchema: { type: "object", properties: {}, required: [] }
-  }
+    name: "inbox_cleanup",
+    description: "Limpieza profunda del inbox: elimina duplicados, mueve procesados, normaliza nombres",
+    fn: () => runShell(`bash ${ROOT}/scripts/inbox-cleanup-jun2026.sh`),
+  },
+  {
+    name: "inbox_migrate",
+    description: "Migra archivos del inbox a su destino definitivo según clasificación",
+    fn: () => runShell(`bash ${ROOT}/scripts/inbox-migrate.sh`),
+  },
+  {
+    name: "fix_permisos",
+    description: "Corrige permisos de ejecución en todos los scripts del ecosistema",
+    fn: () => runShell(`bash ${ROOT}/scripts/fix-permisos.sh`),
+  },
 ];
 
-// ─── IMPLEMENTACIÓN DE TOOLS ──────────────────────────────────
-async function callTool(name, args = {}) {
-  switch (name) {
-    case "orquestador_supremo":
-      return runScript("orquestador-supremo.sh");
-    case "orquestador_total":
-      return runScript("orquestador-total.sh", args.modo || "completo");
-    case "watchdog_monitor":
-      return runScript("watchdog.sh", String(args.sla_horas || 24));
-    case "clasificador_maestro":
-      return runScript("clasificador-maestro.sh");
-    case "gestor_estados_inbox":
-      return runScript("gestor-estados-inbox.sh");
-    case "struct_auditor":
-      return runScript("struct-auditor.sh", args.fix ? "--fix" : "");
-    case "agent_docs":
-      return runScript("agent-docs-sync.sh");
-    case "agent_islas":
-      return runScript("agent-islas-orquestador.sh");
-    case "agent_tareas":
-      return runScript("agent-tareas-manager.sh");
-    case "agent_investigacion":
-      return runScript("agent-investigacion-sync.sh");
-    case "agent_ecosistema":
-      return runScript("agent-ecosistema-audit.sh");
-    case "agent_meta":
-      return runScript("agent-meta-audit.sh");
-    case "agent_meta_deep":
-      return runScript("agentes/agente-meta-deep.sh", `${args.scope||"full"} ${args.modelo||"llama3"}`);
-    case "galatea_fabrica_agente":
-      return runScript("agentes/galatea-fabrica-agentes.sh", `"${args.nombre}" "${args.rol}" "${args.scope||"general"}" "${args.tags||""}"`);
-    case "galatea_isla_bot":
-      return runScript("galatea-islas-bots.sh", `"${args.tipo}" "${args.nombre}" "${args.descripcion}"`);
-    case "llm_router":
-      return await _llmRouter(args);
-    case "core_estado": {
-      const p = path.join(ROOT, "docs", "CORE-ECOSISTEMA.md");
-      return existsSync(p) ? readFileSync(p, "utf8") : "[ERROR] CORE-ECOSISTEMA.md no encontrado";
-    }
-    case "health_check":
-      return _healthCheck();
-    default:
-      return `[ERROR] Tool desconocida: ${name}`;
+// -------------------------------------------------------
+// Servidor MCP con transporte stdio (compatible Claude Desktop,
+// Copilot MCP, y cualquier cliente MCP estándar)
+// -------------------------------------------------------
+const server = new Server(
+  { name: "yggdrasil-ecosistema", version: "1.0.0" },
+  { capabilities: { tools: {} } }
+);
+
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: TOOLS.map(({ name, description, inputSchema }) => ({
+    name,
+    description,
+    inputSchema: inputSchema ?? { type: "object", properties: {} },
+  })),
+}));
+
+server.setRequestHandler(CallToolRequestSchema, async (req) => {
+  const tool = TOOLS.find((t) => t.name === req.params.name);
+  if (!tool) {
+    return {
+      content: [{ type: "text", text: `Tool no encontrada: ${req.params.name}` }],
+      isError: true,
+    };
   }
-}
-
-async function _llmRouter({ model = "auto", prompt, options = {} }) {
-  // Auto-detección
-  if (model === "auto") {
-    try { runShell("ollama list", 5000); model = "ollama:llama3"; }
-    catch { model = process.env.OPENAI_API_KEY ? "openai:gpt-4o-mini" : "anthropic:claude-3-haiku-20240307"; }
-  }
-
-  if (model.startsWith("ollama:")) {
-    const m = model.replace("ollama:", "");
-    const safe = prompt.replace(/"/g, '\\"').replace(/\n/g, " ");
-    return await runShellAsync(`ollama run ${m} "${safe}"`, 120000);
-  }
-
-  if (model.startsWith("openai:")) {
-    const key = process.env.OPENAI_API_KEY;
-    if (!key) return "[ERROR] OPENAI_API_KEY no configurada";
-    const m = model.replace("openai:", "");
-    const payload = JSON.stringify({ model: m, messages: [{ role: "user", content: prompt }], temperature: options.temperature || 0.3 });
-    return await runShellAsync(`curl -s -X POST https://api.openai.com/v1/chat/completions -H "Authorization: Bearer ${key}" -H "Content-Type: application/json" -d '${payload.replace(/'/g,"'\\''")}' | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['choices'][0]['message']['content'])"`);
-  }
-
-  if (model.startsWith("anthropic:")) {
-    const key = process.env.ANTHROPIC_API_KEY;
-    if (!key) return "[ERROR] ANTHROPIC_API_KEY no configurada";
-    const m = model.replace("anthropic:", "");
-    const payload = JSON.stringify({ model: m, max_tokens: 2048, messages: [{ role: "user", content: prompt }] });
-    return await runShellAsync(`curl -s -X POST https://api.anthropic.com/v1/messages -H "x-api-key: ${key}" -H "anthropic-version: 2023-06-01" -H "Content-Type: application/json" -d '${payload.replace(/'/g,"'\\''")}' | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['content'][0]['text'])"`);
-  }
-
-  if (model.startsWith("http")) {
-    const payload = JSON.stringify({ prompt });
-    return await runShellAsync(`curl -s -X POST ${model} -H "Content-Type: application/json" -d '${payload.replace(/'/g,"'\\''")}' `);
-  }
-
-  return `[ERROR] Modelo no reconocido: ${model}. Usa ollama:<name>, openai:<name>, anthropic:<name>, http:<url>, o 'auto'`;
-}
-
-function _healthCheck() {
-  const checks = [];
-  checks.push(`ROOT: ${ROOT} — ${existsSync(ROOT) ? "✅" : "❌"}`);
-  ["scripts","inbox","diary","mcp","docs"].forEach(d => {
-    checks.push(`${d}/: ${existsSync(path.join(ROOT,d)) ? "✅" : "❌"}`);
-  });
-  checks.push(`CORE-ECOSISTEMA.md: ${existsSync(path.join(ROOT,"docs","CORE-ECOSISTEMA.md")) ? "✅" : "❌"}`);
-  try { runShell("ollama list", 5000); checks.push("Ollama: ✅"); } catch { checks.push("Ollama: ❌ no disponible"); }
-  checks.push(`OPENAI_API_KEY: ${process.env.OPENAI_API_KEY ? "✅" : "⚠️  no configurada"}`);
-  checks.push(`ANTHROPIC_API_KEY: ${process.env.ANTHROPIC_API_KEY ? "✅" : "⚠️  no configurada"}`);
-  return checks.join("\n");
-}
-
-// ─── LOOP MCP STDIO (JSON-RPC 2.0) ───────────────────────────
-const rl = readline.createInterface({ input: process.stdin });
-
-function send(obj) {
-  process.stdout.write(JSON.stringify(obj) + "\n");
-}
-
-rl.on("line", async (line) => {
-  let req;
-  try { req = JSON.parse(line.trim()); } catch { return; }
-  if (!req) return;
-
-  const { id, method, params } = req;
-
-  if (method === "initialize") {
-    send({ jsonrpc: "2.0", id, result: {
-      protocolVersion: "2024-11-05",
-      capabilities: { tools: {} },
-      serverInfo: { name: "yggdrasil-ecosistema", version: "2.0.0" }
-    }});
-    return;
-  }
-
-  if (method === "tools/list") {
-    send({ jsonrpc: "2.0", id, result: { tools: TOOLS } });
-    return;
-  }
-
-  if (method === "tools/call") {
-    const { name, arguments: args } = params;
-    try {
-      const result = await callTool(name, args || {});
-      const text = typeof result === "string" ? result : JSON.stringify(result);
-      send({ jsonrpc: "2.0", id, result: { content: [{ type: "text", text: text.slice(0, 8000) }] } });
-    } catch (e) {
-      send({ jsonrpc: "2.0", id, error: { code: -32603, message: String(e.message) } });
-    }
-    return;
-  }
-
-  if (method === "notifications/initialized") return; // ACK, no response needed
-
-  send({ jsonrpc: "2.0", id, error: { code: -32601, message: `Method not found: ${method}` } });
+  const result = await tool.fn(req.params.arguments ?? {});
+  return { content: [{ type: "text", text: String(result) }] };
 });
 
-process.stderr.write("[MCP] yggdrasil-ecosistema server v2.0 listo (stdio JSON-RPC 2.0)\n");
+const transport = new StdioServerTransport();
+await server.connect(transport);
