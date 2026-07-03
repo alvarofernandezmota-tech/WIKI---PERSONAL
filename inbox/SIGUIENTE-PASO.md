@@ -1,56 +1,44 @@
-# ▶️ Siguiente paso ahora mismo
+# SIGUIENTE PASO — 2026-07-03
 
-> Fichero de paso único. Siempre refleja LO QUE HAY QUE HACER AHORA.
-> Al completarlo, actualizar este fichero con el siguiente.
+> Actualizado tras síntesis maestra de sesión
+
+## 🎯 Acción inmediata elegida: MCP server de Madre
+
+**Justificación:** Es la pieza de mayor ROI — multiplica la capacidad de Cursor, Claude y cualquier IA compatible para interactuar con el ecosistema real.
+
+### Plan de ejecución
+
+```bash
+# 1. Crear repo (o directorio en yggdrasil-madre)
+mkdir madre-mcp-server && cd madre-mcp-server
+
+# 2. Instalar dependencias
+pip install mcp uvicorn fastapi docker requests
+
+# 3. Implementar server con 5 tools básicas:
+#    - get_containers_status()
+#    - get_services_health()
+#    - get_ecosystem_snapshot()
+#    - create_github_issue(title, body)
+#    - query_rag(question)
+
+# 4. Docker-compose con puerto 3100 (solo red interna)
+# 5. Configurar en Cursor → Settings → MCP Servers
+# 6. Test: "¿qué contenedores están caídos?"
+```
+
+### Paralelo posible
+Mientras el MCP server se construye, el workflow n8n del ecosystem-snapshot se puede hacer en la UI sin tocar código.
 
 ---
 
-## 🟥 PASO ACTIVO: F0.1 — ssh-add
+## ⏭ Después del MCP server
 
-**Objetivo:** Que `git pull` en madre no pida passphrase.
-
-**Ejecutar en madre (una línea, segura en Blink):**
-```
-ssh-add ~/.ssh/id_ed25519_github
-```
-
-**Qué esperar:** Te pedirá la passphrase UNA vez. Después de eso, git funciona solo.
-
-**Verificar:**
-```
-cd ~/yggdrasil-dew && git pull
-```
-
-**Resultado esperado:**
-```
-Already up to date.
-```
-o bien que baje los commits nuevos. Sin pedir passphrase.
+1. Deploy health-agent en Madre (docker-compose)
+2. Workflow ecosystem-snapshot en n8n
+3. Cerrar el bucle: n8n → health-agent → acciones safe
+4. OTel Collector + Loki
 
 ---
 
-## ⏭️ Después de este paso
-
-1. **F0.2** — Crear labels en GitHub (2 min en web)
-2. **F0.3** — Verificar carpeta artefacto en madre
-3. **F0.4** — Deduplicar osint/ + osint-stack/
-4. **F0.5** — Deduplicar tools/ + cli-tools/
-5. **F0.6** — Commit de limpieza
-6. **F0.7** — GROQ_API_KEY en GitHub Secrets
-7. → **F1** — thdora #12 y #10
-
----
-
-## 📊 Estado del ecosistema ahora
-
-```
-yggdrasil-dew:  ✅ Repo accesible, Actions activas, docs al día
-thdora:         ⏳ Esperando F0 para deuda técnica
-ssh madre:      ✅ Clave existe y autentica
-git pull:       ⚠️ Pide passphrase — resolver con ssh-add
-Actions:        ⚠️ Labels no creados aún — no crean issues hasta tenerlos
-```
-
----
-
-*Actualizado: 03-Jul-2026 13:05 CEST*
+*Actualizado: 2026-07-03 17:18 CEST*
