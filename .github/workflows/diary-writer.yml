@@ -1,0 +1,117 @@
+name: 📓 Diary Writer — Auto-documenta sesiones
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      session_id:
+        description: 'ID de sesión (ej: S20260703)'
+        required: false
+
+jobs:
+  write-diary:
+    name: Escribir entrada de diario
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: 📅 Variables de fecha y sesión
+        id: vars
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          HOUR=$(date +%H:%M)
+          SESSION="S${DATE//-/}"
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "year=$YEAR" >> $GITHUB_OUTPUT
+          echo "month=$MONTH" >> $GITHUB_OUTPUT
+          echo "hour=$HOUR" >> $GITHUB_OUTPUT
+          echo "session=$SESSION" >> $GITHUB_OUTPUT
+          echo "diary_path=diario/$YEAR/$MONTH/$DATE.md" >> $GITHUB_OUTPUT
+
+      - name: 📜 Recopilar commits del día
+        id: commits
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          LOG=$(git log --since="$TODAY 00:00" --until="$TODAY 23:59" \
+            --pretty=format:"| %h | %s | %an | %ad |" \
+            --date=format:"%H:%M" \
+            HEAD 2>/dev/null || echo "")
+          if [ -z "$LOG" ]; then
+            LOG="| - | Sin commits hoy | - | - |"
+          fi
+          echo "log<<EOF" >> $GITHUB_OUTPUT
+          echo "$LOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 📁 Recopilar archivos modificados hoy
+        id: files
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          FILES=$(git log --since="$TODAY 00:00" --name-only --pretty=format:"" HEAD 2>/dev/null | sort -u | grep -v '^$' | head -50)
+          if [ -z "$FILES" ]; then
+            FILES="Ninguno"
+          fi
+          echo "list<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 🏝️ Detectar islas tocadas hoy
+        id: islands
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          TOUCHED=$(git log --since="$TODAY 00:00" --name-only --pretty=format:"" HEAD 2>/dev/null | sort -u | grep -v '^$' | cut -d'/' -f1 | sort -u | grep -v '^\.' | grep -v '^[A-Z]' | head -20)
+          echo "touched=$TOUCHED" >> $GITHUB_OUTPUT
+
+      - name: 📓 Crear o actualizar entrada del diario
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ steps.vars.outputs.diary_path }}';
+            const date = '${{ steps.vars.outputs.date }}';
+            const session = '${{ steps.vars.outputs.session }}';
+            const hour = '${{ steps.vars.outputs.hour }}';
+            const commits = `${{ steps.commits.outputs.log }}`;
+            const files = `${{ steps.files.outputs.list }}`;
+            const islands = `${{ steps.islands.outputs.touched }}`;
+
+            const header = `# 📓 Diario ${date}\n`;
+            const sessionBlock = `\n## 🕑 Sesión ${session}\n\n**Última actualización:** ${hour} CEST  \n**Workflow:** diary-writer automático\n`;
+            const islandsBlock = `\n### 🏝️ Islas tocadas hoy\n${islands || 'Ninguna'}\n`;
+            const commitsBlock = `\n### 📦 Commits del día\n\n| Hash | Mensaje | Autor | Hora |\n|---|---|---|---|\n${commits}\n`;
+            const filesBlock = `\n### 📁 Archivos modificados\n\`\`\`\n${files}\n\`\`\`\n`;
+            const footer = `\n---\n*Generado automáticamente por diary-writer.yml*  \n*Sesión manual: ver \`sesiones/${session}-RESUMEN.md\`*\n`;
+
+            const content = header + sessionBlock + islandsBlock + commitsBlock + filesBlock + footer;
+            const encoded = Buffer.from(content).toString('base64');
+
+            try {
+              const existing = await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: path
+              });
+              await github.rest.repos.createOrUpdateFileContents({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: path,
+                message: `docs: diary ${date} actualizado automáticamente`,
+                content: encoded,
+                sha: existing.data.sha
+              });
+            } catch (e) {
+              // Crear directorios necesarios + fichero
+              await github.rest.repos.createOrUpdateFileContents({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: path,
+                message: `docs: diary ${date} creado automáticamente`,
+                content: encoded
+              });
+            }
+            console.log(`Diary actualizado: ${path}`);
