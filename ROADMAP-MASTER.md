@@ -1,171 +1,134 @@
-# 🌳 ROADMAP MASTER — Yggdrasil Ecosystem
+# 🗺️ ROADMAP MASTER — Ecosistema Yggdrasil
 
-> Fuente única de verdad para el estado y plan de TODAS las islas.
-> Actualizado automáticamente por `mapa-islas-sync.yml`.
-
-**Última actualización:** 03-Jul-2026  
-**Sesión activa:** S20260703  
-**Estado global:** 🟡 En construcción — ~55% completo
+> Fuente de verdad del plan estratégico.  
+> Actualizado en sesión 2026-07-03.  
+> Estado: **FASE AGENTES activa**
 
 ---
 
-## 📊 Estado global de islas
-
-| Isla | Repo | Estado | Bloqueante | Fase |
-|---|---|---|---|---|
-| yggdrasil-dew | [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | 🟢 Activa | SSH key madre | F0 |
-| thdora | [thdora](https://github.com/alvarofernandezmota-tech/thdora) | 🟡 Gaps | #12 zombie, #10 timeout | F1 |
-| secops | repo-secops | 🟡 Gaps | 3 bots rotos | F2 |
-| local-brain | en ygg/ollama | 🟡 Parcial | sin documentar | F4 |
-| osint | en ygg/osint + osint-stack | ⚪ Duplicado | deduplicar carpetas | F2 |
-| batcueva | 🔜 NO EXISTE | ❌ Sin backup | crear repo | F2 |
-| theodora | dotfiles | 🟡 Gaps | sin dotfiles repo | F5 |
-| moviles | config | 🟡 Parcial | Termius, Tailscale | cuando necesite |
-
----
-
-## 🚦 FASE 0 — Fixes bloqueantes
-
-> Sin estos, todo falla silenciosamente.
-
-**Estado:** 🔴 EN CURSO  
-**Sesión:** S21 (hoy)
-
-| # | Tarea | Tiempo | Comando |
-|---|---|---|---|
-| 0.1 | SSH key madre → GitHub | 5 min | `cat ~/.ssh/id_ed25519.pub` → pegar en github.com/settings/keys |
-| 0.2 | gh auth login en madre | 2 min | `gh auth login` |
-| 0.3 | Blink keepalive config | 2 min | editar `~/.ssh/config` en iPhone |
-| 0.4 | Verificar carpeta artefacto | 1 min | `ls ~/yggdrasil-dew/alvarofernandezmota-tech/` |
-| 0.5 | Deduplicar osint/ + osint-stack/ | 5 min | mover contenido y borrar duplicado |
-| 0.6 | Deduplicar tools/ + cli-tools/ | 5 min | mover contenido y borrar duplicado |
-
-**Definición de hecho:** `git pull` funciona en madre sin errores.
-
----
-
-## 🚦 FASE 1 — Deuda técnica thdora
-
-**Estado:** ⏳ Bloqueada por F0  
-**Sesión:** S21
-
-| # | Issue | Tarea | Impacto |
-|---|---|---|---|
-| 1.1 | [#12](https://github.com/alvarofernandezmota-tech/thdora/issues/12) | Eliminar código zombie | Bot inestable |
-| 1.2 | [#10](https://github.com/alvarofernandezmota-tech/thdora/issues/10) | Fix /config timeout (3 líneas) | Comando roto |
-| 1.3 | — | PR + merge + tests | Cerrar deuda |
-
-**Definición de hecho:** thdora sin issues abiertos de deuda técnica.
-
----
-
-## 🚦 FASE 2 — Estructura ygg + batcueva
-
-**Estado:** 🔴 Pendiente  
-**Sesión:** S22
-
-| # | Tarea | Isla afectada |
-|---|---|---|
-| 2.1 | Añadir README.md a cada isla (plantilla) | todas |
-| 2.2 | Fusionar osint/ + osint-stack/ | osint |
-| 2.3 | Fusionar tools/ + cli-tools/ | ygg |
-| 2.4 | Crear repo batcueva | batcueva |
-| 2.5 | docker-compose de madre documentado | batcueva |
-| 2.6 | Script backup nocturno madre → batcueva | batcueva |
-| 2.7 | Añadir GROQ_API_KEY a GitHub Secrets | ygg |
-| 2.8 | Action: verifica README.md en cada isla | ygg |
-| 2.9 | Resolver secops — 3 bots rotos | secops |
-
-**Definición de hecho:** todas las islas con README.md, batcueva operativo.
-
----
-
-## 🚦 FASE 3 — Automatizaciones reales
-
-**Estado:** 🔴 Pendiente  
-**Sesión:** S23
-
-| # | Tarea | Herramienta |
-|---|---|---|
-| 3.1 | thdora daily-report → Telegram | thdora bot |
-| 3.2 | Sync bidireccional ygg ↔ thdora via webhook | GitHub Actions |
-| 3.3 | Backup nocturno madre → batcueva | cron + rsync |
-| 3.4 | Dashboard ESTADO-ISLAS.md autogenerado | Action |
-| 3.5 | Cursor MCP config en madre | MCP |
-| 3.6 | Action: verifica diario del día existe | ygg |
-
-**Definición de hecho:** el ecosistema se monitoriza y reporta solo.
-
----
-
-## 🚦 FASE 4 — local-brain + ollama
-
-**Estado:** 🔴 Pendiente  
-**Sesión:** S24
-
-| # | Tarea |
-|---|---|
-| 4.1 | Documentar modelos ollama activos en madre |
-| 4.2 | README.md isla local-brain con plantilla |
-| 4.3 | Conectar ollama con thdora (endpoint local) |
-| 4.4 | Script de arranque/parada modelos |
-
-**Definición de hecho:** local-brain documentado y conectado a thdora.
-
----
-
-## 🚦 FASE 5 — theodora + dotfiles + móviles
-
-**Estado:** 🔴 Pendiente  
-**Sesión:** S25+
-
-| # | Tarea |
-|---|---|
-| 5.1 | Crear repo dotfiles |
-| 5.2 | Sincronizar .zshrc, .tmux.conf, .gitconfig, neovim |
-| 5.3 | Script de bootstrap en máquina nueva |
-| 5.4 | Termius config con todos los hosts del ecosistema |
-| 5.5 | Redmi con Tailscale funcional |
-
-**Definición de hecho:** máquina nueva lista en <15 min con bootstrap.
-
----
-
-## 📁 Cómo están conectadas las fases
+## 💡 Principio de evolución
 
 ```
-F0 (SSH fix)
-  └─── desbloquea ───► F1 (thdora deuda)
-                          └─── desbloquea ───► F2 (estructura + batcueva)
-                                                  └─── desbloquea ───► F3 (automatizaciones)
-                                                                          ├─── paralelo ───► F4 (local-brain)
-                                                                          └─── paralelo ───► F5 (theodora)
+Scripts → Tools de agentes
+Bots → Sensores / actuadores
+Agentes → Cerebros autónomos
+Humano → Árbitro final
 ```
 
 ---
 
-## 📜 Normas del ecosistema (resumen ejecutivo)
+## 🟢 FASE ACTUAL: AGENTES
 
-1. **Cada isla tiene su propio README.md** con la plantilla de `templates/isla-README.md`
-2. **Cada commit sigue Conventional Commits** (`feat:`, `fix:`, `docs:`, `chore:`)
-3. **Cada sesión genera un resumen** en `sesiones/SYYYYMMDD-RESUMEN.md`
-4. **Cada idea va a inbox/** primero, luego se procesa
-5. **Nada se mueve a main sin pasar por una Action** que lo verifique
-6. **Los ficheros maestros son 5** y no se pueden borrar: `ECOSISTEMA.md`, `MAPA-ISLAS.md`, `HERRAMIENTAS-ECOSISTEMA.md`, `CONVENCIONES.md`, `ESTADO-SISTEMA.md`
-7. **Las Actions son el sistema inmune** — si una falla, se crea un issue automáticamente
-8. **El ROADMAP-MASTER.md es la fuente de verdad** — se actualiza al cerrar cada fase
+### Objetivo
+Transformar el ecosistema de scripts reactivos a agentes autónomos con memoria, herramientas y guardrails.
+
+### Sub-fases
+
+#### A1 — MCP Server de Madre [EN DISEÑO]
+- [ ] Implementar `agentes/mcp-server/mcp_server.py`
+- [ ] Tools MVP: check_docker, get_ecosystem_state, read_roadmap, list_services
+- [ ] Configurar en Cursor local
+- [ ] Desplegar en docker-compose de Madre
+
+#### A2 — Health Agent [ESQUELETO LISTO]
+- [ ] Desplegar `agentes/health-agent/health_agent_core.py` en Madre
+- [ ] Implementar n8n workflow `agentes/ecosystem-snapshot/n8n-workflow.json`
+- [ ] Test en dry_run durante 48h
+- [ ] Activar acciones automáticas safe
+
+#### A3 — Observabilidad (OTel)
+- [ ] OTel Collector en docker-compose
+- [ ] Loki para logs unificados
+- [ ] Alertmanager con reglas básicas
+- [ ] Beyla para auto-instrumentación sin código
+
+#### A4 — Guardrails en código
+- [ ] Dry-run mode en todas las tools
+- [ ] Circuit breakers implementados
+- [ ] Audit log inmutable (append-only)
+- [ ] Identidad de agente separada
+
+#### A5 — Eval harness
+- [ ] Pytest harness básico para health-agent
+- [ ] Casos: OK, WARN, CRITICAL
+- [ ] Regresión en CI (GitHub Actions)
 
 ---
 
-## 🔑 Secrets necesarios en GitHub
+## ✅ FASES COMPLETADAS
 
-| Secret | Para qué | Estado |
-|---|---|---|
-| `GROQ_API_KEY` | AI reviewer en PRs | ❌ Pendiente |
-| `TELEGRAM_BOT_TOKEN` | Notificaciones thdora | ❓ Verificar |
-| `TELEGRAM_CHAT_ID` | Canal de notificaciones | ❓ Verificar |
+### FASE INFRA
+- [x] Madre operativa (LUKS+Btrfs, GTX 1060, Tailscale)
+- [x] Docker stack (contenedores, healthchecks)
+- [x] GitHub repos (yggdrasil-dew, thdora-personal)
+- [x] n8n operativo
+- [x] Ollama con modelos locales
+- [x] Open WebUI
+- [x] Qdrant desplegado
+- [x] Gitea (mirror local)
+
+### FASE BOTS
+- [x] yggdrasilwatchdog — monitor de contenedores
+- [x] guardianbot — notificaciones Telegram
+- [x] networkradar — escaneo LAN
+- [x] tailscalemonitor — estado nodos Tailscale
+- [x] logguardianbot — auth.log / ufw.log
+- [x] localtripwire — detección cambios ficheros
+
+### FASE DOCS Y CI/CD
+- [x] yggdrasil-dew como second brain
+- [x] ROADMAP-MASTER.md
+- [x] CONVENCIONES.md
+- [x] ecosystem-guardian.yml (auditoría nocturna)
+- [x] new-file-bootstrap.yml (headers automáticos)
+- [x] bge-m3 + RAG base configurado
+
+### FASE thdora-personal (antes: thdora)
+- [x] API FastAPI operativa
+- [x] Bot Telegram single-user
+- [x] Docker healthcheck resuelto (issue #17)
+- [x] Alembic migrations
+- [ ] F10 Multi-usuario — BLOQUEADOR ACTIVO
 
 ---
 
-*Documento vivo — última edición manual: 03-Jul-2026*  
-*Próxima actualización automática: cuando se cierre próximo issue o PR*
+## 🔴 PRÓXIMAS FASES (post-Agentes)
+
+### FASE SOC / SEGURIDAD
+- [ ] Wazuh homelab setup
+- [ ] Suricata IDS de red
+- [ ] Threat model del ecosistema
+- [ ] UFW rules audit automatizado
+- [ ] Pentest interno de la infra
+
+### FASE ROADMAP-AGÉNTICO
+- [ ] Agente roadmap — lee ROADMAP-MASTER.md y avanza tareas [AUTO]
+- [ ] Agente research — investiga y actualiza docs
+- [ ] Multi-agent orchestration con n8n como bus
+- [ ] A2A protocol (Google) para comunicación entre agentes
+
+### FASE thdora-personal MULTI-USUARIO (F10+)
+- [ ] F10 Multi-usuario (BLOQUEADOR)
+- [ ] F11 Scheduler APScheduler
+- [ ] F12 IA lenguaje natural
+- [ ] F13 Análisis IA hábitos
+- [ ] F14 Llamadas Twilio
+- [ ] F15 Voz Whisper
+- [ ] F16 Onboarding completo
+
+---
+
+## 📅 Historial de sesiones
+
+| Fecha | Hito |
+|---|---|
+| 2026-06-27 | Sesión Gemini — auditoría ecosistema base |
+| 2026-06-28 | Auditoría completa + inventario islas |
+| 2026-06-30 | Cierre sesión + estado thdora |
+| 2026-07-01 | Gemini auditoría ecosistema V2 |
+| 2026-07-02 | Auditoría herramientas GitHub + migración inbox |
+| 2026-07-03 | **Diseño arquitectura agentes + MCP server + rename thdora-personal** |
+
+---
+
+*Última actualización: 2026-07-03 · Fase activa: AGENTES*
