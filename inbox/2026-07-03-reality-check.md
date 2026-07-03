@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-03
-hora: 15:01
+hora: 15:08
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-03 15:01
+title: Reality Check 2026-07-03 15:08
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-03 15:01
+# 🔍 Ecosystem Reality Check — 2026-07-03 15:08
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-03 15:01
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 71 |
+| Total scripts | 74 |
 | Ejecutables (chmod +x) | 51 |
-| Sin permisos ejecución | 20 |
-| En raíz scripts/ (sin organizar) | 30 |
-| En subdirectorios | 41 |
+| Sin permisos ejecución | 23 |
+| En raíz scripts/ (sin organizar) | 32 |
+| En subdirectorios | 42 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -40,12 +40,14 @@ title: Reality Check 2026-07-03 15:01
 - `audit-and-migrate.sh`
 - `batcueva-control.sh`
 - `cierre-sesion.sh`
+- `code-drift-detector.sh`
 - `create-issues.sh`
 - `fix-permisos.sh`
 - `hardening-ufw.sh`
 - `inbox-cleanup-jun2024.sh`
 - `inbox-cleanup-jun2026.sh`
 - `inbox-migrate.sh`
+- `inbox-watcher.sh`
 - `inicio-sesion.sh`
 - `issue-creator.sh`
 - `migrar-inbox.sh`
@@ -68,6 +70,7 @@ _Ninguno detectado_
 | `auto-investigacion.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `autonomous-cron.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `clasificador.yml` | push | 🟢 ACTIVO |
+| `code-drift.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
 | `context-reminder.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `diary-writer.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `ecosystem-guardian.yml` | push schedule workflow_dispatch # manual desde Telegram via API | 🟢 ACTIVO |
@@ -160,8 +163,8 @@ _12 items encontrados:_
 | ✅ OK | 3 |
 | ⚠ Warnings | 12 |
 | Total checks | 15 |
-| Scripts totales | 71 |
-| Actions activas | 31 |
+| Scripts totales | 74 |
+| Actions activas | 32 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 15:01*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 15:08*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
