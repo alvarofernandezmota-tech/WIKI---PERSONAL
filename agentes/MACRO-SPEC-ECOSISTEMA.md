@@ -1,64 +1,62 @@
 # 🧠 MACRO-SPEC DEL ECOSISTEMA YGGDRASIL
 
-> Versión: 2026-07-03 | Biblia del ecosistema. Copilot debe leer esto antes de actuar.
+**Versión:** 2026-07-03 — Integrado con COPILOT-CONTEXT.md  
+**Repo destino:** `yggdrasil-dew/agentes/MACRO-SPEC-ECOSISTEMA.md`
 
 ---
 
-## 0. Propósito
+## 0. 📌 Propósito del documento
 
-Este documento define la filosofía, estructura, agentes, MCP server, lenguaje correcto y roadmap del ecosistema Yggdrasil.
-Es la fuente de verdad para cualquier IA que opere en este ecosistema.
+Este documento define:
+- La filosofía del ecosistema Yggdrasil.
+- La estructura real por repos.
+- La arquitectura de agentes.
+- El MCP server de última generación.
+- El lenguaje correcto para IA.
+- El laboratorio de agentes (LAB-AGENTES).
+- El clon operativo Álvaro-agent.
+- El agente Obsidian.
+- El roadmap de 4 semanas.
+- Las fuentes internas que gobiernan el sistema.
 
----
-
-## 1. Filosofía
-
-- **Autonomía con límites** — Agentes actúan solos en tareas `[AUTO]`. NUNCA tocan producción, NUNCA hacen merge, NUNCA borran.
-- **Transparencia radical** — Todo se documenta: Markdown, audit log MCP, RAG (Qdrant + bge-m3).
-- **Responsabilidad humana** — Tareas `[HUMAN]` y `[RISKY]` requieren decisión humana. `CRITICAL` → pausa + Telegram.
-- **Memoria responsable** — El sistema recuerda lo necesario para operar. Sin datos sensibles sin propósito.
-- **Experimentación controlada** — Agentes nuevos se validan en LAB-AGENTES antes de producción.
-
----
-
-## 2. Lenguaje correcto con la IA
-
-### Etiquetas obligatorias
-
-| Etiqueta | Significado |
-|----------|-------------|
-| `[AUTO]` | El agente puede ejecutarlo sin supervisión |
-| `[HUMAN]` | Requiere decisión humana |
-| `[RISKY]` | Acción con riesgo — dry_run primero |
-| `CRITICAL` | Pausa + notificación Telegram |
-| `[DRIFT]` | Código desviado del estándar |
-
-### Estructura de instrucción
-
-```
-Contexto → Objetivo → Reglas → Acción → Documentación
-```
-
-### Reglas absolutas
-
-- NUNCA tocar producción sin `dry_run` previo
-- SIEMPRE `set -euo pipefail` en Bash
-- SIEMPRE `source scripts/lib/common.sh`
-- SIEMPRE loguear con `log()` de common.sh
-- NUNCA `git add -A` — solo el fichero exacto
-
-### Documentos que definen el lenguaje
-
-- `agentes/REGLAS-AGENTES.md`
-- `agentes/AI-CONTEXT.md`
-- `agentes/COPILOT-CONTEXT.md`
-- `docs/SCRIPT-REGISTRY.md`
+Es la biblia del ecosistema, y Copilot debe leerla antes de actuar.
 
 ---
 
-## 3. Estructura del ecosistema
+## 1. 🧩 Filosofía del ecosistema
 
-### 3.1 `yggdrasil-dew` — Cerebro operativo
+### 1.1. Principios fundamentales
+
+- **Autonomía con límites**: Los agentes actúan solos, pero solo en tareas `[AUTO]`. Nunca tocan producción, nunca hacen merge, nunca borran.
+- **Transparencia radical**: Todo se documenta — Markdown (diarios, informes, sesiones), Audit log en MCP, RAG sobre el historial (Qdrant + bge-m3).
+- **Responsabilidad humana**: Tareas `[HUMAN]` y `[RISKY]` requieren tu decisión. `CRITICAL` → pausa + Telegram.
+- **Memoria responsable**: El sistema recuerda lo necesario para operar y aprender. Evita acumular datos sensibles sin propósito claro.
+- **Experimentación controlada (LAB-AGENTES)**: Agentes nuevos se prueban en entorno de laboratorio. No tocan producción hasta estar validados.
+
+---
+
+## 2. 🧠 Lenguaje correcto con la IA
+
+### 2.1. Reglas de lenguaje
+
+- **Etiquetas**: `[AUTO]`, `[HUMAN]`, `[RISKY]`, `CRITICAL`
+- **Instrucciones**: "NUNCA tocar producción.", "SIEMPRE dry_run.", "SIEMPRE documentar."
+- **Estructura**: Contexto → Objetivo → Reglas → Acción → Documentación
+- **Estilo**: Directo. Técnico. Sin relleno. Con rutas reales del repo.
+
+### 2.2. Documentos que definen tu lenguaje
+
+- `REGLAS-AGENTES.md`
+- `AI-CONTEXT.md`
+- `COPILOT-CONTEXT.md`
+- `Tesis-y-Metodo-Sistema-de-Alineacion-Cognitiva.md`
+- `Arquitectura-de-Inteligencia-Artificial-Soberana-y-Open-Source.md`
+
+---
+
+## 3. 📁 Estructura real del ecosistema (por repos)
+
+### 3.1. `yggdrasil-dew` → Cerebro operativo
 
 ```
 yggdrasil-dew/
@@ -69,32 +67,35 @@ yggdrasil-dew/
 │   ├── AI-CONTEXT.md
 │   ├── PLAN-ESTADO-ACTUAL.md
 │   ├── mcp-server/
-│   │   ├── mcp_server.py          ← FastAPI + 5 tools
-│   │   ├── docker-compose.yml     ← puerto 8002
-│   │   └── requirements.txt
-│   ├── health-agent/
-│   │   ├── health_agent.py        ← FastAPI + Ollama
-│   │   └── docker-compose.yml     ← puerto 8001
+│   │   ├── DISEÑO.md
+│   │   ├── mcp_server.py
+│   │   └── tools/
 │   ├── alvaro-agent/
+│   │   ├── PERFIL-ALVARO.md
+│   │   ├── DISEÑO.md
+│   │   └── alvaro_agent.py
 │   ├── docs-agent/
 │   ├── roadmap-agent/
 │   └── obsidian-agent/
+│       ├── DISEÑO.md
+│       ├── ingest.py
+│       ├── api.py
+│       └── tools/
 ├── scripts/
-│   ├── lib/common.sh              ← librería compartida
-│   ├── inbox-watcher.sh           ← daemon inotify
-│   ├── ecosystem-snapshot.sh      ← genera JSON estado
 │   ├── issue-creator.sh
 │   ├── task-analyzer.sh
-│   └── ...
-├── .github/workflows/             ← 29 workflows activos
-├── inbox/                         ← buzón de entrada
+│   ├── cierre-sesion.sh
+│   ├── apertura-sesion.sh
+│   └── maintenance/
+├── .github/workflows/
+├── inbox/
 ├── diary/
 ├── reports/
 ├── ROADMAP-MASTER.md
 └── REGISTRO-AGENTES.md
 ```
 
-### 3.2 `yggdrasil-secops` — Seguridad y watchdogs
+### 3.2. `yggdrasil-secops` → Salud, seguridad, watchdogs
 
 ```
 yggdrasil-secops/
@@ -102,102 +103,122 @@ yggdrasil-secops/
 ├── security-agent/
 ├── optimize-agent/
 └── watchdogs/
-    ├── yggdrasilwatchdog
-    ├── networkradar
-    ├── tailscalemonitor
-    └── logguardianbot
 ```
 
-### 3.3 Otras islas
-
-| Repo | Rol |
-|------|-----|
-| `local-brain` | RAG general + embeddings + Qdrant |
-| `osint-stack` | OSINT + Spiderfoot + osint-agent |
-| `thdora-personal` | Interfaz Telegram (bot + API) |
-
----
-
-## 4. Arquitectura de agentes
-
-| Agente | Repo | Runtime | Rol | Estado |
-|--------|------|---------|-----|--------|
-| MCP server | dew | Docker :8002 | Tools + audit + reglas | 🟡 Listo para deploy |
-| Health-agent | dew/secops | Docker :8001 | Salud del ecosistema | 🟡 Listo para deploy |
-| Roadmap-agent | dew | Actions | Ejecuta tareas [AUTO] | 🟠 En desarrollo |
-| Docs-agent | dew | Actions | Documentación automática | 🟠 En desarrollo |
-| OSINT-agent | osint-stack | Docker | Radar externo | 🔴 Pendiente |
-| Security-agent | secops | Docker | Seguridad | 🔴 Pendiente |
-| Obsidian-agent | dew | Docker | RAG sobre Obsidian | 🔴 Pendiente |
-| Álvaro-agent | dew | Docker | Clon operativo | 🔴 Pendiente |
-| inbox-watcher | dew | systemd | Sensor buzón | 🟡 Listo para deploy |
-
----
-
-## 5. MCP Server — Tools completas
-
-| Tool | Endpoint | Descripción |
-|------|----------|-------------|
-| `write_inbox` | POST /tools/write_inbox | Escribe .md → dispara bucle |
-| `read_roadmap` | GET /tools/read_roadmap | Lee ROADMAP-MASTER.md |
-| `list_issues` | POST /tools/list_issues | Issues por label |
-| `list_scripts` | GET /tools/list_scripts | Inventario scripts |
-| `run_script` | POST /tools/run_script | Ejecuta script (dry_run default) |
-| `ecosystem_health` | GET /tools/ecosystem_health | Estado rápido del sistema |
-
----
-
-## 6. Flujo del bucle autónomo completo
+### 3.3. `local-brain` → RAG general + embeddings
 
 ```
-Evento (push / cron / webhook / inotify / LLM)
-         ↓
-   Trigger (GitHub Actions / systemd / cron)
-         ↓
-   Script (sensor / análisis / acción) [set -euo pipefail + common.sh]
-         ↓
-   Agente (LLM Ollama + FastAPI) ← para decisiones
-         ↓
-   Acción safe [AUTO]: issue / push / telegram / docker restart
-         ↓
-   Log → Markdown → Qdrant RAG → memoria del sistema
-         ↓
-   GitHub Actions verifican drift + calidad [AUTO]
+local-brain/
+├── ingest/
+├── rag/
+└── models/
+```
+
+### 3.4. `osint-stack` → OSINT + Spiderfoot
+
+```
+osint-stack/
+└── agentes/osint-agent/
+```
+
+### 3.5. `thdora-personal` → Interfaz humana (Telegram)
+
+```
+thdora-personal/
+├── bot/
+└── api/
 ```
 
 ---
 
-## 7. Roadmap de 4 semanas
+## 4. 🧬 Arquitectura de agentes
 
-### Semana 1 — Base operativa
-- [ ] Deploy MCP server en Madre (`docker compose up -d`)
-- [ ] Deploy inbox-watcher como systemd daemon
-- [ ] `ecosystem-snapshot.sh` generando JSON
-- [ ] Health-agent en Docker conectado a Ollama
-
-### Semana 2 — Agentes GitOps
-- [ ] Roadmap-agent ejecutando tareas [AUTO]
-- [ ] Docs-agent actualizando documentación
-- [ ] n8n workflow `ecosystem-snapshot` importado
-
-### Semana 3 — Seguridad e investigación
-- [ ] OSINT-agent con Spiderfoot
-- [ ] Security-agent (Wazuh lite)
-- [ ] RAG-second-brain-bot funcional
-
-### Semana 4 — Agentes avanzados
-- [ ] Obsidian-agent con ingestión automática
-- [ ] Álvaro-agent (clon operativo)
-- [ ] Optimization-agent (recursos Madre)
+| Agente | Repo | Runtime | Rol |
+|---|---|---|---|
+| MCP server | dew | Madre | Tools + audit + reglas |
+| Health-agent | secops | Docker | Salud del ecosistema |
+| Roadmap-agent | dew | Actions | Ejecuta tareas [AUTO] |
+| Docs-agent | dew | Actions | Documentación automática |
+| OSINT-agent | osint-stack | Docker | Radar externo |
+| Security-agent | secops | Docker | Seguridad |
+| Optimization-agent | secops | Docker | Recursos |
+| Obsidian-agent | dew | Docker | RAG sobre Obsidian |
+| Álvaro-agent | dew | Docker | Clon operativo |
 
 ---
 
-## 8. Fuentes internas del ecosistema
+## 5. 🧩 MCP server de última generación
 
-- `agentes/REGLAS-AGENTES.md` — Reglas absolutas de comportamiento
-- `agentes/AI-CONTEXT.md` — Contexto para IAs externas
-- `agentes/COPILOT-CONTEXT.md` — Constitución para GitHub Copilot
-- `docs/SCRIPT-REGISTRY.md` — Mapa de todos los scripts
-- `docs/INSTALACION-MADRE.md` — Guía de despliegue en varpc
-- `ROADMAP-MASTER.md` — Fuente de verdad del plan
-- `REGISTRO-AGENTES.md` — Estado de todos los agentes
+### 5.1. Tools actuales
+- `check_docker`
+- `get_ecosystem_state`
+- `read_roadmap`
+- `list_services`
+
+### 5.2. Tools nuevas
+- `write_inbox(content, filename)`
+- `list_issues(label)`
+- `restart_container(name, dry_run=True)`
+
+### 5.3. Buenas prácticas
+- Tools pequeñas, scopes explícitos.
+- Audit log obligatorio en `/srv/yggdrasil-dew/logs/mcp-audit.jsonl`.
+- `dry_run=True` por defecto en todas las tools destructivas.
+- Compatible con Cursor, Claude Desktop, agentes locales.
+
+---
+
+## 6. 🧠 Health-agent + n8n
+
+```
+1. n8n → snapshot (cron cada 5min)
+2. health-agent → clasificación LLM (Ollama phi3:mini)
+3. Acciones:
+   OK       → log Markdown
+   WARN     → issue GitHub
+   CRITICAL → Telegram + pausa supervisión humana
+4. Log → Qdrant → RAG
+```
+
+Endpoint: `POST http://localhost:8001/health/evaluate`
+
+---
+
+## 7. 📚 Obsidian-agent
+
+- Ingesta de notas `.md` desde vault Obsidian
+- RAG sobre Obsidian vault (Qdrant + bge-m3)
+- API `/ask`
+- Tools MCP: `search_obsidian_notes`, `get_obsidian_note`, `create_obsidian_note`
+
+---
+
+## 8. 🧬 Álvaro-agent (clon operativo)
+
+- `PERFIL-ALVARO.md` como base de personalidad
+- RAG sobre: yggdrasil-dew, Obsidian, Tesis de alineación cognitiva
+- Tools MCP: Ecosistema + Roadmap + Obsidian
+- Integración con n8n y Telegram
+
+---
+
+## 9. 🔧 Roadmap de 4 semanas
+
+| Semana | Objetivos |
+|---|---|
+| 1 | MCP server completo · Health-agent Docker · Workflow n8n importado |
+| 2 | Roadmap-agent · Docs-agent |
+| 3 | OSINT-agent · Security-agent |
+| 4 | Obsidian-agent · Álvaro-agent · Optimization-agent |
+
+---
+
+## 10. 📚 Fuentes internas del ecosistema
+
+- `REGLAS-AGENTES.md`
+- `AI-CONTEXT.md`
+- `COPILOT-CONTEXT.md`
+- `Tesis-y-Metodo-Sistema-de-Alineacion-Cognitiva.md`
+- `Arquitectura-de-Inteligencia-Artificial-Soberana-y-Open-Source.md`
+- `PLAN-ESTADO-ACTUAL.md`
+- `REGISTRO-AGENTES.md`

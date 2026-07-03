@@ -1,43 +1,19 @@
-# ==============================================================================
-# Yggdrasil-DEW Ecosistema - MCP Server Stack
-# Nodo: Madre (varpc) | Puerto: 8002 | Red: Tailscale exclusiva
-# ==============================================================================
+version: "3.9"
 
 services:
   mcp-server:
-    image: python:3.11-slim
-    container_name: yggdrasil_mcp_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yggdrasil-mcp
     restart: unless-stopped
-    user: "1000:1000"  # varopc UID/GID — hereda permisos Git y gh CLI
     volumes:
-      # Repositorio completo (lectura roadmap, escritura inbox)
-      - /srv/yggdrasil-dew:/srv/yggdrasil-dew:rw
-      # gh CLI y sesión autenticada (solo lectura)
-      - /usr/bin/gh:/usr/bin/gh:ro
-      - /home/varopc/.config/gh:/home/varopc/.config/gh:ro
-      # Logs de auditoría
-      - /var/log:/var/log:rw
+      - /srv/yggdrasil-dew:/srv/yggdrasil-dew
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - HOME=/home/varopc
-      - YGG_LOG_FILE=/var/log/yggdrasil-dew-maintenance.log
-      - YGG_REPO_DIR=/srv/yggdrasil-dew
-      - YGG_DRY_RUN=true  # SIEMPRE dry-run por defecto en el contenedor
-    working_dir: /srv/yggdrasil-dew/agentes/mcp-server
+      - PYTHONUNBUFFERED=1
     ports:
-      - "127.0.0.1:8002:8002"  # Solo localhost — UFW + Tailscale controlan acceso externo
-    command: >
-      bash -c "
-        pip install --no-cache-dir fastapi uvicorn pydantic 2>/dev/null &&
-        python3 mcp_server.py
-      "
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-networks:
-  default:
-    name: yggdrasil_ecosystem_network
-    external: true
+      - "3000:3000"
+    labels:
+      - "yggdrasil.role=mcp-server"
+      - "yggdrasil.tier=cerebro"
