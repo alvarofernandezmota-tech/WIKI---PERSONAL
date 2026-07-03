@@ -1,108 +1,33 @@
 ---
 type: report
 date: 2026-07-03
-hora: 15:20
+hora: 15:26
 source: inbox-audit-cleanup.sh
 priority: medium
 status: pending
 processed_by: pending
-title: Inbox audit consolidado 2026-07-03 15:20
+title: Inbox audit consolidado 2026-07-03 15:26
 ---
 
-# Inbox Audit Consolidado — 2026-07-03 15:20
+# Inbox Audit Consolidado — 2026-07-03 15:26
 
-**Total ficheros antes de limpieza**: 20  
+**Total ficheros antes de limpieza**: 18  
 **Umbral de alerta**: 10  
 **Estado**: ⚠ SUPERA UMBRAL
 
 ---
 
-## Micro-audits consolidados (3 ficheros → 1)
+## Micro-audits consolidados (0
+0 ficheros → 1)
 
-### audit-2026-07-03-46.md
-
-# 🔍 Audit Push — 2026-07-03 14:55 UTC
-
-**Commit:** `3e1c927`
-**Autor:** alvarofernandezmota-tech
-
-## Archivos modificados
-
-### `.github/workflows/autonomous-cron.yml`
-- 📎 Tamaño: 7944 bytes
-
-### `agentes/MACRO-SPEC-ECOSISTEMA.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 4808 bytes
-
-### `scripts/maintenance/repo-analyzer.sh`
-- 📎 Tamaño: 7902 bytes
-
-## Estado
-- 🤖 Pendiente procesar por Thdora Guardián
-- 📥 Mover a `docs/` cuando esté revisado
-
-### audit-2026-07-03-49.md
-
-# 🔍 Audit Push — 2026-07-03 15:04 UTC
-
-**Commit:** `f082c73`
-**Autor:** alvarofernandezmota-tech
-
-## Archivos modificados
-
-### `.github/workflows/code-drift.yml`
-- 📎 Tamaño: 1099 bytes
-
-### `agentes/MASTER-SCHEDULE.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 3635 bytes
-
-### `docs/REGLAS-ISLAS.md`
-- 📎 Tamaño: 4507 bytes
-
-### `scripts/code-drift-detector.sh`
-- 📎 Tamaño: 5624 bytes
-
-## Estado
-- 🤖 Pendiente procesar por Thdora Guardián
-- 📥 Mover a `docs/` cuando esté revisado
-
-### audit-2026-07-03-51.md
-
-# 🔍 Audit Push — 2026-07-03 15:11 UTC
-
-**Commit:** `483b560`
-**Autor:** alvarofernandezmota-tech
-
-## Archivos modificados
-
-### `agentes/MACRO-SPEC-ECOSISTEMA.md`
-- ⚠️ **Sin frontmatter** — añadir tags/fecha
-- 📎 Tamaño: 6758 bytes
-
-### `agentes/health-agent/docker-compose.yml`
-- 📎 Tamaño: 1217 bytes
-
-### `agentes/health-agent/health_agent.py`
-- 📎 Tamaño: 5768 bytes
-
-### `scripts/deploy-madre.sh`
-- 📎 Tamaño: 6243 bytes
-
-### `scripts/ecosystem-snapshot.sh`
-- 📎 Tamaño: 4195 bytes
-
-## Estado
-- 🤖 Pendiente procesar por Thdora Guardián
-- 📥 Mover a `docs/` cuando esté revisado
-
+_Sin micro-audits pendientes._
 
 ---
 
-## Clasificados archivados (1 ficheros)
+## Clasificados archivados (0
+0 ficheros)
 
-- clasificado-2026-07-03-45.md
+_Sin clasificados pendientes._
 
 ---
 
@@ -113,8 +38,10 @@ _Sin docs antiguos._
 
 ---
 
-## Docs de sesión activos (15 ficheros — se mantienen)
+## Docs de sesión activos (17 ficheros — se mantienen)
 
+- **2026-07-03-MACRO-SPEC-ECOSISTEMA.md** — 2026-07-03-MACRO-SPEC-ECOSISTEMA.md
+- **2026-07-03-MCP-SERVER-DISEÑO.md** — 2026-07-03-MCP-SERVER-DISEÑO.md
 - **2026-07-03-SINTESIS-MAESTRA-SESION.md** — 2026-07-03-SINTESIS-MAESTRA-SESION.md
 - **2026-07-03-alerting-inteligente.md** — 2026-07-03-alerting-inteligente.md
 - **2026-07-03-arquitectura-bots-ecosistema.md** — 2026-07-03-arquitectura-bots-ecosistema.md
@@ -133,4 +60,4 @@ _Sin docs antiguos._
 
 ---
 
-*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 15:20*
+*Generado por inbox-audit-cleanup.sh [AUTO] · 2026-07-03 15:26*
