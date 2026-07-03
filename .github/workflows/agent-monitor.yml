@@ -1,0 +1,65 @@
+# =============================================================
+# FUNCIÓN:   Centinela de centinelas. Vigila que todos los
+#            workflows críticos estén vivos cada 6h.
+#            Si alguno lleva >24h caído, abre issue urgente.
+# TRIGGER:   schedule cada 6h / workflow_dispatch
+# ETIQUETAS: automatizacion, urgente
+# DEPS:      scripts/agent-monitor.sh
+# =============================================================
+
+name: 🤖 Agent Monitor — Centinela de Centinelas
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # cada 6 horas
+  workflow_dispatch:
+
+jobs:
+  vigilar-agentes:
+    name: Vigilar estado de todos los agentes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar git
+        run: |
+          git config user.name  "thdora-monitor[bot]"
+          git config user.email "thdora-monitor[bot]@users.noreply.github.com"
+
+      - name: Ejecutar agent-monitor
+        run: |
+          chmod +x scripts/agent-monitor.sh
+          bash scripts/agent-monitor.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Commit log de monitoreo
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Sin cambios de monitoreo"
+          else
+            git commit -m "chore: [AUTO] agent-monitor check $(date +%Y-%m-%d-%H%M)"
+            git push
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resumen
+        run: |
+          echo "### 🤖 Agent Monitor" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Ejecución: $(date '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          CAIDOS=$(grep -c '🔴 CAÍDO' diarios/agent-monitor-$(date +%Y-%m-%d).md 2>/dev/null || echo 0)
+          echo "Agentes caídos: $CAIDOS" >> $GITHUB_STEP_SUMMARY
