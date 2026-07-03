@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# test.sh
-# Doc: docs/  <- COMPLETAR ruta al doc relacionado
-# Fase: <- COMPLETAR fase
-# Descripción: <- COMPLETAR
 set -euo pipefail
-ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo '.')}"
+ROOT="${YGGDRASIL_ROOT:-/srv/yggdrasil-dew}"
 REPORT_DIR="$ROOT/reports/agent-tareas"
 mkdir -p "$REPORT_DIR"
 TS=$(date +"%Y%m%d-%H%M%S")
@@ -18,7 +14,7 @@ else
 fi
 
 empty=0
-for f in "$ROOT"/docs/tareas/*.md 2>/dev/null; do
+for f in "$ROOT/docs/tareas"/*.md; do
   [ -f "$f" ] || continue
   if [ ! -s "$f" ]; then
     echo "- ERROR: empty task file $(basename "$f")" >> "$OUT"

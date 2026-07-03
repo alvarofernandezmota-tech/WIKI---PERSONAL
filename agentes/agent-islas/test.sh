@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# test.sh
-# Doc: docs/  <- COMPLETAR ruta al doc relacionado
-# Fase: <- COMPLETAR fase
-# Descripción: <- COMPLETAR
 set -euo pipefail
-ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo '.')}"
+ROOT="${YGGDRASIL_ROOT:-/srv/yggdrasil-dew}"
 REPORT_DIR="$ROOT/reports/agent-islas"
 mkdir -p "$REPORT_DIR"
 TS=$(date +"%Y%m%d-%H%M%S")
@@ -14,11 +10,11 @@ echo "# test agent-islas run $TS" > "$OUT"
 if [ -d "$ROOT/islas" ]; then
   echo "- islas folder exists" >> "$OUT"
 else
-  echo "- WARN: islas folder missing (no es error en fase inicial)" >> "$OUT"
+  echo "- ERROR: islas folder missing" >> "$OUT"; exit 2
 fi
 
 bad=0
-for f in "$ROOT"/islas/*.md 2>/dev/null; do
+for f in "$ROOT/islas"/*.md; do
   [ -f "$f" ] || continue
   if ! grep -q "Siguiente-paso" "$f"; then
     echo "- WARN: $(basename "$f") missing Siguiente-paso" >> "$OUT"

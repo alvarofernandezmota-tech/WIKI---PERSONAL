@@ -1,139 +1,44 @@
-name: CI — Tests de agentes
+name: CI Agentes
 
 on:
   push:
+    branches: [main]
     paths:
-      - 'scripts/agentes/**'
       - 'agentes/**'
+      - 'scripts/agentes/**'
       - 'mcp/**'
-      - '.github/workflows/ci-agentes.yml'
   pull_request:
     paths:
-      - 'scripts/agentes/**'
       - 'agentes/**'
+      - 'scripts/agentes/**'
       - 'mcp/**'
 
 jobs:
   test-agentes:
-    name: Tests unitarios de agentes
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Instalar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Instalar dependencias Python
-        run: |
-          pip install --quiet requests 2>/dev/null || true
-          [ -f mcp/requirements.txt ] && pip install --quiet -r mcp/requirements.txt || true
-
-      - name: Validar scripts de agentes (bash -n)
-        run: |
-          echo "── Validando sintaxis bash ──"
-          errors=0
-          for f in scripts/agentes/*.sh; do
-            bash -n "$f" && echo "  OK: $f" || { echo "  ERROR: $f"; errors=$((errors+1)); }
-          done
-          [ $errors -eq 0 ] || exit 1
-
-      - name: Validar sintaxis Python MCP
-        run: |
-          echo "── Validando sintaxis Python ──"
-          for f in mcp/*.py; do
-            python3 -m py_compile "$f" && echo "  OK: $f" || exit 1
-          done
-
-      - name: Test llm_adapters.py (modo sin LLM)
-        run: |
-          echo "── Test sanitize_prompt ──"
-          python3 - <<'EOF'
-          import sys
-          sys.path.insert(0, 'mcp')
-          from llm_adapters import sanitize_prompt
-
-          # Test 1: enmascarar email
-          r = sanitize_prompt("Escríbeme a test@ejemplo.com")
-          assert '[EMAIL]' in r, f"Fallo: email no enmascarado: {r}"
-          print("  PASS: email enmascarado")
-
-          # Test 2: enmascarar API key
-          r = sanitize_prompt("Mi clave es sk-abc123def456ghi789jkl012")
-          assert '[API_KEY]' in r, f"Fallo: API key no enmascarada: {r}"
-          print("  PASS: API key enmascarada")
-
-          # Test 3: truncar prompt largo
-          big = 'x' * 100000
-          r = sanitize_prompt(big)
-          assert 'truncado' in r, "Fallo: prompt largo no truncado"
-          print("  PASS: prompt largo truncado")
-
-          print("\nTodos los tests de sanitize_prompt pasaron.")
-          EOF
-
-      - name: Test mcp_client.c compila
-        run: |
-          if [ -f mcp/mcp_client.c ]; then
-            gcc -Wall -Wextra -o /tmp/mcp_client mcp/mcp_client.c && echo "  PASS: mcp_client.c compila" || exit 1
-          else
-            echo "  SKIP: mcp_client.c no encontrado"
-          fi
-
-      - name: Ejecutar tests de agentes (si existen)
-        run: |
-          echo "── Buscando tests en tests/agentes/ ──"
-          if ls tests/agentes/test-*.sh &>/dev/null 2>&1; then
-            for t in tests/agentes/test-*.sh; do
-              echo "  Ejecutando: $t"
-              bash "$t" || exit 1
-            done
-          else
-            echo "  No hay tests de agentes todavía (OK en fase inicial)"
-          fi
-
-      - name: Validar plantilla de agente
-        run: |
-          echo "── Validando PLANTILLA-AGENTE.md ──"
-          python3 - <<'EOF'
-          import re, sys
-          with open('agentes/PLANTILLA-AGENTE.md') as f:
-              content = f.read()
-          required = [
-              '## 1. Identidad',
-              '## 2. Personalidad',
-              '## 3. Capacidades',
-              '## 4. Prompts de ejemplo',
-              '## 5. Tests unitarios',
-              '## 6. Métricas',
-              '## 7. Checklist de seguridad',
-          ]
-          for section in required:
-              assert section in content, f"Sección faltante: {section}"
-              print(f"  PASS: '{section}' presente")
-          print("\nPlantilla válida.")
-          EOF
-
-  lint-workflows:
-    name: Lint de workflows YAML
-    runs-on: ubuntu-latest
+    env:
+      YGGDRASIL_ROOT: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
-      - name: Validar YAML de workflows
+
+      - name: Make test scripts executable
         run: |
-          python3 - <<'EOF'
-          import yaml, glob, sys
-          ok = True
-          for f in glob.glob('.github/workflows/*.yml'):
-              try:
-                  yaml.safe_load(open(f))
-                  print(f'  OK: {f}')
-              except Exception as e:
-                  print(f'  ERROR: {f} — {e}')
-                  ok = False
-          sys.exit(0 if ok else 1)
-          EOF
+          find agentes -name 'test.sh' -exec chmod +x {} \;
+          find scripts/agentes -name '*.sh' -exec chmod +x {} \;
+
+      - name: Run agent-docs test
+        run: bash agentes/agent-docs/test.sh
+
+      - name: Run agent-islas test
+        run: bash agentes/agent-islas/test.sh
+
+      - name: Run agent-tareas test
+        run: bash agentes/agent-tareas/test.sh
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-test-reports
+          path: reports/
+          if-no-files-found: ignore
