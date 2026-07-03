@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# session-terminal-doc.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # ============================================================
 # ARCHIVO      : session-terminal-doc.sh
 # VERSIÓN      : 1.0.0

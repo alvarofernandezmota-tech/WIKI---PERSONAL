@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# orquestador-unico.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # ============================================================
 # ARCHIVO      : orquestador-unico.sh
 # VERSIÓN      : 1.0.0
