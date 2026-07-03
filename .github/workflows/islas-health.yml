@@ -1,0 +1,88 @@
+name: 🏝️ Islas Health Check
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 04:00 UTC = 06:00 CEST cada dia
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Auditar estado de todas las islas
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Auditar ficheros maestros del ecosistema
+        id: audit
+        run: |
+          ISSUES_FOUND=""
+
+          # 1. Verificar que existen los ficheros maestros
+          for f in ECOSISTEMA.md MAPA-ISLAS.md HERRAMIENTAS-ECOSISTEMA.md CONVENCIONES.md ESTADO-SISTEMA.md; do
+            if [ ! -f "$f" ]; then
+              ISSUES_FOUND="$ISSUES_FOUND\n- ❌ Fichero maestro ausente: $f"
+            fi
+          done
+
+          # 2. Verificar que no hay ficheros en raiz sin extension ni README
+          for dir in core agentes mocs formacion; do
+            if [ -d "$dir" ] && [ -z "$(ls -A $dir 2>/dev/null)" ]; then
+              ISSUES_FOUND="$ISSUES_FOUND\n- ⚠️ Carpeta vacia: $dir/"
+            fi
+          done
+
+          # 3. Verificar que inbox no lleva mas de 7 dias sin limpiar
+          if [ -d "inbox" ]; then
+            OLD_FILES=$(find inbox/ -name '*.md' -mtime +7 2>/dev/null | wc -l)
+            if [ "$OLD_FILES" -gt 0 ]; then
+              ISSUES_FOUND="$ISSUES_FOUND\n- 📥 Inbox tiene $OLD_FILES ficheros con mas de 7 dias sin procesar"
+            fi
+          fi
+
+          # 4. Verificar que MAPA-ISLAS.md fue actualizado en los ultimos 7 dias
+          if [ -f "MAPA-ISLAS.md" ]; then
+            DAYS_OLD=$(( ($(date +%s) - $(git log -1 --format=%ct -- MAPA-ISLAS.md)) / 86400 ))
+            if [ "$DAYS_OLD" -gt 7 ]; then
+              ISSUES_FOUND="$ISSUES_FOUND\n- 🗺️ MAPA-ISLAS.md lleva $DAYS_OLD dias sin actualizar"
+            fi
+          fi
+
+          if [ -n "$ISSUES_FOUND" ]; then
+            echo "has_issues=true" >> $GITHUB_OUTPUT
+            echo -e "$ISSUES_FOUND" > /tmp/issues_report.txt
+            cat /tmp/issues_report.txt
+          else
+            echo "has_issues=false" >> $GITHUB_OUTPUT
+            echo "✅ Todas las islas saludables"
+          fi
+
+      - name: Crear issue si hay problemas
+        if: steps.audit.outputs.has_issues == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/issues_report.txt', 'utf8');
+            const today = new Date().toISOString().split('T')[0];
+            const title = `[GUARDIAN] Islas Health Check — ${today}`;
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ecosystem-health'
+            });
+
+            const exists = existing.data.some(i => i.title === title);
+            if (!exists) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: `## 🏝️ Islas Health Check\n\nProblemas detectados el ${today}:\n\n${report}\n\n---\n*Generado por islas-health.yml*`,
+                labels: ['ecosystem-health', 'automated']
+              });
+            }
