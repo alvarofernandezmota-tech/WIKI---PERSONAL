@@ -1,7 +1,7 @@
 ---
 type: alert
 date: 2026-07-03
-hora: 16:23
+hora: 17:56
 source: health-check-action
 priority: high
 status: pending
@@ -9,7 +9,7 @@ processed_by: pending
 title: Health alert — workflows fallidos
 ---
 
-# Health Alert — 2026-07-03 16:23
+# Health Alert — 2026-07-03 17:56
 
 ## Problemas detectados
 
