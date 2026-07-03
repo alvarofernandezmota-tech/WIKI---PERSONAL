@@ -1,0 +1,74 @@
+name: 📥 Inbox Clasificador
+
+on:
+  push:
+    paths:
+      - 'inbox/drop/**'
+      - 'inbox/sesiones/**'
+
+jobs:
+  clasificar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clasificar archivos de inbox/drop/
+        run: |
+          set -euo pipefail
+          FECHA=$(date +%Y-%m-%d)
+          MOVED=0
+
+          for f in inbox/drop/*; do
+            [ -f "$f" ] || continue
+            [ "$(basename $f)" = ".gitkeep" ] && continue
+
+            NAME=$(basename "$f")
+
+            case "$NAME" in
+              cierre-*)             DEST="diarios/${FECHA}-${NAME}" ;;
+              apertura-*)           DEST="inbox/sesiones/${NAME}" ;;
+              audit-*)              DEST="inbox/_meta/${NAME}" ;;
+              *.sh)                 DEST="scripts/${NAME}" ;;
+              *.py)                 DEST="scripts/agentes/${NAME}" ;;
+              *.yml|*.yaml)         DEST=".github/workflows/${NAME}" ;;
+              diario-*|journal-*)   DEST="diarios/${NAME}" ;;
+              doc-*|docs-*)         DEST="docs/${NAME}" ;;
+              *.md)                 DEST="diarios/${FECHA}-${NAME}" ;;
+              *)                    DEST="inbox/sesiones/${NAME}" ;;
+            esac
+
+            mkdir -p "$(dirname $DEST)"
+            mv "$f" "$DEST"
+            echo "  ✅ $f → $DEST"
+            MOVED=$((MOVED+1))
+          done
+
+          echo "Total movidos: $MOVED"
+
+      - name: Mover cierres de sesión a diarios/
+        run: |
+          for f in inbox/sesiones/cierre-*.md; do
+            [ -f "$f" ] || continue
+            NAME=$(basename "$f")
+            DEST="diarios/${NAME}"
+            mkdir -p diarios
+            mv "$f" "$DEST"
+            echo "  📓 $f → $DEST"
+          done
+
+      - name: Commit clasificación
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nada que commitear"
+          else
+            git commit -m "chore(clasificador): clasificación automática $(date +%Y-%m-%d)"
+            git push
+          fi
