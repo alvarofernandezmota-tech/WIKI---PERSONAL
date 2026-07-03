@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-03
-hora: 16:51
+hora: 16:52
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-03 16:51
+title: Reality Check 2026-07-03 16:52
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-03 16:51
+# 🔍 Ecosystem Reality Check — 2026-07-03 16:52
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -101,11 +101,11 @@ title: Reality Check 2026-07-03 16:51
 ### Contenedores activos
 ```
 NAMES                STATUS                            IMAGE
-log_guardian_bot     Up 3 minutes (health: starting)   yggdrasil-secops-log_guardian
-tailscale_monitor    Up 4 minutes (health: starting)   yggdrasil-secops-tailscale_monitor
+log_guardian_bot     Up 5 minutes (health: starting)   yggdrasil-secops-log_guardian
+tailscale_monitor    Up 6 minutes (unhealthy)          yggdrasil-secops-tailscale_monitor
 radar_backup         Up 27 hours                       alpine:latest
 guardian_bot         Up 27 hours (healthy)             yggdrasil-secops-guardian_bot
-local_tripwire       Up 4 minutes (health: starting)   yggdrasil-secops-local_tripwire
+local_tripwire       Up 5 minutes (health: starting)   yggdrasil-secops-local_tripwire
 network_radar        Up 27 hours (healthy)             yggdrasil-secops-network_radar
 yggdrasil_watchdog   Up 27 hours (unhealthy)           yggdrasil-secops-yggdrasil_watchdog
 kali-pentest         Up 27 hours                       kasmweb/kali-rolling-desktop:1.16.0
@@ -115,7 +115,7 @@ n8n                  Up 27 hours                       n8nio/n8n:latest
 gitea                Up 27 hours                       gitea/gitea:latest
 uptime-kuma          Up 27 hours (healthy)             louislam/uptime-kuma:1
 portainer            Up 27 hours                       portainer/portainer-ce:latest
-thdora-bot           Up 26 hours (healthy)             thdora-bot
+thdora-bot           Up 27 hours (healthy)             thdora-bot
 thdora               Up 27 hours (healthy)             thdora-thdora
 grafana              Up 27 hours                       grafana/grafana:10.4.2
 prometheus           Up 27 hours                       prom/prometheus:v2.51.2
@@ -185,5 +185,5 @@ _12 items encontrados:_
 | Scripts totales | 70 |
 | Actions activas | 29 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 16:51*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-03 16:52*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
