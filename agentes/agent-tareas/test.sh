@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# test.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 set -euo pipefail
 ROOT="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo '.')}"
 REPORT_DIR="$ROOT/reports/agent-tareas"

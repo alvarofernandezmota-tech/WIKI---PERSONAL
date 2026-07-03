@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# galatea-create-pr-sample.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 set -euo pipefail
 REPO_DIR="${YGGDRASIL_ROOT:-$(git rev-parse --show-toplevel)}"
 BRANCH="galatea/sample-$(date +%Y%m%d%H%M%S)"
