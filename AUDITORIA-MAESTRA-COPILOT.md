@@ -1,6 +1,7 @@
 # AUDITORIA-MAESTRA-COPILOT.md
 
-> **Generado:** 2026-07-04 12:56 CEST — actualizado  
+> **Generado:** 2026-07-04 12:56 CEST  
+> **Última actualización:** 2026-07-04 22:02 CEST — revisión nocturna + anti-desviación  
 > **Por:** Perplexity + inspección directa del repo  
 > **Para:** GitHub Copilot — leer COMPLETO antes de ejecutar cualquier acción  
 > **Objetivo:** Auditoría total del ecosistema yggdrasil-dew al 100%  
@@ -8,6 +9,31 @@
 > No se crearán archivos de auditoría adicionales en la raíz ni en docs/.  
 > Todo el estado vivo de la auditoría se actualiza aquí directamente.  
 > Los reportes de resultados van a `inbox/_meta/` con fecha.
+
+---
+
+## ⛔ FILOSOFÍA DEL ECOSISTEMA — LEER ANTES DE ACTUAR
+
+```
+Este ecosistema es LOCAL y MINIMALISTA.
+No conecta con APIs externas.
+No usa Perplexity como servicio.
+No añade nuevas capas de complejidad sin confirmación del owner.
+
+Antes de proponer cualquier cosa, hazte estas preguntas:
+  1. ¿Existe ya algo que haga esto en el repo?
+  2. ¿Es imprescindible o es "nice to have"?
+  3. ¿Lo ha pedido Álvaro explícitamente?
+
+Si la respuesta a (1) es sí o a (3) es no → NO LO HAGAS.
+
+Prohibido añadir:
+  - Integraciones con APIs externas (Perplexity, OpenAI, etc.)
+  - Dockerización nueva sin confirmación
+  - Archivos de auditoría adicionales
+  - Scripts duplicados
+  - Workflows sin propósito real definido
+```
 
 ---
 
@@ -42,6 +68,7 @@
    - docs: ...
    - docs(agentes): ...
    - fix: ...
+   - audit: ...
 
 ❌ NUNCA:
    - Borrar archivos permanentemente sin moverlos antes
@@ -49,6 +76,9 @@
    - Ejecutar scripts de seguridad (03, 09) sin confirmación
    - Crear archivos de auditoría fuera de inbox/_meta/
    - Crear un segundo archivo de auditoría en la raíz
+   - Añadir integraciones con APIs externas (Perplexity, OpenAI, etc.)
+   - Proponer dockerización nueva sin confirmación del owner
+   - Crear scripts sin propósito operativo real y concreto
 ```
 
 ---
@@ -61,6 +91,48 @@ Antes de pasar a la siguiente fase: confírmame qué hiciste.
 Si algo no está claro: pregúntame antes de actuar.
 Actualiza la tabla ESTADO DEL ECOSISTEMA al final de cada fase.
 ```
+
+---
+
+## PROGRESO DE LA AUDITORÍA (actualizar aquí)
+
+| Fase | Descripción | Estado | Fecha | Observaciones |
+|------|-------------|--------|-------|---------------|
+| 0 | Crear archivo maestro + permisos + mapa | ✅ COMPLETO | 2026-07-04 12:56 | Perplexity |
+| 0b | Scripts nuevos: inbox-commit.sh, inbox-clasificador.sh, orquestador-unico.sh, session-logger.sh, session-terminal-doc.sh | ✅ COMPLETO | 2026-07-04 ~01:00 | Perplexity |
+| 0c | Revisión bloque Copilot externo — rechazado por desviación API | ✅ DOCUMENTADO | 2026-07-04 22:02 | Ver sección RECHAZADO |
+| 1 | Limpieza scripts/ + archivado duplicados | 🔴 PENDIENTE | — | Próximo bloque |
+| 2 | Workflows: stubs + duplicados | 🔴 PENDIENTE | — | — |
+| 3 | Docs faltantes | 🔴 PENDIENTE | — | — |
+| 4 | Agentes: README + workflows | 🔴 PENDIENTE | — | — |
+| 5 | Informe final + ESTADO-SISTEMA | 🔴 PENDIENTE | — | — |
+| 6 | Módulos siguientes: inbox, mcp, islas | 🔵 PLANIFICADO | — | Tras fase 5 |
+
+---
+
+## ⛔ BLOQUE RECHAZADO — 2026-07-04 noche
+
+**Qué propuso Copilot externo:**  
+Un script `scripts/maintenance/create_perplexity_patch.sh` que añadía:
+- `tools/perplexity_adapter.py` (integración API externa)
+- `agentes/agent-perplexity-informer/` (agente dependiente de API)
+- `inbox/context/perplexity/` (carpeta nueva no acordada)
+- `docker/mcp/`, `docker/retrieval/` (dockerización nueva)
+- `scripts/agentes/agente-meta-deep.sh` (extracción PERCENT_COMPLETE vía API)
+- `scripts/observador-obsidian.sh` (no solicitado)
+- Workflows nuevos no alineados con el plan de auditoría
+
+**Por qué se rechaza:**
+1. Añade dependencia de API externa (Perplexity) — el ecosistema es LOCAL
+2. Propone dockerización nueva sin confirmación del owner
+3. Crea carpetas y scripts no acordados
+4. Desvía a Copilot de la auditoría en curso
+5. Contradice la filosofía minimalista del repo
+
+**Qué sí se acepta del bloque:**
+- El concepto de `master_run.sh` como punto de entrada único (ya cubierto por `orquestador-unico.sh`)
+- El concepto de PR draft para cambios bot (ya en los permisos)
+- El `OPERATIONAL-PLAYBOOK.md` → incorporar reglas útiles en `docs/` sin referencias a API
 
 ---
 
@@ -83,15 +155,15 @@ yggdrasil-dew/
 ├── cli-tools/            Herramientas CLI propias
 ├── core/                 Lógica central
 ├── diarios/              Cierres de sesión archivados
-├── docker/               Docker/compose
+├── docker/               Docker/compose (NO TOCAR sin confirmación)
 ├── docs/                 Documentación técnica
 ├── formacion/            Recursos aprendizaje
-├── hardware/             Config hardware
+├── hardware/             Config hardware (NO TOCAR sin confirmación)
 ├── inbox/                Zona de trabajo viva
 │   ├── drop/             Zona de aterrizaje
 │   ├── sesiones/         Logs y cierres
 │   └── _meta/            Reportes de auditoría
-├── infra/                Infraestructura
+├── infra/                Infraestructura (NO TOCAR sin confirmación)
 ├── investigacion/        Research/OSINT
 ├── islas/                Proyectos satélite
 ├── logs/                 Logs del sistema
@@ -166,6 +238,21 @@ git push
 | 33 | `session-logger.sh` | Logger sesión terminal | 🟢 activo | OK |
 | 34 | `session-terminal-doc.sh` | Doc cierre sesión | 🟢 activo | OK |
 
+### Scripts canónicos activos (los que SIEMPRE se mantienen)
+
+```
+apertura-sesion.sh         ← inicio de sesión
+cierre-sesion.sh           ← cierre de sesión
+orquestador-unico.sh       ← punto de entrada único del ecosistema
+file-arrival-guardian.sh   ← guardián de estructura
+inbox-commit.sh            ← commit rápido al ecosistema
+inbox-clasificador.sh      ← clasificación de inbox/drop/
+session-logger.sh          ← logger de terminal
+session-terminal-doc.sh    ← documentación de cierre
+copilot-mission-briefing.sh ← briefing para sesiones IA
+agent-monitor.sh           ← monitorización de agentes
+```
+
 ### Estructura canónica de scripts/ tras auditoría
 
 ```
@@ -208,7 +295,7 @@ agentes/
 ### Inventario real con estado
 
 | Workflow | Tamaño | Estado | Problema detectado |
-|----------|---------|--------|--------------------|
+|----------|---------|--------|---------------------|
 | `agent-monitor.yml` | 152b | 🔴 stub | Casi vacío |
 | `audit-on-push.yml` | 152b | 🔴 stub | Casi vacío |
 | `auditoria-auto.yml` | 193b | 🔴 stub | Muy pequeño |
@@ -313,9 +400,10 @@ FASE D — Duplicados de watchdog:
 | `docs/scripts-diccionario.md` | Falta | Crear desde Sección 1 |
 | `docs/workflows-inventario.md` | Falta | Crear desde Sección 3 |
 | `docs/agentes-manual.md` | Falta | Crear inventario agentes |
-| `docs/mcp-config-guide.md` | Falta | Config Copilot + Gemini al MCP |
+| `docs/mcp-config-guide.md` | Falta | Config Copilot + Gemini al MCP local |
 | `docs/islas-mapa.md` | Verificar | Actualizar estado real de islas |
 | `docs/ecosistema-flujo-completo.md` | Falta | Diagrama terminal→inbox→diarios |
+| `docs/OPERATIONAL-PLAYBOOK.md` | Falta | Reglas operativas locales (sin APIs externas) |
 
 ---
 
@@ -340,18 +428,18 @@ FASE D — Duplicados de watchdog:
 ```json
 {
   "tools": [
-    { "name": "start_session",     "script": "scripts/apertura-sesion.sh" },
-    { "name": "close_session",     "script": "scripts/cierre-sesion.sh" },
-    { "name": "commit_inbox",      "script": "scripts/inbox-commit.sh" },
-    { "name": "classify_inbox",    "script": "scripts/inbox-clasificador.sh" },
-    { "name": "gen_session_doc",   "script": "scripts/session-terminal-doc.sh" },
-    { "name": "orchestrate",       "script": "scripts/orquestador-unico.sh" },
-    { "name": "validate_structure","script": "scripts/file-arrival-guardian.sh" },
-    { "name": "sync_repos",        "script": "scripts/02-git-pull-rebase.sh" },
-    { "name": "backup",            "script": "scripts/07-fase3-restic-backup.sh" },
-    { "name": "start_ecosystem",   "script": "scripts/04-fase2-start-batcueva.sh" },
-    { "name": "briefing",          "script": "scripts/copilot-mission-briefing.sh" },
-    { "name": "monitor_agents",    "script": "scripts/agent-monitor.sh" }
+    { "name": "start_session",      "script": "scripts/apertura-sesion.sh" },
+    { "name": "close_session",      "script": "scripts/cierre-sesion.sh" },
+    { "name": "commit_inbox",       "script": "scripts/inbox-commit.sh" },
+    { "name": "classify_inbox",     "script": "scripts/inbox-clasificador.sh" },
+    { "name": "gen_session_doc",    "script": "scripts/session-terminal-doc.sh" },
+    { "name": "orchestrate",        "script": "scripts/orquestador-unico.sh" },
+    { "name": "validate_structure", "script": "scripts/file-arrival-guardian.sh" },
+    { "name": "sync_repos",         "script": "scripts/02-git-pull-rebase.sh" },
+    { "name": "backup",             "script": "scripts/07-fase3-restic-backup.sh" },
+    { "name": "start_ecosystem",    "script": "scripts/04-fase2-start-batcueva.sh" },
+    { "name": "briefing",           "script": "scripts/copilot-mission-briefing.sh" },
+    { "name": "monitor_agents",     "script": "scripts/agent-monitor.sh" }
   ],
   "blocked": [
     "deploy.sh", "deploy-madre.sh",
@@ -362,90 +450,127 @@ FASE D — Duplicados de watchdog:
 
 ---
 
-## SECCIÓN 6 — PROMPT RAW COMPLETO PARA COPILOT
+## SECCIÓN 6 — PROMPT COMPLETO ANTI-DESVIACIÓN PARA COPILOT
 
-> Copia este bloque COMPLETO y pégalo en Copilot Chat en VS Code
+> ⚠️ Usa este bloque cuando Copilot se desvíe o proponga cosas fuera del ecosistema local
 
 ```
-Lee los archivos AUDITORIA-MAESTRA-COPILOT.md, COPILOT-CONTEXT.md y CONVENCIONES.md
-antes de hacer nada. Lee también AGENT.md si existe.
+LEE ESTO COMPLETO ANTES DE ACTUAR.
+Archivos a leer en orden: AUDITORIA-MAESTRA-COPILOT.md, COPILOT-CONTEXT.md, CONVENCIONES.md
 
-PERMISOS: El owner (Álvaro) te autoriza a crear, editar, mover y hacer commit/push
-según la sección PERMISOS EXPLÍCITOS PARA COPILOT de AUDITORIA-MAESTRA-COPILOT.md.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILOSOFÍA DEL ECOSISTEMA (no negociable)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Este repo es LOCAL y MINIMALISTA.
+NO conecta con APIs externas.
+NO usa Perplexity como servicio externo.
+NO añade complejidad nueva sin confirmación del owner.
+Si propones algo que no está en AUDITORIA-MAESTRA-COPILOT.md → pregunta antes.
 
-REGLA CRÍTICA: Este es el ÚNICO archivo de auditoría del repo.
-No crees archivos de auditoría adicionales en la raíz ni en docs/.
-Los reportes de resultados van ÚNICAMENTE a inbox/_meta/ con fecha.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOQUE 1 — LIMPIEZA scripts/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Crea scripts/archive/setup/ y scripts/archive/deprecated/
+2. Mueve los 4 .md de scripts/ a inbox/_meta/ o diarios/ (ver Sección 1)
+3. Mueve históricos (01, 03, 08, 09, 10) → scripts/archive/setup/
+4. Mueve duplicados (12, 15, 18, 20) → scripts/archive/deprecated/
+5. Audita scripts sin auditar: between-sessions.sh, code-drift-detector.sh,
+   copilot-2fases.sh, copilot-fases.sh, cross-ref-checker.sh, deploy.sh, deploy-madre.sh
+   → para cada uno: abre el fichero, lee qué hace, documenta en SCRIPTS-AUDITORIA.md
+6. Define canónico para: deploy.sh vs deploy-madre.sh; copilot-2fases vs copilot-fases
+7. Crea scripts/SCRIPTS-AUDITORIA.md con tabla: activos / archivados / deprecados / pendientes
+8. Commit: "chore(scripts): limpieza fase 1 — archivado + inventario"
+9. Push a main
 
-Ejecuta la auditoría en 5 fases. Una fase por respuesta.
-Confírmame qué hiciste antes de pasar a la siguiente.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOQUE 2 — WORKFLOWS (nivel DevOps real)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Para cada uno de los 22 stubs (<200b):
+   - Abre el fichero
+   - Lee el nombre
+   - Decide: ¿implementar con cuerpo mínimo real? ¿o deprecar?
+   - Si deprecar: añade comentario en la primera línea: # DEPRECATED: usar [canónico alternativo]
+   - Si implementar: añade trigger real + un step mínimo funcional
+2. Consolida duplicados:
+   - orquestador-supremo.yml → deprecar, canónico: orquestador-maestro.yml
+   - orquestador-total.yml → deprecar, canónico: orquestador-maestro.yml
+   - repo-health-check.yml → comparar con repo-health.yml → conservar el más completo
+   - watchdog-monitor.yml vs watchdog.yml → consolidar en uno solo
+3. Para cada workflow funcional (🟢): verifica que los scripts que llama existen en scripts/
+4. Crea docs/workflows-inventario.md con tabla:
+   - nombre | trigger | scripts que llama | estado | criticidad (crítico/importante/auxiliar/deprecado)
+5. Commit: "audit(workflows): stubs implementados + duplicados deprecados + inventario"
+6. Push a main
 
-────────────────────────────────────────
-FASE 1 — LIMPIEZA scripts/
-────────────────────────────────────────
-- Crea scripts/archive/setup/ y scripts/archive/deprecated/
-- Mueve los 4 archivos .md de scripts/ a inbox/_meta/ o diarios/ (Sección 1)
-- Mueve scripts históricos (01, 03, 08, 09, 10) → scripts/archive/setup/
-- Mueve scripts duplicados (12, 15, 18, 20) → scripts/archive/deprecated/
-- Crea scripts/SCRIPTS-AUDITORIA.md con el diccionario final
-- Commit: "chore(scripts): limpieza fase 1 — .md fuera de sitio + archivado"
-- Push
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOQUE 3 — DOCS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Crea estos archivos. Sin inventar componentes. Sin APIs externas.
+1. docs/scripts-diccionario.md
+   → tabla con todos los scripts: nombre | propósito | estado | notas | canónico
+2. docs/workflows-inventario.md
+   → tabla: workflow | trigger | scripts | estado | criticidad
+3. docs/agentes-manual.md
+   → inventario de agentes/, qué hace cada uno, cómo se lanza
+4. docs/mcp-config-guide.md
+   → cómo conectar Copilot y Gemini CLI al MCP local del repo
+5. docs/ecosistema-flujo-completo.md
+   → diagrama textual: terminal → inbox/drop/ → inbox-clasificador → destino → workflow → diarios/
+6. docs/OPERATIONAL-PLAYBOOK.md
+   → reglas operativas del ecosistema (sin APIs externas, sin dockerización no acordada)
+7. Actualiza docs/inbox-flujo.md con el flujo real vigente
+8. Commit: "docs: inventarios scripts/workflows/agentes + playbook operativo"
+9. Push a main
 
-────────────────────────────────────────
-FASE 2 — WORKFLOWS STUB (22 workflows <200b)
-────────────────────────────────────────
-- Para cada stub: leer nombre → implementar cuerpo real O marcar DEPRECATED
-- Duplicados (orquestador-supremo, orquestador-total): deprecar → canónico = orquestador-maestro
-- Duplicados (repo-health-check): deprecar → canónico = repo-health
-- Duplicados (watchdog-monitor): comparar → consolidar
-- Commit: "audit(workflows): implementar stubs + deprecar duplicados"
-- Push
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOQUE 4 — AGENTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Lista TODO lo que hay en agentes/
+2. Para cada agente:
+   a. ¿Tiene README.md? Si no → crear con: misión, comando, input, output, workflow asociado
+   b. ¿Tiene workflow en .github/workflows/? Si no → crear uno mínimo con workflow_dispatch
+   c. ¿Tiene dependencia de API externa? Si sí → documentar como bloqueado hasta decisión owner
+3. Cruza agentes con workflows: ¿algún agente sin workflow? ¿algún workflow que llama a un agente inexistente?
+4. Actualiza docs/agentes-manual.md
+5. Commit: "docs(agentes): README.md para todos los agentes + workflows mínimos"
+6. Push a main
 
-────────────────────────────────────────
-FASE 3 — DOCS FALTANTES
-────────────────────────────────────────
-- Crea: docs/scripts-diccionario.md (desde Sección 1)
-- Crea: docs/workflows-inventario.md (desde Sección 3)
-- Crea: docs/agentes-manual.md (lista agentes/ + estado)
-- Crea: docs/mcp-config-guide.md (config Copilot + Gemini CLI)
-- Crea: docs/ecosistema-flujo-completo.md (diagrama terminal→inbox→diarios)
-- Actualiza: docs/inbox-flujo.md con estado real
-- Commit: "docs: crear inventarios faltantes (scripts, workflows, agentes, mcp, flujo)"
-- Push
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOQUE 5 — CIERRE DE AUDITORÍA + SIGUIENTES MÓDULOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Crea inbox/_meta/auditoria-completa-2026-07-04.md con:
+   - resumen de cada bloque ejecutado
+   - archivos creados, movidos, deprecados
+   - scripts canónicos activos
+   - workflows funcionales
+   - bloqueantes que quedaron pendientes
+2. Actualiza CHANGELOG.md con todas las fases
+3. Actualiza ESTADO-SISTEMA.md post-auditoría
+4. Actualiza AUDITORIA-MAESTRA-COPILOT.md:
+   - tabla PROGRESO marcando las fases completadas
+   - tabla ESTADO DEL ECOSISTEMA actualizada
+5. Añade sección "SIGUIENTES MÓDULOS" al final del archivo maestro:
+   - inbox/ (consolidar sesiones/, verificar drop/, limpiar _meta/)
+   - mcp/ (verificar server, whitelist, conexión local)
+   - islas/ (mapeo + estructura mínima de cada isla)
+   - yggdrasil-nosek (mismo proceso de auditoría)
+6. Commit: "audit: cierre fase 1-5 + plan módulos siguientes"
+7. Push a main
 
-────────────────────────────────────────
-FASE 4 — AGENTES
-────────────────────────────────────────
-- Lista todo agentes/
-- Para cada agente sin README.md: créalo con estructura mínima
-- Para cada agente sin workflow: crea uno básico con workflow_dispatch
-- Actualiza docs/agentes-manual.md
-- Commit: "docs(agentes): README.md para todos los agentes"
-- Push
-
-────────────────────────────────────────
-FASE 5 — INFORME FINAL
-────────────────────────────────────────
-- Crea: inbox/_meta/auditoria-completa-2026-07-04.md (resumen de todo)
-- Actualiza: CHANGELOG.md (todas las fases)
-- Actualiza: ESTADO-SISTEMA.md (estado post-auditoría)
-- Actualiza: AUDITORIA-MAESTRA-COPILOT.md → tabla ESTADO DEL ECOSISTEMA
-- Commit: "audit: informe final + ESTADO-SISTEMA actualizado"
-- Push
-
-────────────────────────────────────────
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS ABSOLUTAS:
 - No borres nada sin moverlo antes
 - Sigue CONVENCIONES.md en todo momento
 - NO crees archivos de auditoría fuera de inbox/_meta/
-- Confírmame qué hiciste antes de pasar a la siguiente fase
+- NO añadas integraciones con APIs externas
+- Confírmame qué hiciste antes de pasar al siguiente bloque
 - Si algo no está claro: pregúntame
-────────────────────────────────────────
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
 
-## SECCIÓN 7 — ISLAS
+## SECCIÓN 7 — ISLAS (módulo siguiente tras cerrar yggdrasil-dew)
 
 ### Orden de auditoría
 
@@ -502,21 +627,25 @@ bash scripts/orquestador-unico.sh all
 
 ---
 
-## ESTADO DEL ECOSISTEMA (actualizar en cada fase)
+## ESTADO DEL ECOSISTEMA (actualizar al final de cada fase)
 
 | Área | Estado | Bloqueante | Fase que lo resuelve |
 |------|--------|------------|----------------------|
-| Scripts: .md fuera de sitio | 🔴 pendiente | Sí | Fase 1 |
-| Scripts: duplicados | 🔴 pendiente | Sí | Fase 1 |
-| Workflows: 22 stubs | 🔴 pendiente | Sí | Fase 2 |
-| Workflows: duplicados | 🔴 pendiente | No | Fase 2 |
-| Docs: 5 archivos faltantes | 🔴 pendiente | Sí | Fase 3 |
-| Agentes: sin README | 🔵 sin auditar | No | Fase 4 |
-| inbox/sesiones/ vs sesiones/ | 🟡 verificar | No | Fase 1 |
-| MCP config | 🔵 pendiente | No | Post-auditoría |
+| Scripts: .md fuera de sitio | 🔴 pendiente | Sí | Bloque 1 |
+| Scripts: duplicados | 🔴 pendiente | Sí | Bloque 1 |
+| Scripts: sin auditar (between-sessions, code-drift, etc.) | 🔴 pendiente | Sí | Bloque 1 |
+| Workflows: 22 stubs | 🔴 pendiente | Sí | Bloque 2 |
+| Workflows: duplicados orquestadores | 🔴 pendiente | No | Bloque 2 |
+| Workflows: cruces con scripts | 🔴 pendiente | Sí | Bloque 2 |
+| Docs: 6 archivos faltantes | 🔴 pendiente | Sí | Bloque 3 |
+| Agentes: sin README | 🔵 sin auditar | No | Bloque 4 |
+| inbox/sesiones/ vs sesiones/ duplicado | 🟡 verificar | No | Bloque 1 |
+| MCP config local | 🔵 pendiente | No | Post-auditoría |
 | Islas | 🔵 pendiente tras ygg | No | Post-auditoría |
+| Bloque externo Copilot (Perplexity/API) | ⛔ rechazado | — | No aplica |
 
 ---
 
 _Generado por Perplexity · 2026-07-04 12:56 CEST_  
-_Actualizar tras completar cada fase — NO crear archivos de auditoría adicionales_
+_Actualizado 2026-07-04 22:02 CEST — anti-desviación + bloque completo 5 fases_  
+_Actualizar tras completar cada bloque — NO crear archivos de auditoría adicionales_
