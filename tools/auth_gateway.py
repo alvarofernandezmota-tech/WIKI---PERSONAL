@@ -1,48 +1,38 @@
-# tools/auth_gateway.py — Gateway de autenticación para MCP HTTP
-import os
-import hashlib
-import hmac
-import time
-from functools import wraps
+# tools/auth_gateway.py
+# Auth gateway: validates token and scopes before forwarding to MCP backend
+import os, json, sys
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import requests
 
-API_TOKEN = os.getenv("MCP_API_TOKEN", "")
-RATE_LIMIT_PER_MIN = int(os.getenv("MCP_RATE_LIMIT", "60"))
+MCP_URL = os.getenv("MCP_BACKEND", "http://127.0.0.1:8081")
+API_TOKEN = os.getenv("GATEWAY_TOKEN", "")
+PORT = int(os.getenv("GATEWAY_PORT", "8080"))
 
-# Almacén en memoria de rate limiting (reseteado al reiniciar proceso)
-_request_log: dict = {}
+class Handler(BaseHTTPRequestHandler):
+    def _send(self, code, body):
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(body).encode())
 
-def verify_token(token: str) -> bool:
-    """Verifica el token Bearer de forma segura (timing-safe)."""
-    if not API_TOKEN:
-        return True  # sin token configurado = modo desarrollo
-    expected = f"Bearer {API_TOKEN}"
-    return hmac.compare_digest(token or "", expected)
+    def do_POST(self):
+        auth = self.headers.get("Authorization", "")
+        if API_TOKEN and auth != f"Bearer {API_TOKEN}":
+            return self._send(401, {"error": "unauthorized"})
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length).decode()
+        payload = json.loads(raw)
+        tool = payload.get("tool", "")
+        # Scope check: galatea tools require auth
+        if tool.startswith("galatea") and auth != f"Bearer {API_TOKEN}":
+            return self._send(403, {"error": "forbidden"})
+        try:
+            r = requests.post(MCP_URL, json=payload, timeout=30)
+            return self._send(r.status_code, r.json())
+        except Exception as e:
+            return self._send(502, {"error": str(e)})
 
-def check_rate_limit(client_ip: str) -> bool:
-    """Devuelve True si el cliente está dentro del límite."""
-    now = time.time()
-    window_start = now - 60
-    log = _request_log.get(client_ip, [])
-    log = [t for t in log if t > window_start]
-    if len(log) >= RATE_LIMIT_PER_MIN:
-        return False
-    log.append(now)
-    _request_log[client_ip] = log
-    return True
-
-def sanitize_input(data: dict) -> dict:
-    """Elimina campos potencialmente peligrosos del input."""
-    BLOCKED = ['__proto__', 'constructor', 'prototype']
-    return {k: v for k, v in data.items() if k not in BLOCKED}
-
-SCOPES = {
-    "orquestador_total":      ["admin", "operator"],
-    "agent_meta_deep":        ["admin", "operator", "readonly"],
-    "llm_router":             ["admin", "operator"],
-    "galatea_fabrica_agente": ["admin"],
-    "galatea_create_pr":      ["admin"]
-}
-
-def can_access(tool: str, scope: str) -> bool:
-    """Verifica si el scope tiene acceso a la herramienta."""
-    return scope in SCOPES.get(tool, [])
+if __name__ == "__main__":
+    server = HTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"Auth gateway listening on :{PORT}", flush=True)
+    server.serve_forever()

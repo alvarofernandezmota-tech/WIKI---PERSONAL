@@ -1,28 +1,20 @@
 # agent-ocr-auditor
 
-## Descripción
-Audita documentos procesados por el pipeline OCR: valida calidad del texto extraído,
-detecta anomalías y genera reportes estructurados para Copilot.
-
 ## Rol
-auditor-ocr
+Auditor especializado en documentos OCR: normaliza, indexa, detecta inconsistencias y propone PRs de corrección.
 
-## Responsabilidades
-- Verificar que inbox/ocr/text/*.txt tengan contenido válido (no vacíos, no solo ruido)
-- Extraer metadatos clave: fecha, autor, tipo de documento
-- Indexar en vector DB via tools/vector_adapter.py
-- Generar reporte en reports/agent-ocr-auditor/
-- Notificar a Copilot si hay documentos con baja calidad OCR (<50 palabras)
+## Scope
+inbox/ocr/text, inbox/context/perplexity, docs/
 
 ## Entradas
 - inbox/ocr/text/*.txt
-- inbox/ocr/meta/*.json
+- inbox/context/perplexity/*.md
 
 ## Salidas
-- reports/agent-ocr-auditor/audit-TIMESTAMP.md
-- tools/vector_index/*.json
+- reports/agent-ocr-auditor/*.md
+- tools/vector_index entries
+- draft PR payloads en reports/drafts/
 
-## Dependencias
-- scripts/ingest/ocr-ingest.sh
-- tools/vector_adapter.py
-- mcp/server.py (herramienta: agent_meta_deep)
+## Límites
+- No modifica archivos sin PR aprobado
+- No envía datos sensibles a modelos remotos

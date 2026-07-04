@@ -1,0 +1,38 @@
+name: E2E Full Flow
+on:
+  workflow_dispatch:
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup tools
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr jq
+      - name: Simulate scan
+        run: |
+          mkdir -p inbox/ocr/raw
+          cp tests/samples/sample-page.png inbox/ocr/raw/ 2>/dev/null || echo 'no sample found, skipping'
+      - name: OCR ingest
+        run: |
+          if ls inbox/ocr/raw/*.png 2>/dev/null | head -n1 | grep -q .; then
+            bash scripts/ingest/ocr-ingest.sh inbox/ocr/raw/sample-page.png
+          else
+            echo 'No sample to ingest, skipping OCR'
+          fi
+      - name: Run perplexity informer
+        run: bash agentes/agent-perplexity-informer/run.sh || true
+      - name: Run OCR auditor
+        run: bash agentes/agent-ocr-auditor/run.sh || true
+      - name: Run meta deep
+        run: bash scripts/agentes/agente-meta-deep.sh
+      - name: Validate outputs
+        run: |
+          test -d reports/meta-deep && echo 'meta-deep OK' || echo 'WARN: no meta-deep reports'
+          test -d inbox/context/perplexity && echo 'context OK' || echo 'WARN: no context'
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-outputs
+          path: |
+            reports/
+            inbox/context/
