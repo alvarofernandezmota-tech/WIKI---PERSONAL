@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 21:43
+hora: 22:20
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 21:43
+title: Reality Check 2026-07-04 22:20
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 21:43
+# 🔍 Ecosystem Reality Check — 2026-07-04 22:20
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,10 +19,10 @@ title: Reality Check 2026-07-04 21:43
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 120 |
-| Ejecutables (chmod +x) | 104 |
-| Sin permisos ejecución | 16 |
-| En raíz scripts/ (sin organizar) | 62 |
+| Total scripts | 122 |
+| Ejecutables (chmod +x) | 103 |
+| Sin permisos ejecución | 19 |
+| En raíz scripts/ (sin organizar) | 64 |
 | En subdirectorios | 58 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
@@ -56,6 +56,7 @@ title: Reality Check 2026-07-04 21:43
 - `deploy.sh`
 - `ecosystem-snapshot.sh`
 - `entrypoint.sh`
+- `estado-madre.sh`
 - `file-arrival-guardian.sh`
 - `fix-permisos.sh`
 - `galatea-fabrica-agentes.sh`
@@ -72,6 +73,7 @@ title: Reality Check 2026-07-04 21:43
 - `inicio-sesion.sh`
 - `isla-sync-validator.sh`
 - `issue-creator.sh`
+- `log-comando.sh`
 - `orquestador-supremo.sh`
 - `orquestador-total.sh`
 - `orquestador-unico.sh`
@@ -204,8 +206,8 @@ _24 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 120 |
+| Scripts totales | 122 |
 | Actions activas | 34 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 21:43*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 22:20*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
