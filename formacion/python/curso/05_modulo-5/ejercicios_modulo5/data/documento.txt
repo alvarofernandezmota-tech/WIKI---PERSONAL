@@ -1,2 +1,0 @@
-"Python es un lenguaje de programacion`nEs facil de aprender y muy potente`nSe usa en ciencia
- de datos inteligencia artificial y desarrollo web"
