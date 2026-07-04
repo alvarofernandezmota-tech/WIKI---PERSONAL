@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 10:04
+hora: 10:24
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 10:04
+title: Reality Check 2026-07-04 10:24
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 10:04
+# 🔍 Ecosystem Reality Check — 2026-07-04 10:24
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-04 10:04
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 135 |
+| Total scripts | 143 |
 | Ejecutables (chmod +x) | 69 |
-| Sin permisos ejecución | 66 |
+| Sin permisos ejecución | 74 |
 | En raíz scripts/ (sin organizar) | 70 |
-| En subdirectorios | 65 |
+| En subdirectorios | 73 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -119,7 +119,7 @@ title: Reality Check 2026-07-04 10:04
 | `cross-ref-checker.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `deuda-tecnica.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `diary-writer.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `e2e-full-flow.yml` | workflow_dispatch | 🟢 ACTIVO |
+| `e2e-full-flow.yml` | push pull_request | 🟢 ACTIVO |
 | `ecosystem-guardian.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `file-arrival-guardian.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `galatea.yml` | workflow_dispatch schedule | 🟢 ACTIVO |
@@ -150,7 +150,7 @@ title: Reality Check 2026-07-04 10:04
 | `repo-research-on-push.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `resumen-diario.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `secret-scan.yml` | push pull_request | 🟢 ACTIVO |
-| `session-close.yml` | workflow_dispatch push | 🟢 ACTIVO |
+| `session-close.yml` | push | 🟢 ACTIVO |
 | `struct-auditor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `sync-drive.yml` | schedule workflow_dispatch # permite ejecución manual desde GitHub Actions | 🟢 ACTIVO |
 | `sync-estado.yml` | schedule workflow_dispatch # También manual desde GitHub | 🟢 ACTIVO |
@@ -190,7 +190,7 @@ NAMES     STATUS    IMAGE
 ### Scripts referenciados en README pero no encontrados
 
 ### TODOs/FIXMEs pendientes en scripts
-_22 items encontrados:_
+_26 items encontrados:_
 ```
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
@@ -202,16 +202,16 @@ _22 items encontrados:_
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:89:# --- 6. TODOs y FIXMEs ---
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:91:  count=$(grep -c 'TODO\|FIXME\|HACK\|XXX' "$f" 2>/dev/null || true)
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:93:    add_item "todos-fixmes" "$f" "${count} TODO/FIXME/HACK encontrados" "BAJA"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:36:TODO: definir propósito del agente.
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:39:- TODO
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:42:- TODO
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:56:echo "[TEST] TODO: implementar tests para este agente"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-mejorador.sh:47:    | xargs -0 -n1 bash -c 'f="$0"; grep -Iq . "$f" || exit 0; (head -n1 "$f" | grep -q "^#!/" || grep -q "TODO" "$f") && echo "$f"' || true
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-mejorador.sh:62:  if grep -q "TODO" "$file"; then
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/clasificador-maestro.sh:75:  elif echo "$nombre $cabecera" | grep -qiE '(tarea|TAREA|PENDIENTE|pendiente|TODO|SIGUIENTE-PASO|PENDIENTES)'; then
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:200:# TODOs y FIXMEs en scripts
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:201:echo "### TODOs/FIXMEs pendientes en scripts" >> "$OUTPUT"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:202:TODOS=$(grep -rn 'TODO\|FIXME\|HACK\|XXX' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | wc -l | tr -d ' ')
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:203:if [ "$TODOS" -gt 0 ]; then
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:204:  log_warn "$TODOS TODOs/FIXMEs en scripts"
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:205:  echo "_$TODOS items encontrados:_" >> "$OUTPUT"
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:207:  grep -rn 'TODO\|FIXME' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | head -20 >> "$OUTPUT" || true
 ```
 
 ## 6. Fase actual del ecosistema
@@ -234,8 +234,8 @@ _22 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 135 |
+| Scripts totales | 143 |
 | Actions activas | 56 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 10:04*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 10:24*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
