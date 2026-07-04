@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 00:23
+hora: 08:48
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 00:23
+title: Reality Check 2026-07-04 08:48
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 00:23
+# 🔍 Ecosystem Reality Check — 2026-07-04 08:48
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -189,9 +189,8 @@ NAMES     STATUS    IMAGE
 ### Scripts referenciados en README pero no encontrados
 
 ### TODOs/FIXMEs pendientes en scripts
-_23 items encontrados:_
+_22 items encontrados:_
 ```
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/inbox-commit.sh:3:# inbox-commit.sh — Commitea TODO lo que haya en inbox/drop/ de una vez
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/thdora/thdora-scaffold.sh:60:    # TODO: conectar con Ollama para clasificar y resumir
@@ -211,6 +210,7 @@ _23 items encontrados:_
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:203:if [ "$TODOS" -gt 0 ]; then
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:204:  log_warn "$TODOS TODOs/FIXMEs en scripts"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:205:  echo "_$TODOS items encontrados:_" >> "$OUTPUT"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:207:  grep -rn 'TODO\|FIXME' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | head -20 >> "$OUTPUT" || true
 ```
 
 ## 6. Fase actual del ecosistema
@@ -236,5 +236,5 @@ _23 items encontrados:_
 | Scripts totales | 133 |
 | Actions activas | 55 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 00:23*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 08:48*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
