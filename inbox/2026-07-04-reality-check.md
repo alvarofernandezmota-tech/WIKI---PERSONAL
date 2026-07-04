@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 22:20
+hora: 22:26
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 22:20
+title: Reality Check 2026-07-04 22:26
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 22:20
+# 🔍 Ecosystem Reality Check — 2026-07-04 22:26
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -209,5 +209,5 @@ _24 items encontrados:_
 | Scripts totales | 122 |
 | Actions activas | 34 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 22:20*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 22:26*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
