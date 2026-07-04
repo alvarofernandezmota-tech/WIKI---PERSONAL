@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# validate-workflows.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/verify/validate-workflows.sh
 # Detecta workflows con git push / git commit directo (escritores peligrosos)
 set -euo pipefail

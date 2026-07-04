@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# agente-health-check.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/agentes/agente-health-check.sh
 # Comprueba que MCP server, retrieval API y Ollama responden
 set -euo pipefail

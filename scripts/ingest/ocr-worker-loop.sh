@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ocr-worker-loop.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/ingest/ocr-worker-loop.sh
 # Daemon: vigila inbox/ocr/raw/ cada 30s y lanza ocr-ingest.sh si hay archivos
 set -euo pipefail

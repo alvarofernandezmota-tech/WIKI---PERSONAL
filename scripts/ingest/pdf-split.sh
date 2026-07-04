@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# pdf-split.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/ingest/pdf-split.sh
 # Divide PDFs de inbox/ocr/raw/ en páginas individuales usando pdftk o ghostscript
 set -euo pipefail

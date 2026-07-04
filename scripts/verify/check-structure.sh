@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# check-structure.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/verify/check-structure.sh
 # Valida estructura de carpetas y detecta archivos prohibidos en raíz
 set -euo pipefail

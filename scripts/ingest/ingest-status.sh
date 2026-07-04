@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ingest-status.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/ingest/ingest-status.sh
 # Muestra cuántos archivos hay en cada zona OCR
 set -euo pipefail

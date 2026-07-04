@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# e2e-local.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/verify/e2e-local.sh
 # Simula el flujo completo: ingest → classify → index → retrieve
 set -euo pipefail
