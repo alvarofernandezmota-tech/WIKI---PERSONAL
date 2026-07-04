@@ -1,133 +1,92 @@
 #!/usr/bin/env bash
-# ============================================================
-# ARCHIVO      : inbox-clasificador.sh
-# VERSIÓN      : 1.0.0
-# FUNCIÓN ÚNICA: Clasifica cada archivo en inbox/drop/ y lo
-#                mueve al destino correcto del ecosistema
-#                según su nombre, extensión y contenido.
+# =============================================================================
+# inbox-clasificador.sh — Mueve archivos de inbox/drop/ al destino correcto
+#                         según nombre y extensión.
 #
-# REGLAS DE CLASIFICACIÓN (en orden de prioridad):
-#   nombre contiene fecha YYYY-MM-DD → diarios/
-#   nombre contiene 'sesion' o 'cierre' → sesiones/
-#   extensión .sh → scripts/ (requiere revisión manual)
-#   nombre contiene 'osint' → osint-stack/
-#   nombre contiene 'infra' o 'docker' o 'service' → infra/
-#   nombre contiene 'investigacion' o 'research' → investigacion/
-#   nombre contiene 'formacion' o 'curso' → formacion/
-#   nombre contiene 'proyecto' → proyectos/
-#   nombre contiene 'hardware' → hardware/
-#   nombre contiene 'doc' o 'docs' → docs/
-#   nombre contiene 'template' → templates/
-#   resto → inbox/sin-clasificar/ (para revisión manual)
+# REGLAS DE CLASIFICACIÓN:
+#   *.md con "sesion" o "cierre" en el nombre  → inbox/sesiones/
+#   *.md con "diario" o fecha YYYY-MM-DD        → diarios/
+#   *.md genérico                               → inbox/docs/
+#   *.sh                                        → scripts/ (aviso, no mueve)
+#   *.py                                        → inbox/code/
+#   *.log                                       → inbox/logs/
+#   *                                           → inbox/misc/
 #
-# MODO DRY-RUN: bash scripts/inbox-clasificador.sh --dry-run
-# MODO REAL   : bash scripts/inbox-clasificador.sh
-# AUTOR       : alvarofernandezmota-tech
-# ============================================================
-
+# USO:
+#   bash scripts/inbox-clasificador.sh           # mover archivos
+#   bash scripts/inbox-clasificador.sh --dry-run # solo mostrar qué haría
+# =============================================================================
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
-DROP_DIR="$REPO_ROOT/inbox/drop"
-SIN_CLASIFICAR="$REPO_ROOT/inbox/sin-clasificar"
-META_DIR="$REPO_ROOT/inbox/_meta"
-STAMP=$(date "+%Y%m%dT%H%M%S")
 DRY_RUN=false
-MOVED=0
-SKIPPED=0
-
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
-CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-BOLD='\033[1m'; RESET='\033[0m'
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/yggdrasil-dew")"
+DROP_DIR="$REPO_ROOT/inbox/drop"
 
-log()  { echo -e "${CYAN}[clasificador]${RESET} $1"; }
-ok()   { echo -e "${GREEN}✓${RESET} $1"; }
-warn() { echo -e "${YELLOW}⚠${RESET} $1"; }
+mkdir -p \
+  "$REPO_ROOT/inbox/sesiones" \
+  "$REPO_ROOT/inbox/docs" \
+  "$REPO_ROOT/inbox/code" \
+  "$REPO_ROOT/inbox/logs" \
+  "$REPO_ROOT/inbox/misc" \
+  "$REPO_ROOT/diarios"
 
-echo -e "${BOLD}================================================${RESET}"
-echo -e "${CYAN}${BOLD}  INBOX CLASIFICADOR — yggdrasil-dew${RESET}"
-$DRY_RUN && echo -e "  ${YELLOW}[DRY-RUN activado — no se mueven archivos]${RESET}"
-echo -e "${BOLD}================================================${RESET}"
-
-mkdir -p "$SIN_CLASIFICAR" "$META_DIR"
-
-REPORT="$META_DIR/clasificador-${STAMP}.md"
-cat > "$REPORT" << EOF
-# Informe clasificador — ${STAMP}
-$( $DRY_RUN && echo '> Modo DRY-RUN' )
-
-## Archivos procesados
-
-EOF
-
-# Función que decide el destino
-destino_para() {
-  local nombre="$1"
-  local base
-  base=$(basename "$nombre" | tr '[:upper:]' '[:lower:]')
-  local ext="${base##*.}"
-
-  # Por nombre
-  [[ "$base" =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]] && { echo "diarios"; return; }
-  [[ "$base" =~ (sesion|cierre|session) ]]      && { echo "sesiones"; return; }
-  [[ "$base" =~ (osint) ]]                      && { echo "osint-stack"; return; }
-  [[ "$base" =~ (infra|docker|service|systemd) ]] && { echo "infra"; return; }
-  [[ "$base" =~ (investigacion|research|grok) ]] && { echo "investigacion"; return; }
-  [[ "$base" =~ (formacion|curso|tutorial) ]]   && { echo "formacion"; return; }
-  [[ "$base" =~ (proyecto|project) ]]            && { echo "proyectos"; return; }
-  [[ "$base" =~ (hardware|disco|ssd|hdd) ]]      && { echo "hardware"; return; }
-  [[ "$base" =~ (doc|docs|readme|manual) ]]      && { echo "docs"; return; }
-  [[ "$base" =~ (template|plantilla) ]]          && { echo "templates"; return; }
-
-  # Por extensión
-  case "$ext" in
-    sh)    echo "scripts"; return ;;
-    py)    echo "tools"; return ;;
-    json)  echo "core"; return ;;
-    yml|yaml) echo ".github/workflows"; return ;;
-    md)    echo "inbox/sin-clasificar"; return ;;
-    *)     echo "inbox/sin-clasificar"; return ;;
-  esac
+move_file() {
+  local src="$1"
+  local dst="$2"
+  local filename
+  filename="$(basename "$src")"
+  if $DRY_RUN; then
+    echo "[DRY-RUN] $src → $dst/$filename"
+  else
+    mv "$src" "$dst/$filename"
+    echo "[clasificador] ✓ $filename → $dst/"
+  fi
 }
 
-# Procesar cada archivo en drop/
-for ARCHIVO in "$DROP_DIR"/*; do
-  [ -f "$ARCHIVO" ] || continue
-  [ "$(basename "$ARCHIVO")" = ".gitkeep" ] && continue
+CLASIFICADOS=0
 
-  NOMBRE=$(basename "$ARCHIVO")
-  DESTINO=$(destino_para "$NOMBRE")
-  DESTINO_PATH="$REPO_ROOT/$DESTINO"
+for file in "$DROP_DIR"/*; do
+  [[ -f "$file" ]] || continue
+  [[ "$(basename "$file")" == ".gitkeep" ]] && continue
 
-  log "$NOMBRE → $DESTINO/"
-  echo "- \`$NOMBRE\` → \`$DESTINO/\`" >> "$REPORT"
+  name="$(basename "$file")"
+  ext="${name##*.}"
+  name_lower="$(echo "$name" | tr '[:upper:]' '[:lower:]')"
 
-  if $DRY_RUN; then
-    warn "  [DRY-RUN] NO movido"
-    ((SKIPPED++)) || true
-  else
-    mkdir -p "$DESTINO_PATH"
-    mv "$ARCHIVO" "$DESTINO_PATH/$NOMBRE"
-    ok "  Movido a $DESTINO/$NOMBRE"
-    ((MOVED++)) || true
-  fi
+  case "$ext" in
+    md)
+      if echo "$name_lower" | grep -qE '(sesion|cierre|log-)'; then
+        move_file "$file" "$REPO_ROOT/inbox/sesiones"
+      elif echo "$name_lower" | grep -qE '(diario|[0-9]{4}-[0-9]{2}-[0-9]{2})'; then
+        move_file "$file" "$REPO_ROOT/diarios"
+      else
+        move_file "$file" "$REPO_ROOT/inbox/docs"
+      fi
+      ;;
+    sh)
+      echo "[clasificador] AVISO: $name es un .sh — muévelo manualmente a scripts/ con permisos adecuados."
+      ;;
+    py)
+      move_file "$file" "$REPO_ROOT/inbox/code"
+      ;;
+    log)
+      move_file "$file" "$REPO_ROOT/inbox/logs"
+      ;;
+    *)
+      move_file "$file" "$REPO_ROOT/inbox/misc"
+      ;;
+  esac
+
+  ((CLASIFICADOS++)) || true
 done
 
-# Resumen
-echo "" >> "$REPORT"
-cat >> "$REPORT" << EOF
-## Resumen
-- Movidos: ${MOVED}
-- DRY-RUN (no movidos): ${SKIPPED}
-- Timestamp: $(date '+%Y-%m-%d %H:%M:%S')
-EOF
-
-echo ""
-echo -e "${BOLD}================================================${RESET}"
-if $DRY_RUN; then
-  echo -e "${YELLOW}[DRY-RUN] Se habrían movido $SKIPPED archivos${RESET}"
+if [[ $CLASIFICADOS -eq 0 ]]; then
+  echo "[clasificador] inbox/drop/ estaba vacío. Nada que clasificar."
 else
-  echo -e "${GREEN}${BOLD}✅ $MOVED archivos clasificados y movidos${RESET}"
+  echo "[clasificador] $CLASIFICADOS archivo(s) clasificado(s)."
+  if ! $DRY_RUN; then
+    echo "[clasificador] Recuerda: git add -A && git commit -m 'inbox: clasificación' && git push"
+  fi
 fi
-echo -e "Reporte: $REPORT"
