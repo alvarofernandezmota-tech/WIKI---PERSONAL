@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 08:48
+hora: 09:24
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 08:48
+title: Reality Check 2026-07-04 09:24
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 08:48
+# 🔍 Ecosystem Reality Check — 2026-07-04 09:24
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-04 08:48
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 133 |
+| Total scripts | 135 |
 | Ejecutables (chmod +x) | 69 |
-| Sin permisos ejecución | 64 |
+| Sin permisos ejecución | 66 |
 | En raíz scripts/ (sin organizar) | 70 |
-| En subdirectorios | 63 |
+| En subdirectorios | 65 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -149,6 +149,7 @@ title: Reality Check 2026-07-04 08:48
 | `repo-health.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `repo-research-on-push.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `resumen-diario.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
+| `secret-scan.yml` | push pull_request | 🟢 ACTIVO |
 | `session-close.yml` | workflow_dispatch push | 🟢 ACTIVO |
 | `struct-auditor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `sync-drive.yml` | schedule workflow_dispatch # permite ejecución manual desde GitHub Actions | 🟢 ACTIVO |
@@ -233,8 +234,8 @@ _22 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 133 |
-| Actions activas | 55 |
+| Scripts totales | 135 |
+| Actions activas | 56 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 08:48*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 09:24*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
