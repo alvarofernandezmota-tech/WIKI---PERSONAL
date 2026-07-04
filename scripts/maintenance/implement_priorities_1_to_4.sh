@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# implement_priorities_1_to_4.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # scripts/maintenance/implement_priorities_1_to_4.sh
 # Implementa PRIORIDAD 1..4 según auditoría: consolidación orquestadores,
 # auto-commit cierre-sesion, migración sesiones->diarios, auditoría pre-sesión.
