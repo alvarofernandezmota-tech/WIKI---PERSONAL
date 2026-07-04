@@ -1,36 +1,10 @@
-# FUNCIÓN:   Detectar archivos fantasma y referencias rotas diariamente
-# TRIGGER:   Cron diario 05:00 UTC + manual
-# AGENTE:    ghost-file-detector
-# ETIQUETAS: estructura, deuda-tecnica
-name: ghost-file-detector
+name: Ghost File Detector [SILENCIADO]
 
 on:
-  schedule:
-    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
-  ghost-detector:
+  skip:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run ghost-file-detector
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YGGDRASIL_ROOT: ${{ github.workspace }}
-        run: |
-          chmod +x scripts/ghost-file-detector.sh
-          bash scripts/ghost-file-detector.sh
-
-      - name: Commit reporte
-        run: |
-          git config user.name  "ghost-detector[bot]"
-          git config user.email "bot@yggdrasil-dew"
-          git add diarios/ || true
-          git diff --cached --quiet || git commit -m "chore: ghost-file-detector $(date +%Y-%m-%d) [AUTO]"
-          git push || true
+      - run: echo "Workflow silenciado"

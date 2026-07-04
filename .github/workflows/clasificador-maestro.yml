@@ -1,102 +1,10 @@
-# =============================================================
-# FUNCIÓN:   Ejecuta el clasificador-maestro.sh en cada push
-#            para mover archivos del inbox a su destino final.
-#            Es la Action más crítica del flujo de automatización.
-# TRIGGER:   push a main (cuando hay cambios en inbox/)
-#            workflow_dispatch (ejecución manual)
-# ETIQUETAS: inbox, clasificacion
-# DEPS:      scripts/clasificador-maestro.sh
-# =============================================================
-
-name: 📬 Clasificador Maestro Inbox
+name: Clasificador Maestro [SILENCIADO]
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'inbox/**'
   workflow_dispatch:
-    inputs:
-      forzar:
-        description: 'Forzar clasificación aunque no haya cambios en inbox'
-        required: false
-        default: 'false'
 
 jobs:
-  clasificar:
-    name: Clasificar archivos del inbox
+  skip:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configurar git
-        run: |
-          git config user.name  "thdora-clasificador[bot]"
-          git config user.email "thdora-clasificador[bot]@users.noreply.github.com"
-
-      - name: Instalar gh CLI
-        run: |
-          type -p gh >/dev/null 2>&1 || (
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-              | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-              | sudo tee /etc/apt/sources.list.d/github-cli.list
-            sudo apt-get update && sudo apt-get install gh -y
-          )
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Contar archivos en inbox antes
-        id: antes
-        run: |
-          COUNT=$(find inbox/ -maxdepth 1 -name '*.md' -not -name '.*' 2>/dev/null | wc -l | tr -d ' ')
-          echo "count=$COUNT" >> $GITHUB_OUTPUT
-          echo "📥 Archivos en inbox antes de clasificar: $COUNT"
-
-      - name: Ejecutar clasificador maestro
-        run: |
-          chmod +x scripts/clasificador-maestro.sh
-          bash scripts/clasificador-maestro.sh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Contar archivos en inbox después
-        id: despues
-        run: |
-          COUNT=$(find inbox/ -maxdepth 1 -name '*.md' -not -name '.*' 2>/dev/null | wc -l | tr -d ' ')
-          echo "count=$COUNT" >> $GITHUB_OUTPUT
-          echo "📤 Archivos en inbox después de clasificar: $COUNT"
-
-      - name: Commit cambios de clasificación
-        run: |
-          git add -A
-          if git diff --cached --quiet; then
-            echo "Sin cambios que commitear"
-          else
-            ANTES="${{ steps.antes.outputs.count }}"
-            DESPUES="${{ steps.despues.outputs.count }}"
-            MOVIDOS=$((ANTES - DESPUES))
-            git commit -m "chore: [AUTO] clasificador-maestro movió $MOVIDOS archivos de inbox"
-            git push
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Resumen
-        run: |
-          echo "### 📬 Clasificador Maestro" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Métrica | Valor |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Archivos antes | ${{ steps.antes.outputs.count }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Archivos después | ${{ steps.despues.outputs.count }} |" >> $GITHUB_STEP_SUMMARY
-          MOVIDOS=$(( ${{ steps.antes.outputs.count }} - ${{ steps.despues.outputs.count }} ))
-          echo "| Archivos movidos | $MOVIDOS |" >> $GITHUB_STEP_SUMMARY
+      - run: echo "Workflow silenciado"

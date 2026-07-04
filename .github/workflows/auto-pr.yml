@@ -1,23 +1,10 @@
-name: Auto PR from agent-fix branches
+name: Auto PR [SILENCIADO]
+
 on:
-  push:
-    branches:
-      - 'agent-fix/**'
+  workflow_dispatch:
+
 jobs:
-  create-pr:
+  skip:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Create PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          gh pr create \
-            --title "Agent fixes: $BRANCH" \
-            --body "Automated fixes proposed by agent" \
-            --base main \
-            --head "$BRANCH" || true
+      - run: echo "Workflow silenciado"

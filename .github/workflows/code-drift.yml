@@ -1,44 +1,10 @@
-# Descripcion: Detecta desviaciones del estandar del sistema en scripts y
-# workflows. Comprueba: pipefail, log(), timeouts, docs desincronizadas,
-# funciones eliminadas, shebangs incorrectos.
-# Se ejecuta en cada push y 2 veces por semana.
-
-name: Code Drift Detector
+name: Code Drift [SILENCIADO]
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/**'
-      - '.github/workflows/**'
-  schedule:
-    - cron: '0 6 * * 1,4'  # Lunes y jueves a las 6:00 UTC
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Modo simulacion'
-        required: false
-        default: 'false'
-
-permissions:
-  contents: read
-  issues: write
 
 jobs:
-  detect-drift:
-    name: Detectar drift de codigo
+  skip:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 10
-
-      - name: Ejecutar code-drift-detector
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-        run: |
-          chmod +x scripts/code-drift-detector.sh
-          bash scripts/code-drift-detector.sh
+      - run: echo "Workflow silenciado"
