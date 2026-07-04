@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 20:50
+hora: 22:26
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 20:50
+title: Reality Check 2026-07-04 22:26
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 20:50
+# 🔍 Ecosystem Reality Check — 2026-07-04 22:26
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-04 20:50
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 147 |
-| Ejecutables (chmod +x) | 69 |
-| Sin permisos ejecución | 78 |
-| En raíz scripts/ (sin organizar) | 72 |
-| En subdirectorios | 75 |
+| Total scripts | 122 |
+| Ejecutables (chmod +x) | 103 |
+| Sin permisos ejecución | 19 |
+| En raíz scripts/ (sin organizar) | 64 |
+| En subdirectorios | 58 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -56,6 +56,7 @@ title: Reality Check 2026-07-04 20:50
 - `deploy.sh`
 - `ecosystem-snapshot.sh`
 - `entrypoint.sh`
+- `estado-madre.sh`
 - `file-arrival-guardian.sh`
 - `fix-permisos.sh`
 - `galatea-fabrica-agentes.sh`
@@ -63,8 +64,6 @@ title: Reality Check 2026-07-04 20:50
 - `galatea-scan.sh`
 - `gestor-estados-inbox.sh`
 - `ghost-file-detector.sh`
-- `guardian-estructura.sh`
-- `guardian-maestro.sh`
 - `hardening-ufw.sh`
 - `inbox-clasificador.sh`
 - `inbox-cleanup-jun2026.sh`
@@ -74,14 +73,7 @@ title: Reality Check 2026-07-04 20:50
 - `inicio-sesion.sh`
 - `isla-sync-validator.sh`
 - `issue-creator.sh`
-- `meta-orquestador.sh`
-- `observador-diarios.sh`
-- `observador-inbox.sh`
-- `observador-islas.sh`
-- `observador-mcp.sh`
-- `observador-obsidian.sh`
-- `observador-scripts.sh`
-- `observador-workflows.sh`
+- `log-comando.sh`
 - `orquestador-supremo.sh`
 - `orquestador-total.sh`
 - `orquestador-unico.sh`
@@ -106,43 +98,20 @@ title: Reality Check 2026-07-04 20:50
 
 | Workflow | Trigger | Estado |
 |----------|---------|--------|
-| `agent-monitor.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `audit-on-push.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `auditoria-auto.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `auto-investigacion.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `auto-pr.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `autonomous-cron.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `between-sessions.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `bot-writer-template.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `ci-agentes.yml` | push pull_request | 🟢 ACTIVO |
-| `ci-readonly.yml` | push pull_request | 🟢 ACTIVO |
-| `clasificador-maestro.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `clasificador.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `code-drift.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `context-reminder.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `cross-ref-checker.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `deuda-tecnica.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `diary-writer.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `e2e-full-flow.yml` | push pull_request | 🟢 ACTIVO |
-| `ecosystem-guardian.yml` | workflow_dispatch | 🟢 ACTIVO |
+| `auto-audit.yml` | push schedule workflow_dispatch # trigger manual | 🟢 ACTIVO |
 | `file-arrival-guardian.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `galatea.yml` | workflow_dispatch schedule | 🟢 ACTIVO |
 | `gestor-estados-inbox.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
-| `ghost-file-detector.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `health-check.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `inbox-clasificador.yml` | push | 🟢 ACTIVO |
 | `inbox-cleanup.yml` | schedule push workflow_dispatch | 🟢 ACTIVO |
 | `inbox-dispatcher.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `inbox-health.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
 | `inbox-processor.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
-| `isla-context-sync.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `isla-sync-validator.yml` | workflow_dispatch | 🟢 ACTIVO |
-| `islas-health.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `issue-creator.yml` | schedule push workflow_dispatch | 🟢 ACTIVO |
 | `lint-commits.yml` | push pull_request | 🟢 ACTIVO |
 | `mapa-islas-sync.yml` | pull_request push | 🟢 ACTIVO |
 | `meta-deep-audit.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
-| `meta-deep-draft-pr.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `new-file-bootstrap.yml` | push | 🟢 ACTIVO |
 | `orquestador-maestro.yml` | push pull_request schedule | 🟢 ACTIVO |
 | `orquestador-supremo.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
@@ -153,8 +122,7 @@ title: Reality Check 2026-07-04 20:50
 | `repo-health.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `repo-research-on-push.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `resumen-diario.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
-| `secret-scan.yml` | push pull_request | 🟢 ACTIVO |
-| `session-close.yml` | push | 🟢 ACTIVO |
+| `session-close.yml` | workflow_dispatch push | 🟢 ACTIVO |
 | `struct-auditor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `sync-drive.yml` | schedule workflow_dispatch # permite ejecución manual desde GitHub Actions | 🟢 ACTIVO |
 | `sync-estado.yml` | schedule workflow_dispatch # También manual desde GitHub | 🟢 ACTIVO |
@@ -162,9 +130,8 @@ title: Reality Check 2026-07-04 20:50
 | `tool-inventory-auditor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `tripwire-repo.yml` | push pull_request | 🟢 ACTIVO |
 | `watchdog-monitor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
-| `watchdog.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
+| `watchdog.yml` | schedule workflow_dispatch {} | 🟢 ACTIVO |
 | `yamllint.yml` | push pull_request | 🟢 ACTIVO |
-| `yggdrasil-maestro.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
 
 ## 3. Servicios Docker (Madre)
 
@@ -193,43 +160,30 @@ NAMES     STATUS    IMAGE
 ## 5. Discordancias detectadas
 
 ### Scripts referenciados en README pero no encontrados
-- ❌ `bash scripts/agentes/agente-meta-deep.sh` referenciado pero no existe
-- ❌ `bash scripts/observador-obsidian.sh` referenciado pero no existe
-- ❌ `bash scripts/verify/run-smoke-tests.sh` referenciado pero no existe
-- ❌ `scripts/agentes/agente-meta-deep.sh` referenciado pero no existe
-- ❌ `scripts/inbox-clasificador.sh` referenciado pero no existe
-- ❌ `scripts/inbox-commit.sh` referenciado pero no existe
-- ❌ `scripts/maintenance/create_perplexity_patch.sh` referenciado pero no existe
-- ❌ `scripts/maintenance/master_run.sh` referenciado pero no existe
-- ❌ `scripts/observador-obsidian.sh` referenciado pero no existe
-- ❌ `scripts/session-logger.sh` referenciado pero no existe
-- ❌ `scripts/session-terminal-doc.sh` referenciado pero no existe
-- ❌ `scripts/verify/run-smoke-tests.sh` referenciado pero no existe
-- ❌ `source scripts/session-logger.sh` referenciado pero no existe
 
 ### TODOs/FIXMEs pendientes en scripts
-_26 items encontrados:_
+_24 items encontrados:_
 ```
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/inbox-commit.sh:3:# inbox-commit.sh — Commitea TODO lo que haya en inbox/drop/ de una vez
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:10:- TODO/FIXME sin issue asociado
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/ci/ecosystem_audit.py:49:        ["grep", "-rn", "--include=*.py", "--include=*.sh", "-E", "TODO|FIXME", str(repo_path / "src")],
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/thdora/thdora-scaffold.sh:60:    # TODO: conectar con Ollama para clasificar y resumir
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/guardian-maestro.sh:56:  echo "**Estado final: ✅ TODOS LOS OBSERVADORES OK**" >> "${REPORT}"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/galatea-fabrica-agentes.sh:88:# TODO: lógica específica del agente
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/galatea-scan.sh:6:# Detecta islas y bots Galatea, genera reporte y TODO
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/galatea-scan.sh:39:echo "## TODO Galatea" >> "$REPORT"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:89:# --- 6. TODOs y FIXMEs ---
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:91:  count=$(grep -c 'TODO\|FIXME\|HACK\|XXX' "$f" 2>/dev/null || true)
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-deuda-detecta.sh:93:    add_item "todos-fixmes" "$f" "${count} TODO/FIXME/HACK encontrados" "BAJA"
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:36:TODO: definir propósito del agente.
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:39:- TODO
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:42:- TODO
-/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:56:echo "[TEST] TODO: implementar tests para este agente"
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:33:# Author: TODO
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/galatea-fabrica-agentes.sh:66:  # TODO: implement agent logic
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-mejorador.sh:47:    | xargs -0 -n1 bash -c 'f="$0"; grep -Iq . "$f" || exit 0; (head -n1 "$f" | grep -q "^#!/" || grep -q "TODO" "$f") && echo "$f"' || true
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/agentes/agente-mejorador.sh:62:  if grep -q "TODO" "$file"; then
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/clasificador-maestro.sh:75:  elif echo "$nombre $cabecera" | grep -qiE '(tarea|TAREA|PENDIENTE|pendiente|TODO|SIGUIENTE-PASO|PENDIENTES)'; then
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:200:# TODOs y FIXMEs en scripts
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:201:echo "### TODOs/FIXMEs pendientes en scripts" >> "$OUTPUT"
 /home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:202:TODOS=$(grep -rn 'TODO\|FIXME\|HACK\|XXX' "$REPO_DIR/scripts" --include='*.sh' --include='*.py' 2>/dev/null | wc -l | tr -d ' ')
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:203:if [ "$TODOS" -gt 0 ]; then
+/home/runner/work/yggdrasil-dew/yggdrasil-dew/scripts/maintenance/ecosystem-reality-check.sh:204:  log_warn "$TODOS TODOs/FIXMEs en scripts"
 ```
 
 ## 6. Fase actual del ecosistema
@@ -252,8 +206,8 @@ _26 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 147 |
-| Actions activas | 59 |
+| Scripts totales | 122 |
+| Actions activas | 34 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 20:50*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 22:26*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
