@@ -1,12 +1,8 @@
 # Workflows
 
-> **Sin automatizaciones activas.**
+Esta carpeta está vacía intencionalmente.
 
-Este repo funciona en modo manual. No hay ningún workflow ejecutándose.
+Este repo es una **wiki de documentación**, no un proyecto de software.
+Los workflows se eliminaron el 2026-07-05 durante la reorganización total.
 
-Cuando se cree una automatización real (con infraestructura detrás que la justifique), se documenta aquí antes de activarla.
-
----
-
-*Workflows eliminados el 2026-07-04 durante reorganización del ecosistema.*
-*Motivo: 33 workflows sin infraestructura real detrás.*
+Cuando se necesite automatización real (backup, sync, notificación), se añadirá aquí con un propósito concreto y documentado.
