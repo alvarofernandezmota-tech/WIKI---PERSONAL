@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 10:24
+hora: 19:07
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 10:24
+title: Reality Check 2026-07-04 19:07
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 10:24
+# 🔍 Ecosystem Reality Check — 2026-07-04 19:07
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,11 +19,11 @@ title: Reality Check 2026-07-04 10:24
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 143 |
+| Total scripts | 146 |
 | Ejecutables (chmod +x) | 69 |
-| Sin permisos ejecución | 74 |
-| En raíz scripts/ (sin organizar) | 70 |
-| En subdirectorios | 73 |
+| Sin permisos ejecución | 77 |
+| En raíz scripts/ (sin organizar) | 71 |
+| En subdirectorios | 75 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
 - `01-fix-driver-rtl8188ftu.sh`
@@ -78,6 +78,7 @@ title: Reality Check 2026-07-04 10:24
 - `observador-inbox.sh`
 - `observador-islas.sh`
 - `observador-mcp.sh`
+- `observador-obsidian.sh`
 - `observador-scripts.sh`
 - `observador-workflows.sh`
 - `orquestador-supremo.sh`
@@ -111,7 +112,9 @@ title: Reality Check 2026-07-04 10:24
 | `auto-pr.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `autonomous-cron.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `between-sessions.yml` | workflow_dispatch | 🟢 ACTIVO |
+| `bot-writer-template.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `ci-agentes.yml` | push pull_request | 🟢 ACTIVO |
+| `ci-readonly.yml` | push pull_request | 🟢 ACTIVO |
 | `clasificador-maestro.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `clasificador.yml` | workflow_dispatch | 🟢 ACTIVO |
 | `code-drift.yml` | workflow_dispatch | 🟢 ACTIVO |
@@ -188,6 +191,19 @@ NAMES     STATUS    IMAGE
 ## 5. Discordancias detectadas
 
 ### Scripts referenciados en README pero no encontrados
+- ❌ `bash scripts/agentes/agente-meta-deep.sh` referenciado pero no existe
+- ❌ `bash scripts/observador-obsidian.sh` referenciado pero no existe
+- ❌ `bash scripts/verify/run-smoke-tests.sh` referenciado pero no existe
+- ❌ `scripts/agentes/agente-meta-deep.sh` referenciado pero no existe
+- ❌ `scripts/inbox-clasificador.sh` referenciado pero no existe
+- ❌ `scripts/inbox-commit.sh` referenciado pero no existe
+- ❌ `scripts/maintenance/create_perplexity_patch.sh` referenciado pero no existe
+- ❌ `scripts/maintenance/master_run.sh` referenciado pero no existe
+- ❌ `scripts/observador-obsidian.sh` referenciado pero no existe
+- ❌ `scripts/session-logger.sh` referenciado pero no existe
+- ❌ `scripts/session-terminal-doc.sh` referenciado pero no existe
+- ❌ `scripts/verify/run-smoke-tests.sh` referenciado pero no existe
+- ❌ `source scripts/session-logger.sh` referenciado pero no existe
 
 ### TODOs/FIXMEs pendientes en scripts
 _26 items encontrados:_
@@ -234,8 +250,8 @@ _26 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 143 |
-| Actions activas | 56 |
+| Scripts totales | 146 |
+| Actions activas | 58 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 10:24*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 19:07*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
