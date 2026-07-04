@@ -1,35 +1,42 @@
-name: Bot Writer — Draft PR Template
-# REGLA: ningún bot escribe en main directamente.
-# Siempre crea rama + PR draft para revisión humana.
+name: Bot Writer Template
+# Template para bots que necesitan escribir en el repo.
+# REGLA: nunca merge directo en main. Siempre rama bot/ + PR draft.
+
 on:
   workflow_dispatch:
     inputs:
       description:
-        description: 'Descripción del cambio a generar'
+        description: 'Descripcion del cambio del bot'
         required: true
-        default: 'chore: automated changes'
+        default: 'automated changes'
 
 jobs:
   prepare:
+    name: Prepare bot branch and PR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create branch and commit
+      - name: Create bot branch
         run: |
-          BRANCH="bot/changes-$(date +%Y%m%d-%H%M%S)"
-          git checkout -b "$BRANCH"
-          # Placeholder: add bot-generated changes here
-          echo "# Bot changes $(date -Iseconds)" >> docs/BOT-CHANGELOG.md
-          git add -A
-          git commit -m "chore(bot): ${{ github.event.inputs.description }}"
-          git push origin "$BRANCH"
+          BRANCH="bot/changes-$(date +%s)"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          git checkout -b "$BRANCH"
+
+      - name: Generate changes
+        run: |
+          # Aqui van los comandos del bot
+          echo "# Bot change $(date -Iseconds)" >> bot-output.md
+          git add -A
+          git diff --cached --quiet || git commit -m "chore(bot): ${{ github.event.inputs.description }}"
+          git push origin "$BRANCH"
 
       - name: Create draft PR
         uses: peter-evans/create-pull-request@v5
@@ -38,14 +45,10 @@ jobs:
           branch: ${{ env.BRANCH }}
           title: "bot: ${{ github.event.inputs.description }}"
           body: |
-            ## Cambios automáticos
+            Draft PR creado automaticamente por bot.
 
-            Generado por `bot-writer-template` workflow.
+            **Revision humana obligatoria antes del merge.**
 
-            **⚠️ Requiere revisión humana antes de mergear.**
-
-            - Descripción: ${{ github.event.inputs.description }}
-            - Rama: ${{ env.BRANCH }}
+            - Descripcion: ${{ github.event.inputs.description }}
             - Timestamp: $(date -Iseconds)
           draft: true
-          labels: bot,needs-review

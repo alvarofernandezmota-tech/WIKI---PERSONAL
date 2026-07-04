@@ -1,79 +1,54 @@
-# scripts/ — Guía de uso
+# scripts/ — README
 
-## Punto de entrada único
+> **Regla:** Este directorio contiene SOLO scripts ejecutables (`.sh`) y herramientas.  
+> Ningun archivo `.md` de sesion o diario debe vivir aqui.
+
+---
+
+## Scripts principales
+
+| Script | Proposito | Uso |
+|---|---|---|
+| `scripts/maintenance/master_run.sh` | Terminal madre — punto de entrada unico | `bash scripts/maintenance/master_run.sh [--apply]` |
+| `scripts/maintenance/create_perplexity_patch.sh` | Crea todos los ficheros del ecosistema Perplexity | `bash scripts/maintenance/create_perplexity_patch.sh [--apply]` |
+| `scripts/verify/run-smoke-tests.sh` | Comprueba que todos los ficheros clave existen | `bash scripts/verify/run-smoke-tests.sh` |
+| `scripts/agentes/agente-meta-deep.sh` | Extrae PERCENT_COMPLETE y abre issue si < 70% | `bash scripts/agentes/agente-meta-deep.sh` |
+| `scripts/observador-obsidian.sh` | Exporta notas Obsidian modificadas en 24h | `bash scripts/observador-obsidian.sh` |
+| `scripts/inbox-commit.sh` | Commitea archivos de `inbox/drop/` | `bash scripts/inbox-commit.sh "descripcion"` |
+| `scripts/inbox-clasificador.sh` | Clasifica `inbox/drop/` a destinos correctos | `bash scripts/inbox-clasificador.sh [--dry-run]` |
+| `scripts/session-logger.sh` | Logger de sesion de terminal | `source scripts/session-logger.sh` |
+| `scripts/session-terminal-doc.sh` | Genera documento de cierre de sesion | `bash scripts/session-terminal-doc.sh "descripcion"` |
+
+---
+
+## Flujo rapido sesion
+
 ```bash
-# Dry-run (muestra qué haría sin ejecutar nada)
-bash scripts/maintenance/master_run.sh
-
-# Ejecutar de verdad
-bash scripts/maintenance/master_run.sh --apply
-```
-
-## Flujo de sesión de trabajo
-```bash
-# 1. Sincronizar
+# 1. Inicio
 git pull origin main
-
-# 2. Iniciar logging de terminal
 source scripts/session-logger.sh
 
-# 3. Trabajar normalmente...
+# 2. Ver que haria el ecosistema (siempre primero)
+bash scripts/maintenance/master_run.sh
 
-# 4. Auditoría rápida antes de cerrar
-bash scripts/verify/run-smoke-tests.sh
+# 3. Ejecutar
+bash scripts/maintenance/master_run.sh --apply
 
-# 5. Generar documento de cierre
-bash scripts/session-terminal-doc.sh "descripción de la sesión"
-
-# 6. Subir
+# 4. Cierre
+bash scripts/session-terminal-doc.sh "resumen de la sesion"
 git add inbox/sesiones/cierre-*.md
-git commit -m "docs(sesion): cierre $(date +%Y-%m-%d) — descripción"
+git commit -m "docs(sesion): cierre $(date +%Y-%m-%d)"
 git push origin main
 ```
 
-## Inbox
-```bash
-# Copiar archivo a zona de aterrizaje y commitear
-cp /ruta/archivo.md inbox/drop/
-bash scripts/inbox-commit.sh "descripción del archivo"
+---
 
-# Clasificar manualmente sin esperar Actions
-bash scripts/inbox-clasificador.sh
-```
+## Variables de entorno relevantes
 
-## Auditoría de estructura
-```bash
-bash scripts/file-arrival-guardian.sh --dry-run
-bash scripts/struct-auditor.sh
-bash scripts/verify/run-smoke-tests.sh
-```
-
-## Perplexity
-```bash
-# Requiere PERPLEXITY_URL y PERPLEXITY_API_KEY en entorno
-export PERPLEXITY_URL="https://..."
-export PERPLEXITY_API_KEY="pplx-..."
-bash agentes/agent-perplexity-informer/run.sh
-bash scripts/agentes/agente-meta-deep.sh
-```
-
-## Mantenimiento
-```bash
-# Ver qué crearía el parche Perplexity (dry-run)
-bash scripts/maintenance/create_perplexity_patch.sh
-
-# Aplicar parche en nueva rama + PR draft
-bash scripts/maintenance/create_perplexity_patch.sh --apply
-```
-
-## Subdirectorios
-| Dir | Contenido |
-|---|---|
-| `scripts/agentes/` | Scripts de agentes de análisis |
-| `scripts/maintenance/` | Scripts de mantenimiento y parches |
-| `scripts/verify/` | Smoke tests y verificación |
-| `scripts/ci/` | Scripts usados por GitHub Actions |
-| `scripts/infra/` | Infraestructura y Docker helpers |
-| `scripts/backup/` | Backup y restic |
-| `scripts/seguridad/` | Hardening y seguridad |
-| `scripts/archive/` | Scripts obsoletos archivados |
+| Variable | Descripcion | Requerida para |
+|---|---|---|
+| `YGGDRASIL_ROOT` | Raiz del repositorio | Todos los scripts |
+| `PERPLEXITY_URL` | URL endpoint Perplexity | agent-informer, adapter |
+| `PERPLEXITY_API_KEY` | Token API Perplexity | agent-informer, adapter |
+| `OBSIDIAN_VAULT` | Ruta al vault de Obsidian | observador-obsidian |
+| `GITHUB_REMOTE` | Remote de git (default: origin) | create_perplexity_patch |

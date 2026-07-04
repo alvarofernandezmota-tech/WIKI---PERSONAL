@@ -1,64 +1,72 @@
 #!/usr/bin/env bash
-# scripts/maintenance/master_run.sh — Terminal Madre
-# Punto de entrada único. Orquesta todos los pasos en orden seguro.
-# Dry-run por defecto. --apply para ejecutar de verdad.
+# scripts/maintenance/master_run.sh
+# =============================================
+# TERMINAL MADRE — Punto de entrada unico del ecosistema Yggdrasil.
+# Orquesta todos los agentes y scripts en el orden correcto.
+# Dry-run por defecto. Usa --apply para ejecutar realmente.
+# =============================================
 set -euo pipefail
 
-ROOT="$(pwd)"
+ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
 DRY_RUN=true
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) DRY_RUN=false; shift ;;
-    --help) echo "Usage: $0 [--apply]"; exit 0 ;;
-    *) echo "Unknown arg: $1"; exit 1 ;;
+    --help)
+      echo "Usage: $0 [--apply]"
+      echo ""
+      echo "Dry-run (default): muestra que haria cada paso sin ejecutar nada."
+      echo "--apply:           ejecuta todos los pasos en orden."
+      exit 0
+      ;;
+    *) echo "[ERROR] Unknown arg: $1"; exit 1 ;;
   esac
 done
 
-MODE=$( $DRY_RUN && echo "DRY-RUN" || echo "APPLY" )
-echo "═══════════════════════════════════════"
-echo "  TERMINAL MADRE — Yggdrasil-Dew       "
-echo "  Mode: $MODE"
-echo "  $(date -Iseconds)"
-echo "═══════════════════════════════════════"
+mode() { $DRY_RUN && echo "DRY-RUN" || echo "APPLY"; }
 
 run_step() {
-  local n="$1" desc="$2" cmd="$3"
+  local step="$1"; shift
+  local cmd="$*"
   echo ""
-  echo "── STEP $n: $desc"
+  echo "━━━ STEP $step ━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   if [ "$DRY_RUN" = true ]; then
-    echo "   [DRY-RUN] $cmd"
+    echo "[DRY-RUN] Would run: $cmd"
   else
-    eval "$cmd" && echo "   ✓ OK" || echo "   ✗ FAILED (continuing)"
+    echo "[RUN] $cmd"
+    eval "$cmd"
   fi
 }
 
-run_step 0 "smoke tests" \
-  "bash scripts/verify/run-smoke-tests.sh"
+echo "============================================"
+echo " MASTER RUNNER — Yggdrasil-Dew"
+echo " Mode: $(mode)"
+echo " Root: $ROOT"
+echo " Time: $(date -Iseconds)"
+echo "============================================"
 
-run_step 1 "mover .md fuera de scripts/" \
-  "git mv scripts/2026-07-03-23-05-struct-auditor-output.md inbox/_meta/ 2>/dev/null || true; git mv scripts/2026-07-03-inbox-audit-consolidado.md inbox/_meta/ 2>/dev/null || true; git mv scripts/2026-07-03-cierre-sesion-completo.md diarios/ 2>/dev/null || true; git mv scripts/2026-07-03-reality-check.md diarios/ 2>/dev/null || true; git mv scripts/gemini-brief.md docs/ 2>/dev/null || true"
+# PASO 0: Mover .md extraviados en scripts/
+run_step "0: Move stray .md" \
+  "bash -c 'cd \"$ROOT\"; for f in scripts/2026-*.md; do [ -f \"\$f\" ] || continue; git mv \"\$f\" inbox/_meta/ 2>/dev/null && echo moved \$f || true; done'"
 
-run_step 2 "file-arrival-guardian (dry-run)" \
-  "bash scripts/file-arrival-guardian.sh --dry-run"
+# PASO 1: Perplexity informer
+run_step "1: Perplexity informer" \
+  "bash \"$ROOT/agentes/agent-perplexity-informer/run.sh\""
 
-run_step 3 "Perplexity informer" \
-  "bash agentes/agent-perplexity-informer/run.sh"
+# PASO 2: Meta-deep auditor
+run_step "2: Meta-deep auditor" \
+  "bash \"$ROOT/scripts/agentes/agente-meta-deep.sh\""
 
-run_step 4 "meta-deep auditor" \
-  "bash scripts/agentes/agente-meta-deep.sh"
+# PASO 3: Obsidian observer
+run_step "3: Obsidian observer" \
+  "bash \"$ROOT/scripts/observador-obsidian.sh\""
 
-run_step 5 "obsidian observer" \
-  "bash scripts/observador-obsidian.sh"
-
-run_step 6 "inbox clasificador" \
-  "bash scripts/inbox-clasificador.sh"
-
-run_step 7 "struct auditor" \
-  "bash scripts/struct-auditor.sh"
+# PASO 4: Smoke tests
+run_step "4: Smoke tests" \
+  "bash \"$ROOT/scripts/verify/run-smoke-tests.sh\""
 
 echo ""
-echo "═══════════════════════════════════════"
-echo "  TERMINAL MADRE — $MODE completado    "
-echo "  $(date -Iseconds)"
-echo "═══════════════════════════════════════"
+echo "============================================"
+echo " MASTER RUNNER COMPLETE — Mode: $(mode)"
+echo "============================================"

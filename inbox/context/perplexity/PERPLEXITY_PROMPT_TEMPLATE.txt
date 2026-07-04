@@ -1,8 +1,8 @@
 Analiza este extracto y devuelve:
-1) Resumen breve (máx. 120 palabras).
+1) Resumen breve (max. 120 palabras).
 2) Tres acciones prioritarias, numeradas.
-3) PERCENT_COMPLETE: XX% (entero, 0-100 — estimación de cobertura del análisis).
-4) Referencias públicas o links relevantes si los hay.
-CONFIDENCE_REASON: <breve justificación de la confianza en el análisis>
+3) PERCENT_COMPLETE: XX% (entero entre 0 y 100, indica completitud/cobertura del analisis).
+4) Referencias publicas o links relevantes.
+CONFIDENCE_REASON: <breve justificacion de la confianza en el analisis>
 
-Texto:
+Texto a analizar:

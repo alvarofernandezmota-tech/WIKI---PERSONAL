@@ -1,14 +1,13 @@
-# agent-perplexity-informer — Profile
+# PROFILE — agent-perplexity-informer
 
 | Campo | Valor |
 |---|---|
 | Nombre | agent-perplexity-informer |
+| Version | 1.0.0 |
+| Tipo | Agente de analisis LLM |
 | Owner | @alvarofernandezmota-tech |
-| Tipo | Extractor / Classifier |
-| Trigger | Manual / GitHub Actions |
-| Input | `inbox/ocr/text/*.txt` |
-| Output | `inbox/context/perplexity/*.md` |
-| Crítico | No (puede fallar sin bloquear pipeline) |
-| Versión | 1.0.0 |
-| Creado | 2026-07-04 |
-| Dependencias | `tools/perplexity_adapter.py`, Python 3.11+, requests |
+| Estado | ✅ Activo |
+| Frecuencia | On-demand / Trigger por push a inbox/ocr/text/ |
+| Dependencias | `tools/perplexity_adapter.py`, Python3, requests |
+| Salida | `inbox/context/perplexity/*.md` |
+| PERCENT_COMPLETE | Extrae y registra cobertura |

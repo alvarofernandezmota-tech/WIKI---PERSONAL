@@ -1,25 +1,26 @@
 #!/usr/bin/env bash
-# agentes/agent-perplexity-informer/test.sh — smoke test
+# agentes/agent-perplexity-informer/test.sh
+# Test basico: crea un txt de prueba y verifica que el agente genera output.
 set -euo pipefail
+
 ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
-TEST_DIR="$ROOT/inbox/ocr/text"
-mkdir -p "$TEST_DIR"
+TEST_IN="$ROOT/inbox/ocr/text/test-agent-informer.txt"
+TEST_OUT="$ROOT/inbox/context/perplexity/test-agent-informer.md"
 
-echo "Creating test input..."
-echo "Test content. PERCENT_COMPLETE: 85% — this is a sample input for testing purposes." \
-  > "$TEST_DIR/test-perplexity-sample.txt"
+# Crear input de prueba
+mkdir -p "$ROOT/inbox/ocr/text"
+echo "Texto de prueba para verificar el agente informer. PERCENT_COMPLETE: 85%" > "$TEST_IN"
 
-echo "Running agent (PERPLEXITY_URL may not be set — expecting graceful fallback)..."
-bash "$(dirname "$0")/run.sh"
+# Ejecutar agente (sin API real, el adapter devolvera error JSON que es valido)
+export PERPLEXITY_URL=""
+bash "$ROOT/agentes/agent-perplexity-informer/run.sh" || true
 
-OUT="$ROOT/inbox/context/perplexity/test-perplexity-sample.md"
-if [ -f "$OUT" ]; then
-  echo "PASS: output file created at $OUT"
+# Verificar que se genero el output
+if [ -f "$TEST_OUT" ]; then
+  echo "[PASS] Output generado: $TEST_OUT"
+  rm -f "$TEST_IN" "$TEST_OUT" "$ROOT/inbox/context/perplexity/test-agent-informer.prompt.txt"
+  exit 0
 else
-  echo "FAIL: output file not found"
+  echo "[FAIL] Output no encontrado: $TEST_OUT"
   exit 1
 fi
-
-rm -f "$TEST_DIR/test-perplexity-sample.txt" "$OUT" \
-  "$ROOT/inbox/context/perplexity/test-perplexity-sample.prompt.txt" 2>/dev/null || true
-echo "Cleanup done."

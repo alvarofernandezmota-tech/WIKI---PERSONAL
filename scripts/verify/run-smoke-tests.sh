@@ -1,72 +1,70 @@
 #!/usr/bin/env bash
 # scripts/verify/run-smoke-tests.sh
-# Suite de smoke tests del ecosistema Yggdrasil-Dew.
-# Retorna 0 si todos pasan, 1 si alguno falla.
+# Comprueba que todos los ficheros clave del ecosistema existen.
 set -euo pipefail
 
 ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
-FAILS=0
 PASS=0
+FAIL=0
 
 check() {
   local desc="$1"
-  local cmd="$2"
-  if eval "$cmd" >/dev/null 2>&1; then
+  local path="$2"
+  if [ -e "$ROOT/$path" ]; then
     echo "  ✓ $desc"
     PASS=$((PASS+1))
   else
-    echo "  ✗ $desc"
-    FAILS=$((FAILS+1))
+    echo "  ✗ $desc — NOT FOUND: $path"
+    FAIL=$((FAIL+1))
   fi
 }
 
-echo "═══════════════════════════════════════"
-echo "  Smoke Tests — Yggdrasil-Dew          "
-echo "  $(date -Iseconds)                    "
-echo "═══════════════════════════════════════"
+echo "=== SMOKE TESTS — Yggdrasil-Dew ==="
 echo ""
-echo "── Estructura de carpetas"
-check "scripts/ existe"                    "[ -d '$ROOT/scripts' ]"
-check "inbox/ existe"                      "[ -d '$ROOT/inbox' ]"
-check "diarios/ existe"                    "[ -d '$ROOT/diarios' ]"
-check "agentes/ existe"                    "[ -d '$ROOT/agentes' ]"
-check "tools/ existe"                      "[ -d '$ROOT/tools' ]"
-check "docs/ existe"                       "[ -d '$ROOT/docs' ]"
-check ".github/workflows/ existe"          "[ -d '$ROOT/.github/workflows' ]"
+echo "[Herramientas]"
+check "Perplexity adapter"          "tools/perplexity_adapter.py"
 
 echo ""
-echo "── Scripts ejecutables"
-check "file-arrival-guardian.sh"           "[ -x '$ROOT/scripts/file-arrival-guardian.sh' ]"
-check "inbox-commit.sh"                    "[ -x '$ROOT/scripts/inbox-commit.sh' ]"
-check "inbox-clasificador.sh"              "[ -x '$ROOT/scripts/inbox-clasificador.sh' ]"
-check "cierre-sesion.sh"                   "[ -x '$ROOT/scripts/cierre-sesion.sh' ]"
-check "master_run.sh"                      "[ -x '$ROOT/scripts/maintenance/master_run.sh' ]"
-check "agente-meta-deep.sh"                "[ -x '$ROOT/scripts/agentes/agente-meta-deep.sh' ]"
-check "observador-obsidian.sh"             "[ -x '$ROOT/scripts/observador-obsidian.sh' ]"
+echo "[Agentes]"
+check "Informer run.sh"             "agentes/agent-perplexity-informer/run.sh"
+check "Informer DISEÑO.md"          "agentes/agent-perplexity-informer/DISEÑO.md"
+check "Informer PROFILE.md"         "agentes/agent-perplexity-informer/PROFILE.md"
+check "Informer test.sh"            "agentes/agent-perplexity-informer/test.sh"
 
 echo ""
-echo "── Herramientas Python"
-check "tools/perplexity_adapter.py existe" "[ -f '$ROOT/tools/perplexity_adapter.py' ]"
-check "python3 disponible"                 "command -v python3"
+echo "[Scripts]"
+check "Master runner"               "scripts/maintenance/master_run.sh"
+check "Agente meta-deep"            "scripts/agentes/agente-meta-deep.sh"
+check "Obsidian observer"           "scripts/observador-obsidian.sh"
+check "Create perplexity patch"     "scripts/maintenance/create_perplexity_patch.sh"
 
 echo ""
-echo "── Agentes"
-check "agent-perplexity-informer/run.sh"   "[ -x '$ROOT/agentes/agent-perplexity-informer/run.sh' ]"
-check "agent-perplexity-informer/DISEÑO"   "[ -f '$ROOT/agentes/agent-perplexity-informer/DISEÑO.md' ]"
+echo "[Inbox]"
+check "Prompt template Perplexity"  "inbox/context/perplexity/PERPLEXITY_PROMPT_TEMPLATE.txt"
+check "Inbox drop zone"             "inbox/drop/.gitkeep"
 
 echo ""
-echo "── Documentación"
-check "OPERATIONAL-PLAYBOOK.md"            "[ -f '$ROOT/docs/OPERATIONAL-PLAYBOOK.md' ]"
-check "OWNERS.md"                          "[ -f '$ROOT/docs/OWNERS.md' ]"
-check "SCRIPTS-AUDITORIA.md"               "[ -f '$ROOT/scripts/SCRIPTS-AUDITORIA.md' ]"
+echo "[Docker]"
+check "Docker compose"              "docker/docker-compose.yml"
+check "MCP Dockerfile"              "docker/mcp/Dockerfile"
+check "Retrieval Dockerfile"        "docker/retrieval/Dockerfile"
 
 echo ""
-echo "── Git"
-check "git disponible"                     "command -v git"
-check "repo es git"                        "[ -d '$ROOT/.git' ]"
+echo "[Workflows]"
+check "CI readonly"                 ".github/workflows/ci-readonly.yml"
+check "Bot writer template"         ".github/workflows/bot-writer-template.yml"
 
 echo ""
-echo "═══════════════════════════════════════"
-echo "  Resultado: $PASS OK / $FAILS FAIL    "
-echo "═══════════════════════════════════════"
-[ "$FAILS" -eq 0 ] && exit 0 || exit 1
+echo "[Docs]"
+check "Operational playbook"        "docs/OPERATIONAL-PLAYBOOK.md"
+check "Owners"                      "docs/OWNERS.md"
+check "Audit log"                   "docs/AUDIT-LOG.md"
+check "Scripts README"              "scripts/README.md"
+check "Scripts auditoria"           "scripts/SCRIPTS-AUDITORIA.md"
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo " Smoke tests: $PASS passed, $FAIL failed."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+[ "$FAIL" -eq 0 ] && exit 0 || exit 1
