@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 21:10
+hora: 21:43
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 21:10
+title: Reality Check 2026-07-04 21:43
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 21:10
+# 🔍 Ecosystem Reality Check — 2026-07-04 21:43
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -96,6 +96,7 @@ title: Reality Check 2026-07-04 21:10
 
 | Workflow | Trigger | Estado |
 |----------|---------|--------|
+| `auto-audit.yml` | push schedule workflow_dispatch # trigger manual | 🟢 ACTIVO |
 | `file-arrival-guardian.yml` | push workflow_dispatch | 🟢 ACTIVO |
 | `galatea.yml` | workflow_dispatch schedule | 🟢 ACTIVO |
 | `gestor-estados-inbox.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
@@ -204,7 +205,7 @@ _24 items encontrados:_
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
 | Scripts totales | 120 |
-| Actions activas | 33 |
+| Actions activas | 34 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 21:10*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 21:43*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
