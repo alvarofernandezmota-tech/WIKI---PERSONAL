@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# guardian-estructura.sh
+# Doc: docs/  <- COMPLETAR ruta al doc relacionado
+# Fase: <- COMPLETAR fase
+# Descripción: <- COMPLETAR
 # =============================================================================
 # guardian-estructura.sh
 # Galatea · Yggdrasil-Dew · Reorganización estructural de docs/
