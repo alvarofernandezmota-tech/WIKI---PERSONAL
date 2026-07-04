@@ -1,80 +1,37 @@
-# ================================================================
-# session-close.yml — GitHub Action de cierre de sesión
-# FUNCIÓN ÚNICA: Ejecuta auditoría completa del ecosistema
-# cuando se cierra una sesión de trabajo (push o dispatch manual)
-# ================================================================
-name: session-close
+name: Session Close
 
 on:
-  workflow_dispatch:
-    inputs:
-      fecha:
-        description: 'Fecha de cierre (YYYY-MM-DD)'
-        required: false
-        default: ''
-      hora:
-        description: 'Hora de cierre (HH:MM)'
-        required: false
-        default: ''
   push:
+    branches: [main]
     paths:
-      - 'diary/**-sesion-cierre.md'
-      - 'inbox/**-cierre-sesion.md'
+      - 'inbox/sesiones/cierre-*.md'
 
 jobs:
-  auditoria-post-cierre:
-    name: Auditoría post-cierre
+  move-to-diarios:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Info de cierre
+      - name: Mover cierres a diarios/
         run: |
-          echo "=== CIERRE DE SESIÓN ==="
-          echo "Fecha: ${{ github.event.inputs.fecha || 'desde push' }}"
-          echo "Hora:  ${{ github.event.inputs.hora || 'desde push' }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Actor:  ${{ github.actor }}"
+          mkdir -p diarios
+          for f in inbox/sesiones/cierre-*.md; do
+            [ -f "$f" ] || continue
+            name=$(basename "$f")
+            dest="diarios/$name"
+            mv "$f" "$dest"
+            echo "Movido: $f -> $dest"
+          done
 
-      - name: Auditoría estructural
+      - name: Commit y push
         run: |
-          echo "=== STRUCT AUDITOR ==="
-          bash scripts/struct-auditor.sh || echo 'struct-auditor: completado con advertencias'
-
-      - name: Detectar archivos fantasma
-        run: |
-          echo "=== GHOST FILE DETECTOR ==="
-          bash scripts/ghost-file-detector.sh || echo 'ghost-detector: completado con advertencias'
-
-      - name: Validar islas
-        run: |
-          echo "=== ISLA SYNC VALIDATOR ==="
-          bash scripts/isla-sync-validator.sh || echo 'isla-validator: completado con advertencias'
-
-      - name: Cross-ref checker
-        run: |
-          echo "=== CROSS REF CHECKER ==="
-          bash scripts/cross-ref-checker.sh || echo 'cross-ref: completado con advertencias'
-
-      - name: Contar inbox
-        run: |
-          echo "=== ESTADO INBOX ==="
-          TOTAL=$(find inbox/ -maxdepth 1 -name '*.md' ! -name 'README.md' ! -name 'PLANTILLA*.md' | wc -l)
-          echo "Ficheros activos en inbox: $TOTAL"
-          if [ "$TOTAL" -gt 15 ]; then
-            echo "::warning::Inbox supera 15 ficheros — revisar en próxima sesión"
-          fi
-
-      - name: Resumen final
-        run: |
-          echo ""
-          echo "╔══════════════════════════════════════════╗"
-          echo "║   AUDITORÍA POST-CIERRE COMPLETADA ✅    ║"
-          echo "║   Repo: yggdrasil-dew                    ║"
-          echo "║   Action: session-close.yml              ║"
-          echo "╚══════════════════════════════════════════╝"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diarios/ inbox/sesiones/
+          git diff --cached --quiet || git commit -m "docs(sesion): mover cierres a diarios/ [skip ci]"
+          git push origin main

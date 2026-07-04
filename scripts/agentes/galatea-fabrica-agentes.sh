@@ -1,112 +1,61 @@
 #!/usr/bin/env bash
-# scripts/agentes/galatea-fabrica-agentes.sh — Fábrica completa de agentes
+# scripts/agentes/galatea-fabrica-agentes.sh
+# Fábrica: dado un nombre, genera agentes/<nombre>/ con PROFILE.md y test.sh
+# Uso: bash galatea-fabrica-agentes.sh <nombre-agente> ["descripción"]
 set -euo pipefail
 
-NOMBRE="${1:-agent-nuevo}"
-DESCRIPCION="${2:-Agente generado por Galatea}"
-ROL="${3:-generico}"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+TPL_PROFILE="$ROOT/scripts/agentes/agent-templates/PROFILE-TEMPLATE.md"
+TPL_TEST="$ROOT/scripts/agentes/agent-templates/TEST-TEMPLATE.sh"
 
-ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
-AGENT_DIR="$ROOT/agentes/$NOMBRE"
+NAME="${1:-}"
+DESC="${2:-Agente generado por Galatea el $(date +%Y-%m-%d)}"
 
-if [ -d "$AGENT_DIR" ]; then
-  echo "[ERROR] El agente $NOMBRE ya existe en $AGENT_DIR"
+if [ -z "$NAME" ]; then
+  echo "ERROR: Uso: $0 <nombre-agente> [descripción]" >&2
   exit 1
 fi
 
-mkdir -p "$AGENT_DIR"
+DIR="$ROOT/agentes/$NAME"
+if [ -d "$DIR" ]; then
+  echo "WARN: $DIR ya existe, omitiendo creación"
+  exit 0
+fi
 
-# DISEÑO.md
-cat > "$AGENT_DIR/DISEÑO.md" <<EOF
-# $NOMBRE
+mkdir -p "$DIR"
 
-## Descripción
-$DESCRIPCION
+# PROFILE.md
+if [ -f "$TPL_PROFILE" ]; then
+  sed "s/AGENT_NAME/$NAME/g; s/AGENT_DESC/$DESC/g" "$TPL_PROFILE" > "$DIR/PROFILE.md"
+else
+  cat > "$DIR/PROFILE.md" <<EOF
+# Agente: $NAME
+> $DESC
 
-## Rol
-$ROL
-
-## Responsabilidades
-- [ ] Definir responsabilidades específicas
-- [ ] Integrar con MCP server
-- [ ] Conectar con llm-router si aplica
+## Propósito
+TODO: definir propósito del agente.
 
 ## Entradas
-- Archivos de inbox/
-- Contexto de COPILOT-CONTEXT.md
+- TODO
 
 ## Salidas
-- reports/$NOMBRE/
-- inbox/context/
+- TODO
 
-## Dependencias
-- scripts/agentes/llm-router.sh
-- mcp/server.py
+## Siguiente-paso
+- [ ] Implementar lógica principal
 EOF
-
-# PROFILE.md (personalidad y memoria)
-cat > "$AGENT_DIR/PROFILE.md" <<EOF
-# Perfil — $NOMBRE
-
-## Tono
-Técnico, preciso, sin adornos.
-
-## Estilo
-Respuestas estructuradas con bullets y código cuando aplica.
-
-## Límites
-- No ejecutar acciones destructivas sin aprobación humana
-- No enviar PII a modelos externos
-- Crear PR en modo draft para cambios significativos
-
-## PII a enmascarar
-- Emails → [REDACTED_EMAIL]
-- API keys → [REDACTED_KEY]
-- Tokens → Bearer [REDACTED]
-
-## Ejemplos de prompts
-- "Audita el estado de $NOMBRE y genera un reporte"
-- "Sugiere mejoras para $NOMBRE con diffs"
-EOF
+fi
 
 # test.sh
-cat > "$AGENT_DIR/test.sh" <<'EOF'
+if [ -f "$TPL_TEST" ]; then
+  sed "s/AGENT_NAME/$NAME/g" "$TPL_TEST" > "$DIR/test.sh"
+else
+  cat > "$DIR/test.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-DIR="$(dirname "$0")"
-echo "[TEST] Verificando estructura de $(basename "$DIR")..."
-[ -f "$DIR/DISEÑO.md" ]  && echo "  ✅ DISEÑO.md" || { echo "  ❌ DISEÑO.md"; exit 1; }
-[ -f "$DIR/PROFILE.md" ] && echo "  ✅ PROFILE.md" || { echo "  ❌ PROFILE.md"; exit 1; }
-echo "[TEST] OK"
+echo "[TEST] TODO: implementar tests para este agente"
 EOF
-chmod +x "$AGENT_DIR/test.sh"
+fi
+chmod +x "$DIR/test.sh"
 
-# Script del agente en scripts/agentes/
-SCRIPT="$ROOT/scripts/agentes/$NOMBRE.sh"
-cat > "$SCRIPT" <<EOF
-#!/usr/bin/env bash
-# scripts/agentes/$NOMBRE.sh — $DESCRIPCION
-set -euo pipefail
-
-ROOT="\${YGGDRASIL_ROOT:-\$(pwd)}"
-REPORT_DIR="\$ROOT/reports/$NOMBRE"
-mkdir -p "\$REPORT_DIR"
-
-TS=\$(date +"%Y%m%d-%H%M%S")
-OUT="\$REPORT_DIR/$NOMBRE-\$TS.md"
-
-echo "# $NOMBRE — \$TS" > "\$OUT"
-echo "$DESCRIPCION" >> "\$OUT"
-echo "\$OUT"
-EOF
-chmod +x "$SCRIPT"
-
-# Registrar en REGISTRO-HERRAMIENTAS.md
-REGISTRO="$ROOT/docs/REGISTRO-HERRAMIENTAS.md"
-mkdir -p "$ROOT/docs"
-[ -f "$REGISTRO" ] || echo "# Registro de Herramientas\n" > "$REGISTRO"
-echo "- **$NOMBRE** — $DESCRIPCION (rol: $ROL) — $(date +%Y-%m-%d)" >> "$REGISTRO"
-
-echo "[Galatea] Agente '$NOMBRE' creado en $AGENT_DIR"
-echo "  Script: $SCRIPT"
-echo "  Test:   $AGENT_DIR/test.sh"
+echo "OK: agente $NAME creado en $DIR"

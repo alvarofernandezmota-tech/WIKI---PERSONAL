@@ -1,69 +1,41 @@
 #!/usr/bin/env bash
-# scripts/agentes/llm-router.sh — Router LLM con sanitización y circuit breaker
+# scripts/agentes/llm-router.sh
+# Sanitiza PII del PROMPT y lo envía al MCP LLM router
+# Uso: PROMPT="texto" bash scripts/agentes/llm-router.sh
+# o:   bash scripts/agentes/llm-router.sh "mi prompt aquí"
 set -euo pipefail
 
-ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
-PROMPT_RAW="${1:-}"
-MODE="${2:-auto}"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+MCP_URL="${MCP_URL:-http://localhost:3000}"
+PROMPT="${1:-${PROMPT:-}}"
 
-# Sanitización: elimina emails y API keys antes de enviar al LLM
-sanitize() {
-  local p="$1"
-  p=$(echo "$p" | sed -E 's/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/[REDACTED_EMAIL]/g')
-  p=$(echo "$p" | sed -E 's/(sk-[A-Za-z0-9_-]{20,})/[REDACTED_KEY]/g')
-  p=$(echo "$p" | sed -E 's/(Bearer [A-Za-z0-9_-]{10,})/Bearer [REDACTED]/g')
-  echo "$p"
-}
+if [ -z "$PROMPT" ]; then
+  echo "ERROR: PROMPT vacío. Uso: bash llm-router.sh \"mi prompt\"" >&2
+  exit 1
+fi
 
-PROMPT="$(sanitize "$PROMPT_RAW")"
+# === SANITIZACIÓN PII ===
+# DNI/NIE español
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{8}[A-Z]/[REDACTED_ID]/g')
+PROMPT=$(echo "$PROMPT" | sed -E 's/[XYZ][0-9]{7}[A-Z]/[REDACTED_NIE]/g')
+# SSN americano
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{3}-[0-9]{2}-[0-9]{4}/[REDACTED_SSN]/g')
+# Emails
+PROMPT=$(echo "$PROMPT" | sed -E 's/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/[REDACTED_EMAIL]/g')
+# Teléfonos (ES y formato internacional)
+PROMPT=$(echo "$PROMPT" | sed -E 's/(\+34|0034)?[ -]?[6789][0-9]{2}[ -]?[0-9]{3}[ -]?[0-9]{3}/[REDACTED_PHONE]/g')
+# Tarjetas (Luhn-like pattern)
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}/[REDACTED_CARD]/g')
+# IBANs
+PROMPT=$(echo "$PROMPT" | sed -E 's/[A-Z]{2}[0-9]{2}[ ]?([0-9]{4}[ ]?){4,6}/[REDACTED_IBAN]/g')
 
-LOGDIR="$ROOT/logs/llm-router"
-mkdir -p "$LOGDIR"
-TS=$(date +"%Y%m%d-%H%M%S")
-echo "{\"ts\":\"$TS\",\"mode\":\"$MODE\",\"prompt_len\":${#PROMPT}}" >> "$LOGDIR/llm-router.log"
+# === ENVÍO AL ROUTER ===
+RESPONSE=$(curl -sf -X POST "$MCP_URL/route" \
+  -H "Content-Type: application/json" \
+  -d "{\"prompt\": $(echo "$PROMPT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read().strip()))')}" \
+  2>/dev/null) || {
+    echo "ERROR: MCP router no disponible en $MCP_URL" >&2
+    exit 1
+  }
 
-# Circuit breaker: máximo 3 intentos
-ATTEMPTS=0
-MAX=3
-
-call_ollama() {
-  command -v ollama >/dev/null 2>&1 || return 2
-  timeout 30s ollama run "${OLLAMA_MODEL:-llama3}" --prompt "$PROMPT" 2>/dev/null
-}
-
-call_openai() {
-  [ -z "${OPENAI_API_KEY:-}" ] && return 2
-  local payload
-  payload=$(printf '{"model":"%s","messages":[{"role":"user","content":"%s"}],"max_tokens":800}' \
-    "${OPENAI_MODEL:-gpt-4o}" "$(echo "$PROMPT" | sed 's/"/\\"/g')")
-  curl -sS -X POST "https://api.openai.com/v1/chat/completions" \
-    -H "Authorization: Bearer $OPENAI_API_KEY" \
-    -H "Content-Type: application/json" \
-    -d "$payload" | grep -o '"content":"[^"]*"' | head -1 | sed 's/"content":"//;s/"$//'
-}
-
-call_anthropic() {
-  [ -z "${ANTHROPIC_API_KEY:-}" ] && return 2
-  local payload
-  payload=$(printf '{"model":"claude-3-haiku-20240307","max_tokens":800,"messages":[{"role":"user","content":"%s"}]}' \
-    "$(echo "$PROMPT" | sed 's/"/\\"/g')")
-  curl -sS -X POST "https://api.anthropic.com/v1/messages" \
-    -H "x-api-key: $ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -H "Content-Type: application/json" \
-    -d "$payload" | grep -o '"text":"[^"]*"' | head -1 | sed 's/"text":"//;s/"$//'
-}
-
-for provider in ollama openai anthropic; do
-  [ "$MODE" != "auto" ] && [ "$MODE" != "$provider" ] && continue
-  [ "$ATTEMPTS" -ge "$MAX" ] && break
-  ATTEMPTS=$((ATTEMPTS + 1))
-  OUT=$(call_$provider 2>/dev/null || true)
-  if [ -n "$OUT" ]; then
-    echo "$OUT"
-    exit 0
-  fi
-done
-
-echo "LLM_ROUTER_ERROR: no model available (tried $ATTEMPTS providers)" >&2
-exit 1
+echo "$RESPONSE"

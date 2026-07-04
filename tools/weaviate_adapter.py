@@ -1,27 +1,65 @@
 #!/usr/bin/env python3
-# tools/weaviate_adapter.py
-# Template adapter: stores locally as JSON; swap for real Weaviate client when ready
-import sys, json, os
+"""
+tools/weaviate_adapter.py
+Adapter Weaviate para indexar/buscar documentos.
+NO conecta en import — llamar connect() explícitamente.
+Requiere: pip install weaviate-client
+Variables de entorno: WEAVIATE_URL, WEAVIATE_API_KEY (opcional)
+"""
+import os, json
+from typing import Optional
 
-ROOT = os.getenv("YGGDRASIL_ROOT", ".")
+CLASS_NAME = "YggdrasilDoc"
 
-def index_text(id, path, meta_json):
-    with open(path, "r", encoding="utf8") as fh:
-        text = fh.read()
-    meta = json.loads(meta_json)
-    outdir = os.path.join(ROOT, "tools", "vector_index")
-    os.makedirs(outdir, exist_ok=True)
-    outpath = os.path.join(outdir, f"{id}.json")
-    with open(outpath, "w", encoding="utf8") as fh:
-        json.dump({"id": id, "text": text, "meta": meta}, fh, ensure_ascii=False, indent=2)
-    print(outpath)
-    return 0
+class WeaviateAdapter:
+    def __init__(self):
+        self.client = None
+        self.url = os.getenv("WEAVIATE_URL", "http://localhost:8080")
+        self.api_key = os.getenv("WEAVIATE_API_KEY", "")
+
+    def connect(self):
+        try:
+            import weaviate
+            auth = weaviate.auth.AuthApiKey(self.api_key) if self.api_key else None
+            self.client = weaviate.Client(url=self.url, auth_client_secret=auth)
+            print(f"[weaviate] Conectado a {self.url}")
+        except ImportError:
+            raise RuntimeError("Instala: pip install weaviate-client")
+
+    def ensure_schema(self):
+        if self.client.schema.exists(CLASS_NAME):
+            return
+        self.client.schema.create_class({
+            "class": CLASS_NAME,
+            "properties": [
+                {"name": "source", "dataType": ["string"]},
+                {"name": "text",   "dataType": ["text"]},
+                {"name": "meta",   "dataType": ["string"]},
+            ]
+        })
+        print(f"[weaviate] Schema {CLASS_NAME} creado")
+
+    def index(self, doc: dict):
+        self.ensure_schema()
+        self.client.data_object.create({
+            "source": doc.get("source", ""),
+            "text":   doc.get("text", ""),
+            "meta":   json.dumps(doc.get("meta", {})),
+        }, CLASS_NAME)
+
+    def search(self, query: str, limit: int = 5) -> list:
+        self.ensure_schema()
+        res = (
+            self.client.query
+            .get(CLASS_NAME, ["source", "text", "meta"])
+            .with_bm25(query=query)
+            .with_limit(limit)
+            .do()
+        )
+        return res.get("data", {}).get("Get", {}).get(CLASS_NAME, [])
+
 
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
-    if cmd == "index_text":
-        _, _, id_, path, meta = sys.argv
-        sys.exit(index_text(id_, path, meta))
-    else:
-        print("Usage: weaviate_adapter.py index_text <id> <path> <meta_json>")
-        sys.exit(2)
+    adapter = WeaviateAdapter()
+    adapter.connect()
+    print(adapter.search("test"))

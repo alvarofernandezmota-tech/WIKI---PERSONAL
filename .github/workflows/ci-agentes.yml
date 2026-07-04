@@ -3,42 +3,26 @@ name: CI Agentes
 on:
   push:
     branches: [main]
-    paths:
-      - 'agentes/**'
-      - 'scripts/agentes/**'
-      - 'mcp/**'
   pull_request:
-    paths:
-      - 'agentes/**'
-      - 'scripts/agentes/**'
-      - 'mcp/**'
+    branches: [main]
 
 jobs:
-  test-agentes:
+  smoke-tests:
     runs-on: ubuntu-latest
-    env:
-      YGGDRASIL_ROOT: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Make test scripts executable
+      - name: Crear carpetas necesarias
         run: |
-          find agentes -name 'test.sh' -exec chmod +x {} \;
-          find scripts/agentes -name '*.sh' -exec chmod +x {} \;
+          mkdir -p reports/verify logs agentes
 
-      - name: Run agent-docs test
-        run: bash agentes/agent-docs/test.sh
+      - name: Ejecutar smoke tests
+        run: bash scripts/verify/run-smoke-tests.sh
 
-      - name: Run agent-islas test
-        run: bash agentes/agent-islas/test.sh
-
-      - name: Run agent-tareas test
-        run: bash agentes/agent-tareas/test.sh
-
-      - name: Upload test reports
+      - name: Upload resultados
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: agent-test-reports
-          path: reports/
+          name: smoke-tests-${{ github.run_id }}
+          path: reports/verify/
           if-no-files-found: ignore

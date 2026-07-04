@@ -1,25 +1,42 @@
 #!/usr/bin/env bash
+# scripts/verify/run-smoke-tests.sh
+# Ejecuta todos los agentes/*/test.sh y reporta resultados
 set -euo pipefail
-ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
 
-echo "=== Smoke Tests ==="
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+TS="$(date +%Y%m%d-%H%M%S)"
+OUT="$ROOT/reports/verify/smoke-$TS.md"
+mkdir -p "$ROOT/reports/verify"
 
-echo "1. Check MCP HTTP (expects JSON response)"
-curl -s -X POST http://localhost:8080 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${MCP_API_TOKEN:-}" \
-  -d '{"tool":"orquestador_total","arguments":{}}' | jq '.' || echo 'WARN: MCP not running'
+echo "# Smoke Tests — $TS" > "$OUT"
+echo "" >> "$OUT"
 
-echo "2. Check OCR output folder"
-ls "$ROOT/inbox/ocr/text" 2>/dev/null | head -n5 || echo 'WARN: no OCR outputs'
+PASS=0; FAIL=0; SKIP=0
 
-echo "3. Check meta-deep reports"
-ls "$ROOT/reports/meta-deep" 2>/dev/null | head -n5 || echo 'WARN: no meta-deep reports'
+for dir in "$ROOT/agentes"/*/; do
+  name=$(basename "$dir")
+  test_sh=""
+  [ -f "$dir/test.sh" ] && test_sh="$dir/test.sh"
+  [ -f "$dir/tests.sh" ] && test_sh="$dir/tests.sh"
 
-echo "4. Check agent-ocr-auditor reports"
-ls "$ROOT/reports/agent-ocr-auditor" 2>/dev/null | head -n5 || echo 'WARN: no OCR audit reports'
+  if [ -z "$test_sh" ]; then
+    echo "- [SKIP] $name: sin test.sh" >> "$OUT"
+    SKIP=$((SKIP+1))
+    continue
+  fi
 
-echo "5. Check context/perplexity outputs"
-ls "$ROOT/inbox/context/perplexity" 2>/dev/null | head -n5 || echo 'WARN: no perplexity context'
+  if bash "$test_sh" >> "$OUT" 2>&1; then
+    echo "- [PASS] $name" >> "$OUT"
+    PASS=$((PASS+1))
+  else
+    echo "- [FAIL] $name" >> "$OUT"
+    FAIL=$((FAIL+1))
+  fi
+done
 
-echo "=== Smoke Tests Done ==="
+echo "" >> "$OUT"
+echo "## Resumen: PASS=$PASS FAIL=$FAIL SKIP=$SKIP" >> "$OUT"
+echo "Smoke tests guardados en: $OUT"
+echo "PASS=$PASS FAIL=$FAIL SKIP=$SKIP"
+
+[ "$FAIL" -eq 0 ] && exit 0 || exit 1

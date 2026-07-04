@@ -1,54 +1,63 @@
-# tools/prometheus_exporter.py — Métricas Prometheus para el ecosistema
-from prometheus_client import start_http_server, Counter, Gauge, Histogram
-import time
-import os
+#!/usr/bin/env python3
+"""
+tools/prometheus_exporter.py
+Exporta métricas Yggdrasil en formato Prometheus (puerto 9090)
+Métricas:
+  ygg_inbox_files_total{zone}  — archivos en cada zona del inbox
+  ygg_index_docs_total          — documentos en vector_index/
+  ygg_last_ingest_ts            — timestamp del último archivo procesado
+Uso: python3 tools/prometheus_exporter.py
+"""
+import os, time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-PORT = int(os.getenv("PROMETHEUS_PORT", "9100"))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# Métricas
-EXEC_COUNTER = Counter(
-    'yggdrasil_tool_executions_total',
-    'Total de ejecuciones de herramientas',
-    ['tool', 'status']
-)
-LATENCY = Histogram(
-    'yggdrasil_tool_latency_seconds',
-    'Latencia de herramientas en segundos',
-    ['tool'],
-    buckets=[0.1, 0.5, 1.0, 5.0, 10.0, 30.0, 60.0]
-)
-ACTIVE_AGENTS = Gauge(
-    'yggdrasil_active_agents',
-    'Agentes activos en el ecosistema'
-)
-OCR_QUEUE = Gauge(
-    'yggdrasil_ocr_queue_size',
-    'Archivos pendientes en inbox/ocr/raw'
-)
-LLM_ERRORS = Counter(
-    'yggdrasil_llm_errors_total',
-    'Errores del router LLM',
-    ['provider']
-)
+ZONES = {
+    "raw":       os.path.join(ROOT, "inbox", "ocr", "raw"),
+    "text":      os.path.join(ROOT, "inbox", "ocr", "text"),
+    "processed": os.path.join(ROOT, "inbox", "ocr", "processed"),
+    "drop":      os.path.join(ROOT, "inbox", "drop"),
+    "perplexity":os.path.join(ROOT, "inbox", "context", "perplexity"),
+}
+INDEX_DIR = os.path.join(ROOT, "tools", "vector_index")
 
-def record(tool: str, status: str, latency_seconds: float):
-    EXEC_COUNTER.labels(tool=tool, status=status).inc()
-    LATENCY.labels(tool=tool).observe(latency_seconds)
+def count_files(d):
+    if not os.path.isdir(d):
+        return 0
+    return sum(1 for f in os.listdir(d) if f != ".gitkeep" and not f.startswith("."))
 
-def update_queue_metrics():
-    root = os.getenv("YGGDRASIL_ROOT", ".")
-    ocr_raw = os.path.join(root, "inbox", "ocr", "raw")
-    if os.path.isdir(ocr_raw):
-        count = len([f for f in os.listdir(ocr_raw) if os.path.isfile(os.path.join(ocr_raw, f))])
-        OCR_QUEUE.set(count)
-    agents_dir = os.path.join(root, "agentes")
-    if os.path.isdir(agents_dir):
-        count = len([d for d in os.listdir(agents_dir) if os.path.isdir(os.path.join(agents_dir, d))])
-        ACTIVE_AGENTS.set(count)
+def last_ingest_ts():
+    proc = ZONES["processed"]
+    if not os.path.isdir(proc):
+        return 0
+    files = [os.path.getmtime(os.path.join(proc, f)) for f in os.listdir(proc) if f != ".gitkeep"]
+    return max(files) if files else 0
+
+def metrics() -> str:
+    lines = ["# HELP ygg_inbox_files_total Archivos en zona inbox",
+             "# TYPE ygg_inbox_files_total gauge"]
+    for zone, path in ZONES.items():
+        lines.append(f'ygg_inbox_files_total{{zone="{zone}"}} {count_files(path)}')
+    idx = count_files(INDEX_DIR)
+    lines += ["# HELP ygg_index_docs_total Documentos indexados en vector_index",
+              "# TYPE ygg_index_docs_total gauge",
+              f"ygg_index_docs_total {idx}",
+              "# HELP ygg_last_ingest_ts Timestamp último archivo procesado",
+              "# TYPE ygg_last_ingest_ts gauge",
+              f"ygg_last_ingest_ts {last_ingest_ts()}"]
+    return "\n".join(lines) + "\n"
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, *_): pass
+    def do_GET(self):
+        body = metrics().encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; version=0.0.4")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
 if __name__ == "__main__":
-    start_http_server(PORT)
-    print(f"[prometheus_exporter] Métricas en http://0.0.0.0:{PORT}/metrics")
-    while True:
-        update_queue_metrics()
-        time.sleep(15)
+    print("[prometheus_exporter] escuchando en :9090 — GET /metrics")
+    HTTPServer(("0.0.0.0", 9090), Handler).serve_forever()
