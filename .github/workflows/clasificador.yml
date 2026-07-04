@@ -1,10 +1,1 @@
-name: Clasificador [SILENCIADO]
-
-on:
-  workflow_dispatch:
-
-jobs:
-  skip:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Workflow silenciado"
+# ELIMINADO — consolidado en yggdrasil-maestro.yml
