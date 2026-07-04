@@ -1,74 +1,54 @@
-# Scripts — yggdrasil-dew
+# scripts/ — README
 
-Directorio raíz de scripts del ecosistema. Los scripts están organizados en subdirectorios por dominio (islas).
-
-## Ruta canónica del repo
-
-```
-/srv/yggdrasil-dew
-```
-
-Si no existe, crea un symlink desde home:
-```bash
-ln -s /srv/yggdrasil-dew ~/yggdrasil-dew
-```
+> **Regla:** Este directorio contiene SOLO scripts ejecutables (`.sh`) y herramientas.  
+> Ningun archivo `.md` de sesion o diario debe vivir aqui.
 
 ---
 
-## Scripts de sesión
+## Scripts principales
 
-| Script | Uso | Descripción |
+| Script | Proposito | Uso |
 |---|---|---|
-| `inicio-sesion.sh` | Al arrancar el día | Sincroniza repo, muestra estado |
-| `cierre-sesion.sh` | Al terminar sesión | Auto-commit, push, diario |
+| `scripts/maintenance/master_run.sh` | Terminal madre — punto de entrada unico | `bash scripts/maintenance/master_run.sh [--apply]` |
+| `scripts/maintenance/create_perplexity_patch.sh` | Crea todos los ficheros del ecosistema Perplexity | `bash scripts/maintenance/create_perplexity_patch.sh [--apply]` |
+| `scripts/verify/run-smoke-tests.sh` | Comprueba que todos los ficheros clave existen | `bash scripts/verify/run-smoke-tests.sh` |
+| `scripts/agentes/agente-meta-deep.sh` | Extrae PERCENT_COMPLETE y abre issue si < 70% | `bash scripts/agentes/agente-meta-deep.sh` |
+| `scripts/observador-obsidian.sh` | Exporta notas Obsidian modificadas en 24h | `bash scripts/observador-obsidian.sh` |
+| `scripts/inbox-commit.sh` | Commitea archivos de `inbox/drop/` | `bash scripts/inbox-commit.sh "descripcion"` |
+| `scripts/inbox-clasificador.sh` | Clasifica `inbox/drop/` a destinos correctos | `bash scripts/inbox-clasificador.sh [--dry-run]` |
+| `scripts/session-logger.sh` | Logger de sesion de terminal | `source scripts/session-logger.sh` |
+| `scripts/session-terminal-doc.sh` | Genera documento de cierre de sesion | `bash scripts/session-terminal-doc.sh "descripcion"` |
+
+---
+
+## Flujo rapido sesion
 
 ```bash
-# Cierre de sesión:
-bash /srv/yggdrasil-dew/scripts/cierre-sesion.sh
+# 1. Inicio
+git pull origin main
+source scripts/session-logger.sh
 
-# Inicio de sesión:
-bash /srv/yggdrasil-dew/scripts/inicio-sesion.sh
+# 2. Ver que haria el ecosistema (siempre primero)
+bash scripts/maintenance/master_run.sh
+
+# 3. Ejecutar
+bash scripts/maintenance/master_run.sh --apply
+
+# 4. Cierre
+bash scripts/session-terminal-doc.sh "resumen de la sesion"
+git add inbox/sesiones/cierre-*.md
+git commit -m "docs(sesion): cierre $(date +%Y-%m-%d)"
+git push origin main
 ```
 
 ---
 
-## Scripts de auditoría y mejora del repo
+## Variables de entorno relevantes
 
-| Script | Uso | Descripción |
+| Variable | Descripcion | Requerida para |
 |---|---|---|
-| `audit-and-migrate.sh` | Auditoría + migración | Analiza y mueve ficheros mal ubicados |
-| `repo-research.sh` | Investigación de mejora | Genera reporte en `inbox/` con gaps detectados |
-
-```bash
-# Auditoría (siempre dry-run primero):
-bash scripts/audit-and-migrate.sh --dry-run
-bash scripts/audit-and-migrate.sh
-
-# Research del repo:
-bash scripts/repo-research.sh --dry-run  # ver sin escribir
-bash scripts/repo-research.sh            # genera inbox/DATE-repo-research.md
-```
-
----
-
-## Subdirectorios (islas)
-
-| Directorio | Contenido |
-|---|---|
-| `backup/` | Scripts de backup (restic) |
-| `ci/` | Scripts de CI/CD |
-| `infra/` | Infraestructura Docker / servicios |
-| `maintenance/` | Mantenimiento del sistema |
-| `osint/` | OSINT tools y workflows |
-
----
-
-## Scripts numerados (legacy)
-
-Los scripts con prefijo numérico (`01-`, `02-`...) son de las fases de setup inicial. No borrar, pero **no añadir nuevos** con ese patrón — usar nombres descriptivos.
-
----
-
-## Ver auditoría del estado
-
-Ver [`SCRIPTS-AUDITORIA.md`](./SCRIPTS-AUDITORIA.md) para el inventario completo con estado de cada script.
+| `YGGDRASIL_ROOT` | Raiz del repositorio | Todos los scripts |
+| `PERPLEXITY_URL` | URL endpoint Perplexity | agent-informer, adapter |
+| `PERPLEXITY_API_KEY` | Token API Perplexity | agent-informer, adapter |
+| `OBSIDIAN_VAULT` | Ruta al vault de Obsidian | observador-obsidian |
+| `GITHUB_REMOTE` | Remote de git (default: origin) | create_perplexity_patch |

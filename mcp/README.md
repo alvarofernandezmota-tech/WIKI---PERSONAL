@@ -1,93 +1,73 @@
-# MCP Server — Yggdrasil-dew
+# MCP Server — Yggdrasil-Dew
 
-## FUNCIÓN ÚNICA
-Exponer todas las herramientas del ecosistema (orquestador, watchdog, Galatea, agentes, inbox, auditoría, llm_router) como tools MCP compatibles con Claude Desktop, Copilot MCP y cualquier cliente MCP estándar.
-
-## Requisitos
-- Node 18+
-- `@modelcontextprotocol/sdk` (`npm install` en esta carpeta)
-- Scripts del ecosistema en `scripts/`
-- Variable `YGGDRASIL_ROOT` apuntando al root del repo
+Servidor MCP ligero que expone las tools del ecosistema por **stdio** y opcionalmente por **HTTP**.
 
 ## Instalación
 
 ```bash
-cd /srv/yggdrasil-dew/mcp
-npm install
+pip3 install -r mcp/requirements.txt
+
+# Compilar cliente C (opcional)
+gcc -Wall -O2 -o mcp_client mcp/mcp_client.c
 ```
 
 ## Arranque
 
 ```bash
-export YGGDRASIL_ROOT="/srv/yggdrasil-dew"
-node mcp/server.js
+export YGGDRASIL_ROOT="$(pwd)"
+export MCP_TOKEN="tu-token-secreto"   # opcional
+
+# Solo stdio
+python3 mcp/server.py
+
+# Stdio + HTTP en puerto 8080
+python3 mcp/server.py --port 8080
 ```
 
-## Integración Claude Desktop
+## Tools disponibles
 
-Copia `mcp-config.json` a `~/.config/claude/mcp.json` (Linux) o `~/Library/Application Support/Claude/mcp.json` (macOS) y rellena las API keys si usas modelos remotos.
-
-## Tools expuestas (34 total)
-
-| Tool | Script | Descripción |
+| Tool | Descripción | Args |
 |---|---|---|
-| `orquestador_supremo` | `orquestador-supremo.sh` | Coordina agentes y auditorías principales |
-| `orquestador_total` | `orquestador-total.sh` | Lanza todos los agentes, reporte maestro |
-| `watchdog_monitor` | `watchdog-monitor.sh` | Monitoriza reportes y detecta cuelgues |
-| `agent_monitor` | `agent-monitor.sh` | Monitor secundario de agentes |
-| `clasificador_maestro` | `clasificador-maestro.sh` | Clasifica inbox por tipo y contexto |
-| `gestor_estados_inbox` | `gestor-estados-inbox.sh` | Gestiona estados NUEVO→EN-PROCESO→PROCESADO |
-| `procesar_inbox_masivo` | `procesar-inbox-masivo.sh` | Procesa en lote el inbox |
-| `inbox_watcher` | `inbox-watcher.sh` | Watcher en tiempo real del inbox |
-| `struct_auditor` | `struct-auditor.sh` | Auditoría estructural del repo |
-| `ghost_file_detector` | `ghost-file-detector.sh` | Detecta archivos fantasma |
-| `cross_ref_checker` | `cross-ref-checker.sh` | Detecta links internos rotos |
-| `tool_inventory_auditor` | `tool-inventory-auditor.sh` | Audita cabeceras FUNCIÓN en scripts |
-| `isla_sync_validator` | `isla-sync-validator.sh` | Valida MAPA-ISLAS.md vs repo real |
-| `ecosystem_snapshot` | `ecosystem-snapshot.sh` | Snapshot completo del estado |
-| `audit_and_migrate` | `audit-and-migrate.sh` | Migra estructuras obsoletas |
-| `code_drift_detector` | `code-drift-detector.sh` | Detecta deriva de código |
-| `repo_research` | `repo-research.sh` | Investigación profunda del repo |
-| `task_analyzer` | `task-analyzer.sh` | Analiza tareas pendientes |
-| `issue_creator` | `issue-creator.sh` | Crea issues GitHub para deuda técnica |
-| `create_issues` | `create-issues.sh` | Batch de issues desde plantilla |
-| `setup_labels` | `setup-labels.sh` | Configura labels GitHub del ecosistema |
-| `apertura_sesion` | `apertura-sesion.sh` | Ritual de apertura de sesión |
-| `inicio_sesion` | `inicio-sesion.sh` | Inicio de sesión rápido |
-| `cierre_sesion` | `cierre-sesion.sh` | Ritual de cierre de sesión |
-| `between_sessions` | `between-sessions.sh` | Tareas automáticas entre sesiones |
-| `deploy` | `deploy.sh` | Despliega el ecosistema |
-| `deploy_madre` | `deploy-madre.sh` | Despliega cambios en Madre |
-| `batcueva_control` | `batcueva-control.sh` | Control del entorno Batcueva |
-| `galatea_fabrica_agente` | `galatea-fabrica-agentes.sh` | Crea nuevo agente con plantilla base |
-| `galatea_isla_bot` | `galatea-islas-bots.sh` | Crea isla o bot Galatea |
-| `galatea_scan` | `galatea-scan.sh` | Escanea y cataloga agentes |
-| `llm_router` | — | Router: ollama/openai/anthropic/http |
-| `core_estado` | `docs/CORE-ECOSISTEMA.md` | Lee fuente de verdad del sistema |
-| `inbox_cleanup` | `inbox-cleanup-jun2026.sh` | Limpieza profunda del inbox |
+| `orquestador_total` | Ejecuta orquestador-total.sh | `phase`: all\|audit\|inbox\|health |
+| `llm_router` | Enruta prompt al mejor LLM disponible | `prompt`, `mode`: auto\|ollama\|openai\|anthropic |
+| `agent_test` | Corre test.sh de un agente | `agent`: nombre del agente |
+| `inbox_commit` | Commitea inbox/drop | `description`: texto del commit |
 
-## Ejemplos de llamada MCP (JSON)
+## Ejemplos de llamadas JSON
 
-```json
-{ "type": "call_tool", "tool": "orquestador_total", "arguments": {} }
+```bash
+# Listar tools
+echo '{"type":"list_tools"}' | python3 mcp/server.py
+
+# Llamar orquestador
+echo '{"type":"call_tool","tool":"orquestador_total","arguments":{"phase":"audit"}}' | python3 mcp/server.py
+
+# Llamar llm_router
+echo '{"type":"call_tool","tool":"llm_router","arguments":{"prompt":"estado del sistema","mode":"auto"}}' | python3 mcp/server.py
+
+# Via HTTP (si arrancado con --port)
+curl -s -X POST http://localhost:8080 \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer tu-token' \
+  -d '{"type":"call_tool","tool":"agent_test","arguments":{"agent":"agent-docs"}}'
+
+# Health check
+curl http://localhost:8080/health
 ```
 
-```json
-{ "type": "call_tool", "tool": "llm_router", "arguments": { "model": "ollama:llama3", "prompt": "Resume el último reporte maestro" } }
+## Cliente C
+
+```bash
+# Listar tools
+echo '{"type":"list_tools"}' | ./mcp_client list_tools '{}'
+
+# Llamar tool directamente
+./mcp_client orquestador_total '{"phase":"audit"}'
 ```
 
-```json
-{ "type": "call_tool", "tool": "galatea_fabrica_agente", "arguments": { "nombre": "agent-docs-enhancer", "rol": "Mejora automática de docs", "scope": "docs", "tags": "docs,enhancer" } }
-```
+## Seguridad
 
-## Arquitectura
-
-```
-Cliente MCP (Claude / Copilot / IA en C)
-        │ JSON-RPC over stdio
-        ▼
-  mcp/server.js
-        │ execSync / readFileSync
-        ▼
-  scripts/*.sh  →  inbox/ docs/ diary/  →  GitHub API (gh cli)
-```
+- Setear `MCP_TOKEN` para requerir `Authorization: Bearer <token>` en HTTP.
+- Sin token, el servidor HTTP es abierto — úsalo solo en red local.
+- Stdio no requiere autenticación (aislado por proceso).
+- El router LLM sanitiza emails, API keys y números largos antes de loggear.

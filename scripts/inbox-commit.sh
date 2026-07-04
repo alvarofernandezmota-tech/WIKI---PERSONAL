@@ -1,30 +1,49 @@
 #!/usr/bin/env bash
 # =============================================================================
-# inbox-commit.sh — Commitea TODO lo que haya en inbox/drop/ de una vez
-# Uso: bash scripts/inbox-commit.sh "descripción de lo que entra"
+# inbox-commit.sh — UN solo comando para commitear todo lo que haya en
+#                   inbox/drop/ directamente desde terminal.
+#
+# USO:
+#   bash scripts/inbox-commit.sh "descripción de lo que entra"
+#
+# FLUJO:
+#   1. Verifica que inbox/drop/ tenga archivos
+#   2. git add inbox/drop/
+#   3. git commit con mensaje estándar
+#   4. git push origin main
+#   → GitHub Actions detecta el push y clasifica automáticamente
 # =============================================================================
 set -euo pipefail
 
-DESC="${1:-entrada manual}"
-FECHA=$(date +%Y-%m-%d)
-HORA=$(date +%H:%M)
-BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+DESCRIPCION="${1:-entrada sin descripción}"
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/yggdrasil-dew")"
+DROP_DIR="$REPO_ROOT/inbox/drop"
+TIMESTAMP="$(date +%Y%m%dT%H%M%S)"
 
-DROP_COUNT=$(find inbox/drop/ -not -name '.gitkeep' -not -type d 2>/dev/null | wc -l)
+cd "$REPO_ROOT"
 
-if [ "$DROP_COUNT" -eq 0 ]; then
-  echo "ℹ️  inbox/drop/ está vacío. Nada que commitear."
-  echo "   Copia tu archivo primero: cp /ruta/archivo.md inbox/drop/"
+# 1. Verificar que hay archivos nuevos
+if [[ -z "$(find "$DROP_DIR" -not -name '.gitkeep' -not -type d 2>/dev/null)" ]]; then
+  echo "[inbox-commit] inbox/drop/ está vacío. Nada que commitear."
   exit 0
 fi
 
-echo "📦 $DROP_COUNT archivo(s) en inbox/drop/:"
-find inbox/drop/ -not -name '.gitkeep' -not -type d 2>/dev/null | while read f; do echo "  → $f"; done
+echo "[inbox-commit] Archivos en drop/:"
+ls -1 "$DROP_DIR"
 
-git add inbox/drop/
-git commit -m "inbox(drop): ${FECHA} ${HORA} — ${DESC}"
-git push origin "$BRANCH"
+# 2. Sincronizar primero
+echo "[inbox-commit] Sincronizando con origin..."
+git pull --rebase origin main 2>/dev/null || true
 
-echo ""
-echo "✅ Push hecho. El Action inbox-clasificador.yml clasificará los archivos automáticamente."
-echo "   Revisa: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/actions"
+# 3. Add
+git add "$DROP_DIR/"
+
+# 4. Commit
+COMMIT_MSG="inbox(drop): ${TIMESTAMP} — ${DESCRIPCION}"
+git commit -m "$COMMIT_MSG"
+
+# 5. Push
+git push origin main
+
+echo "[inbox-commit] ✓ Push completado. GitHub Actions clasificará los archivos."
+echo "[inbox-commit] Commit: $COMMIT_MSG"

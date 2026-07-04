@@ -1,13 +1,1 @@
-{
-  "mcpServers": {
-    "yggdrasil-ecosistema": {
-      "command": "node",
-      "args": ["mcp/server.js"],
-      "env": {
-        "YGGDRASIL_ROOT": "/srv/yggdrasil-dew",
-        "OPENAI_API_KEY": "",
-        "ANTHROPIC_API_KEY": ""
-      }
-    }
-  }
-}
+// movido desde raíz — ver historial git

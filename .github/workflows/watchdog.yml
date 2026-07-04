@@ -1,19 +1,30 @@
-name: Watchdog SLA Monitor
+name: Watchdog — Health Check
+
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch: {}
+    - cron: '*/30 * * * *'  # Cada 30 minutos
+  workflow_dispatch:
+
 jobs:
-  watchdog:
+  health:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup tools
-        run: sudo apt-get update && sudo apt-get install -y jq bc
-      - name: Run vigilante
-        run: bash scripts/agentes/agente-vigilante.sh --verbose
-      - name: Upload diary
-        uses: actions/upload-artifact@v4
-        with:
-          name: diary
-          path: diary/
+
+      - name: Configurar entorno
+        run: |
+          echo "YGGDRASIL_ROOT=$(pwd)" >> $GITHUB_ENV
+          chmod +x scripts/*.sh 2>/dev/null || true
+
+      - name: Health check
+        run: |
+          echo "=== HEALTH CHECK $(date -Iseconds) ==="
+          # Verificar estructura crítica
+          for dir in mcp scripts agentes tools .github/workflows; do
+            [ -d "$dir" ] && echo "✅ $dir" || echo "❌ $dir MISSING"
+          done
+          # Verificar archivos clave
+          for f in mcp/server.py scripts/agentes/llm-router.sh scripts/agentes/agente-meta-deep.sh; do
+            [ -f "$f" ] && echo "✅ $f" || echo "❌ $f MISSING"
+          done
+          echo "=== END HEALTH CHECK ==="

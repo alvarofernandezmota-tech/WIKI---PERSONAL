@@ -1,68 +1,41 @@
 #!/usr/bin/env bash
-# ============================================================
-# NOMBRE:   scripts/agentes/llm-router.sh
-# VERSION:  1.0.0
-# FUNCIÓN:  Enruta prompts al LLM adecuado: Ollama (local)
-#           u OpenAI/Anthropic (remoto). Auto-detección.
-# TIPO:     gestor
-# REPO:     alvarofernandezmota-tech/yggdrasil-dew
-# USO:      bash scripts/agentes/llm-router.sh <prompt> [proveedor] [modelo]
-# PROVEEDORES: auto | ollama | openai | anthropic
-# ============================================================
+# scripts/agentes/llm-router.sh
+# Sanitiza PII del PROMPT y lo envía al MCP LLM router
+# Uso: PROMPT="texto" bash scripts/agentes/llm-router.sh
+# o:   bash scripts/agentes/llm-router.sh "mi prompt aquí"
 set -euo pipefail
 
-PROMPT="${1:-}"
-PROVEEDOR="${2:-auto}"
-MODELO="${3:-}"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+MCP_URL="${MCP_URL:-http://localhost:3000}"
+PROMPT="${1:-${PROMPT:-}}"
 
 if [ -z "$PROMPT" ]; then
-  echo "USO: $0 <prompt> [proveedor] [modelo]"
+  echo "ERROR: PROMPT vacío. Uso: bash llm-router.sh \"mi prompt\"" >&2
   exit 1
 fi
 
-# ── AUTO-DETECCIÓN ────────────────────────────────────────
-if [ "$PROVEEDOR" = "auto" ]; then
-  if command -v ollama &>/dev/null && ollama list &>/dev/null 2>&1; then
-    PROVEEDOR="ollama"
-  elif [ -n "${OPENAI_API_KEY:-}" ]; then
-    PROVEEDOR="openai"
-  elif [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-    PROVEEDOR="anthropic"
-  else
-    echo "[ERROR] No hay LLM disponible. Instala Ollama o configura API keys."
+# === SANITIZACIÓN PII ===
+# DNI/NIE español
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{8}[A-Z]/[REDACTED_ID]/g')
+PROMPT=$(echo "$PROMPT" | sed -E 's/[XYZ][0-9]{7}[A-Z]/[REDACTED_NIE]/g')
+# SSN americano
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{3}-[0-9]{2}-[0-9]{4}/[REDACTED_SSN]/g')
+# Emails
+PROMPT=$(echo "$PROMPT" | sed -E 's/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/[REDACTED_EMAIL]/g')
+# Teléfonos (ES y formato internacional)
+PROMPT=$(echo "$PROMPT" | sed -E 's/(\+34|0034)?[ -]?[6789][0-9]{2}[ -]?[0-9]{3}[ -]?[0-9]{3}/[REDACTED_PHONE]/g')
+# Tarjetas (Luhn-like pattern)
+PROMPT=$(echo "$PROMPT" | sed -E 's/[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}/[REDACTED_CARD]/g')
+# IBANs
+PROMPT=$(echo "$PROMPT" | sed -E 's/[A-Z]{2}[0-9]{2}[ ]?([0-9]{4}[ ]?){4,6}/[REDACTED_IBAN]/g')
+
+# === ENVÍO AL ROUTER ===
+RESPONSE=$(curl -sf -X POST "$MCP_URL/route" \
+  -H "Content-Type: application/json" \
+  -d "{\"prompt\": $(echo "$PROMPT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read().strip()))')}" \
+  2>/dev/null) || {
+    echo "ERROR: MCP router no disponible en $MCP_URL" >&2
     exit 1
-  fi
-fi
+  }
 
-# ── OLLAMA ────────────────────────────────────────────────
-if [ "$PROVEEDOR" = "ollama" ]; then
-  MODELO="${MODELO:-llama3}"
-  echo "[llm-router] Usando Ollama ($MODELO)" >&2
-  ollama run "$MODELO" "$PROMPT"
-
-# ── OPENAI ────────────────────────────────────────────────
-elif [ "$PROVEEDOR" = "openai" ]; then
-  [ -z "${OPENAI_API_KEY:-}" ] && { echo "[ERROR] OPENAI_API_KEY no configurada"; exit 1; }
-  MODELO="${MODELO:-gpt-4o-mini}"
-  echo "[llm-router] Usando OpenAI ($MODELO)" >&2
-  BODY=$(printf '{"model":"%s","messages":[{"role":"user","content":"%s"}],"temperature":0.3}' "$MODELO" "$(echo "$PROMPT" | sed 's/"/\\"/g')")
-  curl -s -X POST https://api.openai.com/v1/chat/completions \
-    -H "Authorization: Bearer $OPENAI_API_KEY" \
-    -H "Content-Type: application/json" \
-    -d "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['choices'][0]['message']['content'])"
-
-# ── ANTHROPIC ─────────────────────────────────────────────
-elif [ "$PROVEEDOR" = "anthropic" ]; then
-  [ -z "${ANTHROPIC_API_KEY:-}" ] && { echo "[ERROR] ANTHROPIC_API_KEY no configurada"; exit 1; }
-  MODELO="${MODELO:-claude-3-haiku-20240307}"
-  echo "[llm-router] Usando Anthropic ($MODELO)" >&2
-  BODY=$(printf '{"model":"%s","max_tokens":2048,"messages":[{"role":"user","content":"%s"}]}' "$MODELO" "$(echo "$PROMPT" | sed 's/"/\\"/g')")
-  curl -s -X POST https://api.anthropic.com/v1/messages \
-    -H "x-api-key: $ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -H "Content-Type: application/json" \
-    -d "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['content'][0]['text'])"
-else
-  echo "[ERROR] Proveedor desconocido: $PROVEEDOR"
-  exit 1
-fi
+echo "$RESPONSE"

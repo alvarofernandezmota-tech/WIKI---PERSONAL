@@ -1,0 +1,54 @@
+name: Bot Writer Template
+# Template para bots que necesitan escribir en el repo.
+# REGLA: nunca merge directo en main. Siempre rama bot/ + PR draft.
+
+on:
+  workflow_dispatch:
+    inputs:
+      description:
+        description: 'Descripcion del cambio del bot'
+        required: true
+        default: 'automated changes'
+
+jobs:
+  prepare:
+    name: Prepare bot branch and PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create bot branch
+        run: |
+          BRANCH="bot/changes-$(date +%s)"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          git checkout -b "$BRANCH"
+
+      - name: Generate changes
+        run: |
+          # Aqui van los comandos del bot
+          echo "# Bot change $(date -Iseconds)" >> bot-output.md
+          git add -A
+          git diff --cached --quiet || git commit -m "chore(bot): ${{ github.event.inputs.description }}"
+          git push origin "$BRANCH"
+
+      - name: Create draft PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH }}
+          title: "bot: ${{ github.event.inputs.description }}"
+          body: |
+            Draft PR creado automaticamente por bot.
+
+            **Revision humana obligatoria antes del merge.**
+
+            - Descripcion: ${{ github.event.inputs.description }}
+            - Timestamp: $(date -Iseconds)
+          draft: true

@@ -1,240 +1,192 @@
-# COPILOT CONTEXT — yggdrasil-dew
+# COPILOT-CONTEXT.md — Yggdrasil Dew
+> Actualizado: 2026-07-04 | Auditoría completa post-commit 93173615
 
-> **Archivo clave para GitHub Copilot y cualquier IA que trabaje en este repo.**
-> Lee este archivo COMPLETO antes de cualquier tarea. Última actualización: 2026-07-03
-
----
-
-## 🧠 Identidad del ecosistema
-
-- **Nombre:** yggdrasil-dew
-- **Propósito:** Ecosistema operativo autosuficiente para automatización IA, scripts, agentes y workflows GitHub.
-- **Madre:** Servidor local (Raspberry Pi / Acer) — ruta: `/srv/yggdrasil-dew`
-- **MCP server:** Node.js operativo en Madre desde 2026-07-03. Arranque: `cd /srv/yggdrasil-dew/mcp && node server.js`
-- **Idioma:** Español en docs, inglés en código y nombres de archivos.
+Este fichero es el contexto principal para GitHub Copilot y cualquier agente LLM que trabaje sobre este repo.
+**Léelo completo antes de tocar cualquier archivo.**
 
 ---
 
-## 🏗️ Estructura sagrada (NO modificar sin auditoría)
+## Estado actual del ecosistema
+
+### ✅ PRESENTE Y FUNCIONAL
+
+#### `mcp/`
+- `mcp/server.py` — MCP server Python
+- `mcp/server.js` — MCP server Node.js
+- `mcp/llm_adapters.py` — adaptadores LLM (OpenAI, Ollama, Perplexity)
+- `mcp/llm-router.js` — router LLM JS
+- `mcp/mcp_client.c` — cliente C MCP
+- `mcp/requirements.txt` — dependencias Python
+- `mcp/package.json` — dependencias Node
+- `mcp/mcp-config.json` — configuración MCP
+- `mcp/test-mcp.js` — tests MCP
+
+#### `tools/`
+- `tools/retrieval_api.py` — API retrieval (puerto 9001, sirve desde vector_index/)
+- `tools/vector_index/.gitkeep` — carpeta de índice vectorial
+
+#### `scripts/maintenance/`
+- `scripts/maintenance/repo_audit_full.sh` — auditoría completa (11 secciones)
+
+#### `scripts/agentes/agent-templates/`
+- `scripts/agentes/agent-templates/PROFILE-TEMPLATE.md` — plantilla PROFILE agente
+- `scripts/agentes/agent-templates/TEST-TEMPLATE.sh` — plantilla test agente
+
+#### `.github/workflows/`
+- `.github/workflows/secret-scan.yml` — CI scan de secretos
+
+#### `inbox/`
+- `inbox/ocr/raw/` — zona aterrizaje OCR
+- `inbox/ocr/text/` — textos extraídos OCR
+- `inbox/ocr/processed/` — OCR procesado
+- `inbox/context/perplexity/` — contexto Perplexity
+- `inbox/drop/` — zona de aterrizaje general
+- `inbox/_meta/` — reportes de auditoría
+
+#### Docs raíz
+- `ECOSISTEMA.md`, `ECOSYSTEM-ARCHITECTURE.md`, `CONVENCIONES.md`
+- `MAPA-ISLAS.md`, `ROADMAP-MASTER.md`, `ESTADO-SISTEMA.md`
+- `COPILOT-CONTEXT.md` (este archivo)
+- `AGENT.md`, `CONTEXT.md`, `HERRAMIENTAS-ECOSISTEMA.md`
+
+---
+
+### ❌ PENDIENTE — 5 CARPETAS PRIORITARIAS
+
+Estas son las carpetas que **deben crearse con sus archivos**.
+Copilot: implementa cada una respetando las convenciones de `CONVENCIONES.md`.
+
+---
+
+#### PENDIENTE 1: `scripts/ingest/`
+```
+scripts/ingest/
+├── ocr-ingest.sh              # Lanza tesseract sobre inbox/ocr/raw/, guarda en inbox/ocr/text/
+├── ocr-worker-loop.sh         # Loop daemon: vigila inbox/ocr/raw/ y llama ocr-ingest.sh
+├── pdf-split.sh               # Divide PDFs en páginas individuales antes de OCR
+└── ingest-status.sh           # Muestra cuántos archivos hay en raw/text/processed
+```
+**Convenciones:**
+- `set -euo pipefail` en todos
+- Log a `logs/ingest-YYYYMMDD.log`
+- Al terminar cada archivo, moverlo de `raw/` a `processed/`
+- Nunca modificar archivos fuera de `inbox/ocr/`
+
+---
+
+#### PENDIENTE 2: `scripts/agentes/`
+```
+scripts/agentes/
+├── agente-meta-deep.sh        # Auditor meta: lee reports/, genera resumen, extrae PERCENT_COMPLETE
+├── llm-router.sh              # Router bash: recibe PROMPT, sanitiza PII, llama mcp/llm-router.js
+├── galatea-fabrica-agentes.sh # Fábrica: dado un nombre, genera carpeta agentes/<nombre>/ con PROFILE+test
+├── galatea-create-pr.sh       # Crea PR draft en GitHub con los cambios pendientes
+└── agente-health-check.sh     # Comprueba que MCP server, retrieval API y Ollama responden
+```
+**Convenciones:**
+- `llm-router.sh` DEBE sanitizar: DNI/NIE (`[0-9]{8}[A-Z]`), SSN (`[0-9]{3}-[0-9]{2}-[0-9]{4}`), emails, teléfonos
+- `galatea-create-pr.sh` usa `gh pr create --draft`
+- `agente-meta-deep.sh` extrae `PERCENT_COMPLETE: XX%` y crea issue si <70%
+
+---
+
+#### PENDIENTE 3: `scripts/verify/`
+```
+scripts/verify/
+├── run-smoke-tests.sh         # Ejecuta todos los test.sh en agentes/*/test.sh y reporta
+├── check-structure.sh         # Valida que no haya archivos prohibidos en raíz ni carpetas vacías
+├── validate-workflows.sh      # Parsea .github/workflows/*.yml y detecta git push directos
+└── e2e-local.sh               # Simula el flujo completo: ingest → classify → index → retrieve
+```
+**Convenciones:**
+- Salida: `reports/verify/smoke-YYYYMMDD-HHMMSS.md`
+- Exit code 1 si algún test falla
+- `validate-workflows.sh` usa `grep -E 'git push|git commit'` sobre workflows
+
+---
+
+#### PENDIENTE 4: `tools/`  (archivos que faltan)
+```
+tools/
+├── vector_adapter.py          # Indexa texto en tools/vector_index/ como JSON {id, text, meta}
+├── weaviate_adapter.py        # Adapter Weaviate (template, usa WEAVIATE_URL del .env)
+├── prometheus_exporter.py     # Exporta métricas: archivos en inbox, índice size, last_ingest_ts
+└── auth_gateway.py            # Middleware: valida Bearer token antes de servir retrieval_api
+```
+**Convenciones:**
+- `vector_adapter.py`: guarda cada doc como `tools/vector_index/<hash_sha256>.json`
+- `weaviate_adapter.py`: no debe conectar en import, solo en `connect()` explícito
+- `prometheus_exporter.py`: puerto 9090, métricas `ygg_inbox_files_total`, `ygg_index_docs_total`
+- `auth_gateway.py`: lee `AUTH_TOKEN` de env, 401 si falta o incorrecto
+
+---
+
+#### PENDIENTE 5: `.github/workflows/` (workflows que faltan)
+```
+.github/workflows/
+├── e2e-full-flow.yml          # E2E: ingest mock → classify → index → retrieve query → assert
+├── ci-agentes.yml             # CI: ejecuta scripts/verify/run-smoke-tests.sh en cada PR
+├── session-close.yml          # Mueve inbox/sesiones/cierre-*.md a diarios/ al push
+└── pause-noisy-workflows.sh   # (en scripts/maintenance/) pausa workflows escritores
+```
+**Convenciones:**
+- Todos usan `ubuntu-latest`
+- `e2e-full-flow.yml` y `ci-agentes.yml`: trigger en `push` a `main` y `pull_request`
+- `session-close.yml`: trigger en `push` a `main`, solo si `inbox/sesiones/cierre-*.md` existe
+- Ningún workflow hace `git push` directo a `main` sin PR
+
+---
+
+## Arquitectura de flujo (resumen)
 
 ```
-yggdrasil-dew/
-├── docs/              ← Fuente de verdad. CORE-ECOSISTEMA.md es la biblia.
-├── scripts/           ← Scripts bash del ecosistema (cabecera Galatea obligatoria)
-│   ├── agentes/       ← Agentes especializados (función única cada uno)
-│   ├── archive/       ← Scripts obsoletos o duplicados (NO borrar, archivar aquí)
-│   ├── maintenance/   ← Scripts de mantenimiento del sistema
-│   ├── seguridad/     ← Hardening, UFW, seg. del servidor
-│   ├── infra/         ← Infraestructura y despliegue
-│   ├── setup/         ← Instalación inicial del ecosistema
-│   └── tests/         ← Tests automáticos de scripts y agentes
-├── mcp/               ← MCP Server Node.js — expone tools a IAs externas
-│   └── server.js      ← Punto de entrada MCP (OPERATIVO)
-├── .github/
-│   └── workflows/     ← 35 GitHub Actions activos
-├── inbox/             ← TODO lo que pasa por terminal va aquí
-├── diary/             ← Reportes permanentes de sesión
-└── islas/             ← Proyectos específicos (isla-proyectos, isla-hardware...)
+terminal
+  └─► inbox/drop/  ──► scripts/inbox-clasificador.sh
+                            ├─► inbox/ocr/raw/  ──► scripts/ingest/ocr-ingest.sh
+                            │                          └─► inbox/ocr/text/
+                            │                                └─► tools/vector_adapter.py
+                            │                                        └─► tools/vector_index/*.json
+                            │                                                └─► tools/retrieval_api.py (9001)
+                            ├─► inbox/context/perplexity/
+                            └─► inbox/sesiones/  ──► diarios/ (via session-close.yml)
 ```
 
 ---
 
-## 🔴 Reglas ABSOLUTAS para Copilot
+## Reglas que Copilot NUNCA debe romper
 
-1. **Cada script/agente/workflow tiene UNA sola función** — declarada en cabecera `FUNCIÓN:`
-2. **Plantilla Galatea obligatoria** en todos los scripts (ver sección Plantilla abajo)
-3. **TODO output de terminal va a `inbox/`** — usando el bloque OUTPUT→INBOX estándar
-4. **Nunca borrar** `docs/CORE-ECOSISTEMA.md`, `inbox/`, `diary/` sin auditoría previa
-5. **Abre issue automático** si detectas problema crítico usando `scripts/issue-creator.sh`
-6. **Busca antes de crear** — revisa `scripts/` y `scripts/agentes/` antes de proponer script nuevo
-7. **Duplicados van a `scripts/archive/`** antes de ser eliminados — nunca borrado directo
-8. **Un solo orquestador** — punto de entrada único: `orquestador-maestro`
-9. **MAPA-ISLAS.md refleja la realidad** en cada push — `isla-sync-validator.sh` lo verifica
-10. **Copilot no propone cambios** incompatibles con esta arquitectura
+1. **No commitear a `main` directamente** desde scripts automáticos — siempre PR draft
+2. **No subir secretos** — `.env` está en `.gitignore`; usar `.env.template`
+3. **No archivos binarios >5MB** en el repo — usar referencias externas
+4. **Toda salida de scripts** va a `logs/` o `reports/`, nunca a la raíz
+5. **Sanitizar PII** en `llm-router.sh` antes de enviar al LLM externo
+6. **`set -euo pipefail`** en todos los scripts bash
 
 ---
 
-## 🛠️ Plantilla Galatea estándar (TODOS los scripts)
+## Comandos de referencia rápida
 
 ```bash
-#!/usr/bin/env bash
-# ============================================================
-# NOMBRE    : nombre-exacto-del-script.sh
-# VERSIÓN   : 1.0.0
-# FUNCIÓN   : [UNA sola frase — acción concreta y única]
-# CATEGORÍA : [auditoria|orquestacion|sesion|inbox|galatea|seguridad|osint]
-# TRIGGER   : [manual|on-push|cron|llamado-por:otro-script.sh]
-# OUTPUT    : [qué produce: issue/log en inbox/diary/ninguno]
-# AUTOR     : thdora-guardian[bot] / Álvaro
-# REPO      : alvarofernandezmota-tech/yggdrasil-dew
-# ACTUALIZ  : YYYY-MM-DD
-# ============================================================
-# DEPENDENCIAS: gh cli, git, jq
-# ABRE ISSUE  : sí/no — [condición que lo dispara]
-# ============================================================
-set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/..” && pwd)"
-INBOX_DIR="${ROOT}/inbox"
+# Auditoría completa
+bash scripts/maintenance/repo_audit_full.sh
+
+# Ver items faltantes
+grep '\[MISSING\]' reports/audit/full-audit-*.md
+
+# Aplicar templates a agentes sin PROFILE/test
+for a in agentes/*/; do
+  [ -f "${a}PROFILE.md" ] || cp scripts/agentes/agent-templates/PROFILE-TEMPLATE.md "${a}PROFILE.md"
+  [ -f "${a}test.sh" ]    || cp scripts/agentes/agent-templates/TEST-TEMPLATE.sh "${a}test.sh"
+done
+
+# Arrancar retrieval API
+python3 tools/retrieval_api.py &
+curl 'http://localhost:9001/?q=sesion'
+
+# Iniciar sesión
+source scripts/session-logger.sh
+
+# Cerrar sesión
+bash scripts/session-terminal-doc.sh "descripción"
+git add inbox/sesiones/ && git commit -m "docs(sesion): cierre" && git push
 ```
-
-### Bloque OUTPUT→INBOX (obligatorio al final de CADA script)
-
-```bash
-# ============================================================
-# OUTPUT → INBOX
-# ============================================================
-TIMESTAMP=$(date +%Y-%m-%d-%H-%M)
-SCRIPT_NAME=$(basename "$0" .sh)
-OUTPUT_FILE="${INBOX_DIR}/${TIMESTAMP}-${SCRIPT_NAME}-output.md"
-mkdir -p "$INBOX_DIR"
-cat > "$OUTPUT_FILE" << EOF
----
-fecha: $(date +%Y-%m-%d)
-hora: $(date +%H:%M)
-script: ${SCRIPT_NAME}
-estado: completado
----
-# Output: ${SCRIPT_NAME}
-## Resultado
-${RESULTADO:-Sin output registrado}
-## Errores detectados
-${ERRORES:-Ninguno}
-## Acción requerida
-${ACCION:-Ninguna}
-EOF
-echo "[${SCRIPT_NAME}] → inbox: ${OUTPUT_FILE}"
-```
-
----
-
-## 🤖 Agentes MCP disponibles (MCP server Node.js OPERATIVO)
-
-| Tool MCP | Script bash equivalente | Función |
-|---|---|---|
-| `orquestador_total` | `scripts/orquestador-maestro.sh` | Coordina todo el ecosistema |
-| `galatea_fabrica_agente` | `scripts/agentes/galatea-fabrica-agentes.sh` | Genera agentes nuevos |
-| `agente_meta_deep` | `scripts/agentes/agente-meta-deep.sh` | Auditoría profunda con LLM |
-| `llm_router` | `scripts/agentes/llm-router.sh` | Enruta a Ollama/OpenAI/Anthropic |
-| `struct_auditor` | `scripts/struct-auditor.sh` | Detecta duplicados y estructuras |
-| `ghost_file_detector` | `scripts/ghost-file-detector.sh` | Archivos huérfanos y fantasmas |
-| `isla_sync_validator` | `scripts/isla-sync-validator.sh` | Valida MAPA-ISLAS.md |
-| `watchdog` | `scripts/watchdog.sh` | Monitor SLAs |
-| `diary_writer` | `scripts/diary-writer.sh` | Escribe entradas de diario |
-| `issue_creator` | `scripts/issue-creator.sh` | Crea issues GitHub automáticos |
-| `health_check` | `scripts/health-check.sh` | Pulso del ecosistema |
-
----
-
-## ⚡ Arranque rápido en Madre
-
-```bash
-# MCP server (Node.js — OPERATIVO desde 2026-07-03)
-cd /srv/yggdrasil-dew/mcp
-export YGGDRASIL_ROOT="/srv/yggdrasil-dew"
-node server.js
-# Confirma: [MCP] yggdrasil-ecosistema server arrancado
-
-# Auditoría completa (Fase 1 — sólo lee, no modifica)
-cd /srv/yggdrasil-dew
-bash scripts/struct-auditor.sh          # PASO 1: duplicados
-bash scripts/ghost-file-detector.sh     # PASO 2: fantasmas
-bash scripts/tool-inventory-auditor.sh  # PASO 3: cabeceras
-bash scripts/cross-ref-checker.sh       # PASO 4: refs rotas
-bash scripts/audit-and-migrate.sh       # PASO 5: migrar duplicados
-
-# Crear agente nuevo con Galatea
-bash scripts/agentes/galatea-fabrica-agentes.sh "mi-agente" "Función específica" "auditor"
-```
-
----
-
-## 📊 Workflows activos: 35 en `.github/workflows/`
-
-| Categoría | Workflows |
-|---|---|
-| **Orquestación** | orquestador-maestro.yml, orquestador-supremo.yml ⚠️, orquestador-total.yml ⚠️ |
-| **Auditoría** | audit-on-push.yml, meta-deep-audit.yml, ghost-file-detector.yml, cross-ref-checker.yml, struct-auditor.yml |
-| **Inbox** | inbox-cleanup.yml, inbox-dispatcher.yml, inbox-health.yml, inbox-processor.yml, gestor-estados-inbox.yml, clasificador.yml, clasificador-maestro.yml |
-| **Islas** | isla-context-sync.yml, isla-sync-validator.yml, islas-health.yml, mapa-islas-sync.yml |
-| **Salud** | health-check.yml, agent-monitor.yml, ecosystem-guardian.yml, watchdog.yml |
-| **Sesiones** | diary-writer.yml, between-sessions.yml, context-reminder.yml |
-| **Galatea** | galatea.yml, new-file-bootstrap.yml |
-| **Deuda/CI** | deuda-tecnica.yml, code-drift.yml, lint-commits.yml, issue-creator.yml, auto-investigacion.yml, autonomous-cron.yml |
-
-⚠️ = duplicado pendiente de consolidar en `orquestador-maestro`
-
----
-
-## 🚫 Deuda técnica conocida (2026-07-03)
-
-### CRÍTICO
-- [ ] Triplicación de orquestadores: maestro + supremo + total → consolidar en maestro
-- [ ] Clasificadores duplicados: clasificador.yml + clasificador-maestro.yml
-- [ ] `guardian-maestro.sh` no existe aún — es la pieza que orquesta la limpieza completa
-
-### IMPORTANTE
-- [ ] Scripts sin cabecera Galatea: scripts numerados (01- al 10-), `bc` sin extensión
-- [ ] `inbox-cleanup-jun2026.sh` — específico de fecha, candidato a archivar
-- [ ] `watchdog_adb.sh` — naming inconsistente (guión bajo vs guión medio)
-- [ ] `issue-creator.sh` vs `create-issues.sh` — posible duplicado de función
-
-### MENOR
-- [ ] `diary/` vs `diarios/` — consolidar en `diary/`
-- [ ] `osint/` vs `osint-stack/` — consolidar
-- [ ] scripts/agentes/, scripts/thdora/, scripts/thdora-dev/ — inventariar contenido
-
----
-
-## 🔄 Flujo completo: terminal → inbox → diary → issue
-
-```
-Terminal (ejecutas script)
-    ↓
-script.sh corre su lógica
-    ↓
-Deposita output en inbox/ (bloque OUTPUT→INBOX obligatorio)
-    ↓
-inbox-processor.yml lo recoge (cron 6h o on-push)
-    ↓
-clasificador-maestro.yml lo clasifica
-    ↓
-Si hay deuda/error → issue-creator.sh abre issue en GitHub
-    ↓
-diary-writer.yml lo registra en diary/
-```
-
-**Invariante del ecosistema:** nada se pierde, todo queda trazado.
-
----
-
-## 🧩 Pieza faltante crítica: `guardian-maestro.sh`
-
-Agente que orquesta la limpieza completa en secuencia:
-
-```
-1. struct-auditor.sh          → detecta duplicados
-2. ghost-file-detector.sh     → detecta fantasmas
-3. tool-inventory-auditor.sh  → verifica cabeceras
-4. cross-ref-checker.sh       → verifica refs rotas
-5. galatea-scan.sh            → detecta scripts sin plantilla
-6. issue-creator.sh           → abre issues de todo lo encontrado
-7. ecosystem-snapshot.sh      → documenta estado final
-8. isla-sync-validator.sh     → sincroniza MAPA-ISLAS.md
-```
-
-Pendiente de crear con plantilla Galatea completa.
-
----
-
-## 📋 Variables de entorno necesarias en Madre
-
-```bash
-export YGGDRASIL_ROOT=/srv/yggdrasil-dew
-export OPENAI_API_KEY=sk-...        # opcional
-export ANTHROPIC_API_KEY=sk-ant-... # opcional
-# Ollama: preferido (local). OpenAI/Anthropic: fallback remoto
-```
-
----
-
-*Última actualización: 2026-07-03 23:00 CEST — Sesión blindaje ecosistema Álvaro + Perplexity [AUTO]*

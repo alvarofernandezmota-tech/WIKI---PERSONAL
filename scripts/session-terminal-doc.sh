@@ -1,88 +1,68 @@
 #!/usr/bin/env bash
-# session-terminal-doc.sh
-# Doc: docs/  <- COMPLETAR ruta al doc relacionado
-# Fase: <- COMPLETAR fase
-# Descripción: <- COMPLETAR
-# ============================================================
-# ARCHIVO      : session-terminal-doc.sh
-# VERSIÓN      : 1.0.0
-# FUNCIÓN ÚNICA: Al final de cada sesión de trabajo, genera
-#                automáticamente el documento de cierre con:
-#                - Resumen de lo ejecutado
-#                - Estado del repo (git status, log)
-#                - Issues pendientes
-#                - Próximos pasos
-#                Lo guarda en inbox/ para que session-close.yml
-#                lo mueva a diarios/
-# AUTOR        : alvarofernandezmota-tech
-# USO          : bash scripts/session-terminal-doc.sh "Descripción sesión"
-# SALIDA       : inbox/sesiones/cierre-YYYYMMDD-HHMMSS.md
-# ============================================================
-
+# =============================================================================
+# session-terminal-doc.sh — Genera el documento de cierre de sesión con:
+#   - Resumen, estado del repo, últimos commits, archivos cambiados
+#   - Guarda en inbox/sesiones/cierre-YYYYMMDDTHHMMSS.md
+#
+# USO:
+#   bash scripts/session-terminal-doc.sh "descripción de la sesión"
+# =============================================================================
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
-DESC="${1:-sesión sin descripción}"
-STAMP=$(date "+%Y%m%dT%H%M%S")
-DATE_HUMAN=$(date "+%Y-%m-%d %H:%M")
-OUT_DIR="$REPO_ROOT/inbox/sesiones"
-OUT_FILE="$OUT_DIR/cierre-${STAMP}.md"
+DESCRIPCION="${1:-sesión sin descripción}"
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/yggdrasil-dew")"
+SESIONES_DIR="$REPO_ROOT/inbox/sesiones"
+mkdir -p "$SESIONES_DIR"
 
-mkdir -p "$OUT_DIR"
+TIMESTAMP="$(date +%Y%m%dT%H%M%S)"
+FECHA_LEGIBLE="$(date '+%Y-%m-%d %H:%M:%S')"
+CIERRE_FILE="$SESIONES_DIR/cierre-${TIMESTAMP}.md"
+BRANCH="$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo 'main')"
 
-echo "[session-terminal-doc] Generando documento de cierre..."
+cat > "$CIERRE_FILE" <<EOF
+# Cierre de sesión — ${TIMESTAMP}
 
-# Recopilar datos del repo
-BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo 'N/A')
-LAST_COMMITS=$(git -C "$REPO_ROOT" log --oneline -5 2>/dev/null || echo 'N/A')
-GIT_STATUS=$(git -C "$REPO_ROOT" status --short 2>/dev/null || echo 'limpio')
-FILES_CHANGED=$(git -C "$REPO_ROOT" diff --name-only HEAD~1 HEAD 2>/dev/null | head -20 || echo 'N/A')
+## Resumen
 
-cat > "$OUT_FILE" << EOF
-# Cierre de sesión — ${DATE_HUMAN}
+- **Descripción**: ${DESCRIPCION}
+- **Fecha**: ${FECHA_LEGIBLE}
+- **Usuario**: $(whoami)
+- **Host**: $(hostname)
+- **Branch**: ${BRANCH}
 
-## Descripción
-${DESC}
+## Estado del repositorio
 
-## Estado del repo
-| Campo | Valor |
-|---|---|
-| Branch | ${BRANCH} |
-| Archivos pendientes | $(echo "$GIT_STATUS" | wc -l | tr -d ' ') |
-| Timestamp | ${STAMP} |
-
-## Últimos commits
 \`\`\`
-${LAST_COMMITS}
+$(git -C "$REPO_ROOT" status --short 2>/dev/null || echo 'Sin cambios pendientes')
 \`\`\`
 
-## Archivos cambiados en último commit
+## Últimos 10 commits
+
 \`\`\`
-${FILES_CHANGED}
+$(git -C "$REPO_ROOT" log --oneline -10 2>/dev/null || echo 'Sin commits')
 \`\`\`
 
-## Git status
-\`\`\`
-${GIT_STATUS}
-\`\`\`
+## Archivos modificados en esta sesión
 
-## Resultado file-arrival-guardian
-$(bash "$REPO_ROOT/scripts/file-arrival-guardian.sh" --dry-run 2>&1 | tail -5 || echo 'no ejecutado')
+\`\`\`
+$(git -C "$REPO_ROOT" diff --name-only HEAD 2>/dev/null || echo 'Sin diferencias staged')
+$(git -C "$REPO_ROOT" diff --name-only 2>/dev/null || echo '')
+\`\`\`
 
 ## Próximos pasos
-- [ ] Revisar issues abiertos en GitHub
-- [ ] Ejecutar orquestador-unico.sh al inicio de próxima sesión
-- [ ] Verificar Actions completadas en GitHub
+
+<!-- Completar manualmente o dejar para el agente de apertura de próxima sesión -->
+- [ ] Revisar issues abiertos
+- [ ] Ejecutar auditoría de estructura
+- [ ] Sincronizar con GitHub Actions
 
 ---
-> Generado automáticamente por session-terminal-doc.sh
+*Generado automáticamente por session-terminal-doc.sh*
 EOF
 
-echo "[session-terminal-doc] ✅ Documento generado: $OUT_FILE"
+echo "[session-terminal-doc] Documento de cierre creado: $CIERRE_FILE"
 echo ""
-echo "Ahora ejecuta:"
-echo "  git add inbox/sesiones/cierre-${STAMP}.md"
-echo "  git commit -m 'docs(sesion): cierre ${DATE_HUMAN} — ${DESC}'"
+echo "Próximos pasos:"
+echo "  git add inbox/sesiones/cierre-${TIMESTAMP}.md"
+echo "  git commit -m \"docs(sesion): cierre ${TIMESTAMP} — ${DESCRIPCION}\""
 echo "  git push origin main"
-echo ""
-echo "El push disparará session-close.yml que moverá esto a diarios/"

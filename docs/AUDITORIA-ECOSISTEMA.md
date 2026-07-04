@@ -1,110 +1,104 @@
-# 🔍 AUDITORÍA Y MONITORIZACIÓN DEL ECOSISTEMA
+# 🛡️ Auditoría del Ecosistema — Guía Completa
 
-> Todo lo que pasa en el ecosistema queda registrado.
-> Si algo cambia sin permiso — se detecta, se registra, se alerta.
-
----
-
-## Qué se monitoriza y dónde
-
-| Qué | Quién lo monitoriza | Dónde va la alerta |
-|---|---|---|
-| Containers Docker (salud) | `yggdrasil_watchdog` | Log interno |
-| Containers Docker (cambio estado) | `notify-on-change.py` | Telegram |
-| Ficheros del sistema (cambios) | `local_tripwire` | Telegram |
-| Red local (intrusiones) | `network_radar` | Telegram |
-| VPN Tailscale | `tailscale_monitor` | Telegram |
-| Backups | `radar_backup` | Telegram |
-| Logs de todos los containers | `log_guardian_bot` | Telegram |
-| Repo GitHub (cambios no autorizados) | GitHub Action `tripwire-repo` | Email + Telegram |
-| CI/CD (fallos de build) | GitHub Action `orquestador-maestro` | Telegram |
-| Inbox no procesada | GitHub Action `inbox-processor` | GitHub Issue |
-| Código (calidad, zombie) | `ema` (Sprint 7) | Telegram + GitHub Issue |
+> Documento vivo. Actualizar tras cada fase completada.
 
 ---
 
-## Niveles de alerta
+## Arquitectura del núcleo de auditoría
 
 ```
-🔴 CRÍTICO   → Telegram inmediato + log
-               Container caído, fichero crítico modificado, intrusión
-
-🟡 WARNING   → Telegram (horario 07:00-23:00) + log
-               Container unhealthy, backup fallido, tripwire alerta
-
-🔵 INFO      → Solo log (silencio en Telegram)
-               Container arrancando, estado sin cambio, CI OK
-
-📋 RESUMEN   → Telegram 08:00 diario
-               Estado general del ecosistema
+meta-orquestador.sh
+  └── guardian-maestro.sh
+        ├── observador-scripts.sh     → cabeceras Galatea en scripts/
+        ├── observador-workflows.sh   → comentarios en .github/workflows/
+        ├── observador-islas.sh       → islas/ vs MAPA-ISLAS.md
+        ├── observador-inbox.sh       → inbox/drop/ limpio
+        ├── observador-diarios.sh     → entradas recientes en diarios/
+        └── observador-mcp.sh         → tools y docs en mcp/
 ```
 
 ---
 
-## Auditoría del repositorio GitHub
+## Comandos de uso desde terminal
 
-### ¿Qué se detecta?
-- Push a main sin pasar por PR (si se configura branch protection)
-- Ficheros sensibles (.env, tokens) accidentalmente commiteados
-- Cambios en ficheros críticos: NORMAS-ECOSISTEMA.md, ECOSYSTEM-ARCHITECTURE.md
-- Scripts con sintaxis incorrecta
-- Secretos en el código
-
-### ¿Cómo?
-GitHub Action `tripwire-repo.yml` se ejecuta en cada push y PR.
-
----
-
-## Auditoría local (Madre)
-
-### local_tripwire
-Monitoriza 87.918 ficheros. Detecta:
-- Modificación de ficheros del sistema
-- Nuevos ficheros en rutas sensibles
-- Cambios de permisos
-
-**Estado actual**: crash loop — pendiente fix en Sprint 7
-
-### Comando manual de auditoría
 ```bash
-# Ver qué ha cambiado en el repo desde el último commit:
-git -C ~/yggdrasil-dew diff --stat HEAD~1 HEAD
-git -C ~/Projects/thdora diff --stat HEAD~1 HEAD
+# Auditoría completa (todos los observadores)
+bash scripts/guardian-maestro.sh
 
-# Ver ficheros modificados recientemente en Madre:
-find /home/varopc -newer /home/varopc/.bashrc -not -path '*/.git/*' -type f 2>/dev/null | head -20
+# Ciclo completo del ecosistema
+bash scripts/meta-orquestador.sh all
+
+# Solo auditoría
+bash scripts/meta-orquestador.sh audit
+
+# Solo investigación (cuando existan investigadores)
+bash scripts/meta-orquestador.sh investigate
+
+# Solo mejora (cuando existan mejoradores)
+bash scripts/meta-orquestador.sh improve
+```
+
+El reporte se guarda automáticamente en `inbox/_meta/guardian-report-YYYYMMDDTHHMMSS.md`.
+
+---
+
+## Fases del plan global
+
+| Fase | Nombre | Estado |
+|------|--------|--------|
+| 0 | Punto de partida — limpieza | ✅ Hecho |
+| 1 | Estructura y nombres | 🔄 En curso |
+| 2 | Estándar Galatea en toda la repo | 🔄 En curso |
+| 3 | Núcleo de auditoría (guardian + observadores) | ✅ Scripts creados |
+| 4 | MCP, islas y herramientas | ⏳ Pendiente |
+| 5 | Agentes avanzados (investigadores, mejoradores, escaladores) | ⏳ Pendiente |
+| 6 | Meta-agentes (fábrica, auditor de agentes) | ⏳ Pendiente |
+
+---
+
+## Observadores — referencia rápida
+
+| Script | Qué audita | Output |
+|--------|-----------|--------|
+| `observador-scripts.sh` | Cabecera Galatea en `scripts/*.sh` | Lista ✅/⚠️ por script |
+| `observador-workflows.sh` | Comentario de función en `.github/workflows/` | Lista ✅/⚠️ por workflow |
+| `observador-islas.sh` | Islas en disco vs `MAPA-ISLAS.md` | Lista con desfases |
+| `observador-inbox.sh` | Archivos pendientes en `inbox/drop/` | Conteo + lista |
+| `observador-diarios.sh` | Entradas recientes en `diarios/` | Conteo + último diario |
+| `observador-mcp.sh` | Tools y docs en `mcp/` | Conteo + advertencias |
+
+---
+
+## Próximos scripts a crear (Fase 4–6)
+
+```
+scripts/
+  investigador-estructura.sh
+  investigador-deuda-tecnica.sh
+  mejorador-scripts.sh
+  mejorador-documentacion.sh
+  fabrica-agentes.sh
+  auditor-agentes.sh
+  isla-sync-validator.sh
+  mapa-islas-sync.sh
+  mcp-auditor.sh
 ```
 
 ---
 
-## Estructura de etiquetas para la inbox
+## Flujo de una sesión con auditoría
 
-Cada fichero en `inbox/` debe tener en su cabecera YAML:
+```bash
+# 1. Sincronizar
+git pull origin main
 
-```yaml
----
-tags: [categoria, subcategoria]
-fecha: YYYY-MM-DD
-estado: pendiente-clasificar | pendiente-implementar | en-progreso | hecho
-destino: carpeta/destino/final.md
-prioridad: ALTA | MEDIA | BAJA | CRITICA
-bot-destino: thdora | guardian | ema | investigador | ninguno
----
+# 2. Trabajar
+# ... edits, scripts, commits ...
+
+# 3. Antes de cerrar — auditoría rápida
+bash scripts/guardian-maestro.sh
+
+# 4. Cerrar sesión
+bash scripts/session-terminal-doc.sh "descripción"
+git add inbox/ && git commit -m "docs(sesion): cierre" && git push
 ```
-
-### Categorías válidas de tags
-```
-regla          → norma del ecosistema
-docker         → containers, compose, dockerfiles
-bot            → bots y agentes
-script         → scripts bash/python
-infra          → infraestructura, red, hardware
-osint          → investigación, recon
-seguridad      → pentesting, alertas, tripwire
-docs           → documentación
-deuda-tecnica  → cosas a arreglar
-sprint         → tareas de sprint
-idea           → ideas sin validar
-```
-
-_Actualizado: 2026-07-03_

@@ -1,62 +1,49 @@
-name: Meta-Deep Audit
+name: Meta Deep Audit (semanal)
 
 on:
   schedule:
-    - cron: '0 22 * * 0'  # Domingos a las 22:00 UTC
+    - cron: '0 8 * * 1'  # Lunes a las 08:00 UTC
   workflow_dispatch:
-    inputs:
-      scope:
-        description: 'Scope de auditoría'
-        required: false
-        default: 'full'
-        type: choice
-        options:
-          - full
-          - scripts
-          - docs
-          - workflows
 
 jobs:
   meta-deep:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Ejecutar Agente Meta-Deep
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configurar entorno
         run: |
-          chmod +x scripts/agentes/agente-meta-deep.sh
-          bash scripts/agentes/agente-meta-deep.sh "${{ github.event.inputs.scope || 'full' }}"
+          echo "YGGDRASIL_ROOT=$(pwd)" >> $GITHUB_ENV
+          chmod +x scripts/agentes/*.sh 2>/dev/null || true
 
-      - name: Crear issue si hay problemas
+      - name: Ejecutar agente meta deep
+        run: bash scripts/agentes/agente-meta-deep.sh
+
+      - name: Subir reporte
+        uses: actions/upload-artifact@v4
+        with:
+          name: meta-deep-report-${{ github.run_id }}
+          path: reports/meta-deep/
+          retention-days: 90
+
+      - name: Crear issue con propuestas (si hay críticos)
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const glob = require('glob');
-            const files = fs.readdirSync('inbox').filter(f => f.startsWith('meta-deep-'));
-            if (files.length === 0) return;
-            const latest = files.sort().pop();
-            const content = fs.readFileSync(`inbox/${latest}`, 'utf8');
-            if (content.includes('⚠️')) {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `🔍 Meta-Deep Audit ${new Date().toISOString().split('T')[0]}`,
-                body: `## Auditoría automática detectó problemas\n\n${content.slice(0, 3000)}`,
-                labels: ['audit', 'auto-generated']
-              });
-            }
-
-      - name: Commit resultados
-        run: |
-          git config user.name "thdora-guardian[bot]"
-          git config user.email "bot@yggdrasil-dew"
-          git add inbox/ diary/ || true
-          git diff --staged --quiet || git commit -m "chore: meta-deep audit $(date +%Y-%m-%d)"
-          git push || true
+            const path = require('path');
+            const dir = 'reports/meta-deep';
+            if (!fs.existsSync(dir)) return;
+            const files = fs.readdirSync(dir).filter(f => f.endsWith('.md')).sort().reverse();
+            if (!files.length) return;
+            const content = fs.readFileSync(path.join(dir, files[0]), 'utf8');
+            if (!content.includes('⚠️') && !content.includes('CRÍTICO')) return;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[meta-deep] Propuestas críticas — ${new Date().toISOString().slice(0,10)}`,
+              body: `## Reporte meta-deep\n\nSe detectaron elementos críticos. Ver artifacts del run #${context.runId}.\n\n<details><summary>Extracto</summary>\n\n\`\`\`\n${content.slice(0, 2000)}\n\`\`\`\n</details>`,
+              labels: ['meta-deep', 'automated']
+            });
