@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mcp:
+    build:
+      context: ..
+      dockerfile: docker/mcp/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - YGGDRASIL_ROOT=/app
+      - MCP_API_TOKEN=${MCP_API_TOKEN:-}
+    volumes:
+      - ../inbox:/app/inbox
+      - ../reports:/app/reports
+    restart: unless-stopped
+
+  retrieval:
+    build:
+      context: ..
+      dockerfile: docker/retrieval/Dockerfile
+    ports:
+      - "9001:9001"
+    volumes:
+      - ../inbox:/app/inbox
+    restart: unless-stopped
+
+  agent-worker:
+    build:
+      context: ..
+      dockerfile: docker/agent-worker/Dockerfile
+    environment:
+      - YGGDRASIL_ROOT=/app
+      - PERPLEXITY_URL=${PERPLEXITY_URL:-}
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-}
+    volumes:
+      - ../inbox:/app/inbox
+      - ../agentes:/app/agentes
+      - ../scripts:/app/scripts
+      - ../tools:/app/tools
+    restart: unless-stopped
+    depends_on:
+      - retrieval

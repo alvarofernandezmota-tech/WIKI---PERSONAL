@@ -1,74 +1,79 @@
-# Scripts — yggdrasil-dew
+# scripts/ — Guía de uso
 
-Directorio raíz de scripts del ecosistema. Los scripts están organizados en subdirectorios por dominio (islas).
-
-## Ruta canónica del repo
-
-```
-/srv/yggdrasil-dew
-```
-
-Si no existe, crea un symlink desde home:
+## Punto de entrada único
 ```bash
-ln -s /srv/yggdrasil-dew ~/yggdrasil-dew
+# Dry-run (muestra qué haría sin ejecutar nada)
+bash scripts/maintenance/master_run.sh
+
+# Ejecutar de verdad
+bash scripts/maintenance/master_run.sh --apply
 ```
 
----
-
-## Scripts de sesión
-
-| Script | Uso | Descripción |
-|---|---|---|
-| `inicio-sesion.sh` | Al arrancar el día | Sincroniza repo, muestra estado |
-| `cierre-sesion.sh` | Al terminar sesión | Auto-commit, push, diario |
-
+## Flujo de sesión de trabajo
 ```bash
-# Cierre de sesión:
-bash /srv/yggdrasil-dew/scripts/cierre-sesion.sh
+# 1. Sincronizar
+git pull origin main
 
-# Inicio de sesión:
-bash /srv/yggdrasil-dew/scripts/inicio-sesion.sh
+# 2. Iniciar logging de terminal
+source scripts/session-logger.sh
+
+# 3. Trabajar normalmente...
+
+# 4. Auditoría rápida antes de cerrar
+bash scripts/verify/run-smoke-tests.sh
+
+# 5. Generar documento de cierre
+bash scripts/session-terminal-doc.sh "descripción de la sesión"
+
+# 6. Subir
+git add inbox/sesiones/cierre-*.md
+git commit -m "docs(sesion): cierre $(date +%Y-%m-%d) — descripción"
+git push origin main
 ```
 
----
-
-## Scripts de auditoría y mejora del repo
-
-| Script | Uso | Descripción |
-|---|---|---|
-| `audit-and-migrate.sh` | Auditoría + migración | Analiza y mueve ficheros mal ubicados |
-| `repo-research.sh` | Investigación de mejora | Genera reporte en `inbox/` con gaps detectados |
-
+## Inbox
 ```bash
-# Auditoría (siempre dry-run primero):
-bash scripts/audit-and-migrate.sh --dry-run
-bash scripts/audit-and-migrate.sh
+# Copiar archivo a zona de aterrizaje y commitear
+cp /ruta/archivo.md inbox/drop/
+bash scripts/inbox-commit.sh "descripción del archivo"
 
-# Research del repo:
-bash scripts/repo-research.sh --dry-run  # ver sin escribir
-bash scripts/repo-research.sh            # genera inbox/DATE-repo-research.md
+# Clasificar manualmente sin esperar Actions
+bash scripts/inbox-clasificador.sh
 ```
 
----
+## Auditoría de estructura
+```bash
+bash scripts/file-arrival-guardian.sh --dry-run
+bash scripts/struct-auditor.sh
+bash scripts/verify/run-smoke-tests.sh
+```
 
-## Subdirectorios (islas)
+## Perplexity
+```bash
+# Requiere PERPLEXITY_URL y PERPLEXITY_API_KEY en entorno
+export PERPLEXITY_URL="https://..."
+export PERPLEXITY_API_KEY="pplx-..."
+bash agentes/agent-perplexity-informer/run.sh
+bash scripts/agentes/agente-meta-deep.sh
+```
 
-| Directorio | Contenido |
+## Mantenimiento
+```bash
+# Ver qué crearía el parche Perplexity (dry-run)
+bash scripts/maintenance/create_perplexity_patch.sh
+
+# Aplicar parche en nueva rama + PR draft
+bash scripts/maintenance/create_perplexity_patch.sh --apply
+```
+
+## Subdirectorios
+| Dir | Contenido |
 |---|---|
-| `backup/` | Scripts de backup (restic) |
-| `ci/` | Scripts de CI/CD |
-| `infra/` | Infraestructura Docker / servicios |
-| `maintenance/` | Mantenimiento del sistema |
-| `osint/` | OSINT tools y workflows |
-
----
-
-## Scripts numerados (legacy)
-
-Los scripts con prefijo numérico (`01-`, `02-`...) son de las fases de setup inicial. No borrar, pero **no añadir nuevos** con ese patrón — usar nombres descriptivos.
-
----
-
-## Ver auditoría del estado
-
-Ver [`SCRIPTS-AUDITORIA.md`](./SCRIPTS-AUDITORIA.md) para el inventario completo con estado de cada script.
+| `scripts/agentes/` | Scripts de agentes de análisis |
+| `scripts/maintenance/` | Scripts de mantenimiento y parches |
+| `scripts/verify/` | Smoke tests y verificación |
+| `scripts/ci/` | Scripts usados por GitHub Actions |
+| `scripts/infra/` | Infraestructura y Docker helpers |
+| `scripts/backup/` | Backup y restic |
+| `scripts/seguridad/` | Hardening y seguridad |
+| `scripts/archive/` | Scripts obsoletos archivados |

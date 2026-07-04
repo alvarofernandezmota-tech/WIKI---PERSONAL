@@ -1,181 +1,66 @@
-# OPERATIONAL PLAYBOOK — yggdrasil-dew
+# OPERATIONAL PLAYBOOK — Yggdrasil-Dew
 
-> Documento vivo. Última actualización: 2026-07-04.
-
----
-
-## Índice
-
-1. [Visión del ecosistema](#1-visión-del-ecosistema)
-2. [Flujo de una sesión (terminal → inbox → diarios)](#2-flujo-de-una-sesión)
-3. [Mapa de scripts y responsabilidades](#3-mapa-de-scripts)
-4. [Prevención de ruido y loops de bots](#4-prevención-de-ruido-y-loops-de-bots)
-5. [Procedimiento de mantenimiento (Prioridades 1–4)](#5-procedimiento-de-mantenimiento)
-6. [Política de ramas y PRs](#6-política-de-ramas-y-prs)
-7. [Rollback y backups](#7-rollback-y-backups)
-8. [Human-in-the-loop — responsables por workflow](#8-human-in-the-loop)
+> Versión: 2.0 — 2026-07-04  
+> Autor: Perplexity + @alvarofernandezmota-tech
 
 ---
 
-## 1. Visión del ecosistema
+## Regla 1 — Bot Writes (Anti-ruido)
+Ningún workflow o agente puede commitear directamente en `main`.  
+Si necesita escribir:
+1. Crear rama `bot/<workflow>-<ts>`.
+2. Commit en esa rama.
+3. Abrir PR draft hacia `main`.
+4. **Revisión humana obligatoria** antes de mergear.
 
-El ecosistema **yggdrasil-dew** convierte trabajo en terminal en documentación estructurada y trazable.
-El flujo siempre es:
+## Regla 2 — Inbox Conventions
+| Carpeta | Contenido |
+|---|---|
+| `inbox/drop/` | Zona de aterrizaje — archivos nuevos del operador |
+| `inbox/ocr/raw/` | Archivos binarios para OCR |
+| `inbox/ocr/text/` | Textos extraídos por OCR |
+| `inbox/sesiones/` | Cierres de sesión `cierre-YYYYMMDD-*.md` |
+| `inbox/context/perplexity/` | Respuestas Perplexity con `PERCENT_COMPLETE: XX%` |
+| `inbox/context/obsidian/` | Exports del vault de Obsidian |
+| `inbox/_meta/` | Reportes de auditoría automáticos |
 
-```
-TERMINAL  →  inbox/drop/  →  inbox/sesiones/  →  diarios/  →  docs/
-```
+## Regla 3 — PII y Secrets
+- Sanitizar prompts antes de enviar a LLMs externos.
+- CI ejecuta secret-scan en todos los PRs.
+- Nunca incluir API keys en el código — usar `.env` (en `.gitignore`) o GitHub Secrets.
 
-Los agentes (GitHub Actions, scripts) mueven los archivos hacia la derecha.  
-El humano siempre aprueba los pasos críticos (merge de PRs, `--apply` en scripts de mantenimiento).
+## Regla 4 — Tamaño de archivos
+- No subir archivos > 10 MB al repo.
+- Binarios grandes → `inbox/ocr/raw/` y documentados en `.gitignore` si son temporales.
 
----
+## Regla 5 — Ownership de agentes
+Cada agente en `agentes/` debe tener:
+- `DISEÑO.md` — arquitectura y flujo.
+- `PROFILE.md` — metadatos y owner.
+- `test.sh` — smoke test propio.
+- Owner declarado en `docs/OWNERS.md`.
 
-## 2. Flujo de una sesión
+## Regla 6 — Monitoreo Perplexity
+- Prompts DEBEN incluir `PERCENT_COMPLETE: XX%` en la respuesta solicitada.
+- `agente-meta-deep.sh` extrae el valor y abre issue automático si < 70%.
+- Revisar `reports/meta-deep/` después de cada run.
 
-### Inicio
+## Regla 7 — Sesiones de trabajo
+Flujo obligatorio:
 ```bash
 git pull origin main
-source scripts/apertura-sesion.sh   # lanza struct-auditor --quick; aborta si hay errores críticos
+source scripts/session-logger.sh          # iniciar logging
+# ... trabajo ...
+bash scripts/session-terminal-doc.sh "descripción de la sesión"
+git add inbox/sesiones/cierre-*.md
+git commit -m "docs(sesion): cierre YYYY-MM-DD — descripción"
+git push origin main
 ```
 
-### Durante la sesión
+## Regla 8 — Terminal Madre
+`scripts/maintenance/master_run.sh` es el punto de entrada único.  
+Siempre correr dry-run primero:
 ```bash
-# Cualquier archivo que quieras meter al ecosistema:
-cp /ruta/archivo.md inbox/drop/
-bash scripts/inbox-commit.sh "descripción breve"
+bash scripts/maintenance/master_run.sh           # dry-run — ver qué haría
+bash scripts/maintenance/master_run.sh --apply   # ejecutar de verdad
 ```
-
-### Cierre
-```bash
-bash scripts/cierre-sesion.sh "descripción de la sesión"
-# → genera inbox/sesiones/cierre-YYYYMMDDTHHMMSS.md
-# → llama automáticamente a inbox-commit.sh (si está configurado con --apply)
-```
-
-### Migración a diarios (manual o vía Actions)
-```bash
-bash scripts/migrar-sesiones-diarios.sh
-git add diarios/ && git commit -m "docs: migrar sesiones a diarios" && git push
-```
-
----
-
-## 3. Mapa de scripts
-
-| Script | Responsabilidad | Cuándo se ejecuta |
-|---|---|---|
-| `apertura-sesion.sh` | Inicio de sesión + auditoría rápida pre-sesión | Manual al abrir VS Code / terminal |
-| `cierre-sesion.sh` | Genera documento de cierre + auto-commit | Manual al terminar sesión |
-| `inbox-commit.sh` | Commitea y pushea contenido de `inbox/drop/` | Manual o llamado desde cierre |
-| `inbox-clasificador.sh` | Mueve archivos de `drop/` a carpeta destino según tipo | Manual o vía Actions post-push |
-| `migrar-sesiones-diarios.sh` | Mueve `inbox/sesiones/cierre-*.md` → `diarios/` | Manual o vía Actions |
-| `orquestador-unico.sh` | Punto de entrada único para ejecutar agentes en orden | Manual o vía Actions |
-| `struct-auditor.sh` | Audita estructura del repo; `--quick` para pre-sesión | Automático en apertura |
-| `file-arrival-guardian.sh` | Valida que no haya archivos en carpetas prohibidas | Automático en CI o manual |
-| `session-logger.sh` | Captura comandos de terminal en `inbox/sesiones/` | `source` al inicio de sesión |
-| `maintenance/implement_priorities_1_to_4.sh` | Aplica las 4 prioridades de mantenimiento con dry-run/apply | Manual (human-in-the-loop) |
-
-**Scripts archivados** (no ejecutar; conservados en `scripts/archive/` para referencia):
-- `orquestador-supremo.sh`, `orquestador-total.sh`, `meta-orquestador.sh`, `clasificador-maestro.sh`, `guardian-maestro.sh`
-
----
-
-## 4. Prevención de ruido y loops de bots
-
-### Problema detectado
-Se detectaron múltiples workflows que generan commits automáticos y se disparan entre sí, creando **bucles y ruido en CI**.
-
-### Política inmediata
-- Todos los workflows que escriben en el repo deben estar en **`workflow_dispatch`** hasta que se revisen individualmente.
-- Los workflows que necesiten escribir deben:
-  1. Escribir en rama `bot/<workflow>-<ts>` (nunca directamente en `main`).
-  2. Crear un **PR draft** para revisión humana.
-  3. Nunca hacer merge automático a `main`.
-
-### Regla de oro para nuevos workflows
-```yaml
-# Ejemplo de job que escribe en el repo de forma segura
-- name: Create branch for bot changes
-  run: |
-    BRANCH="bot/${GITHUB_WORKFLOW}-$(date +%Y%m%d-%H%M%S)"
-    git checkout -b "$BRANCH"
-    # ... hacer cambios ...
-    git add -A
-    git commit -m "bot: [descripción]"
-    git push origin "$BRANCH"
-    gh pr create --draft --title "bot: [descripción]" --body "Auto-generated by $GITHUB_WORKFLOW"
-```
-
----
-
-## 5. Procedimiento de mantenimiento
-
-### Las 4 Prioridades
-
-| Prioridad | Qué hace | Script/archivo afectado |
-|---|---|---|
-| **P1** | Consolida orquestadores: archiva los 5 redundantes, deja solo `orquestador-unico.sh` | `scripts/archive/` |
-| **P2** | Añade auto-commit al final de `cierre-sesion.sh` llamando a `inbox-commit.sh` | `scripts/cierre-sesion.sh` |
-| **P3** | Crea `migrar-sesiones-diarios.sh` para mover cierres de sesión a `diarios/` con nombre normalizado | `scripts/migrar-sesiones-diarios.sh` |
-| **P4** | Añade auditoría rápida (`struct-auditor.sh --quick`) al inicio de `apertura-sesion.sh` | `scripts/apertura-sesion.sh` |
-
-### Cómo ejecutar
-
-```bash
-# 1. Dry-run — ver qué haría sin tocar nada
-chmod +x scripts/maintenance/implement_priorities_1_to_4.sh
-git checkout main && git pull origin main
-./scripts/maintenance/implement_priorities_1_to_4.sh
-
-# 2. Revisar el informe generado
-cat scripts/SCRIPTS-AUDITORIA.md
-ls reports/maintenance/
-
-# 3. Aplicar (solo con responsable humano presente)
-./scripts/maintenance/implement_priorities_1_to_4.sh --apply
-
-# 4. Verificar ramas, commits y PR drafts en GitHub
-```
-
-### Verificación post-apply
-```bash
-bash scripts/verify/run-smoke-tests.sh                          # si existe
-bash scripts/migrar-sesiones-diarios.sh                        # prueba en dry-run
-bash scripts/struct-auditor.sh --quick                         # debe salir 0
-```
-
----
-
-## 6. Política de ramas y PRs
-
-| Tipo de cambio | Rama | PR |
-|---|---|---|
-| Mantenimiento automático | `maintenance/priority-<n>-<ts>` | Draft, aprobación manual |
-| Cambios de bot/Actions | `bot/<workflow>-<ts>` | Draft, aprobación manual |
-| Feature manual | `feat/<descripción>` | Normal, revisión antes de merge |
-| Hotfix crítico | `hotfix/<descripción>` | PR urgente, sin draft |
-
-**Nunca** se hace merge automático a `main` desde un bot o workflow.
-
----
-
-## 7. Rollback y backups
-
-- Los backups de cada ejecución de mantenimiento están en `maintenance/backups/<timestamp>/`.
-- Para restaurar un archivo: copia desde el backup y crea un commit de revert con mensaje `revert: restore <archivo> from backup <ts>`.
-- Para revertir un commit entero: `git revert <hash>` y push.
-- Los workflows pausados están documentados en `.github/workflows/` con comentario `# PAUSED - revisar antes de reactivar`.
-
----
-
-## 8. Human-in-the-loop — responsables por workflow
-
-| Workflow / Script | Owner | Notas |
-|---|---|---|
-| `implement_priorities_1_to_4.sh` | @alvarofernandezmota-tech | Siempre requiere `--apply` manual |
-| `inbox-clasificador.sh` | @alvarofernandezmota-tech | Puede correr en Actions tras revisión |
-| `migrar-sesiones-diarios.sh` | @alvarofernandezmota-tech | Revisar resultado antes de push |
-| Todos los workflows de CI/CD | @alvarofernandezmota-tech | Reactivar uno a uno tras revisión |
-
-> **Regla operativa:** Si un script o workflow no tiene owner documentado aquí, no se activa.

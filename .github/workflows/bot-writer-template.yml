@@ -1,0 +1,51 @@
+name: Bot Writer — Draft PR Template
+# REGLA: ningún bot escribe en main directamente.
+# Siempre crea rama + PR draft para revisión humana.
+on:
+  workflow_dispatch:
+    inputs:
+      description:
+        description: 'Descripción del cambio a generar'
+        required: true
+        default: 'chore: automated changes'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create branch and commit
+        run: |
+          BRANCH="bot/changes-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          # Placeholder: add bot-generated changes here
+          echo "# Bot changes $(date -Iseconds)" >> docs/BOT-CHANGELOG.md
+          git add -A
+          git commit -m "chore(bot): ${{ github.event.inputs.description }}"
+          git push origin "$BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Create draft PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH }}
+          title: "bot: ${{ github.event.inputs.description }}"
+          body: |
+            ## Cambios automáticos
+
+            Generado por `bot-writer-template` workflow.
+
+            **⚠️ Requiere revisión humana antes de mergear.**
+
+            - Descripción: ${{ github.event.inputs.description }}
+            - Rama: ${{ env.BRANCH }}
+            - Timestamp: $(date -Iseconds)
+          draft: true
+          labels: bot,needs-review

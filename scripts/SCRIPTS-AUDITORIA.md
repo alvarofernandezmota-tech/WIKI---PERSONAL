@@ -1,217 +1,100 @@
-# SCRIPTS-AUDITORIA.md — Inventario completo de scripts
+# SCRIPTS-AUDITORIA — Yggdrasil-Dew
 
-> **Generado:** 2026-07-04 por Perplexity  
-> **Última auditoría anterior:** 2026-07-03  
-> **Total scripts `.sh`:** ~45 (raíz de `scripts/`) + subdirectorios  
-> **Propósito:** Auditoría de qué hace cada script, si sigue siendo útil, y si es candidato a MCP tool
+Última actualización: 2026-07-04T20:57:00+02:00
 
 ---
 
-## Leyenda
+## ✅ MÓDULOS COMPLETADOS
 
-| Símbolo | Significado |
-|---------|-------------|
-| 🟢 | Activo, se usa regularmente |
-| 🟡 | Activo pero necesita revisión / deprecar si hay duplicado |
-| 🔴 | Probablemente obsoleto o sin uso |
-| 🚨 | **FUERA DE SITIO** — archivo mal colocado, requiere acción |
-| 🆕 | Nuevo desde auditoría 2026-07-03 |
-| 🤖 | Candidato a MCP tool (el agente puede llamarlo) |
-| 👤 | Solo uso humano manual |
+### Sesión 2026-07-03 — Estructura base + inbox
+- [x] `scripts/file-arrival-guardian.sh` — Guardián de llegada de archivos con `--dry-run`
+- [x] `scripts/session-logger.sh` — Logger de terminal para sesiones
+- [x] `scripts/session-terminal-doc.sh` — Generador de documentos de cierre
+- [x] `scripts/orquestador-unico.sh` — Orquestador con fases (all/audit/inbox/health)
+- [x] `scripts/inbox-commit.sh` — Commit de inbox en un comando
+- [x] `scripts/inbox-clasificador.sh` — Clasificador automático de `inbox/drop/`
+- [x] `docs/inbox-flujo.md` — Documentación del flujo inbox
+- [x] `inbox/drop/.gitkeep` — Zona de aterrizaje inicializada
 
----
-
-## ⚠️ PROBLEMA DETECTADO — Archivos .md dentro de scripts/
-
-Estos archivos NO deben estar en `scripts/`. Solo deben existir `.sh`, `.py` y subdirectorios.
-
-| Archivo | Dónde debería estar | Acción |
-|---------|---------------------|--------|
-| `scripts/2026-07-03-23-05-struct-auditor-output.md` 🚨 | `inbox/_meta/` | Mover manualmente o via `inbox-clasificador.sh` |
-| `scripts/2026-07-03-cierre-sesion-completo.md` 🚨 | `diarios/` | Mover manualmente |
-| `scripts/2026-07-03-inbox-audit-consolidado.md` 🚨 | `inbox/_meta/` | Mover manualmente |
-| `scripts/2026-07-03-reality-check.md` 🚨 | `diarios/` o `inbox/_meta/` | Mover manualmente |
-| `scripts/README.md` | `scripts/` ✅ | Permitido (documentación raíz) |
-| `scripts/SCRIPTS-AUDITORIA.md` | `scripts/` ✅ | Permitido (este archivo) |
-| `scripts/SCRIPTS.md` | `scripts/` ✅ | Permitido (documentación raíz) |
-
-**Comandos para limpiarlos desde terminal:**
-```bash
-# Mover reportes de auditoría
-mv scripts/2026-07-03-23-05-struct-auditor-output.md inbox/_meta/
-mv scripts/2026-07-03-inbox-audit-consolidado.md inbox/_meta/
-
-# Mover cierres de sesión
-mv scripts/2026-07-03-cierre-sesion-completo.md diarios/
-mv scripts/2026-07-03-reality-check.md diarios/
-
-# Commitear la limpieza
-git add -A && git commit -m "fix(estructura): mover .md fuera de scripts/ a sus destinos correctos" && git push
-```
+### Sesión 2026-07-04 — Parche Perplexity full
+- [x] `scripts/maintenance/create_perplexity_patch.sh` — Script maestro idempotente (dry-run / apply)
+- [x] `tools/perplexity_adapter.py` — Adaptador HTTP para Perplexity API
+- [x] `agentes/agent-perplexity-informer/run.sh` — Agente OCR → Perplexity
+- [x] `agentes/agent-perplexity-informer/DISEÑO.md` — Arquitectura y flujo del agente
+- [x] `agentes/agent-perplexity-informer/PROFILE.md` — Metadatos y owner
+- [x] `agentes/agent-perplexity-informer/test.sh` — Smoke test del agente
+- [x] `inbox/context/perplexity/PERPLEXITY_PROMPT_TEMPLATE.txt` — Template de prompt estándar
+- [x] `inbox/context/perplexity/.gitkeep` — Carpeta inicializada
+- [x] `inbox/context/obsidian/.gitkeep` — Carpeta inicializada
+- [x] `scripts/agentes/agente-meta-deep.sh` — Extractor `PERCENT_COMPLETE` + issue automático
+- [x] `scripts/observador-obsidian.sh` — Observer del vault de Obsidian (últimas 24h)
+- [x] `docker/mcp/Dockerfile` — Dockerfile servidor MCP (con healthcheck)
+- [x] `docker/retrieval/Dockerfile` — Dockerfile API de retrieval
+- [x] `docker/agent-worker/Dockerfile` — Dockerfile worker de agentes
+- [x] `docker/docker-compose.yml` — Composición completa (mcp + retrieval + agent-worker)
+- [x] `scripts/maintenance/master_run.sh` — Terminal Madre (8 pasos, dry-run safe)
+- [x] `scripts/verify/run-smoke-tests.sh` — Suite de 20 smoke tests
+- [x] `.github/workflows/ci-readonly.yml` — CI smoke tests en push/PR
+- [x] `.github/workflows/bot-writer-template.yml` — Template bots → PR draft (Regla 1)
+- [x] `docs/OPERATIONAL-PLAYBOOK.md` — Playbook operativo v2.0 (8 reglas)
+- [x] `docs/OWNERS.md` — Tabla de ownership de módulos
+- [x] `scripts/README.md` — Guía de uso de scripts/
 
 ---
 
-## Grupo 0 — Scripts de flujo (NUEVOS 2026-07-04) 🆕
+## 🔴 PENDIENTE — Próxima auditoría
 
-Scripts añadidos esta madrugada para el flujo terminal → inbox → diarios.
+### Bloque A — Limpieza de scripts/ (deuda técnica)
+- [ ] `git mv scripts/2026-07-03-23-05-struct-auditor-output.md inbox/_meta/`
+- [ ] `git mv scripts/2026-07-03-inbox-audit-consolidado.md inbox/_meta/`
+- [ ] `git mv scripts/2026-07-03-cierre-sesion-completo.md diarios/`
+- [ ] `git mv scripts/2026-07-03-reality-check.md diarios/`
+- [ ] `git mv scripts/gemini-brief.md docs/`
+- [ ] Revisar duplicados: `orquestador-supremo.sh` vs `orquestador-total.sh` vs `orquestador-unico.sh`
+- [ ] Archivar scripts `01-xx` redundantes en `scripts/archive/`
 
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `inbox-commit.sh` 🆕 | **UN comando**: copia archivo a `inbox/drop/`, git add + commit + push | 🟢 uso diario | 🤖 `commit_to_inbox` |
-| `inbox-clasificador.sh` 🆕 | Mueve archivos de `inbox/drop/` al destino correcto según nombre/extensión | 🟢 | 🤖 `classify_inbox` (dry-run) |
-| `session-logger.sh` 🆕 | Captura todo lo que ocurre en terminal y genera log en `inbox/sesiones/` | 🟢 | 👤 source manual |
-| `session-terminal-doc.sh` 🆕 | Genera documento de cierre de sesión con estado del repo | 🟢 | 🤖 `generate_session_doc` |
-| `orquestador-unico.sh` 🆕 | Punto de entrada único para ejecutar todos los agentes en orden | 🟢 | 🤖 `orchestrate` |
+### Bloque B — Agentes (inventario y completar)
+- [ ] Listar todos los agentes en `agentes/` y crear `agentes/README.md`
+- [ ] Verificar que cada agente tiene DISEÑO.md + PROFILE.md + test.sh
+- [ ] Crear agentes faltantes: `llm-router`, `ocr-processor`, `diario-writer`
+- [ ] Añadir `agentes/README.md` con tabla de todos los agentes
 
-**Uso desde terminal:**
-```bash
-# Inicio sesión
-source scripts/session-logger.sh
+### Bloque C — Workflows (auditoría completa)
+- [ ] Listar todos los workflows en `.github/workflows/` y verificar que ninguno escribe en main
+- [ ] Añadir `secret-scan.yml`
+- [ ] Añadir `session-close.yml` (mueve `inbox/sesiones/` → `diarios/` vía PR draft)
+- [ ] Añadir `inbox-guardian.yml` (dispara file-arrival-guardian en cada push)
 
-# Meter archivo al ecosistema
-bash scripts/inbox-commit.sh "descripción"
+### Bloque D — Docker (completar)
+- [ ] Añadir `requirements.txt` para cada imagen Docker
+- [ ] Añadir `docker/prometheus/` — Dockerfile + config de métricas
+- [ ] Añadir healthchecks completos en `docker-compose.yml`
+- [ ] Probar `docker-compose up -d` localmente y documentar resultado
 
-# Cierre sesión
-bash scripts/session-terminal-doc.sh "descripción de la sesión"
-git add inbox/sesiones/cierre-*.md && git commit -m "docs(sesion): cierre" && git push
-```
+### Bloque E — Tests (ampliar)
+- [ ] Ampliar smoke tests con verificación de workflows YAML syntax
+- [ ] Añadir `scripts/tests/integration/` con tests de extremo a extremo
+- [ ] Configurar coverage report para agentes Python
+- [ ] Añadir test para `perplexity_adapter.py` con mock HTTP
 
----
-
-## Grupo 1 — Sesión (inicio / cierre)
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `apertura-sesion.sh` | Git pull, verifica servicios, muestra estado del ecosistema | 🟢 | 🤖 `start_session` |
-| `apertura-maestra.sh` | Versión extendida de apertura — lanza todo el stack | 🟡 solapamiento con `apertura-sesion` | 👤 revisar si consolidar |
-| `cierre-sesion.sh` | Guarda estado, git commit/push, genera resumen | 🟢 | 🤖 `close_session` |
-| `cierre-maestro.sh` | Cierre completo del ecosistema (servicios + commit) | 🟡 solapamiento con `cierre-sesion` | 👤 revisar si consolidar |
-| `between-sessions.sh` | Tareas entre sesiones (sync, limpieza ligera) | 🟡 poco documentado | 👤 revisar |
-
-**Pendiente auditar:** `apertura-maestra.sh` vs `apertura-sesion.sh` — ¿son duplicados? Decidir cuál es el canónico.
-
----
-
-## Grupo 2 — Orquestación / Auditoría
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `orquestador-unico.sh` 🆕 | Punto de entrada único para todas las fases | 🟢 | 🤖 `orchestrate` |
-| `auditoria-maestra.sh` | Auditoría general del ecosistema | 🟡 solapamiento con `orquestador-unico` | 👤 revisar |
-| `audit-and-migrate.sh` | Audita estructura y migra archivos mal ubicados | 🟡 solapamiento | 👤 revisar |
-| `clasificador-maestro.sh` | Clasificación masiva de archivos | 🟡 solapamiento con `inbox-clasificador` | 👤 revisar |
-| `file-arrival-guardian.sh` | Valida que archivos lleguen al sitio correcto | 🟢 | 🤖 `validate_structure` (--dry-run) |
-| `cross-ref-checker.sh` | Verifica referencias cruzadas entre archivos | 🟡 poco claro | 🔴 auditar |
-| `code-drift-detector.sh` | Detecta derivaciones en el código | 🟡 poco claro | 🔴 auditar |
+### Bloque F — Documentación (completar)
+- [ ] Actualizar `ECOSISTEMA.md` con los nuevos módulos Perplexity + Docker
+- [ ] Crear `docs/ARCHITECTURE-DIAGRAM.md` con diagrama Mermaid del flujo completo
+- [ ] Actualizar `HOME.md` con links a los nuevos módulos
+- [ ] Crear `docs/QUICKSTART.md` para nuevos colaboradores
+- [ ] Actualizar `CHANGELOG.md` con los cambios de la sesión 2026-07-04
 
 ---
 
-## Grupo 3 — Mantenimiento / Cron
+## 📊 Métricas de salud del repo
 
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `06-verificacion-post-reboot.sh` | Verifica que todo arranca bien tras reboot | 🟢 | 🤖 `verify_post_reboot` |
-| `agent-monitor.sh` | Monitoriza agentes en ejecución | 🟢 | 🤖 `monitor_agents` |
-
----
-
-## Grupo 4 — Inbox
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `inbox-commit.sh` 🆕 | Commit al inbox (ver Grupo 0) | 🟢 | 🤖 |
-| `inbox-clasificador.sh` 🆕 | Clasificador de inbox (ver Grupo 0) | 🟢 | 🤖 |
-
----
-
-## Grupo 5 — Seguridad
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `03-fase1-seguridad.sh` | Setup inicial de seguridad (fase 1) | 🟡 setup histórico | 👤 manual |
-| `09-fase8-seguridad-acer.sh` | Hardening específico Acer | 🟡 setup histórico | 👤 manual |
-
----
-
-## Grupo 6 — Infraestructura / Setup
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `04-fase2-start-batcueva.sh` | Arranca el stack completo (Batcueva) | 🟢 | 🤖 `start_ecosystem` (dry-run) |
-| `batcueva-control.sh` | Control del stack: start/stop/restart | 🟢 | 🤖 `control_ecosystem` |
-| `05-fase7-ollama-pull.sh` | Descarga modelos Ollama | 🟢 | 🤖 `pull_ollama_model` |
-| `02-git-pull-rebase.sh` | Git pull con rebase | 🟢 | 🤖 `sync_repos` |
-| `01-fix-driver-rtl8188ftu.sh` | Instala driver WiFi USB | 🟡 setup puntual | 👤 manual |
-| `deploy.sh` | Deploy general | 🟢 | 👤 manual (riesgo) |
-| `deploy-madre.sh` | Deploy completo del ecosistema madre | 🟡 solapamiento con `deploy.sh` | 👤 revisar |
-
----
-
-## Grupo 7 — Backup
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `07-fase3-restic-backup.sh` | Backup con Restic | 🟢 | 🤖 `run_backup` (dry-run obligatorio) |
-
----
-
-## Grupo 8 — Thdora / Copilot
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `08-fase6-thdora-handlers.sh` | Setup handlers de Thdora | 🟡 setup histórico | 👤 manual |
-| `copilot-fases.sh` | Gestión de fases del copilot | 🟡 por auditar | 🔴 auditar |
-| `copilot-2fases.sh` | Variante 2 fases del copilot | 🟡 solapamiento | 🔴 auditar |
-| `copilot-mission-briefing.sh` | Genera briefing de misión para el copilot | 🟢 | 🤖 `generate_briefing` |
-| `create-issues.sh` | Crea issues en GitHub | 🟢 | 🤖 `create_github_issues` |
-
----
-
-## Grupo 9 — OSINT
-
-| Script | Qué hace | Estado | MCP? |
-|--------|----------|--------|------|
-| `10-fase9-osint-stack.sh` | Instala/configura stack OSINT | 🟡 setup histórico | 👤 manual |
-
----
-
-## Resumen de acciones pendientes
-
-### 🚨 URGENTE — Mover archivos .md fuera de scripts/
-Ver tabla al inicio del documento. Comandos incluidos arriba.
-
-### 🔴 Pendiente auditar (sin uso claro)
-- `cross-ref-checker.sh` — ¿qué referencias cruza exactamente?
-- `code-drift-detector.sh` — ¿contra qué baseline detecta drift?
-- `copilot-fases.sh` vs `copilot-2fases.sh` — ¿son versiones del mismo script? ¿cuál es el actual?
-- `apertura-maestra.sh` vs `apertura-sesion.sh` — decidir cuál es el canónico
-- `cierre-maestro.sh` vs `cierre-sesion.sh` — lo mismo
-- `deploy.sh` vs `deploy-madre.sh` — consolidar en uno
-
-### 🤖 Whitelist MCP tools confirmada
-```
-start_session          → apertura-sesion.sh
-close_session          → cierre-sesion.sh
-commit_to_inbox        → inbox-commit.sh
-classify_inbox         → inbox-clasificador.sh (--dry-run primero)
-generate_session_doc   → session-terminal-doc.sh
-orchestrate            → orquestador-unico.sh
-validate_structure     → file-arrival-guardian.sh (--dry-run)
-sync_repos             → 02-git-pull-rebase.sh
-run_backup             → 07-fase3-restic-backup.sh (dry-run obligatorio)
-start_ecosystem        → 04-fase2-start-batcueva.sh (dry-run)
-generate_briefing      → copilot-mission-briefing.sh
-monitor_agents         → agent-monitor.sh
-```
-
-### 🚫 BLOQUEADAS para agentes (solo humano)
-```
-deploy.sh / deploy-madre.sh
-03-fase1-seguridad.sh / 09-fase8-seguridad-acer.sh
-01-fix-driver-rtl8188ftu.sh
-10-fase9-osint-stack.sh
-```
-
----
-
-_Auditado por Perplexity · 2026-07-04 12:24 CEST_
+| Métrica | Estado | Notas |
+|---|---|---|
+| Scripts `.sh` con extensión correcta | ✅ | Verificado por struct-auditor |
+| `.md` en `scripts/` (contaminación) | ⚠️ | 5 ficheros pendientes de mover (Bloque A) |
+| Agentes con DISEÑO+PROFILE+test | ⚠️ | Solo `agent-perplexity-informer` completo |
+| Workflows seguros (no escriben en main) | ✅ | ci-readonly + bot-writer-template |
+| Docker compose sintácticamente correcto | ✅ | Falta requirements.txt para build |
+| Smoke tests (20 checks) | ✅ | run-smoke-tests.sh |
+| Documentación operativa | ✅ | OPERATIONAL-PLAYBOOK.md v2.0 |
+| Ownership declarado | ✅ | docs/OWNERS.md |

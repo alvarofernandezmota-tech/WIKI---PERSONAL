@@ -1,58 +1,64 @@
 #!/usr/bin/env bash
 # scripts/agentes/agente-meta-deep.sh
-# Auditor meta: lee reports/, genera resumen y extrae PERCENT_COMPLETE
-# Si cobertura < 70% crea issue en GitHub automáticamente
+# Extrae PERCENT_COMPLETE de los outputs de Perplexity.
+# Si PCT < 70 y gh CLI disponible → abre issue automático.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-TS="$(date +%Y%m%d-%H%M%S)"
-OUT="$ROOT/reports/meta-deep/meta-deep-$TS.md"
-mkdir -p "$ROOT/reports/meta-deep"
+ROOT="${YGGDRASIL_ROOT:-$(pwd)}"
+REPORT_DIR="$ROOT/reports/meta-deep"
+CONTEXT_DIR="$ROOT/inbox/context/perplexity"
+THRESHOLD=70
 
-log(){ echo "[$(date +%Y-%m-%dT%H:%M:%S)] $*"; }
+mkdir -p "$REPORT_DIR"
 
-echo "# Meta-Deep Audit — $TS" > "$OUT"
-echo "" >> "$OUT"
+PCT="unknown"
+PCT_FILE=""
 
-# Contar reportes existentes
-AUDIT_COUNT=$(ls "$ROOT/reports/audit"/*.md 2>/dev/null | wc -l | tr -d ' ')
-SMOKE_COUNT=$(ls "$ROOT/reports/verify"/*.md 2>/dev/null | wc -l | tr -d ' ')
-echo "## Reportes encontrados" >> "$OUT"
-echo "- audit/: $AUDIT_COUNT" >> "$OUT"
-echo "- verify/: $SMOKE_COUNT" >> "$OUT"
+if [ -d "$CONTEXT_DIR" ]; then
+  PCT_LINE=$(grep -R --line-number -E "PERCENT_COMPLETE: [0-9]{1,3}%" \
+    "$CONTEXT_DIR" 2>/dev/null | head -n1 || true)
 
-# Contar MISSING en el último audit
-LAST_AUDIT=$(ls "$ROOT/reports/audit"/*.md 2>/dev/null | tail -n1 || echo "")
-MISSING_COUNT=0
-OK_COUNT=0
-if [ -n "$LAST_AUDIT" ]; then
-  MISSING_COUNT=$(grep -c '\[MISSING\]' "$LAST_AUDIT" || true)
-  OK_COUNT=$(grep -c '\[OK\]' "$LAST_AUDIT" || true)
-fi
-TOTAL=$((MISSING_COUNT + OK_COUNT))
-if [ "$TOTAL" -gt 0 ]; then
-  PCT=$(( (OK_COUNT * 100) / TOTAL ))
+  if [ -n "$PCT_LINE" ]; then
+    PCT=$(echo "$PCT_LINE" | grep -Eo "[0-9]{1,3}%" | head -n1 | tr -d '%')
+    PCT_FILE=$(echo "$PCT_LINE" | cut -d: -f1)
+    echo "Detected PERCENT_COMPLETE: ${PCT}% in $PCT_FILE"
+
+    if [ "$PCT" -lt "$THRESHOLD" ]; then
+      echo "WARNING: coverage ${PCT}% below threshold ${THRESHOLD}%"
+      if command -v gh >/dev/null 2>&1; then
+        gh issue create \
+          --title "[meta-deep] Low coverage: ${PCT}%" \
+          --body "Auto-detected PERCENT_COMPLETE=${PCT}% (threshold=${THRESHOLD}%) in:\n\n\`$PCT_FILE\`\n\nReview and increase coverage." \
+          --label "audit" 2>/dev/null || echo "  (gh issue create skipped — no labels or permissions)"
+      else
+        echo "  gh CLI not available — skipping issue creation"
+      fi
+    else
+      echo "Coverage OK: ${PCT}% >= ${THRESHOLD}%"
+    fi
+  else
+    echo "No PERCENT_COMPLETE found in $CONTEXT_DIR"
+  fi
 else
-  PCT=0
+  echo "WARN: context dir not found at $CONTEXT_DIR"
 fi
 
-echo "" >> "$OUT"
-echo "## Cobertura" >> "$OUT"
-echo "- OK: $OK_COUNT" >> "$OUT"
-echo "- MISSING: $MISSING_COUNT" >> "$OUT"
-echo "- PERCENT_COMPLETE: ${PCT}%" >> "$OUT"
+TS=$(date +"%Y%m%d-%H%M%S")
+OUT="$REPORT_DIR/meta-deep-$TS.md"
+STATUS="NO_DATA"
+[ "$PCT" != "unknown" ] && [ "$PCT" -ge "$THRESHOLD" ] && STATUS="OK"
+[ "$PCT" != "unknown" ] && [ "$PCT" -lt "$THRESHOLD" ] && STATUS="BELOW_THRESHOLD"
 
-log "Cobertura calculada: ${PCT}% (OK=$OK_COUNT MISSING=$MISSING_COUNT)"
+cat > "$OUT" <<REPORT
+# META DEEP — $TS
 
-# Crear issue si cobertura < 70%
-if [ "$PCT" -lt 70 ] && command -v gh &>/dev/null; then
-  log "WARN: cobertura ${PCT}% < 70%, creando issue"
-  gh issue create \
-    --title "[meta-deep] Cobertura baja: ${PCT}%" \
-    --body "Auto-detectado PERCENT_COMPLETE ${PCT}% en meta-deep $TS. MISSING=$MISSING_COUNT. Ver $OUT" \
-    --label "audit" 2>/dev/null || log "WARN: no se pudo crear issue (gh no autenticado)"
-fi
+| Campo | Valor |
+|---|---|
+| PERCENT_COMPLETE | ${PCT}% |
+| Threshold | ${THRESHOLD}% |
+| Status | $STATUS |
+| Source | ${PCT_FILE:-N/A} |
+| Scan timestamp | $(date -Iseconds) |
+REPORT
 
-echo "" >> "$OUT"
-echo "Meta-deep guardado en: $OUT"
-log "DONE: $OUT"
+echo "Report: $OUT"
