@@ -1,15 +1,15 @@
 ---
 type: audit
 date: 2026-07-04
-hora: 19:07
+hora: 20:50
 source: ecosystem-reality-check.sh
 priority: high
 status: pending
 processed_by: pending
-title: Reality Check 2026-07-04 19:07
+title: Reality Check 2026-07-04 20:50
 ---
 
-# 🔍 Ecosystem Reality Check — 2026-07-04 19:07
+# 🔍 Ecosystem Reality Check — 2026-07-04 20:50
 
 > Auditoría automática del estado real vs documentado.
 > Generado por 
@@ -19,10 +19,10 @@ title: Reality Check 2026-07-04 19:07
 
 | Métrica | Valor |
 |---------|-------|
-| Total scripts | 146 |
+| Total scripts | 147 |
 | Ejecutables (chmod +x) | 69 |
-| Sin permisos ejecución | 77 |
-| En raíz scripts/ (sin organizar) | 71 |
+| Sin permisos ejecución | 78 |
+| En raíz scripts/ (sin organizar) | 72 |
 | En subdirectorios | 75 |
 
 ### Scripts en raíz (candidatos a migrar a subdirs)
@@ -63,6 +63,7 @@ title: Reality Check 2026-07-04 19:07
 - `galatea-scan.sh`
 - `gestor-estados-inbox.sh`
 - `ghost-file-detector.sh`
+- `guardian-estructura.sh`
 - `guardian-maestro.sh`
 - `hardening-ufw.sh`
 - `inbox-clasificador.sh`
@@ -163,6 +164,7 @@ title: Reality Check 2026-07-04 19:07
 | `watchdog-monitor.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `watchdog.yml` | schedule workflow_dispatch | 🟢 ACTIVO |
 | `yamllint.yml` | push pull_request | 🟢 ACTIVO |
+| `yggdrasil-maestro.yml` | push schedule workflow_dispatch | 🟢 ACTIVO |
 
 ## 3. Servicios Docker (Madre)
 
@@ -250,8 +252,8 @@ _26 items encontrados:_
 | ✅ OK | 2 |
 | ⚠ Warnings | 13 |
 | Total checks | 15 |
-| Scripts totales | 146 |
-| Actions activas | 58 |
+| Scripts totales | 147 |
+| Actions activas | 59 |
 
-*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 19:07*
+*Generado por ecosystem-reality-check.sh [AUTO] · 2026-07-04 20:50*
 *Ejecutar en Madre para datos Docker/HTTP reales.*
