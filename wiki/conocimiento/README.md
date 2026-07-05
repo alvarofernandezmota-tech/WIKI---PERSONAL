@@ -1,24 +1,14 @@
 ---
-tags: [conocimiento, formacion, aprendizaje]
+tags: [conocimiento, formacion]
 ---
 
 # 🧠 Conocimiento
 
-Notas técnicas permanentes, aprendizajes y documentación de tecnologías usadas en el ecosistema.
+Las notas técnicas, apuntes de cursos y formación están en el repo dedicado:
 
-## Qué va aquí
-- Notas de tecnologías (Docker, Linux, redes, Python, etc.)
-- Cheatsheets propios
-- Resúmenes de cursos y formación
-- Conceptos que quiero recordar
+→ **[formacion-tech](https://github.com/alvarofernandezmota-tech/formacion-tech)**
 
-## Estructura sugerida
-```
-conocimiento/
-├── docker.md
-├── linux.md
-├── redes.md
-├── python.md
-├── git.md
-└── seguridad.md
-```
+## Qué va aquí (solo referencias rápidas)
+- Cheatsheets de consulta rápida mientras trabajas
+- Snippets de comandos frecuentes
+- Nada de apuntes largos — eso va a formacion-tech
