@@ -1,61 +1,45 @@
 ---
+title: Isla Cerebro
 tipo: isla
 nombre: Cerebro
-descripcion: Centro de gobierno técnico del ecosistema — donde nacen las reglas
+descripcion: Mapa conceptual del cerebro técnico del ecosistema — automatización, conocimiento y desarrollo
 repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
 github_issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues
 obsidian_link: "[[cerebro]]"
-depende_de: []
-sirve_a: [todas las islas]
+depende_de: [infra]
+sirve_a: [thdora, ia-local, seguridad]
 estado: estable
 author: Alvaro Fernandez Mota
 creado: 2026-07-05
 actualizado: 2026-07-05
+tags: [cerebro, dew, n8n, gitea, automatizacion]
 ---
 
 # 🧠 Isla: Cerebro
 
-El cerebro es el **centro de gobierno** de todo el ecosistema Yggdrasil. No ejecuta — define las reglas, registra las decisiones y da contexto a todo lo demás.
+El cerebro es la capa de inteligencia y automatización del ecosistema. Conecta servicios, almacena conocimiento y permite desarrollar desde cualquier dispositivo.
 
-> ⚡ Todo lo técnico → [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)
-
----
-
-## Qué vive en Dew (no aquí)
-
-- Diarios de sesión → `yggdrasil-dew/docs/diarios/YYYY-MM-DD.md`
-- Roadmap maestro → `yggdrasil-dew/ROADMAP-MASTER.md`
-- Arquitectura del ecosistema → `yggdrasil-dew/ECOSYSTEM-ARCHITECTURE.md`
-- Convenciones → `yggdrasil-dew/CONVENCIONES.md`
-- Backlog técnico global → `yggdrasil-dew/MASTER-PENDIENTES.md`
-- Issues técnicos → siempre en `yggdrasil-dew/issues`, nunca en WIKI
+> ⚡ Canon, arquitectura y diarios → [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)
 
 ---
 
-## Repos
+## Servicios
 
-| Repo | Propósito | URL |
+| Contenedor | Función | Acceso |
 |---|---|---|
-| `yggdrasil-dew` | Diarios, roadmap, arquitectura, backlog, ley máxima | https://github.com/alvarofernandezmota-tech/yggdrasil-dew |
-| `alvarofernandezmota-tech` | Perfil público GitHub + README profesional | https://github.com/alvarofernandezmota-tech/alvarofernandezmota-tech |
+| `n8n` | Automatizaciones y flujos de trabajo | Solo Tailscale |
+| `gitea` | Git local privado — espejo o alternativa a GitHub | Solo Tailscale |
+| `code-server` | VS Code en el navegador desde cualquier dispositivo | Solo Tailscale |
 
 ---
 
-## Regla de oro
+## Repos canónicos del cerebro
 
-> Todo lo que no tiene repo propio vive en Dew primero.
-> Todo issue técnico se abre en Dew, nunca en WIKI.
-> El diario se escribe en Dew, nunca en WIKI.
-> WIKI = navegas y piensas. Dew = el sistema funciona.
-
----
-
-## Conexiones
-
-- → [[infra]] (el cerebro gobierna la infraestructura)
-- → [[ia-local]] (el cerebro define cómo se usa la IA)
-- → [[thdora]] (el cerebro registra el estado de THDORA)
-- → [[seguridad]] (el cerebro registra hallazgos de seguridad)
+| Repo | Propósito |
+|---|---|
+| [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Canon, arquitectura, diarios, ADRs |
+| [`WIKI---PERSONAL`](https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL) | Mapa conceptual del ecosistema |
 
 ---
-_Actualizado: 2026-07-05 21:00 CEST · Perplexity-MCP_
+
+_Actualizado: 2026-07-05 23:43 CEST · Perplexity-MCP_
