@@ -1,83 +1,58 @@
 ---
-tags: [home, indice, mapa]
-fecha-actualizacion: 2026-07-05
+tipo: home
+author: Alvaro Fernandez Mota
+actualizado: 2026-07-05 15:03 CEST
+tags: [home, indice, navegacion, wiki]
+status: vigente
 ---
 
-# 🏠 HOME — yggdrasil-dew
+# 🌳 WIKI Personal — Ecosistema Yggdrasil
 
-> Punto de entrada al ecosistema Batcueva.
-> Si no sabes por dónde empezar, empieza aquí.
-
----
-
-## 🚨 Estado actual
-
-➡️ **[Estado del sistema → ESTADO-SISTEMA.md](ESTADO-SISTEMA.md)**
-➡️ **[Pendientes activos → MASTER-PENDIENTES.md](MASTER-PENDIENTES.md)**
-➡️ **[Dónde continuar → docs/ecosistema/donde-continuar.md](docs/ecosistema/donde-continuar.md)**
+> Portal de entrada al ecosistema completo.
+> Cada sección enlaza a su isla. Cada isla enlaza a su repo.
 
 ---
 
-## 📋 Documentos raíz
+## 🧩 Índice de Islas
 
-### Orientación
-| Fichero | Para qué sirve |
+| Isla | Descripción corta | Enlace |
+|---|---|---|
+| 🧠 Cerebro | Ley máxima, diarios, arquitectura | [wiki/islas/cerebro.md](wiki/islas/cerebro.md) |
+| 🗺️ Conocimiento | Mapa personal, hardware, vida | [wiki/islas/conocimiento.md](wiki/islas/conocimiento.md) |
+| 📚 Formación | Apuntes técnicos, I+D IA | [wiki/islas/formacion.md](wiki/islas/formacion.md) |
+| 🖥️ Infraestructura | Madre, Acer, Dockers | [wiki/islas/infraestructura.md](wiki/islas/infraestructura.md) |
+| 🤖 IA Local | Modelos LLM, RAG, memoria | [wiki/islas/ia-local.md](wiki/islas/ia-local.md) |
+| 🦾 Thdora | Bot Telegram personal | [wiki/islas/thdora.md](wiki/islas/thdora.md) |
+| 🛡️ Seguridad | Defensivo + ofensivo/OSINT | [wiki/islas/seguridad.md](wiki/islas/seguridad.md) |
+| 🧪 Labs | Sandbox y prototipos | [wiki/islas/labs.md](wiki/islas/labs.md) |
+
+---
+
+## 🔗 Acceso rápido a repos
+
+| Repo | Link directo |
 |---|---|
-| [README.md](README.md) | Qué es este repo y cómo está organizado |
-| [CONTEXT.md](CONTEXT.md) | Contexto técnico completo para IAs y agentes |
-| [AGENT.md](AGENT.md) | Instrucciones para agentes IA que trabajen aquí |
-| [ECOSYSTEM-ARCHITECTURE.md](ECOSYSTEM-ARCHITECTURE.md) | Arquitectura completa del ecosistema Batcueva |
-| [MAPA-ISLAS.md](MAPA-ISLAS.md) | Mapa de repos y su propósito |
-
-### Estado operativo
-| Fichero | Para qué sirve |
-|---|---|
-| [ESTADO-SISTEMA.md](ESTADO-SISTEMA.md) | Estado REAL ahora mismo — servicios, red, alertas |
-| [MASTER-PENDIENTES.md](MASTER-PENDIENTES.md) | Lista priorizada de todo lo pendiente |
-| [CHANGELOG.md](CHANGELOG.md) | Historial de cambios importantes |
-| [ROADMAP-MASTER.md](ROADMAP-MASTER.md) | Hoja de ruta por fases |
-
-### Reglas y convenciones
-| Fichero | Para qué sirve |
-|---|---|
-| [CONVENCIONES.md](CONVENCIONES.md) | Cómo nombrar, documentar y estructurar todo |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Cómo contribuir al repo |
-| [PLAN-SEGURIDAD-Y-DESPLIEGUE.md](PLAN-SEGURIDAD-Y-DESPLIEGUE.md) | Plan de seguridad del ecosistema |
-| [HERRAMIENTAS-ECOSISTEMA.md](HERRAMIENTAS-ECOSISTEMA.md) | Catálogo de herramientas del ecosistema |
-| [ESTRUCTURA.md](ESTRUCTURA.md) | Estructura detallada del repo |
+| yggdrasil-dew | [github.com/.../yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) |
+| madre-config | [github.com/.../madre-config](https://github.com/alvarofernandezmota-tech/madre-config) |
+| THDORA-PERSONAL | [github.com/.../THDORA-PERSONAL](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) |
+| yggdrasil-secops | [github.com/.../yggdrasil-secops](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) |
+| ollama-stack | [github.com/.../ollama-stack](https://github.com/alvarofernandezmota-tech/ollama-stack) |
+| local-brain | [github.com/.../local-brain](https://github.com/alvarofernandezmota-tech/local-brain) |
+| osint-stack | [github.com/.../osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) |
+| formacion-tech | [github.com/.../formacion-tech](https://github.com/alvarofernandezmota-tech/formacion-tech) |
+| investigacion-ia | [github.com/.../investigacion-ia](https://github.com/alvarofernandezmota-tech/investigacion-ia) |
+| acer-config | [github.com/.../acer-config](https://github.com/alvarofernandezmota-tech/acer-config) |
+| dev-labs | [github.com/.../dev-labs](https://github.com/alvarofernandezmota-tech/dev-labs) |
 
 ---
 
-## 📁 Carpetas del repo
+## 📌 Referencias clave
 
-| Carpeta | Qué contiene |
-|---|---|
-| [diarios/](diarios/README.md) | Log diario técnico — qué se hizo cada día |
-| [wiki/agentes/](wiki/agentes/README.md) | Prompts y configuración de agentes IA |
-| [wiki/conocimiento/](wiki/conocimiento/README.md) | Notas técnicas, cheatsheets, aprendizajes |
-| [wiki/infra/](wiki/infra/README.md) | Infraestructura, red, accesos, hardware |
-| [wiki/operaciones/](wiki/operaciones/README.md) | Runbooks, backups, mantenimiento |
-| [wiki/vida/](wiki/vida/README.md) | Sistemas y hábitos de vida personal |
-| [hardware/](hardware/) | Fichas de hardware del ecosistema |
-| [infra/](infra/) | Configuraciones de infraestructura |
-| [docs/](docs/) | Documentación técnica permanente |
-| [inbox/](inbox/) | Notas rápidas — procesar periódicamente |
-| [_archivo/](_archivo/README.md) | Documentos históricos, auditorías antiguas |
+- [MAPA-ISLAS.md](MAPA-ISLAS.md) — Mapa completo del ecosistema
+- [ECOSYSTEM-ARCHITECTURE.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md) — Reglas técnicas (en yggdrasil-dew)
+- [Diario hoy](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/diarios/2026-07-05.md) — Última sesión
+- [hardware/](hardware/) — Inventario de máquinas
 
 ---
 
-## 🔗 Accesos rápidos servicios
-
-| Servicio | URL |
-|---|---|
-| Open WebUI (IA local) | `http://100.91.112.32:3001` |
-| Portainer (Docker) | `http://100.91.112.32:9000` |
-| Grafana | `http://100.91.112.32:3000` |
-| Gitea | `http://100.91.112.32:3003` |
-| SpiderFoot (OSINT) | `http://100.91.112.32:5001` |
-| Kali Desktop | `https://100.91.112.32:6901` |
-
-➡️ Lista completa: [docs/infra/accesos-servicios.md](docs/infra/accesos-servicios.md)
-
----
-_Actualizado: 05 jul 2026 — Estructura wiki profesional_
+_Actualizado: 2026-07-05 15:03 CEST · Perplexity-MCP_
