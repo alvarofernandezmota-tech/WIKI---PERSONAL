@@ -8,25 +8,27 @@ obsidian_link: "[[thdora]]"
 depende_de: [infra, ia-local]
 sirve_a: [cerebro]
 estado: activo-con-deuda
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
+actualizado: 2026-07-05
 ---
 
 # 🦾 Isla: THDORA
 
 THDORA es el **bot Telegram** del ecosistema. Es la interfaz conversacional que permite interactuar con Madre, con los modelos de IA local y con el ecosistema desde cualquier dispositivo.
 
-## Repos
+> ⚡ Código y deuda técnica → [`THDORA-PERSONAL`](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL)
 
-| Repo | Propósito | URL |
-|---|---|---|
-| `THDORA-PERSONAL` | Bot Telegram principal del ecosistema | https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL |
+---
 
-## Stack técnico
+## Stack técnico (mapa)
 
 - **Lenguaje:** Python
 - **Framework:** python-telegram-bot + FastAPI
 - **IA:** Groq API + Ollama local (en migración)
-- **Corre en:** Madre vía Docker
-- **Puerto:** 8000
+- **Corre en:** Madre vía Docker · Puerto 8000
+
+---
 
 ## Deuda técnica activa
 
@@ -40,6 +42,8 @@ THDORA es el **bot Telegram** del ecosistema. Es la interfaz conversacional que 
 
 > No se crea repo nuevo ni bot nuevo hasta que `thdora#12`, `thdora#10` y `thdora#17` estén cerrados.
 
+---
+
 ## Conexiones
 
 - ← [[infra]] (corre en Madre vía Docker)
@@ -47,4 +51,4 @@ THDORA es el **bot Telegram** del ecosistema. Es la interfaz conversacional que 
 - → [[cerebro]] (reporta estado al ecosistema)
 
 ---
-_Actualizado: 2026-07-05 · Perplexity-MCP_
+_Actualizado: 2026-07-05 21:00 CEST · Perplexity-MCP_

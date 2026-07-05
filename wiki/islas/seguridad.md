@@ -7,12 +7,19 @@ github_issues: https://github.com/alvarofernandezmota-tech/yggdrasil-secops/issu
 obsidian_link: "[[seguridad]]"
 depende_de: [infra]
 sirve_a: [cerebro]
-estado: activo
+estado: estable
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
+actualizado: 2026-07-05
 ---
 
 # 🛡️ Isla: Seguridad
 
 Dos capas diferenciadas: **defensiva** (proteger el ecosistema) y **ofensiva/investigadora** (OSINT, pentesting, red team).
+
+> ⚡ Hallazgos y procedimientos técnicos → [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops)
+
+---
 
 ## Repos
 
@@ -21,38 +28,31 @@ Dos capas diferenciadas: **defensiva** (proteger el ecosistema) y **ofensiva/inv
 | `yggdrasil-secops` | Defensiva | Hallazgos HAL-XXX, remediaciones, blue team | https://github.com/alvarofernandezmota-tech/yggdrasil-secops |
 | `osint-stack` | Ofensiva | Spiderfoot, OSINT, pentesting, red team | https://github.com/alvarofernandezmota-tech/osint-stack |
 
+---
+
 ## Hallazgos activos
 
 | ID | Descripción | Severidad | Estado |
 |---|---|---|---|
-| HAL-001 | Puerto 21 FTP abierto en router | 🔴 Alta | Pendiente remediación |
+| [HAL-001](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) | Puerto 21 FTP abierto en router Digi | 🔴 Alta | ⚠️ Pendiente remediación |
 
-```bash
-# Verificar HAL-001
-nmap -p 21 $(curl -s ifconfig.me)
-# Si devuelve open → remediación urgente
-```
+---
 
-## Hardening aplicado en Madre
+## Estado hardening Madre
 
-- ✅ SSH solo desde Tailscale (`100.86.119.102`)
+- ✅ SSH solo desde Tailscale
 - ✅ UFW deny incoming
-- ✅ fail2ban activo (SSH jail)
-- ✅ smartd activo (HDD salud)
+- ✅ fail2ban activo
 - ⚠️ `PermitRootLogin no` → pendiente
 - ⚠️ Wazuh SIEM → pendiente
 - ⚠️ Suricata IDS → pendiente
 
+---
+
 ## Conexiones
 
 - ← [[infra]] (defiende los servidores del ecosistema)
-- → [[cerebro]] (hallazgos se registran en yggdrasil-secops + dew)
-
-## Docs clave
-
-- `yggdrasil-secops/hallazgos/HAL-001-ftp-puerto21.md`
-- `yggdrasil-secops/blue_team/` → configuraciones defensivas
-- `yggdrasil-secops/red_team/` → herramientas y procedimientos ofensivos
+- → [[cerebro]] (hallazgos registrados en yggdrasil-secops + dew)
 
 ---
-_Actualizado: 2026-07-05 · Perplexity-MCP_
+_Actualizado: 2026-07-05 21:00 CEST · Perplexity-MCP_

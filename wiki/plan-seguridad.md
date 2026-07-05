@@ -1,32 +1,20 @@
 ---
-tipo: conocimiento
-tags: [seguridad, despliegue, ufw, fail2ban, ssh, docker]
-estado: activo
-created: 2026-07-03
+tipo: redireccion
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
 actualizado: 2026-07-05
+ruta: wiki/plan-seguridad.md
+status: deprecado
 ---
 
-# 🛡️ PLAN DE SEGURIDAD Y DESPLIEGUE
+# ⚠️ Documento movido
 
-> Migrado desde raíz — 2026-07-05
-> Issues de seguimiento: [yggdrasil-dew issues](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
+Este documento contenía el plan de seguridad técnico del ecosistema.
 
----
+**La fuente de verdad está en los repos técnicos:**
+→ [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) — hallazgos y blue team
+→ [`yggdrasil-dew/ECOSYSTEM-ARCHITECTURE.md`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md) — reglas generales
 
-## Capas de seguridad activas
+> Regla: si hace que el sistema funcione mejor → vive en Dew o en su repo técnico, no en WIKI.
 
-- **UFW** — deny incoming por defecto, reglas específicas por servicio y origen
-- **fail2ban** — jail SSH activo en Madre y Acer (maxretry 5, bantime 24h)
-- **Tailscale** — VPN mesh para acceso remoto seguro
-- **SSH** — solo clave pública, PasswordAuthentication no
-- **Docker** — contenedores sin privilegios, redes aisladas
-
-## Pendientes de seguridad
-
-- [ ] Puerto 21 FTP en router — verificar si sigue abierto
-- [ ] `PermitRootLogin no` explícito en sshd_config
-- [ ] CrowdSec sobre UFW
-- [ ] Vaultwarden para secrets del ecosistema
-- [ ] AlertManager → Telegram para alertas críticas
-
-_Migrado desde raíz — 2026-07-05 · Perplexity-MCP_
+_Deprecado: 2026-07-05 · Perplexity-MCP_

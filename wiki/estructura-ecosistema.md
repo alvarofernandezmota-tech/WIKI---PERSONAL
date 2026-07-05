@@ -1,41 +1,19 @@
 ---
-tipo: conocimiento
-tags: [estructura, repos, convenciones, ecosistema]
-estado: activo
-created: 2026-07-03
+tipo: redireccion
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
 actualizado: 2026-07-05
+ruta: wiki/estructura-ecosistema.md
+status: deprecado
 ---
 
-# 🏗️ ESTRUCTURA DEL ECOSISTEMA
+# ⚠️ Documento movido
 
-> Migrado desde raíz — 2026-07-05
-> Normas completas: [yggdrasil-dew/CONVENCIONES.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/CONVENCIONES.md)
+Este documento era una copia de la arquitectura técnica del ecosistema.
 
----
+**La fuente de verdad está en Dew:**
+→ [`yggdrasil-dew/ECOSYSTEM-ARCHITECTURE.md`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md)
 
-## Principio de separación
+> Regla: si afecta a cómo funciona el sistema → vive en Dew, no en WIKI.
 
-| Repo | Contiene | No contiene |
-|---|---|---|
-| yggdrasil-dew | Gobierno, diarios, arquitectura | Código operativo |
-| thdora | Bot FastAPI, scripts propios | Docs de otras islas |
-| madre-config | Config Madre, Docker, scripts infra | Docs de thdora |
-| WIKI---PERSONAL | Conocimiento, notas Obsidian | Issues técnicos |
-| formacion-tech | Cursos, prácticas, apuntes | Config infra |
-
-## Estructura mínima repo hija
-
-```
-repo-hija/
-├── README.md
-├── docs/
-│   ├── CONVENCIONES-LOCAL.md
-│   └── ROADMAP.md
-├── scripts/
-└── .github/workflows/
-    ├── ci.yml
-    ├── ecosystem-guardian.yml
-    └── lint-commits.yml
-```
-
-_Migrado desde raíz — 2026-07-05 · Perplexity-MCP_
+_Deprecado: 2026-07-05 · Perplexity-MCP_
