@@ -1,55 +1,50 @@
 ---
 tipo: isla
-isla: thdora
-repos: [THDORA-PERSONAL]
-actualizado: 2026-07-05 15:03 CEST
-tags: [thdora, telegram, bot, fastapi, ia, personal]
+nombre: THDORA
+descripcion: Bot Telegram del ecosistema — interfaz conversacional con todo el sistema
+repo_principal: https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL
+github_issues: https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL/issues
+obsidian_link: "[[thdora]]"
+depende_de: [infra, ia-local]
+sirve_a: [cerebro]
+estado: activo-con-deuda
 ---
 
 # 🦾 Isla: THDORA
 
-> El bot personal. Interfaz de voz y texto con el ecosistema desde Telegram.
-> Evolución natural de `thea-ia` (archivado).
-
----
+THDORA es el **bot Telegram** del ecosistema. Es la interfaz conversacional que permite interactuar con Madre, con los modelos de IA local y con el ecosistema desde cualquier dispositivo.
 
 ## Repos
 
-### [`THDORA-PERSONAL`](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) 🌐 Público
-Bot Telegram personal con IA local integrada:
-- **FastAPI** — backend y webhook Telegram
-- **Ollama** — respuestas con LLM local
-- **local-brain** — memoria y contexto personal
-- Gestiona: recordatorios, consultas, notas rápidas
-- Fase actual: 10 (multi-agente en desarrollo)
+| Repo | Propósito | URL |
+|---|---|---|
+| `THDORA-PERSONAL` | Bot Telegram principal del ecosistema | https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL |
+
+## Stack técnico
+
+- **Lenguaje:** Python
+- **Framework:** python-telegram-bot + FastAPI
+- **IA:** Groq API + Ollama local (en migración)
+- **Corre en:** Madre vía Docker
+- **Puerto:** 8000
+
+## Deuda técnica activa
+
+| Issue | Problema | Prioridad |
+|---|---|---|
+| [thdora#12](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL/issues/12) | Duplicación `src/bot/agents/` + 3 LLM zombie | 🔴 Crítica |
+| [thdora#10](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL/issues/10) | `/config` timeout `asyncio.wait_for` 5s | 🔴 Crítica |
+| [thdora#17](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL/issues/17) | Crear `scripts/deploy.sh` | 🟠 Alta |
+
+## Regla de deuda
+
+> No se crea repo nuevo ni bot nuevo hasta que `thdora#12`, `thdora#10` y `thdora#17` estén cerrados.
+
+## Conexiones
+
+- ← [[infra]] (corre en Madre vía Docker)
+- ← [[ia-local]] (usa modelos Ollama de Madre)
+- → [[cerebro]] (reporta estado al ecosistema)
 
 ---
-
-## Arquitectura
-
-```
-iPhone (Telegram)
-    ↓
-THDORA-PERSONAL (FastAPI en Madre)
-    ├──→ ollama-stack (respuesta LLM)
-    └──→ local-brain (memoria RAG)
-```
-
----
-
-## Herramientas
-- **Python / FastAPI** — backend
-- **python-telegram-bot** — cliente Telegram
-- **Ollama** — modelos LLM locales
-- **Docker** — despliegue en Madre
-- **Qdrant** — memoria vectorial
-
----
-
-## Historial
-- `thea-ia` — proyecto original (archivado, delegado aquí)
-- `ai-toolkit` — stack IA anterior (archivado, delegado en ollama-stack)
-
----
-
-← [HOME](../../HOME.md)
+_Actualizado: 2026-07-05 · Perplexity-MCP_

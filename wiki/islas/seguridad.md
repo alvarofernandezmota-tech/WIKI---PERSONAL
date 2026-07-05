@@ -1,53 +1,58 @@
 ---
 tipo: isla
-isla: seguridad
-repos: [yggdrasil-secops, osint-stack]
-actualizado: 2026-07-05 15:03 CEST
-tags: [seguridad, secops, osint, pentest, blue-team, red-team]
+nombre: Seguridad
+descripcion: Defensa del ecosistema propio y capacidades OSINT/red-team
+repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-secops
+github_issues: https://github.com/alvarofernandezmota-tech/yggdrasil-secops/issues
+obsidian_link: "[[seguridad]]"
+depende_de: [infra]
+sirve_a: [cerebro]
+estado: activo
 ---
 
 # 🛡️ Isla: Seguridad
 
-> Dos capas distintas y complementarias:
-> **Defensiva** — proteger el ecosistema propio.
-> **Ofensiva/Investigadora** — atacar y descubrir.
-
----
+Dos capas diferenciadas: **defensiva** (proteger el ecosistema) y **ofensiva/investigadora** (OSINT, pentesting, red team).
 
 ## Repos
 
-### [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) 🔒 Privado — DEFENSIVO
-Seguridad del ecosistema Yggdrasil:
-- `hallazgos/` — vulnerabilidades encontradas (formato HAL-XXX)
-- `blue_team/` — bastionado, hardening, monitoreo
-- `red_team/` — ejercicios ofensivos sobre infra propia
-- `osint/` — auto-OSINT del perfil público
-- **HAL-001** — FTP puerto 21 abierto (pendiente remediar)
-
-### [`osint-stack`](https://github.com/alvarofernandezmota-tech/osint-stack) 🔒 Privado — OFENSIVO
-Herramientas de investigación y reconocimiento:
-- **Spiderfoot** — OSINT automático
-- Pipelines de reconocimiento de objetivos
-- Automatización de recon pasivo/activo
-
----
+| Repo | Capa | Propósito | URL |
+|---|---|---|---|
+| `yggdrasil-secops` | Defensiva | Hallazgos HAL-XXX, remediaciones, blue team | https://github.com/alvarofernandezmota-tech/yggdrasil-secops |
+| `osint-stack` | Ofensiva | Spiderfoot, OSINT, pentesting, red team | https://github.com/alvarofernandezmota-tech/osint-stack |
 
 ## Hallazgos activos
 
 | ID | Descripción | Severidad | Estado |
 |---|---|---|---|
-| HAL-001 | FTP puerto 21 abierto en router | Alta | 🔴 Pendiente |
+| HAL-001 | Puerto 21 FTP abierto en router | 🔴 Alta | Pendiente remediación |
+
+```bash
+# Verificar HAL-001
+nmap -p 21 $(curl -s ifconfig.me)
+# Si devuelve open → remediación urgente
+```
+
+## Hardening aplicado en Madre
+
+- ✅ SSH solo desde Tailscale (`100.86.119.102`)
+- ✅ UFW deny incoming
+- ✅ fail2ban activo (SSH jail)
+- ✅ smartd activo (HDD salud)
+- ⚠️ `PermitRootLogin no` → pendiente
+- ⚠️ Wazuh SIEM → pendiente
+- ⚠️ Suricata IDS → pendiente
+
+## Conexiones
+
+- ← [[infra]] (defiende los servidores del ecosistema)
+- → [[cerebro]] (hallazgos se registran en yggdrasil-secops + dew)
+
+## Docs clave
+
+- `yggdrasil-secops/hallazgos/HAL-001-ftp-puerto21.md`
+- `yggdrasil-secops/blue_team/` → configuraciones defensivas
+- `yggdrasil-secops/red_team/` → herramientas y procedimientos ofensivos
 
 ---
-
-## Herramientas
-- **Spiderfoot** — OSINT automatizado
-- **Nmap** — escaneo de puertos
-- **Wazuh** — SIEM (planificado)
-- **UFW** — firewall en Madre
-- **Fail2ban** — protección SSH
-- **Canary tokens** — tripwires
-
----
-
-← [HOME](../../HOME.md)
+_Actualizado: 2026-07-05 · Perplexity-MCP_
