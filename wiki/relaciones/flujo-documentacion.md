@@ -1,80 +1,121 @@
 ---
 tipo: relacion
-nombre: Flujo de documentación
-islas: [cerebro]
-obsidian_link: "[[flujo-documentacion]]"
-estado: activo
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
+actualizado: 2026-07-05 21:18 CEST
+ruta: wiki/relaciones/flujo-documentacion.md
+tags: [relacion, flujo, documentacion, inbox, clasificador, dew, wiki, guardian]
+status: vigente
+islas: [cerebro, conocimiento]
 ---
 
-# 🔗 Relación: Cómo fluye la documentación en el ecosistema
+# 📄 Flujo de Documentación del Ecosistema
 
-Esta página explica **dónde va cada tipo de información** y cómo Obsidian y GitHub se retroalimentan.
+> Cómo entra la información, cómo se clasifica, transforma y archiva.
+> Este flujo es la columna vertebral del ecosistema cognitivo.
 
-## Regla definitiva — qué va dónde
+---
 
-| ¿Qué es? | ¿Dónde va? | URL |
+## Diagrama del flujo
+
+```
+Entrada (nueva información)
+    ↓
+Inbox (bruto, sin clasificar)
+    ↓
+Clasificador Maestro
+    ├── ¿Hace funcionar el sistema?  → yggdrasil-dew (diario / issue / doc)
+    ├── ¿Es de seguridad?             → yggdrasil-secops (hallazgo HAL-XXX)
+    ├── ¿Es de infra / Madre?         → madre-config (script / config)
+    ├── ¿Es formación técnica?         → formacion-tech (apunte / ejercicio)
+    ├── ¿Me ayuda a pensar / navegar? → WIKI (isla / relación)
+    └── ¿Es vida personal?            → VIDAPERSONAL
+    ↓
+Documentación estable (fuente de verdad en su repo)
+    ↓
+Guardian Maestro (audita coherencia y detecta desviaciones)
+    ↓
+Árbol de agentes (observadores, investigadores, mejoradores)
+    ↓
+Sincronización entre capas (según MAPA-SYNC)
+```
+
+---
+
+## Paso a paso
+
+### 1. Entrada
+
+La información entra por:
+- Sesiones de trabajo con MCP (iPhone / Acer)
+- Sesiones SSH en Madre
+- Hallazgos de auditoría
+- Aprendizajes de formación
+- Conversaciones con IA (Perplexity, Ollama)
+
+### 2. Inbox
+
+> El inbox es temporal. Nunca es fuente de verdad.
+
+- En Dew: `inbox/` (si existe) → se procesa en el mismo día
+- En WIKI: no hay inbox — todo entra ya clasificado
+- En Madre: archivos sueltos en `~/` → se mueven a su repo
+
+### 3. Clasificador Maestro
+
+Aplica la regla de oro:
+
+> ¿Hace funcionar el sistema? → **Dew**
+> ¿Me ayuda a pensar / navegar? → **WIKI**
+
+Si hay duda: va a **Dew** como issue o diario primero.
+
+### 4. Documentación estable
+
+| Tipo | Ruta canónica | Formato |
 |---|---|---|
-| Diario de sesión | `yggdrasil-dew/docs/diarios/` | https://github.com/alvarofernandezmota-tech/yggdrasil-dew/tree/main/docs/diarios |
-| Arquitectura ecosistema | `yggdrasil-dew/ECOSYSTEM-ARCHITECTURE.md` | https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md |
-| Mapa conceptual / islas | `WIKI---PERSONAL/wiki/islas/` | https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL/tree/main/wiki/islas |
-| Relaciones entre islas | `WIKI---PERSONAL/wiki/relaciones/` | https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL/tree/main/wiki/relaciones |
-| Tarea técnica (issue) | `yggdrasil-dew/issues` | https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues |
-| Backlog global | `yggdrasil-dew/MASTER-PENDIENTES.md` | https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/MASTER-PENDIENTES.md |
-| Config servidor Madre | `madre-config/` | https://github.com/alvarofernandezmota-tech/madre-config |
-| Hallazgo seguridad | `yggdrasil-secops/hallazgos/HAL-XXX` | https://github.com/alvarofernandezmota-tech/yggdrasil-secops/tree/main/hallazgos |
-| Apunte técnico | `formacion-tech/<área>/` | https://github.com/alvarofernandezmota-tech/formacion-tech |
-| Contexto personal/HW | `WIKI---PERSONAL/wiki/` | https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL/tree/main/wiki |
-| Proto sin repo propio | `dev-labs/` | https://github.com/alvarofernandezmota-tech/dev-labs |
+| Diario de sesión | `yggdrasil-dew/docs/diarios/YYYY-MM-DD.md` | Markdown |
+| Decisión técnica | `yggdrasil-dew/docs/decisiones/` | Markdown (ADR) |
+| Hallazgo seguridad | `yggdrasil-secops/hallazgos/HAL-XXX.md` | Markdown |
+| Isla conceptual | `WIKI/wiki/islas/<nombre>.md` | Markdown |
+| Relación entre islas | `WIKI/wiki/relaciones/<nombre>.md` | Markdown |
+| Config de servicio | `madre-config/services/<nombre>/` | YAML / bash |
+| Apunte de formación | `formacion-tech/<area>/` | Markdown |
 
-## Flujo GitHub ↔ Obsidian
+### 5. Guardian Maestro
 
-```
-Obsidian Vault (WIKI---PERSONAL clonado)
-    │
-    ├── git pull origin main  ← sincroniza notas desde GitHub
-    │
-    ├── Editas notas en Obsidian
-    │        (frontmatter con github_issues: [#N])
-    │        (enlaces [[isla]] entre notas)
-    │
-    └── git push origin main  → sube cambios a GitHub
+Periódicamente (o bajo demanda) verifica:
+- ¿Todo lo que hay en inbox fue procesado?
+- ¿Hay duplicados entre repos?
+- ¿Hay docs técnicos viviendo en WIKI?
+- ¿Hay diarios sin fecha ni contexto?
+- ¿Hay issues abiertos sin repo correcto?
 
-GitHub Issues (yggdrasil-dew)
-    │
-    ├── Cada issue referencia la nota de WIKI con URL
-    └── Cada nota de WIKI referencia el issue con #N
-```
+### 6. Sincronización
 
-## Cómo clonar los repos en Obsidian vault
-
-```bash
-# En el directorio de tu Obsidian vault
-cd ~/ObsidianVault   # o donde tengas el vault
-
-# Clonar WIKI como subcarpeta del vault
-git clone https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL ./WIKI
-
-# O directamente usar WIKI---PERSONAL como el vault
-git clone https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL
-cd WIKI---PERSONAL
-# Abrir esta carpeta como vault en Obsidian
-```
-
-## Frontmatter estándar para notas de isla
-
-```yaml
----
-tipo: isla
-nombre: [nombre]
-descripcion: [descripción corta]
-repo_principal: [URL GitHub]
-github_issues: [#N, #N]
-obsidian_link: "[[nombre]]"
-depende_de: [isla1, isla2]
-sirve_a: [isla1, isla2]
-estado: activo | pausado | archivado
----
-```
+Según [`yggdrasil-dew/docs/canon/MAPA-SYNC.md`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/MAPA-SYNC.md):
+- Dew → WIKI (unidireccional)
+- Madre → WIKI (unidireccional)
+- SecOps → Dew + WIKI (unidireccional)
 
 ---
-_Actualizado: 2026-07-05 · Perplexity-MCP_
+
+## Reglas del flujo
+
+1. **El inbox siempre se vacía.** Nada vive en inbox más de 24h.
+2. **La duda va a Dew.** Si no sabes dónde va algo, abre un issue en Dew.
+3. **WIKI no tiene inbox.** Todo lo que entra en WIKI ya está clasificado.
+4. **Los diarios son sagrados.** Cada sesión importante tiene su diario en Dew.
+5. **El Guardian audita, no decide.** Las decisiones las toma el Clasificador o el humano.
+
+---
+
+## Conexiones
+
+- → [[cerebro]] (Dew es el destino principal)
+- → [[conocimiento]] (WIKI es el destino conceptual)
+- → `yggdrasil-dew/docs/canon/MAPA-SYNC.md` (reglas de sincronización)
+- → `yggdrasil-dew/docs/canon/DICCIONARIO.md` (vocabulario del flujo)
+
+---
+_Actualizado: 2026-07-05 21:18 CEST · Perplexity-MCP_

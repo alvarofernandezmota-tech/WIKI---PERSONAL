@@ -1,64 +1,85 @@
 ---
 tipo: relacion
-nombre: Servicios en Madre
-islas: [infra, ia-local, thdora, seguridad]
-obsidian_link: "[[servicios-madre]]"
-estado: activo
+author: Alvaro Fernandez Mota
+creado: 2026-07-05
+actualizado: 2026-07-05 21:18 CEST
+ruta: wiki/relaciones/servicios-madre.md
+tags: [relacion, madre, servicios, docker, infra, dew, secops]
+status: vigente
+islas: [infra, ia-local, thdora, seguridad, cerebro]
 ---
 
-# 🔗 Relación: Todos los servicios que corren en Madre
+# 🖥️ Servicios de Madre — Mapa de relaciones
 
-Madre (`varpc`, `100.91.112.32`) es el servidor central del ecosistema. Esta página es el inventario completo de todo lo que corre en él.
-
-## Inventario de servicios
-
-| Servicio | Puerto | Repo | Verificar |
-|---|---|---|---|
-| SSH | 22 | `madre-config` | `systemctl is-active sshd` |
-| Ollama | 11434 | `ollama-stack` | `systemctl is-active ollama` |
-| THDORA bot | 8000 | `THDORA-PERSONAL` | `docker ps \| grep thdora` |
-| Netdata | 19999 | — | `systemctl is-active netdata` |
-| Docker daemon | — | — | `systemctl is-active docker` |
-| Tailscale | — | — | `tailscale status` |
-| UFW | — | `madre-config` | `ufw status` |
-| fail2ban | — | `madre-config` | `fail2ban-client status` |
-
-## Script de verificación global
-
-```bash
-#!/bin/bash
-# health-check-madre.sh
-echo "=== MADRE HEALTH CHECK ==="
-for svc in sshd ollama netdata docker tailscaled ufw fail2ban; do
-    status=$(systemctl is-active $svc 2>/dev/null)
-    echo "[$status] $svc"
-done
-echo ""
-echo "=== DOCKER CONTAINERS ==="
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-echo ""
-echo "=== OLLAMA MODELS ==="
-ollama list
-```
-
-## Acceso desde Acer
-
-```bash
-# SSH
-ssh varopc@100.91.112.32
-
-# Ollama API
-curl http://100.91.112.32:11434/api/tags
-
-# Netdata dashboard
-# Abrir en navegador: http://100.91.112.32:19999
-```
-
-## Repos relacionados
-
-- `madre-config` → https://github.com/alvarofernandezmota-tech/madre-config
-- `ollama-stack` → https://github.com/alvarofernandezmota-tech/ollama-stack
-- `THDORA-PERSONAL` → https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL
+> Qué servicios viven en Madre, dónde se documentan y dónde se auditan.
+> Madre es el servidor físico. Esta wiki es el mapa conceptual — no el manual técnico.
 
 ---
-_Actualizado: 2026-07-05 · Perplexity-MCP_
+
+## Servicios activos en Madre
+
+| Servicio | Puerto | Estado | Documentado en | Auditado en |
+|---|---|---|---|---|
+| SSH | 22 | ✅ solo Tailscale | `madre-config` | SecOps |
+| Ollama | 11434 | ✅ | `ollama-stack` | — |
+| Open WebUI | 3000 | ✅ | `ollama-stack` | — |
+| Qdrant | 6333 | ✅ | `local-brain` | — |
+| THDORA bot | 8000 | ✅ | `THDORA-PERSONAL` | SecOps |
+| Portainer | — | ✅ | `madre-config` | SecOps |
+| Grafana + Prometheus | — | ✅ | `madre-config` | — |
+| Nextcloud | — | ✅ | `madre-config` | SecOps |
+| Vaultwarden | — | ✅ | `madre-config` | SecOps ⚠️ |
+| Pi-hole + Unbound | — | ✅ | `madre-config` | — |
+| log_guardian_bot | — | ⚠️ unhealthy | `madre-config` | Dew (backlog) |
+| yggdrasil_watchdog | — | ⚠️ unhealthy | `madre-config` | Dew (backlog) |
+| UFW | — | ✅ | `madre-config` | SecOps |
+| fail2ban | — | ✅ | `madre-config` | SecOps |
+
+---
+
+## Cómo se distribuye el conocimiento de cada servicio
+
+### Lo que vive en cada capa
+
+**WIKI (aquí):**
+- Qué hace cada servicio y para qué existe en el ecosistema
+- Relaciones entre servicios
+- Estado conceptual (activo, unhealthy, pendiente)
+
+**`madre-config`:**
+- Docker compose de cada servicio
+- Variables de entorno
+- Scripts de arranque y shutdown
+- Procedimientos operativos
+
+**`yggdrasil-dew`:**
+- Decisiones de arquitectura sobre servicios
+- Backlog de servicios unhealthy
+- Diarios de cambios de configuración
+
+**`yggdrasil-secops`:**
+- Auditorías de puertos
+- Credenciales expuestas
+- Planes de remediación
+
+---
+
+## Servicios prioritarios a sanear
+
+1. **log_guardian_bot** — unhealthy. Bloquea la observabilidad del sistema.
+2. **yggdrasil_watchdog** — unhealthy. Bloquea la detección automática de fallos.
+3. **Vaultwarden** — gestor de contraseñas expuesto → requiere auditoría SecOps urgente.
+4. **Disco HDD WD 1TB** — 28k horas. Riesgo crítico de fallo → plan de backup obligatorio.
+
+---
+
+## Conexiones
+
+- → [[infra]] (el hardware donde corren los servicios)
+- → [[ia-local]] (Ollama + Qdrant + Open WebUI)
+- → [[thdora]] (bot corriendo en Madre)
+- → [[seguridad]] (auditorías de servicios expuestos)
+- → [[cerebro]] (Dew documenta decisiones de arquitectura)
+
+---
+_Actualizado: 2026-07-05 21:18 CEST · Perplexity-MCP_
