@@ -1,19 +1,16 @@
 ---
-tipo: redireccion
-author: Alvaro Fernandez Mota
+tipo: redirect
+status: deprecado
 creado: 2026-07-05
 actualizado: 2026-07-05
 ruta: wiki/herramientas-ecosistema.md
-status: deprecado
+tags: [redirect, deprecado]
 ---
 
 # ⚠️ Documento movido
 
-Este documento listaba herramientas técnicas del ecosistema.
+Este documento ha sido consolidado en el repo canónico.
 
-**La fuente de verdad está en Dew:**
-→ [`yggdrasil-dew/ECOSYSTEM-ARCHITECTURE.md`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md)
+➡️ **Canónico:** [`yggdrasil-dew/docs/canon/DICCIONARIO.md`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/DICCIONARIO.md)
 
-> Regla: si afecta a cómo funciona el sistema → vive en Dew, no en WIKI.
-
-_Deprecado: 2026-07-05 · Perplexity-MCP_
+No actualizar este archivo. Actualizar el canónico.

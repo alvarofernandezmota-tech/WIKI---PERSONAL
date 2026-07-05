@@ -1,17 +1,16 @@
 ---
-tipo: redireccion
-author: Alvaro Fernandez Mota
+tipo: redirect
+status: deprecado
 creado: 2026-07-05
 actualizado: 2026-07-05
 ruta: wiki/islas/infraestructura.md
-status: deprecado
+tags: [redirect, deprecado, infra]
 ---
 
-# ⚠️ Fichero duplicado — usar infra.md
+# ⚠️ Duplicado — archivo movido
 
-Este fichero era un duplicado con datos desactualizados.
+Este archivo era un duplicado de `infra.md`.
 
-**Usa el canónico:**
-→ [`wiki/islas/infra.md`](./infra.md)
+➡️ **Canónico:** [`wiki/islas/infra.md`](./infra.md)
 
-_Deprecado: 2026-07-05 · Perplexity-MCP_
+No actualizar este archivo.
