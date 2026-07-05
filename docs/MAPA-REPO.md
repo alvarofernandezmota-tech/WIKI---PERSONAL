@@ -1,6 +1,14 @@
-# Mapa del Repositorio — yggdrasil-dew
+---
+tipo: mapa
+nombre: Mapa del Repositorio WIKI-PERSONAL
+estado: vigente
+created: 2026-06-25
+actualizado: 2026-07-05
+---
 
-> **Actualizado:** 2026-06-25  
+# Mapa del Repositorio — WIKI-PERSONAL
+
+> **Actualizado:** 2026-07-05  
 > **Estado:** VIVO — actualizar cuando cambie la estructura
 
 ---
@@ -8,94 +16,127 @@
 ## Estructura de directorios
 
 ```
-yggdrasil-dew/
+WIKI---PERSONAL/
 │
-├── 📋 RAÍZ (documentos maestros)
-│   ├── README.md              ← Entrada principal
-│   ├── CONTEXT.md             ← Contexto para IAs
-│   ├── ECOSISTEMA.md          ← Mapa del ecosistema completo
-│   ├── ESTADO-SISTEMA.md      ← Estado actual del sistema
-│   ├── MASTER-PENDIENTES.md   ← Lista maestra de pendientes
-│   ├── CONVENCIONES.md        ← Convenciones del proyecto
-│   ├── ROADMAP.md             ← Hoja de ruta
-│   ├── CHANGELOG.md           ← Cambios por versión
+├── 📋 RAÍZ (documentos maestros — MAYÚSCULAS)
+│   ├── README.md              ← Entrada pública del repo
+│   ├── HOME.md                ← Dashboard de navegación (islas + repos)
 │   ├── AGENT.md               ← Instrucciones para agentes IA
-│   ├── HOME.md                ← Dashboard principal
-│   └── filosofia.md           ← Filosofía del proyecto
+│   ├── CONTEXT.md             ← Estado actual del ecosistema
+│   ├── CONTRIBUTING.md        ← Flujo de trabajo y commits
+│   └── CHANGELOG.md           ← Cambios por versión/sesión
 │
-├── 📁 inbox/                  ← ZONA DE ATERRIZAJE (limpiar regularmente)
-│   └── YYYY-MM-DD-*.md        ← Ficheros sin clasificar
+├── 📁 wiki/                   ← Documentación conceptual del ecosistema
+│   ├── 00-mapa.md             ← Mapa maestro: islas + repos + estado
+│   ├── mapa-islas.md          ← Tabla completa de islas
+│   ├── estructura-ecosistema.md
+│   ├── herramientas-ecosistema.md
+│   ├── plan-seguridad.md
+│   ├── islas/                 ← Una ficha Markdown por isla
+│   │   ├── cerebro.md
+│   │   ├── conocimiento.md
+│   │   ├── formacion.md
+│   │   ├── infraestructura.md
+│   │   ├── ia-local.md
+│   │   ├── thdora.md
+│   │   ├── seguridad.md
+│   │   └── labs.md
+│   ├── infra/                 ← Docs de infraestructura (Madre, Acer, red)
+│   ├── agentes/               ← Fichas de agentes IA del ecosistema
+│   ├── operaciones/           ← Rutinas y procesos operativos
+│   ├── conocimiento/          ← Conocimiento técnico general
+│   ├── vida/                  ← Hábitos, finanzas, personal
+│   └── relaciones/            ← Relaciones entre islas/componentes
 │
-├── 📁 docs/                   ← Documentación estructurada
+├── 📁 docs/                   ← Documentación técnica de soporte
 │   ├── adr/                   ← Architecture Decision Records
-│   │   ├── ADR-001-*.md
-│   │   ├── ADR-002-*.md
-│   │   ├── ADR-003-ollama-vs-llamacpp.md
-│   │   └── ADR-004-estrategia-ramas.md
-│   ├── ias/                   ← Fichas de herramientas IA
-│   │   ├── claude-anthropic.md
-│   │   ├── perplexity.md
-│   │   ├── gemini-google.md
-│   │   └── INCIDENTE-CLAUDE-MIENTE-2026-06-25.md
-│   ├── decisiones/            ← Decisiones de arquitectura y proyecto
-│   ├── setup/                 ← Guías de configuración
-│   ├── sistema/               ← Documentación del sistema
-│   └── *.md                   ← Docs generales
+│   ├── agentes/               ← Configuración de agentes
+│   ├── arquitectura/          ← Arquitectura del sistema
+│   ├── auditorias/            ← Auditorías periódicas
+│   ├── archivo/               ← Docs obsoletos (archivar, no borrar)
+│   ├── bitacora/              ← Registro de eventos
+│   ├── bots/                  ← Bots y automatizaciones
+│   ├── decisiones/            ← Decisiones técnicas puntuales
+│   ├── diarios/               ← Diarios de sesión (destino definitivo)
+│   ├── ecosistema/            ← Documentos del ecosistema
+│   ├── filosofia/             ← Principios y valores
+│   ├── fixes/                 ← Soluciones documentadas
+│   ├── github/                ← GitHub Actions, labels, workflows
+│   ├── hardware/              ← Inventario de máquinas
+│   ├── herramientas/          ← Stack de herramientas
+│   ├── ias/                   ← Fichas de modelos y agentes IA
+│   ├── infra/                 ← Infraestructura técnica
+│   ├── investigacion/         ← Investigaciones técnicas
+│   ├── leyes/                 ← Leyes y normas del sistema
+│   ├── madre/                 ← Documentos maestros del sistema
+│   ├── mcp/                   ← Model Context Protocol
+│   ├── misc/                  ← Miscelánea sin clasificar
+│   ├── normas/                ← Normas operativas
+│   ├── operativa/             ← Procesos operativos
+│   ├── pentesting/            ← Seguridad ofensiva
+│   ├── procesos/              ← Workflows y procesos
+│   ├── proyectos/             ← Gestión de proyectos
+│   ├── referencias/           ← Referencias externas
+│   ├── reglas/                ← Reglas del sistema
+│   ├── seguridad/             ← Seguridad defensiva
+│   ├── sesiones/              ← Registro de sesiones
+│   ├── setup/                 ← Guías de instalación y configuración
+│   ├── sistema/               ← Core del sistema
+│   ├── tareas/                ← Gestión de tareas
+│   ├── thdora-guardian/       ← Agente Thdora Guardian
+│   └── CONVENCIONES.md        ← ⚠️ Leer antes de crear cualquier fichero
 │
-├── 📁 diarios/                ← Diarios de sesión
+├── 📁 diarios/                ← Diarios raíz (pendiente migrar a docs/diarios/)
+├── 📁 hardware/               ← Inventario hardware en raíz
+├── 📁 inbox/                  ← ZONA DE ATERRIZAJE (máx. 20 ficheros)
 │   └── YYYY-MM-DD-*.md
 │
-├── 📁 proyectos/              ← Fichas de proyectos
-│   ├── local-brain/
-│   ├── thdora/
-│   ├── chatbot-control/
-│   └── terminal-ia/
+├── 📁 _archivo/               ← Archivado histórico (no tocar salvo consulta)
+│   ├── AUDITORIA-COMPLETA-YGG.md
+│   ├── AUDITORIA-MAESTRA-COPILOT.md
+│   ├── COPILOT-AUDIT-PLAN.md
+│   ├── COPILOT-CONTEXT.md
+│   ├── COPILOT-MASTER-CONTEXT.md
+│   ├── diarios/
+│   ├── mocs/
+│   └── thdora/
 │
-├── 📁 ollama/                 ← Configuración Ollama
-│   └── Modelfiles/
-│
-├── 📁 osint/                  ← Herramientas y docs OSINT
-│
-├── 📁 setup/                  ← Scripts de configuración del sistema
-│
-├── 📁 tools/                  ← Scripts y herramientas del repo
-│   ├── inbox-processor.sh     ← Migración automática de inbox
-│   └── inbox-stats.sh         ← Estadísticas del inbox
-│
-├── 📁 agentes/                ← Configuración de agentes
-│
-├── 📁 formacion/              ← Material de formación
-│
-├── 📁 templates/              ← Plantillas
-│
-├── 📁 cli-tools/              ← Herramientas CLI
-│
-└── 📁 yo/                     ← Información personal
+└── 📁 .github/                ← Templates de PR/issues, CODEOWNERS, Actions
 ```
 
 ---
 
-## Ramas activas
+## Convenciones de nomenclatura
 
-| Rama | Propósito | Estado |
-|------|-----------|--------|
-| `main` | Estado estable y documentación verificada | ✅ Activa |
-| `feat/ollama-stack` | Implementación Ollama + Modelfiles | 🔄 Pendiente crear |
-| `feat/litellm-proxy` | LiteLLM + SOPS secrets | 🔄 Pendiente crear |
-| `feat/inbox-cleanup` | Migración masiva inbox | 🔄 Pendiente crear |
-| `feat/local-brain` | Proyecto Local Brain RAG | 🔄 Pendiente crear |
-| `feat/thdora-agent` | Agente Thdora | 🔄 Pendiente crear |
+| Contexto | Regla | Ejemplo |
+|---|---|---|
+| Raíz del repo | `MAYÚSCULAS.md` | `AGENT.md` |
+| Carpetas temáticas en `docs/` o `wiki/` | `kebab-case` minúsculas | `flujo-sesiones.md` |
+| Diarios | `YYYY-MM-DD.md` | `2026-07-05.md` |
+| ADRs | `ADR-NNN-descripcion.md` | `ADR-001-estructura.md` |
 
----
-
-## Reglas de la inbox
-
-1. **La inbox NO es almacenamiento** — es una zona de tránsito
-2. **Máximo 20 ficheros** antes de procesar
-3. **Procesamiento:** `bash tools/inbox-processor.sh` en la Madre
-4. **Cada fichero** debe ir a su carpeta definitiva con `git mv`
-5. **Tras migración:** commit con mensaje `chore(inbox): migración YYYY-MM-DD`
+Ver [`docs/CONVENCIONES.md`](./CONVENCIONES.md) para la guía completa.
 
 ---
 
-*Mantenido por: Perplexity MCP | Última actualización: 2026-06-25*
+## Flujo de trabajo
+
+```
+ INICIO DE SESIÓN
+   → Leer AGENT.md + CONTEXT.md
+   → Revisar inbox/
+
+ DURANTE LA SESIÓN
+   → Todo material nuevo entra por inbox/
+   → Migrar con git mv al destino correcto
+
+ CIERRE DE SESIÓN
+   → Escribir diario en docs/diarios/YYYY-MM-DD.md
+   → Actualizar CONTEXT.md
+   → Vaciar inbox/
+   → Commit de cierre
+```
+
+---
+
+*Mantenido por: Álvaro Fernández Mota · Actualizado: 2026-07-05 · Perplexity-MCP*

@@ -10,7 +10,7 @@
 
 - **Nombre:** Álvaro Fernández Mota
 - **Perfil:** Ingeniero de sistemas autodidacta. Stack: Python, Docker, Linux, IA local, OSINT.
-- **Filosofía:** Producción primero, perfección después. El ritmo importa más que el sprint. Ver `docs/filosofia.md`.
+- **Filosofía:** Producción primero, perfección después. El ritmo importa más que el sprint. Ver `docs/filosofia/`.
 - **Ubicación habitual:** Casa (Madre + Thdora) / móvil desde iPhone 11 cuando está fuera.
 
 ---
@@ -26,27 +26,36 @@
 
 ---
 
-## 🗂️ Repos activos
+## 🗂️ Repos activos del ecosistema
 
 | Repo | Visibilidad | Para qué |
 |---|---|---|
-| `yggdrasil-dew` | Privado | Segundo cerebro · infraestructura · docs · diarios |
-| `alvarofernandezmota-tech` | Público | Profile README de GitHub (pendiente crear) |
-| `thdora` | Privado | Bot TOKI · FastAPI · Docker |
-| `personal` | Privado | Histórico · curso Python · archivado |
+| `WIKI---PERSONAL` | Privado | **Este repo** — wiki central, mapa conceptual, segundo cerebro |
+| `yggdrasil-dew` | Privado | Segundo cerebro técnico · infraestructura · docs · diarios |
+| `thdora` / `THDORA-PERSONAL` | Privado | Bot TOKI · FastAPI · Docker |
+| `madre-config` | Privado | Configuración Madre (Arch Linux, Docker, servicios) |
+| `ollama-stack` | Privado | Ollama + modelos locales |
+| `local-brain` | Privado | RAG + Qdrant + memoria |
+| `yggdrasil-secops` | Privado | Seguridad defensiva (hallazgos HAL-XXX) |
+| `osint-stack` | Privado | Seguridad ofensiva / OSINT / pentest |
+| `formacion-tech` | Privado | Aprendizaje, cursos, Python |
+| `investigacion-ia` | Privado | PoCs de IA |
+| `acer-config` | Privado | Configuración Acer (Arch Linux + Hyprland) |
+| `dev-labs` | Privado | Sandbox antes de crear repo propio |
+| `alvarofernandezmota-tech` | Público | Profile README de GitHub |
 
 ---
 
 ## 📋 Reglas del sistema — OBLIGATORIAS
 
-1. **Todo entra por `inbox/`** — nunca sobreescribir ficheros existentes directamente
-2. **Flujo:** `inbox/ → destino correcto → CONTEXT.md actualizado`
-3. **CONTEXT.md** = estado actual del ecosistema — actualizar al inicio Y al final de cada sesión
-4. **AGENT.md** = contexto estructural — actualizar solo si cambia algo estructural
+1. **Leer antes de actuar** — `AGENT.md` → `CONTEXT.md` → `docs/CONVENCIONES.md`
+2. **Todo entra por `inbox/`** — nunca sobrescribir ficheros existentes directamente
+3. **Verificar SHA** antes de actualizar cualquier fichero existente
+4. **CONTEXT.md** = estado actual — actualizar al inicio Y al final de cada sesión
 5. **HOME.md** = índice de navegación — actualizar cuando se añade sección nueva
-6. **MASTER-PENDIENTES.md** = backlog maestro — añadir tareas aquí, no en diarios
-7. **CONVENCIONES.md** = normas de estructura — consultar antes de crear ficheros
-8. **Diario de sesión** = obligatorio al cierre, en `docs/diarios/` (o `diarios/` hasta migración)
+6. **Diario de sesión** = obligatorio al cierre en `docs/diarios/YYYY-MM-DD.md`
+7. **Convenciones** = `kebab-case` en `docs/` y `wiki/`, `MAYÚSCULAS` en raíz
+8. **No crear stubs vacíos** — si no hay contenido real, no crear el fichero
 
 ---
 
@@ -86,15 +95,32 @@ Infraestructura:
 Desarrollo:
   - Python 3 + FastAPI + LangGraph
   - Docker Compose (todo containerizado)
-  - GitHub Actions CI/CD              [fase 5, pendiente]
-  - Cursor + MCP GitHub               [pendiente en Thdora]
+  - Cursor + MCP GitHub               [pendiente en Thdora/Acer]
 
 Seguridad:
   - SSH: ed25519 only, no passwords    [pendiente hardening completo]
   - Fail2ban                           [pendiente]
   - nftables                           [activo]
+  - FTP puerto 21 router Digi          [🔴 EXPUESTO — remediar]
   - Wazuh agentes                      [en progreso]
 ```
+
+---
+
+## 🗺️ Mapa de islas (referencia rápida)
+
+| Isla | Repo | Estado |
+|---|---|---|
+| 🧠 Cerebro | yggdrasil-dew | ✅ Activo |
+| 🗺️ Wiki/Conocimiento | WIKI---PERSONAL (este repo) | ✅ Activo |
+| 🖥️ Infra/Madre | madre-config | ✅ Activo |
+| 🤖 IA Local | ollama-stack + local-brain | ✅ Activo |
+| 🦾 Thdora | THDORA-PERSONAL | ✅ Activo (deuda técnica) |
+| 🛡️ Seguridad | yggdrasil-secops + osint-stack | 🟡 Iniciado |
+| 📚 Formación | formacion-tech + investigacion-ia | ✅ Activo |
+| 🧪 Labs | dev-labs | 🟡 Sandbox |
+
+Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`](wiki/mapa-islas.md)
 
 ---
 
@@ -105,36 +131,35 @@ Seguridad:
 │              INICIO DE SESIÓN                   │
 │  1. Leer AGENT.md (este fichero)                │
 │  2. Leer CONTEXT.md (estado actual)             │
-│  3. Leer MASTER-PENDIENTES.md (backlog)         │
+│  3. Leer docs/CONVENCIONES.md (normas)          │
 └───────────────────┬─────────────────────────────┘
                     ↓
              Trabajar (inbox/ primero)
                     ↓
 ┌───────────────────┴─────────────────────────────┐
 │              CIERRE DE SESIÓN                   │
-│  1. Escribir diario en docs/diarios/            │
+│  1. Escribir diario en docs/diarios/YYYY-MM-DD  │
 │  2. Actualizar CONTEXT.md                       │
 │  3. Procesar inbox/ si hay items                │
-│  4. Actualizar MASTER-PENDIENTES.md si procede  │
-│  5. Commit de cierre                            │
+│  4. Commit de cierre                            │
 └─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚦 Estado de fases (Fase 0 activa)
+## 🚦 Estado de fases
 
 | Fase | Nombre | Estado |
 |---|---|---|
-| **0** | Repo limpio + documentado | 🟡 80% — migración estructura pendiente (Thdora) |
+| **0** | Repo limpio + wiki estructurada | 🟡 95% — islas pendientes de rellenar |
 | **1** | Tailscale + acceso remoto | ✅ Activo |
-| **2** | SSH hardening completo | 🔴 Pendiente |
+| **2** | SSH hardening completo | 🔴 Pendiente (`PasswordAuthentication no`) |
 | **3** | Wazuh SIEM | 🟡 En progreso |
 | **4** | Suricata IDS + reglas | 🟡 En progreso |
 | **5** | GitHub Actions automatización | 🔴 No iniciado |
-| **6** | Cursor + MCP en Thdora | 🔴 Pendiente |
+| **6** | Cursor + MCP en Thdora/Acer | 🔴 Pendiente |
 | **7** | Ollama agentes + workflows IA | 🔴 No iniciado |
 
 ---
 
-_Actualizado: 02-jul-2026 · Fase 0 activa · post-auditoría completa_
+_Actualizado: 2026-07-05 · Fase 0 activa · wiki reorganizada · Perplexity-MCP_

@@ -1,15 +1,14 @@
 # CONTEXT.md — Estado actual del ecosistema
 #context #estado #navegacion
 
-**Última actualización:** 2026-07-03 01:00 CEST  
-**Próxima revisión obligatoria:** 2026-07-10 (Milestone Fase 0)
+**Última actualización:** 2026-07-05 20:50 CEST  
+**Próxima revisión obligatoria:** 2026-07-10 (Milestone Fase 0 cierre)
 
 ---
 
-## 🔴 PRIORIDAD MÁXIMA AHORA
+## 🔴 PRIORIDAD MÁXIMA
 
-> Antes de cualquier otra cosa:
-> **Desactivar FTP puerto 21 en router Digi** → `http://192.168.1.1`
+> **Desactivar FTP puerto 21 en router Digi** → `http://192.168.1.1`  
 > Ver: `docs/seguridad/hallazgos/ftp-puerto21.md`
 
 ---
@@ -19,18 +18,17 @@
 ### Madre (torre Madrid)
 - **Online:** ✅
 - **SSH:** ✅ hardening parcial — falta `PasswordAuthentication no`
-- **Tailscale:** ✅ activo
+- **Tailscale:** ✅ activo · IP `100.91.112.32`
 - **Docker:** ✅ Portainer, Grafana, Ollama activos
-- **FTP puerto 21:** 🔴 EXPUESTO — p0-critico
+- **FTP puerto 21:** 🔴 EXPUESTO — p0-crítico
 
 ### Acer (Toledo)
 - **Online:** cuando está encendido
-- **Tailscale:** ✅ activo
+- **Tailscale:** ✅ activo · IP `100.86.119.102`
 - **Cursor:** ✅ instalado
 - **MCP Cursor:** ❌ pendiente (token `repo` full + `~/.cursor/mcp.json`)
-- **Perplexity web:** ⚠️ sin MCP — usar Cursor en su lugar
 
-### iPhone
+### iPhone 11
 - **Perplexity MCP GitHub:** ✅ ACTIVO — gestión repo completa
 - **a-Shell:** ⏳ pendiente instalar (App Store)
 - **Tailscale iOS:** ⏳ pendiente instalar (App Store)
@@ -42,24 +40,49 @@
 
 ---
 
-## Fase actual
+## Estado de la wiki — 2026-07-05
+
+### ✅ COMPLETADO HOY
+- Estructura `wiki/` creada con islas, infra, operaciones, agentes
+- `wiki/00-mapa.md` — mapa maestro del ecosistema actualizado
+- `wiki/mapa-islas.md` — tabla de islas y repos
+- `HOME.md` — dashboard de navegación completo
+- `docs/CONVENCIONES.md` — convenciones reales escritas desde cero
+- `docs/MAPA-REPO.md` — mapa real del repo (no de yggdrasil-dew)
+- `AGENT.md` — actualizado con todos los repos y estado de fases
+- `CONTEXT.md` — este fichero actualizado
+- `README.md` — actualizado con estructura real
+- Raíz del repo limpia — documentos maestros en MAYÚSCULAS
+
+### ⚠️ PENDIENTE — Wiki
+- Fichas de islas en `wiki/islas/` — páginas por rellenar con contenido real
+- `docs/diarios/` — consolidar con `diarios/` raíz
+- Stubs vacíos en `docs/` — eliminar (SHA `3ee0e19...`)
+- Archivos sueltos en `docs/` — migrar a carpetas correctas
+- `diarios/` raíz — migrar a `docs/diarios/` cuando haya terminal
+
+---
+
+## Fase actual — Fase 0
 
 ### ✅ COMPLETADO
-- **Fase 1 — Tailscale:** ✅ 100%
-- **Fase 0 — Repo:** 90% — 4 pilares GitHub, inbox limpia, docs completa, limpieza raíz hecha
+- Fase 1 — Tailscale: ✅ 100%
+- Fase 0 — Repo + wiki estructurada: 95%
 
 ### ⏳ EN PROGRESO
-- **Fase 0 — Pendiente cierre:** Labels (22), milestones, branch protection
-- **Fase 2 — SSH Hardening:** iniciado, falta `PasswordAuthentication no`
+- Fase 0 cierre: labels (22), milestones, branch protection
+- Fase 2 — SSH Hardening: `PasswordAuthentication no` pendiente
+- Fase 3 — Wazuh SIEM: en progreso
 
 ### 🕑 SIGUIENTE
 - iPhone terminal (a-Shell + Tailscale iOS)
 - Cursor + MCP Acer (Fase 6)
+- Rellenar fichas de islas en `wiki/islas/`
 - Fase 3 — Docker hardening
 
 ---
 
-## Herramientas GitHub activas ✅
+## Herramientas GitHub
 
 | Herramienta | Estado |
 |---|---|
@@ -80,34 +103,17 @@
 | IA | Acceso | MCP GitHub | Estado |
 |---|---|---|---|
 | **Perplexity** | iPhone app | ✅ ACTIVO | Principal |
-| Gemini CLI | Madre | ⏳ config pendiente | Doc: `docs/arquitectura/gemini-fase1-investigacion.md` |
+| Gemini CLI | Madre | ⏳ config pendiente | — |
 | Cursor | Acer | ⏳ token full pendiente | Issue #15 |
 | Ollama | Madre local | — | ✅ activo |
 
 ---
 
-## Raíz del repo — estado
-
-**✅ LIMPIA** (2026-07-03 01:00)
-- `ly` — borrado ✅
-- `tailscale-full.apk` — borrado ✅  
-- `filosofia.md` — movida a `docs/filosofia/FILOSOFIA.md` ✅
-- `diarios/` raíz — pendiente migrar contenido + borrar (needs-terminal)
-
----
-
-## Inbox
-
-**Estado:** ✅ LIMPIA — todos los ficheros procesados (2026-07-03 00:25)
-
----
-
 ## Referencias rápidas
 
-- Diario hoy: [`docs/diarios/2026-07-03.md`](docs/diarios/2026-07-03.md)
-- Pendientes: [`MASTER-PENDIENTES.md`](MASTER-PENDIENTES.md)
-- Plan: [`PLAN-SEGURIDAD-Y-DESPLIEGUE.md`](PLAN-SEGURIDAD-Y-DESPLIEGUE.md)
-- iPhone terminal: [`docs/operativa/iphone-terminal.md`](docs/operativa/iphone-terminal.md)
-- Filosofía: [`docs/filosofia/FILOSOFIA.md`](docs/filosofia/FILOSOFIA.md)
-- Gemini investigación: [`docs/arquitectura/gemini-fase1-investigacion.md`](docs/arquitectura/gemini-fase1-investigacion.md)
-- Health-check script: [`scripts/maintenance/health-check.sh`](scripts/maintenance/health-check.sh)
+- Mapa del ecosistema: [`wiki/00-mapa.md`](wiki/00-mapa.md)
+- Mapa de islas: [`wiki/mapa-islas.md`](wiki/mapa-islas.md)
+- Convenciones: [`docs/CONVENCIONES.md`](docs/CONVENCIONES.md)
+- Mapa del repo: [`docs/MAPA-REPO.md`](docs/MAPA-REPO.md)
+- Seguridad FTP: [`docs/seguridad/hallazgos/ftp-puerto21.md`](docs/seguridad/hallazgos/ftp-puerto21.md)
+- Filosofía: [`docs/filosofia/`](docs/filosofia/)
