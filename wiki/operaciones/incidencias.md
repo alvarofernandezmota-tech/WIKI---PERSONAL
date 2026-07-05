@@ -1,22 +1,34 @@
-# 🚨 Registro de Incidencias
+---
+tags: [operaciones, incidencias, problemas]
+fecha-actualizacion: 2026-07-05
+---
 
-> Cuando algo falla, se documenta aquí: qué pasó, qué se hizo, cómo se resolvió.
+# ⚠️ Incidencias conocidas
+
+Registro de problemas encontrados y cómo se resolvieron.
+
+## Formato de entrada
+
+```
+### INC-XXX — Descripción corta
+- Fecha: YYYY-MM-DD
+- Síntoma: qué pasaba
+- Causa: por qué pasó
+- Solución: cómo se resolvió
+- Estado: resuelto / abierto
+```
 
 ---
 
-## Plantilla
+### INC-001 — Disco duro no detectado
+- Fecha: 2026-07
+- Síntoma: disco no aparecía en `lsblk`
+- Causa: ver [`/hardware/incidencia-disco-duro-no-detectado.md`](../../hardware/incidencia-disco-duro-no-detectado.md)
+- Estado: resuelto
 
-```
-## [YYYY-MM-DD] Título corto
-
-**Síntoma:** qué ocurrió
-**Causa:** por qué ocurrió
-**Solución:** qué se hizo para resolverlo
-**Prevención:** qué hacer para que no vuelva a pasar
-```
-
----
-
-## Historial
-
-_No hay incidencias registradas aún. La primera que documentes aquí, aquí queda para siempre._
+### SEC-001 — Puerto 21 FTP abierto en router Digi
+- Fecha: 2026-07-01
+- Síntoma: puerto 21 expuesto en escaneo externo
+- Causa: configuración por defecto del router
+- Solución: pendiente — cerrar desde panel router Digi
+- Estado: ⚠️ abierto
