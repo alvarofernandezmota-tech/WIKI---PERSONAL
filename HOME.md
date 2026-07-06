@@ -1,7 +1,7 @@
 ---
 tipo: home
 author: Alvaro Fernandez Mota
-actualizado: 2026-07-05 15:03 CEST
+actualizado: 2026-07-06
 tags: [home, indice, navegacion, wiki]
 status: vigente
 ---
@@ -20,9 +20,9 @@ status: vigente
 | 🧠 Cerebro | Ley máxima, diarios, arquitectura | [wiki/islas/cerebro.md](wiki/islas/cerebro.md) |
 | 🗺️ Conocimiento | Mapa personal, hardware, vida | [wiki/islas/conocimiento.md](wiki/islas/conocimiento.md) |
 | 📚 Formación | Apuntes técnicos, I+D IA | [wiki/islas/formacion.md](wiki/islas/formacion.md) |
-| 🖥️ Infraestructura | Madre, Acer, Dockers | [wiki/islas/infraestructura.md](wiki/islas/infraestructura.md) |
+| 🖥️ Infraestructura | Madre, Acer, iPhone, Tailscale, Docker | [wiki/islas/infra.md](wiki/islas/infra.md) |
 | 🤖 IA Local | Modelos LLM, RAG, memoria | [wiki/islas/ia-local.md](wiki/islas/ia-local.md) |
-| 🦾 Thdora | Bot Telegram personal | [wiki/islas/thdora.md](wiki/islas/thdora.md) |
+| 🦷 Thdora | Bot Telegram personal | [wiki/islas/thdora.md](wiki/islas/thdora.md) |
 | 🛡️ Seguridad | Defensivo + ofensivo/OSINT | [wiki/islas/seguridad.md](wiki/islas/seguridad.md) |
 | 🧪 Labs | Sandbox y prototipos | [wiki/islas/labs.md](wiki/islas/labs.md) |
 
@@ -48,11 +48,11 @@ status: vigente
 
 ## 📌 Referencias clave
 
-- [MAPA-ISLAS.md](MAPA-ISLAS.md) — Mapa completo del ecosistema
+- [wiki/islas/INDEX.md](wiki/islas/INDEX.md) — Índice completo de islas con estado
 - [ECOSYSTEM-ARCHITECTURE.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ECOSYSTEM-ARCHITECTURE.md) — Reglas técnicas (en yggdrasil-dew)
-- [Diario hoy](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/diarios/2026-07-05.md) — Última sesión
-- [hardware/](hardware/) — Inventario de máquinas
+- [ADRs](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/INDICE-ADR.md) — Decisiones de arquitectura
+- [Diario hoy](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/diario-2026-07-06.md) — Última sesión
 
 ---
 
-_Actualizado: 2026-07-05 15:03 CEST · Perplexity-MCP_
+_Actualizado: 2026-07-06 · Perplexity-MCP_
