@@ -1,0 +1,104 @@
+name: Validate Canon
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+      - '**.md'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '**.md'
+
+jobs:
+
+  frontmatter:
+    name: "📝 Frontmatter"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar frontmatter en docs/
+        run: |
+          python3 - <<'PY'
+          import os, sys
+          REQUIRED = ['title', 'tipo', 'creado', 'actualizado', 'status']
+          errors = []
+          for root, _, files in os.walk('docs'):
+              for f in files:
+                  if not f.endswith('.md'):
+                      continue
+                  path = os.path.join(root, f)
+                  content = open(path, encoding='utf-8', errors='ignore').read()
+                  if not content.startswith('---'):
+                      errors.append(f'MISSING FRONTMATTER: {path}')
+                      continue
+                  for field in REQUIRED:
+                      if f'{field}:' not in content.split('---')[1]:
+                          errors.append(f'MISSING FIELD [{field}]: {path}')
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('Frontmatter OK')
+          PY
+
+  sensitive-content:
+    name: "🔴 Contenido sensible"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan secretos y datos sensibles
+        run: |
+          python3 - <<'PY'
+          import os, re, sys
+
+          PATTERNS = [
+              (r'(?i)(token|api[_-]?key|secret[_-]?key|access[_-]?key|auth[_-]?token)\s*[=:]\s*[\'"]?[\w\-]{8,}', 'TOKEN/API KEY'),
+              (r'(?i)(password|passwd|pwd)\s*[=:]\s*[\'"]?.{4,}', 'PASSWORD'),
+              (r'-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----', 'PRIVATE KEY'),
+              (r'ghp_[a-zA-Z0-9]{36}', 'GITHUB TOKEN'),
+              (r'\b192\.168\.\d{1,3}\.\d{1,3}\b', 'IP PRIVADA (192.168.x.x)'),
+              (r'\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', 'IP PRIVADA (10.x.x.x)'),
+              (r'\b100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d{1,3}\.\d{1,3}\b', 'IP TAILSCALE'),
+              (r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}', 'EMAIL'),
+              (r'\b([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}\b', 'MAC ADDRESS'),
+              (r'/home/[a-zA-Z0-9_\-]+/', 'RUTA ABSOLUTA /home/'),
+              (r'/root/', 'RUTA ABSOLUTA /root/'),
+              (r'ssh-(rsa|ed25519|ecdsa)\s+AAAA[0-9A-Za-z+/]{20,}', 'SSH PUBLIC KEY'),
+          ]
+
+          SKIP_DIRS = {'.git', '.github', 'node_modules'}
+          SKIP_FILES = {'NORMAS.md', 'CONVENCIONES.md'}
+
+          errors = []
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+              for f in files:
+                  if not f.endswith('.md') or f in SKIP_FILES:
+                      continue
+                  path = os.path.join(root, f)
+                  try:
+                      content = open(path, encoding='utf-8', errors='ignore').read()
+                  except Exception:
+                      continue
+                  for pattern, label in PATTERNS:
+                      matches = re.findall(pattern, content)
+                      if matches:
+                          errors.append(f'[{label}] en {path}: {len(matches)} coincidencia(s)')
+          if errors:
+              print('\n❌ '.join(['\n❌ '] + errors))
+              sys.exit(1)
+          print('✅ Sin contenido sensible detectado')
+          PY
+
+  doc-quality:
+    name: "🟡 Calidad docs"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No shebangs en markdown
+        run: |
+          if grep -rn '^#!' docs/ --include='*.md' 2>/dev/null; then
+            echo 'ERROR: shebang encontrado en markdown'
+            exit 1
+          fi
+          echo 'Sin shebangs'
