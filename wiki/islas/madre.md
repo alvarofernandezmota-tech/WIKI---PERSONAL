@@ -4,7 +4,7 @@ author: Alvaro Fernandez Mota
 creado: 2026-07-09
 actualizado: 2026-07-10
 ruta: wiki/islas/madre.md
-tags: [isla, madre, infra, docker, servidor, homelab]
+tags: [isla, madre, infra, docker, servidor, homelab, hal]
 status: vigente
 repo_principal: madre-config
 ---
@@ -24,60 +24,87 @@ repo_principal: madre-config
 | Usuario | `varopc` |
 | OS | Ubuntu Server |
 | Cifrado | LUKS + Btrfs |
+| CPU | Intel i5-8400 |
+| RAM | 16 GB |
 | GPU | GTX 1060 (Ollama) |
-| Red local | WiFi `wlan0` 192.168.x.x |
+| Red local | WiFi `wlan0` |
 | VPN | Tailscale |
 | SSH | Puerto 22, solo clave pública |
 | Acceso móvil | Blink Shell / Shellfish (iPhone) |
 
 ---
 
-## Stack Docker — 16 servicios
+## Stack IA principal — docker-compose.yml raíz
 
-| Categoría | Servicio | Puerto | Estado |
-|-----------|----------|--------|--------|
-| 🤖 IA local | Ollama | 11434 | ▶ running |
-| 🤖 IA local | Open WebUI | — | ▶ running |
-| 🤖 IA local | Qdrant | 6333 | ▶ running |
-| 🔧 Dev | THDORA API | 8000 | ✅ healthy |
-| 🔧 Dev | THDORA Bot | — | ✅ healthy |
-| 🔧 Dev | Code-server | 8443 | ▶ running |
-| 🔧 Dev | Gitea | 3003 | ▶ running |
-| 🔧 Dev | n8n | 5678 | ▶ running |
-| 📊 Monitoring | Grafana | 3000 | ▶ running |
-| 📊 Monitoring | Prometheus | 9090 | ▶ running |
-| 📊 Monitoring | Uptime Kuma | 3002 | ✅ healthy |
-| 📊 Monitoring | Portainer | 9000 | ▶ running |
-| 🔐 SecOps | SpiderFoot | 5001 | ▶ running |
-| 🔐 SecOps | Kali VNC | 6901 | ▶ running |
-| 🔐 SecOps | Network Radar | — | ✅ healthy |
-| 🔐 SecOps | Guardian Bot | — | ✅ healthy |
+Documentado 2026-07-10. Validado 2026-06-25. Limitaciones RAM i5-8400:
+
+| Servicio | Imagen | RAM límite | Estado |
+|----------|--------|------------|--------|
+| ollama (chat) | ollama/ollama:latest | 7 GB | ▶ running |
+| ollama-embeddings | ollama/ollama:latest | 2 GB | ▶ running |
+| qdrant | qdrant/qdrant:latest | 2 GB | ▶ running |
+| open-webui | ghcr.io/open-webui | 1 GB | ▶ running |
+
+**RAM total estimada: ~11.5 GB / 16 GB ✅**
+⚠️ NO cargar qwen2.5:14b con stack activo — OOM Killer.
 
 ---
 
-## ⚠️ Issues críticos abiertos
+## Inventario IaC — 28 compose files detectados
 
-| Issue | Descripción | Prioridad |
-|-------|-------------|----------|
-| [#31](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/31) | HDD 28.000h — riesgo fallo | 🔴 CRÍTICO |
-| [#34](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/34) | docker-compose.yml raíz sin documentar | 🔴 URGENTE |
-| [#32](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/32) | Watchdog Docker — revisar logs | 🟡 ALTA |
-| [#15](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15) | Puerto 21 FTP abierto | 🔴 CRÍTICO |
+Descubiertos en `/home/varopc/` y `/srv/`:
+
+| Ruta | Stack | Versionado |
+|------|-------|------------|
+| `/home/varopc/docker-compose.yml` | IA principal | ❌ No |
+| `/home/varopc/Projects/thdora/` | THDORA | ❌ No |
+| `/home/varopc/spiderfoot/` | SpiderFoot | ❌ No |
+| `/home/varopc/yggdrasil-secops/blue_team/` | Blue team (7) | ⚠️ En secops |
+| `/srv/yggdrasil-dew/docker/madre/` | Fases 1-3 | ✅ En DEW |
+
+❌ **Problema:** Los compose operativos en `/home/varopc/` no están versionados en `madre-config`.
 
 ---
 
-## Pendiente crítico — IaC sin versionar
+## Estado salud (2026-07-10)
 
-Los 16 servicios Docker corren en Madre pero **los docker-compose no están en `madre-config`**.
-Si el servidor muere, todo el stack se pierde.
+### HDD — SMART ✅ estable, antiguo
 
-→ Issue pendiente de crear en DEW: `[INFRA] Versionar docker-compose de todos los servicios de Madre`
+| Atributo | Valor | Estado |
+|----------|-------|--------|
+| Power_On_Hours | 28.811 h | 🟡 Antigüedad alta |
+| Reallocated_Sector_Ct | 0 | ✅ |
+| Current_Pending_Sector | 0 | ✅ |
+| Offline_Uncorrectable | 0 | ✅ |
+| Temperatura | 45°C | ✅ Normal |
+
+Plan: monitorizar mensualmente. Sustitución preventiva Q4 2026.
+
+### Puerto 21 FTP — filtered 🟡
+
+Confirmado con `nmap -Pn -p 21 100.91.112.32`: resultado `filtered`.
+El filtro bloquea sondas. No aparece como `open`. Pendiente confirmar desde red externa real.
+
+---
+
+## ⚠️ Incidencias abiertas (2026-07-10)
+
+| HAL | Issue DEW | Descripción | Prioridad |
+|-----|-----------|-------------|----------|
+| HAL-007 | [#44](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/44) | .env raíz malformado | 🔴 CRÍTICO |
+| HAL-008 | [#45](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) | Secretos expuestos en chat | 🔴 CRÍTICO |
+| HAL-009 | [#46](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/46) | log_guardian_bot crash loop #971 | 🟡 ALTA |
+| — | [#43](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/43) | IaC — versionar 16 docker-compose | 🔴 CRÍTICO |
+| — | [#31](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/31) | HDD 28k horas — monitorizar | 🟡 MONITORIZAR |
+| — | [#15](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15) | Puerto 21 FTP — confirmar externo | 🟡 PARCIAL |
 
 ---
 
 ## Links
 
 → [madre-config repo](https://github.com/alvarofernandezmota-tech/madre-config)
-→ [Issues Madre en DEW](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues?q=INFRA)
+→ [hdd-salud.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/infra/madre/hdd-salud.md)
+→ [env-malformado-hal007.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/infra/madre/env-malformado-hal007.md)
+→ [Issues DEW Madre](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
 
 _Actualizado: 2026-07-10 · Perplexity-MCP_
