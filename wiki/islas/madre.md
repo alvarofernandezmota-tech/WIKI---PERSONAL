@@ -1,37 +1,83 @@
 ---
-title: Isla Madre
 tipo: isla
+author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-09
-status: borrador
+actualizado: 2026-07-10
 ruta: wiki/islas/madre.md
-tags: [isla, madre, infra, servidor]
-repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-secops
-depende_de: []
-sirve_a: [seguridad, thdora, agentes]
+tags: [isla, madre, infra, docker, servidor, homelab]
+status: vigente
+repo_principal: madre-config
 ---
 
 # Isla: Madre
 
-> Servidor principal del ecosistema. Todo lo demás corre sobre él.
-> Detalles técnicos → `yggdrasil-dew/docs/infra/`
+> Servidor HP Ubuntu — núcleo físico del ecosistema Yggdrasil.
+> Todo el stack Docker corre aquí. Acceso remoto vía Tailscale.
 
 ---
 
-## Qué es Madre
+## Identidad del servidor
 
-Ordenador de sobremesa que actúa como servidor 24/7.
-Acceso remoto via **Tailscale** desde cualquier dispositivo.
-Todos los bots, servicios Docker y scripts operan desde aquí.
-
-## Estado a 2026-07-09
-
-- HDD: 28.000+ horas 🔴 riesgo de fallo — pendiente smartctl
-- Contenedores activos: 7 (watchdog, tailscale_monitor, bots guardiana, tripwire, radar...)
-- Acceso: `ssh madre` desde Acer via Tailscale
+| Campo | Valor |
+|-------|-------|
+| Hostname | `varpc` |
+| Usuario | `varopc` |
+| OS | Ubuntu Server |
+| Cifrado | LUKS + Btrfs |
+| GPU | GTX 1060 (Ollama) |
+| Red local | WiFi `wlan0` 192.168.x.x |
+| VPN | Tailscale |
+| SSH | Puerto 22, solo clave pública |
+| Acceso móvil | Blink Shell / Shellfish (iPhone) |
 
 ---
 
-> ⚠️ Isla en borrador — pendiente de desarrollar en AUDIT-002
+## Stack Docker — 16 servicios
 
-_2026-07-09 · Perplexity-MCP_
+| Categoría | Servicio | Puerto | Estado |
+|-----------|----------|--------|--------|
+| 🤖 IA local | Ollama | 11434 | ▶ running |
+| 🤖 IA local | Open WebUI | — | ▶ running |
+| 🤖 IA local | Qdrant | 6333 | ▶ running |
+| 🔧 Dev | THDORA API | 8000 | ✅ healthy |
+| 🔧 Dev | THDORA Bot | — | ✅ healthy |
+| 🔧 Dev | Code-server | 8443 | ▶ running |
+| 🔧 Dev | Gitea | 3003 | ▶ running |
+| 🔧 Dev | n8n | 5678 | ▶ running |
+| 📊 Monitoring | Grafana | 3000 | ▶ running |
+| 📊 Monitoring | Prometheus | 9090 | ▶ running |
+| 📊 Monitoring | Uptime Kuma | 3002 | ✅ healthy |
+| 📊 Monitoring | Portainer | 9000 | ▶ running |
+| 🔐 SecOps | SpiderFoot | 5001 | ▶ running |
+| 🔐 SecOps | Kali VNC | 6901 | ▶ running |
+| 🔐 SecOps | Network Radar | — | ✅ healthy |
+| 🔐 SecOps | Guardian Bot | — | ✅ healthy |
+
+---
+
+## ⚠️ Issues críticos abiertos
+
+| Issue | Descripción | Prioridad |
+|-------|-------------|----------|
+| [#31](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/31) | HDD 28.000h — riesgo fallo | 🔴 CRÍTICO |
+| [#34](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/34) | docker-compose.yml raíz sin documentar | 🔴 URGENTE |
+| [#32](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/32) | Watchdog Docker — revisar logs | 🟡 ALTA |
+| [#15](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15) | Puerto 21 FTP abierto | 🔴 CRÍTICO |
+
+---
+
+## Pendiente crítico — IaC sin versionar
+
+Los 16 servicios Docker corren en Madre pero **los docker-compose no están en `madre-config`**.
+Si el servidor muere, todo el stack se pierde.
+
+→ Issue pendiente de crear en DEW: `[INFRA] Versionar docker-compose de todos los servicios de Madre`
+
+---
+
+## Links
+
+→ [madre-config repo](https://github.com/alvarofernandezmota-tech/madre-config)
+→ [Issues Madre en DEW](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues?q=INFRA)
+
+_Actualizado: 2026-07-10 · Perplexity-MCP_

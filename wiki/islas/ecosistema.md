@@ -1,66 +1,104 @@
 ---
 tipo: isla
-author: Alvaro Fernandez Mota <alvarofernandezmota@gmail.com>
+author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-09 23:07 CEST
+actualizado: 2026-07-10
 ruta: wiki/islas/ecosistema.md
-tags: [isla, ecosistema, repos, gobernanza, yggdrasil]
+tags: [isla, ecosistema, repos, gobernanza, yggdrasil, triangulo]
 status: vigente
 ---
 
 # Isla: Ecosistema Yggdrasil
 
-> Mapa conceptual del ecosistema. Los detalles técnicos viven en Dew.
-> Esta isla responde a: ¿Qué es el ecosistema y cómo se organiza?
+> Mapa conceptual del ecosistema completo.
+> Los detalles técnicos y los issues viven en DEW.
 
 ---
 
-## Qué es Yggdrasil
+## El triángulo del ecosistema
 
-Ecosistema personal de infraestructura, seguridad y automatización.
-Todo gira alrededor de **Madre** (servidor principal) con acceso remoto via Tailscale.
+```
+        VIDAPERSONAL
+        (vida personal,
+         planifica la semana,
+         diarios, hábitos)
+              ▲
+             / \
+            /   \
+      DEW ◄─────► WIKI (yggdrasil-wiki)
+  (ejecuta,       (mapas conceptuales,
+   issues,         cómo enlaza todo,
+   ADRs, CI)       estructura repos)
+```
 
----
-
-## Repos del ecosistema
-
-| Repo | Para qué sirve | Visibilidad |
-|---|---|---|
-| `yggdrasil-dew` | Documentación técnica, ADRs, diarios, canon | Público |
-| `yggdrasil-secops` | Bots de seguridad, Docker, scripts operativos | 🔒 Privado |
-| `thdora-personal` | Bot Telegram personal (Thdora) | 🔒 Privado |
-| `WIKI---PERSONAL` | Mapas conceptuales, modelo mental, conocimiento | 🔒 Privado |
-
----
-
-## Cómo se documenta
-
-| Capa | Dónde vive | Qué contiene |
-|---|---|---|
-| Canon (reglas) | `yggdrasil-dew/docs/canon/` | Convenciones, ADRs, runbooks |
-| Operativa (qué pasó) | `yggdrasil-dew/docs/diarios/` | Diarios de sesión |
-| Infraestructura | `yggdrasil-dew/docs/infra/` | Madre, Docker, red |
-| Auditorías | `yggdrasil-dew/docs/auditorias/` | Fichas por repo |
-| Mapas mentales | `WIKI---PERSONAL/wiki/` | Islas conceptuales |
+**Nunca duplicar — siempre enlazar.**
 
 ---
 
-## Estado a 2026-07-09
+## Las 18 repos del ecosistema
 
-- Todos los repos privados salvo `yggdrasil-dew` ✅
-- WIKI limpiada: solo `wiki/` con islas conceptuales ✅
-- `inbox/` y `docs/` WIKI borradas completamente ✅
-- 15 issues abiertas en Dew — priorizadas
-- HAL-006 (.env expuesto) pendiente 🔴
-- HDD Madre 28k+ horas — pendiente smartctl 🔴
+### Núcleo (triángulo)
+
+| Repo | Rol | Visibilidad |
+|------|-----|-------------|
+| `VIDAPERSONAL` | Vida personal, diarios, tracking | 🔒 Privado |
+| `yggdrasil-dew` | Cerebro técnico, issues, ADRs, CI | Público |
+| `yggdrasil-wiki` | Mapas conceptuales del ecosistema | 🔒 Privado |
+
+### Infra
+
+| Repo | Rol | Isla WIKI |
+|------|-----|-----------|
+| `madre-config` | Servidor Madre — HP Ubuntu, 16 servicios Docker | [madre.md](madre.md) |
+| `acer-config` | Dotfiles Acer — Arch Linux, Hyprland, Neovim | [acer.md](acer.md) |
+| `ollama-stack` | LLMs locales, Open WebUI, LiteLLM, Qdrant | [ia-local.md](ia-local.md) |
+| `local-brain` | Ollama + pgvector + RAG + embeddings | [ia-local.md](ia-local.md) |
+| `osint-stack` | SpiderFoot, pipelines OSINT | [seguridad.md](seguridad.md) |
+
+### Seguridad
+
+| Repo | Rol | Isla WIKI |
+|------|-----|-----------|
+| `yggdrasil-secops` | SecOps, canary tokens, tripwires | [seguridad.md](seguridad.md) |
+
+### Proyectos activos
+
+| Repo | Rol | Isla WIKI |
+|------|-----|-----------|
+| `THDORA-PERSONAL` | Bot Telegram + FastAPI + Ollama | [thdora.md](thdora.md) |
+| `thea-ia` | Thea IA core (Python) | [thea.md](thea.md) |
+| `formacion-tech` | Apuntes, cursos, laboratorios | [formacion.md](formacion.md) |
+| `ai-toolkit` | Stack AI open source (público) | [ia-local.md](ia-local.md) |
+| `investigacion-ia` | PoCs IA, arquitecturas agentes | [labs.md](labs.md) |
+| `dev-labs` | Sandbox desarrollo web/CLI | [labs.md](labs.md) |
+
+### Menores
+
+| Repo | Rol |
+|------|-----|
+| `image-calculator` | App Python OCR — proyecto terminado |
+| `impresion-3d` | Anycubic Photon V1 — diarios de sesión |
+| `alvarofernandezmota-tech` | Profile README público |
 
 ---
 
-## Links a Dew (fuente de verdad)
+## Estado a 2026-07-10
 
-→ [DASHBOARD.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/DASHBOARD.md)
-→ [PLAN-MAESTRO-2026-07.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/PLAN-MAESTRO-2026-07.md)
+- ✅ Canon del ecosistema creado — `VIDAPERSONAL/00_sistema/ECOSISTEMA-CANON.md`
+- ✅ Triángulo definido y documentado
+- ✅ 18 repos auditadas
+- ✅ WIKI renombrada a `yggdrasil-wiki`
+- ✅ Islas conceptuales completas
+- 🔴 HDD Madre 28k+ horas — Issue #31 DEW
+- 🔴 Puerto 21 FTP abierto — Issue #15 DEW
+- 🔴 IaC Docker madre sin versionar — Issue pendiente DEW
 
 ---
 
-_Actualizado: 2026-07-09 23:07 CEST · Perplexity-MCP_
+## Links
+
+→ [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)
+→ [ECOSISTEMA-CANON.md](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL/blob/main/00_sistema/ECOSISTEMA-CANON.md)
+→ [Issues DEW abiertos](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
+
+_Actualizado: 2026-07-10 · Perplexity-MCP_
