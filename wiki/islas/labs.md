@@ -1,48 +1,37 @@
 ---
 tipo: isla
-nombre: Labs
-descripcion: Zona libre — se prueba antes de crear un repo propio
-repo_principal: https://github.com/alvarofernandezmota-tech/dev-labs
-github_issues: https://github.com/alvarofernandezmota-tech/dev-labs/issues
-obsidian_link: "[[labs]]"
-depende_de: []
-sirve_a: [cerebro]
-estado: borrador
 author: Alvaro Fernandez Mota
-creado: 2026-07-05
-actualizado: 2026-07-05
+creado: 2026-07-10
+actualizado: 2026-07-10
+ruta: wiki/islas/labs.md
+tags: [isla, labs, investigacion, dev, sandbox]
+status: borrador
+repos: [investigacion-ia, dev-labs]
 ---
 
-# 🧪 Isla: Labs
+# Isla: Labs y Experimentación
 
-Zona libre. Aquí se prueba antes de crear un repo propio. Sin reglas estrictas. Con libertad total para experimentar.
-
-> ⚡ Código y prototipos → [`dev-labs`](https://github.com/alvarofernandezmota-tech/dev-labs)
+> Repos sandbox para experimentar, aprender y probar arquitecturas.
+> Nada de lo que está aquí está en producción.
 
 ---
 
 ## Repos
 
-| Repo | Propósito | URL |
-|---|---|---|
-| `dev-labs` | Sandbox: prototipos, scripts sueltos, experimentos | https://github.com/alvarofernandezmota-tech/dev-labs |
+| Repo | Rol |
+|------|-----|
+| `investigacion-ia` | PoCs IA, arquitecturas de agentes, experimentos LLM |
+| `dev-labs` | Sandbox desarrollo web/CLI, katas, throwaway projects |
 
 ---
 
-## Criterio para salir de Labs
+## Estado
 
-Un proyecto pasa de `dev-labs` a su propio repo cuando cumple **alguno** de estos:
+🟡 Repos sin auditar.
 
-- Más de 20 commits propios
-- Tiene deploy independiente
-- Otros proyectos lo importan como dependencia
-- Necesita su propio CI/CD
+- [ ] Auditar `investigacion-ia` — ¿hay algo que merezca pasar a producción?
+- [ ] Auditar `dev-labs` — ¿hay proyectos terminados para archivar?
 
 ---
 
-## Conexiones
-
-- → [[cerebro]] (cuando algo de Labs madura, se documenta en dew)
-
----
-_Actualizado: 2026-07-05 21:00 CEST · Perplexity-MCP_
+_Creado: 2026-07-10 · Perplexity-MCP_

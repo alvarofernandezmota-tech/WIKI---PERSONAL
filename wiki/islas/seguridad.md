@@ -1,67 +1,55 @@
 ---
-title: Isla Seguridad
 tipo: isla
-nombre: Seguridad
-descripcion: Mapa conceptual de la estrategia de seguridad del ecosistema
-repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-secops
-github_issues: https://github.com/alvarofernandezmota-tech/yggdrasil-secops/issues
-obsidian_link: "[[seguridad]]"
-depende_de: [infra]
-sirve_a: [thdora, cerebro, ia-local]
-estado: activo-con-deuda
 author: Alvaro Fernandez Mota
-creado: 2026-07-05
-actualizado: 2026-07-05
-tags: [seguridad, secops, hal, docker]
+creado: 2026-07-10
+actualizado: 2026-07-10
+ruta: wiki/islas/seguridad.md
+tags: [isla, seguridad, secops, osint, hal]
+status: borrador
+repos: [yggdrasil-secops, osint-stack]
 ---
 
-# 🛡️ Isla: Seguridad
+# Isla: Seguridad
 
-Seguridad es la capa que protege todo el ecosistema. No es un servicio único — es un conjunto de capas defensivas que trabajan juntas.
-
-> ⚡ Hallazgos, issues y auditorías → [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops)
-
----
-
-## Capas de defensa
-
-| Capa | Herramienta | Función |
-|---|---|---|
-| Red | UFW | Deny incoming por defecto, servicios solo Tailscale |
-| Red | Tailscale | VPN privada, acceso entre dispositivos |
-| Acceso | fail2ban | Bloqueo automático de ataques fuerza bruta |
-| Acceso | SSH `PermitRootLogin no` | Root deshabilitado por SSH |
-| Contenedores | `yggdrasil_watchdog` | Vigila y reinicia contenedores caídos |
-| Contenedores | `guardian_bot` | Alertas Telegram de seguridad |
-| Red interna | `network_radar` | Detecta dispositivos no autorizados |
-| Logs | `log_guardian_bot` | Analiza logs buscando anomalías |
-| Archivos | `local_tripwire` | Detecta cambios en archivos críticos |
-| OSINT/Pentest | `spiderfoot` + `kali-pentest` | Herramientas ofensivas para auditoría propia |
+> Modelo de amenazas personal, SecOps activo y herramientas OSINT.
+> Todo lo operativo vive en `yggdrasil-secops` (privado).
 
 ---
 
-## Hallazgos activos (HAL)
+## Modelo de defensa
 
-| ID | Resumen | Severidad | Estado |
-|---|---|---|---|
-| HAL-001 | Token THDORA en historial git | 🔴🔴 Crítica | Abierto |
-| HAL-002 | `log_guardian_bot` unhealthy | 🔴 Alta | Abierto |
-| HAL-003 | Rotar token THDORA | 🔴🔴 Crítica | Abierto |
-| HAL-004 | `tailscale_monitor` unhealthy | 🔴 Alta | ✅ Cerrado |
-| HAL-005 | HDD 28.715h sin backup | 🟡 Media | Abierto |
-| HAL-006 | SSH puerto 22 abierto a internet | 🔴 Alta | Abierto |
+```
+Perimetro externo
+    └── Router — cerrar puertos, no FTP/Telnet abiertos
+    └── Tailscale VPN — acceso remoto cifrado
 
-> Detalle completo → [`yggdrasil-secops/issues`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops/issues)
+Madre (servidor)
+    └── SpiderFoot — OSINT y reconocimiento
+    └── Kali VNC — laboratorio pentest
+    └── Guardian Bot — alertas Telegram
+    └── Network Radar — detección de intrusos
 
----
-
-## Próximas acciones
-
-1. **HAL-001/003** — Rotar token THDORA (crítico)
-2. **HAL-006** — Restringir SSH a solo Tailscale
-3. **HAL-002** — Fix `log_guardian_bot` (mismo patrón que HAL-004)
-4. **HAL-005** — Backup HDD antes de que falle
+Código
+    └── Gitleaks CI — secretos en repos
+    └── Secret-scanning — IPs + emails + tokens
+```
 
 ---
 
-_Actualizado: 2026-07-05 23:43 CEST · Perplexity-MCP_
+## Issues críticos abiertos
+
+| Issue | Descripción | Prioridad |
+|-------|-------------|----------|
+| [#15](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15) | Puerto 21 FTP abierto | 🔴 CRÍTICO |
+| [#39](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/39) | Confirmar gitleaks en push | 🟡 ALTA |
+| [#38](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/38) | Secret-scanning ampliar (IPs + emails) | 🟡 ALTA |
+| [#37](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/37) | Auditoría secops Fase 1 | 🟡 ALTA |
+
+---
+
+## Links
+
+→ [yggdrasil-secops](https://github.com/alvarofernandezmota-tech/yggdrasil-secops)
+→ [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack)
+
+_Creado: 2026-07-10 · Perplexity-MCP_
