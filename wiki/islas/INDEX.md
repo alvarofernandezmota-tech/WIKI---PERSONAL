@@ -2,7 +2,7 @@
 tipo: canon
 author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-13T10:13:00+02:00
+actualizado: 2026-07-13T18:43:00+02:00
 ruta: wiki/islas/INDEX.md
 tags: [canon, indice, islas, wiki]
 status: vigente
@@ -11,7 +11,7 @@ status: vigente
 # Índice de Islas — Wiki Yggdrasil
 
 > Mapa completo de todo el conocimiento documentado del ecosistema.
-> 25 islas · 19 repos · Auditado: 2026-07-13
+> 26 islas · 20 repos · Auditado: 2026-07-13
 
 ---
 
@@ -22,7 +22,7 @@ status: vigente
 | Ecosistema general | [ecosistema.md](ecosistema.md) | yggdrasil-dew | ✅ |
 | Arquitectura C4 | → [ARQUITECTURA-C4.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/ARQUITECTURA-C4.md) | yggdrasil-dew | ✅ |
 | Filosofia y principios | [filosofia.md](filosofia.md) | yggdrasil-wiki | ✅ |
-| Normas del tridente | → [NORMAS-TRIDENTE.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/NORMAS-TRIDENTE.md) | yggdrasil-dew | ✅ |
+| Normas del tridente | → [NORMAS.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/NORMAS.md) | yggdrasil-dew | ✅ |
 
 ---
 
@@ -32,7 +32,7 @@ status: vigente
 |------|---------|---------------|--------|
 | Madre (servidor principal) | [madre.md](madre.md) | madre-config | ✅ |
 | Infra general | [infra.md](infra.md) | madre-config | ✅ |
-| Scripts operativos | [scripts.md](scripts.md) | yggdrasil-scripts | ✅ Nuevo |
+| Scripts operativos | [scripts.md](scripts.md) | yggdrasil-scripts | ✅ |
 | Acer (laptop Arch/Hyprland) | [acer.md](acer.md) | acer-config | 🟡 Sin auditar |
 | Thea (iPhone) | [thea.md](thea.md) | — | 🟡 Parcial |
 
@@ -46,7 +46,7 @@ status: vigente
 | Ollama Stack (LLM local) | [ollama-stack.md](ollama-stack.md) | ollama-stack | 🟡 Sin auditar |
 | IA Local (RAG/cerebro) | [ia-local.md](ia-local.md) | local-brain | 🟡 Sin auditar |
 | Investigación IA (PoCs) | [investigacion-ia.md](investigacion-ia.md) | investigacion-ia | 🟡 Sin auditar |
-| Cerebro / conocimiento | [cerebro.md](cerebro.md) | local-brain | 🟡 Fusionar con ia-local |
+| Cerebro / conocimiento | [cerebro.md](cerebro.md) | local-brain | ⚠️ Fusionar con ia-local |
 | Orquestador (n8n+THDORA+MCP)| [orquestador.md](orquestador.md) | THDORA-PERSONAL | 🟡 Parcial |
 | MCP (protocolo agentes) | [mcp.md](mcp.md) | — | ✅ |
 
@@ -68,16 +68,16 @@ status: vigente
 | Dev Labs (sandbox) | [dev-labs.md](dev-labs.md) | dev-labs | 🟡 Sin auditar |
 | Labs generales | [labs.md](labs.md) | dev-labs | ⚠️ Solapamiento con dev-labs — unificar |
 | Conocimiento técnico | [conocimiento.md](conocimiento.md) | formacion-tech | ⚠️ Solapamiento con formacion — revisar |
-| Formación | [formacion.md](formacion.md) | formacion-tech | 🟡 Stub — necesita input Alvaro |
+| Formación técnica | [formacion.md](formacion.md) | yggdrasil-formacion- | 🟡 Stub — necesita input Alvaro |
 
 ---
 
-## 🌱 Vida personal
+## 🌱 Vida personal y aprendizaje
 
 | Isla | Archivo | Repo asociado | Estado |
 |------|---------|---------------|--------|
-| Vida personal general | [vida.md](vida.md) | VIDAPERSONAL | ✅ |
-| VIDAPERSONAL (estructura) | [VIDAPERSONAL.md](VIDAPERSONAL.md) | VIDAPERSONAL | ✅ |
+| Tracking (vida personal) | [tracking.md](tracking.md) | yggdrasil-tracking | ✅ Nueva 2026-07-13 |
+| VIDAPERSONAL (deprecado) | [VIDAPERSONAL.md](VIDAPERSONAL.md) | — | ⛔ Deprecado → ver tracking.md |
 | Impresión 3D | [impresion3d.md](impresion3d.md) | impresion-3d | 🟡 Stub — necesita input Alvaro |
 
 ---
@@ -89,23 +89,24 @@ status: vigente
 | **Solapamiento** labs.md ≡ dev-labs.md | labs.md + dev-labs.md | Unificar en dev-labs.md · archivar labs.md |
 | **Solapamiento** cerebro.md ≈ ia-local.md | cerebro.md + ia-local.md | Unificar en ia-local.md · archivar cerebro.md |
 | **Solapamiento** conocimiento.md ≈ formacion.md | conocimiento.md + formacion.md | Revisar y unificar o separar por scope |
-| **Stub** formacion.md (776 bytes) | formacion.md | Necesita input Alvaro (#56 DEW) |
-| **Stub** impresion3d.md (963 bytes) | impresion3d.md | Necesita input Alvaro (#56 DEW) |
+| **Stub** formacion.md | formacion.md | Necesita input Alvaro (#56 DEW) |
+| **Stub** impresion3d.md | impresion3d.md | Necesita input Alvaro (#56 DEW) |
 
 ---
 
-## Números clave — 2026-07-13 10:13 CEST
+## Números clave — 2026-07-13 18:43 CEST
 
 | Métrica | Valor |
 |---------|-------|
-| Islas totales | 25 |
-| Islas completas (✅) | 11 |
-| Islas parciales (🟡) | 11 |
-| Islas stub (⚪) | 3 |
+| Islas totales | 26 |
+| Islas completas (✅) | 12 |
+| Islas parciales (🟡) | 10 |
+| Islas stub (⚪) | 2 |
+| Deprecadas (⛔) | 1 |
 | Solapamientos a resolver | 3 pares |
-| Repos sin isla propia | 0 (todos cubiertos) |
 | Repos sin auditar terminal | 6 |
+| ADRs vigentes | 11 |
 
 ---
 
-_Actualizado: 2026-07-13 10:13 CEST · Perplexity-MCP · Auditoría completa 25 islas_
+_Actualizado: 2026-07-13 18:43 CEST · Perplexity-MCP · tracking activa · ADR-011_
