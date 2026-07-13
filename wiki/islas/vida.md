@@ -1,90 +1,50 @@
 ---
-title: Isla Vida Personal
 tipo: isla
 author: Alvaro Fernandez Mota
-creado: 2026-07-09
-actualizado: 2026-07-10
-status: vigente
+creado: 2026-07-10
+actualizado: 2026-07-13T10:21:00+02:00
 ruta: wiki/islas/vida.md
-tags: [isla, vida, personal, diarios, tracking, habitos]
-repo_principal: VIDAPERSONAL
-depende_de: []
-sirve_a: [yggdrasil-dew, yggdrasil-wiki]
+tags: [isla, vida, personal, finanzas, gym, salud, diario]
+status: vigente
+repos: [VIDAPERSONAL]
 ---
 
 # Isla: Vida Personal
 
-> Mapa conceptual de la dimensión personal.
-> Los registros reales viven en `VIDAPERSONAL`. Esta isla es el mapa — nunca los datos.
+> Todo lo que eres fuera del técnico — finanzas, salud, gym, relaciones, diario.
+> El vince personal del tridente Yggdrasil.
 
 ---
 
-## El triángulo personal
+## Qué vive en `VIDAPERSONAL`
 
-```
-        VIDAPERSONAL
-        (planifica, registra,
-         diarios, hábitos, tracking)
-              ▲
-             / \
-            /   \
-      DEW ◄─────► WIKI
-  (ejecuta,       (mapas
-   issues,         conceptuales)
-   ADRs)
-```
-
-**Regla de oro:** DEW planifica → VIDAPERSONAL registra → WIKI documenta el mapa.
+| Carpeta | Contenido |
+|---------|----------|
+| `01_diarios/` | Diario diario y de sesiones |
+| `02_formacion/` | Libros, cursos no-técnicos |
+| `03_finanzas/` | Gastos, ingresos, objetivos |
+| `04_gym/` | Entrenamientos, progreso |
+| `05_salud/` | Médico, seguimiento |
+| `06_proyectos_vida/` | Proyectos personales grandes |
 
 ---
 
-## Dónde vive cada cosa
+## Principio rector
 
-| Tipo de información | Repo | Ruta |
-|---------------------|------|------|
-| Diarios diarios | `VIDAPERSONAL` | `01_traking_diario/01_diarios/2026/MM-mes/` |
-| Hábitos y tracking | `VIDAPERSONAL` | `01_traking_diario/` |
-| Metas del año | `VIDAPERSONAL` | `02_metas/` |
-| Formación activa | `VIDAPERSONAL` | `02_formacion/` |
-| Identidad y valores | `VIDAPERSONAL` | `00_yo/` |
-| Canon del ecosistema | `VIDAPERSONAL` | `00_sistema/ECOSISTEMA-CANON.md` |
-| Plan semanal | `VIDAPERSONAL` | `00_sistema/PLAN-DOMINGO-*.md` |
-| Issues de vida | `yggdrasil-dew` | Issues con label `vida` |
-| Mapa conceptual | Aquí | `wiki/islas/vida.md` |
+> **VIDAPERSONAL alimenta el DEW.**
+> El contexto personal (cómo estás, qué priorizas) informa las decisiones técnicas.
+> No son mundos separados — están en el mismo tridente.
 
 ---
 
-## Estructura canónica VIDAPERSONAL
+## 🔗 Conexiones con otras islas
 
-```
-VIDAPERSONAL/
-├── 00_sistema/          ← cerebro: protocolos, canon, planes
-├── 00_yo/               ← identidad, valores, quién eres
-├── 01_traking_diario/   ← núcleo del tracking diario
-│   ├── 01_diarios/2026/07-julio/YYYY-MM-DD.md
-│   ├── 02_plantillas/
-│   └── 03_analisis/
-├── 02_formacion/
-├── 02_metas/
-└── _archivo/            ← todo lo inactivo
-```
+| Isla | Relación |
+|------|----------|
+| [conocimiento.md](conocimiento.md) | Mapa conceptual de todo lo que eres |
+| [formacion.md](formacion.md) | Libros y formación no-técnica |
+| [impresion3d.md](impresion3d.md) | Proyectos maker personales |
 
 ---
 
-## Áreas de vida
-
-- **Salud** — sueño, ejercicio, agua, tabaco, alimentación
-- **Trabajo / carrera técnica** — foco, productividad, ecosistema
-- **Formación** — Musk, cursos, lecturas
-- **Relaciones** — Thea, familia, entorno
-- **Finanzas** — (pendiente de desarrollar)
-- **Proyectos personales** — impresora 3D, ideas
-
----
-
-## Links
-
-→ [VIDAPERSONAL repo](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL)
-→ [ECOSISTEMA-CANON.md](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL/blob/main/00_sistema/ECOSISTEMA-CANON.md)
-
-_Actualizado: 2026-07-10 · Perplexity-MCP_
+_Actualizado: 2026-07-13 10:21 CEST · Perplexity-MCP · Cierre sesión final_
