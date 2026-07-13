@@ -1,72 +1,62 @@
 ---
-título: Índice de Islas — Fuente de Verdad Única
-tipo: indice
+tipo: index
 author: Alvaro Fernandez Mota
 creado: 2026-07-09
 actualizado: 2026-07-13
 ruta: wiki/islas/INDEX.md
-tags: [indice, islas, ecosistema]
+tags: [index, islas, ecosistema, mapa]
 status: vigente
 ---
 
-# 🌊 Islas del Ecosistema Yggdrasil
+# 🏖️ Índice de Islas — Ecosistema Yggdrasil
 
-> **Fuente de verdad única.** README.md y HOME.md enlazan aquí. No duplicar esta tabla.
-
----
-
-## Infraestructura
-
-| Isla | Archivo | Repo operativo | Estado |
-|---|---|---|---|
-| 🖥️ Madre | [madre.md](madre.md) | `madre-config` | 🟡 IaC pendiente versionar (#43 DEW) |
-| 💻 Acer | [acer.md](acer.md) | `acer-config` | 🔴 Config vacío |
-| 🔒 Seguridad / SecOps | [seguridad.md](seguridad.md) | `yggdrasil-secops` | 🟡 Auditoría fase 1 pendiente (#37 DEW) |
-| 🏗️ Infra general | [infra.md](infra.md) | `madre-config` | 🟡 Activo |
-
-## Inteligencia Artificial
-
-| Isla | Archivo | Repo operativo | Estado |
-|---|---|---|---|
-| 🧠 Cerebro / IA local | [cerebro.md](cerebro.md) | `local-brain` | 🟡 Activo |
-| 🤖 THDORA (bot) | [thdora.md](thdora.md) | `THDORA-PERSONAL` | 🟡 Auditoría pendiente (#36 DEW) |
-| 🌐 IA Local (Ollama) | [ia-local.md](ia-local.md) | `ollama-stack` | 🟡 Activo |
-| 👁️ THEA | [thea.md](thea.md) | — | 🔴 Pendiente |
-
-## Conocimiento y Vida
-
-| Isla | Archivo | Repo operativo | Estado |
-|---|---|---|---|
-| 📚 Conocimiento | [conocimiento.md](conocimiento.md) | `WIKI---PERSONAL` | 🟡 Activo |
-| 🌱 Formación | [formacion.md](formacion.md) | `formacion-tech` | 🔴 Estructura creada, contenido vacío |
-| 🧬 Vida personal | [vida.md](vida.md) | `VIDAPERSONAL` | ✅ Canon migrado 2026-07-10 |
-| 🖨️ Impresión 3D | [impresion3d.md](impresion3d.md) | — | 🟡 Activo |
-
-## Desarrollo y Labs
-
-| Isla | Archivo | Repo operativo | Estado |
-|---|---|---|---|
-| 🧪 Labs | [labs.md](labs.md) | `dev-labs` | 🔴 Vacío sandbox |
-| 🌍 Ecosistema (mapa) | [ecosistema.md](ecosistema.md) | todos | ✅ Activo |
+> **Un solo punto de verdad para todas las islas.**
+> README y HOME de cualquier repo enlazan aquí. Nunca duplicar esta tabla.
+> Actualizar al cerrar la auditoría de cada isla.
 
 ---
 
-## Repos del ecosistema
+## Islas del ecosistema
 
-| Repo | Visibilidad | Rol | Isla asociada |
-|---|---|---|---|
-| `yggdrasil-dew` | 🟢 Público | Gobernanza, issues, CI | Todos |
-| `yggdrasil-wiki` | 🔒 Privado | Conocimiento, islas | Conocimiento |
-| `yggdrasil-secops` | 🔒 Privado | Blue team, hallazgos | Seguridad |
-| `THDORA-PERSONAL` | 🔒 Privado | Bot IA personal | THDORA |
-| `VIDAPERSONAL` | 🔒 Privado | Diario, hábitos, vida | Vida |
-| `madre-config` | 🔒 Privado | IaC servidor Madre | Madre / Infra |
-| `acer-config` | 🔒 Privado | Config Acer | Acer |
-| `formacion-tech` | 🔒 Privado | Cursos, notas técnicas | Formación |
-| `ollama-stack` | 🔒 Privado | Stack Ollama | IA Local |
-| `local-brain` | 🔒 Privado | RAG, embeddings | Cerebro |
-| `investigacion-ia` | 🔒 Privado | Research IA | Cerebro |
-| `dev-labs` | 🔒 Privado | Sandbox experimentos | Labs |
+| Isla | Ficha | Repo principal | Estado | Última auditoría |
+|---|---|---|---|---|
+| 🛡️ **Seguridad** | [seguridad.md](seguridad.md) | [yggdrasil-secops](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) | 🟡 En auditoría | 2026-07-12 |
+| 🏗️ **Infra / Madre** | [infra.md](infra.md) · [madre.md](madre.md) | [madre-config](https://github.com/alvarofernandezmota-tech/madre-config) | ⚪ Pendiente | — |
+| 🧠 **Cerebro** | [cerebro.md](cerebro.md) | [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | 🟡 En progreso | 2026-07-13 |
+| 📖 **Wiki** | [conocimiento.md](conocimiento.md) | [yggdrasil-wiki](https://github.com/alvarofernandezmota-tech/yggdrasil-wiki) | 🟡 En progreso | 2026-07-12 |
+| 🤖 **THDORA** | [thdora.md](thdora.md) | [THDORA-PERSONAL](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) | 🔴 Bot caído | — |
+| 🧬 **IA Local** | [ia-local.md](ia-local.md) | [ollama-stack](https://github.com/alvarofernandezmota-tech/ollama-stack) | 🟢 Running | — |
+| 🔬 **Labs** | [labs.md](labs.md) | [dev-labs](https://github.com/alvarofernandezmota-tech/dev-labs) | ⚪ Pendiente | — |
+| 🕵️ **OSINT** | [ecosistema.md](ecosistema.md) | [osint-stack](https://github.com/alvarofernandezmota-tech/osint-stack) | ⚪ Pendiente | — |
+| 🏠 **Vida Personal** | [VIDAPERSONAL.md](VIDAPERSONAL.md) · [vida.md](vida.md) | [VIDAPERSONAL](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL) | 🟡 Limpieza pendiente | 2026-07-12 |
+| 🎼 **Orquestador** | [orquestador.md](orquestador.md) | THDORA + n8n en Madre | 🔴 Parcialmente caído | — |
+| 🌱 **Filosofía** | [filosofia.md](filosofia.md) | — (no tiene repo) | 🟢 Vigente | 2026-07-13 |
+| 📱 **Thea (iPhone)** | [thea.md](thea.md) | — | ⚪ Pendiente | — |
+| 🖥️ **Acer** | [acer.md](acer.md) | — | ⚪ Pendiente | — |
+| 🎨 **Impresión 3D** | [impresion3d.md](impresion3d.md) | — | ⚪ Pendiente | — |
+| 🏥 **Formación** | [formacion.md](formacion.md) | — | ⚪ Pendiente | — |
+
+---
+
+## Orden de auditoría planificado
+
+1. 🛡️ **Seguridad** ← HALs activos (#44 #45 #46)
+2. 🏗️ **Infra / Madre** ← desbloquea HAL-005 (HDD)
+3. 🤖 **THDORA / Orquestador** ← desbloquea bot caído
+4. 🧠 **Cerebro** (yggdrasil-dew)
+5. 🧬 **IA Local** + 🔬 **Labs** + 🕵️ **OSINT**
+6. 🏠 **Vida Personal** + 📱 **Thea** + 🖥️ **Acer**
+
+---
+
+## Leyenda
+
+| Estado | Significado |
+|---|---|
+| 🟢 Activa / Vigente | Operativa, sin issues críticos |
+| 🟡 En progreso | Auditoría activa o limpieza en curso |
+| 🔴 Crítica | Issues bloqueantes sin resolver |
+| ⚪ Pendiente | No auditada todavía |
 
 ---
 
