@@ -1,51 +1,51 @@
 ---
+título: HOME — Punto de entrada Yggdrasil Wiki
 tipo: home
-author: Alvaro Fernandez Mota <alvarofernandezmota@gmail.com>
-creado: 2026-07-05
-actualizado: 2026-07-09 23:07 CEST
+author: Alvaro Fernandez Mota
+creado: 2026-06-12
+actualizado: 2026-07-13
 ruta: HOME.md
 tags: [home, navegacion, wiki]
 status: vigente
 ---
 
-# WIKI---PERSONAL
+# 🏠 HOME — Yggdrasil Wiki
 
-> Mapas conceptuales y modelo mental personal.
-> La operativa y los detalles técnicos viven en [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew).
-
----
-
-## Estructura
-
-```
-wiki/
-├── CONVENCIONES.md        ← reglas de esta wiki
-├── MODELO-MENTAL.md       ← modelo mental del ecosistema
-├── agentes/               ← cómo trabajar con cada agente IA
-├── conocimiento/          ← conceptos técnicos
-├── infra/                 ← mapas de infraestructura
-├── islas/                 ← áreas de conocimiento del ecosistema
-├── operaciones/           ← protocolos y rutinas
-├── relaciones/            ← personas, contextos sociales
-└── vida/                  ← vida personal, hábitos, finanzas
-```
+> Punto de entrada. Si no sabes dónde empezar, empieza aquí.
 
 ---
 
-## Islas activas
+## Estado ahora
 
-| Isla | Descripción |
+→ [ESTADO-SISTEMA.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ESTADO-SISTEMA.md) (DEW) — siempre al día
+
+---
+
+## 🌊 Islas del ecosistema
+
+Ver [wiki/islas/INDEX.md](wiki/islas/INDEX.md) — fuente de verdad única.
+
+---
+
+## Navegación rápida
+
+| Área | Enlace |
 |---|---|
-| [ecosistema.md](./wiki/islas/ecosistema.md) | Qué es Yggdrasil, repos, cómo se documenta |
+| Todas las islas | [wiki/islas/INDEX.md](wiki/islas/INDEX.md) |
+| Mapa visual ecosistema | [wiki/islas/ecosistema.md](wiki/islas/ecosistema.md) |
+| Conocimiento técnico | [wiki/conocimiento/](wiki/conocimiento/) |
+| Infra y servidores | [wiki/infra/](wiki/infra/) |
+| Operaciones / Runbooks | [wiki/operaciones/](wiki/operaciones/) |
+| Agentes IA | [wiki/agentes/](wiki/agentes/) |
+| Convenciones | [wiki/CONVENCIONES.md](wiki/CONVENCIONES.md) |
+| Modelo mental | [wiki/MODELO-MENTAL.md](wiki/MODELO-MENTAL.md) |
 
 ---
 
-## Regla de oro
+## Issues activas (DEW)
 
-> Esta wiki contiene **mapas mentales**, no documentación técnica.
-> Todo lo operativo vive en `yggdrasil-dew`.
-> Si tienes dudas sobre dónde va algo → lee `wiki/CONVENCIONES.md`.
+→ [github.com/alvarofernandezmota-tech/yggdrasil-dew/issues](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
 
 ---
 
-_Actualizado: 2026-07-09 23:07 CEST · Perplexity-MCP_
+_Actualizado: 2026-07-13 · Perplexity-MCP_

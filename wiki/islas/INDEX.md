@@ -1,42 +1,73 @@
 ---
-title: Índice de Islas
+título: Índice de Islas — Fuente de Verdad Única
 tipo: indice
+author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-09 23:15 CEST
-status: vigente
+actualizado: 2026-07-13
 ruta: wiki/islas/INDEX.md
-tags: [indice, islas, wiki]
+tags: [indice, islas, ecosistema]
+status: vigente
 ---
 
-# Índice de Islas
+# 🌊 Islas del Ecosistema Yggdrasil
 
-> Fuente de verdad de todas las islas del ecosistema.
-> Cada isla es un mapa conceptual — NO documentación técnica.
-
----
-
-## Islas activas
-
-| Isla | Archivo | Estado |
-|---|---|---|
-| Ecosistema | [ecosistema.md](./ecosistema.md) | ✅ Activa |
-| Madre / Infra | [madre.md](./madre.md) | ⚠️ Borrador |
-| Seguridad | [seguridad.md](./seguridad.md) | ⚠️ Borrador |
-| Thdora | [thdora.md](./thdora.md) | ⚠️ Borrador |
-| Agentes IA | [agentes.md](./agentes.md) | ⚠️ Borrador |
-| MCP | [mcp.md](./mcp.md) | ⚠️ Borrador |
-| Vida personal | [vida.md](./vida.md) | ⚠️ Borrador |
-| Formación | [formacion.md](./formacion.md) | ⚠️ Borrador |
+> **Fuente de verdad única.** README.md y HOME.md enlazan aquí. No duplicar esta tabla.
 
 ---
 
-## Proceso para añadir una isla
+## Infraestructura
 
-1. Crear `wiki/islas/[nombre].md` con frontmatter completo
-2. Añadir entrada aquí en INDEX.md
-3. Añadir entrada en `wiki/mapa-islas.md`
-4. Commit: `docs(wiki): nueva isla [nombre]`
+| Isla | Archivo | Repo operativo | Estado |
+|---|---|---|---|
+| 🖥️ Madre | [madre.md](madre.md) | `madre-config` | 🟡 IaC pendiente versionar (#43 DEW) |
+| 💻 Acer | [acer.md](acer.md) | `acer-config` | 🔴 Config vacío |
+| 🔒 Seguridad / SecOps | [seguridad.md](seguridad.md) | `yggdrasil-secops` | 🟡 Auditoría fase 1 pendiente (#37 DEW) |
+| 🏗️ Infra general | [infra.md](infra.md) | `madre-config` | 🟡 Activo |
+
+## Inteligencia Artificial
+
+| Isla | Archivo | Repo operativo | Estado |
+|---|---|---|---|
+| 🧠 Cerebro / IA local | [cerebro.md](cerebro.md) | `local-brain` | 🟡 Activo |
+| 🤖 THDORA (bot) | [thdora.md](thdora.md) | `THDORA-PERSONAL` | 🟡 Auditoría pendiente (#36 DEW) |
+| 🌐 IA Local (Ollama) | [ia-local.md](ia-local.md) | `ollama-stack` | 🟡 Activo |
+| 👁️ THEA | [thea.md](thea.md) | — | 🔴 Pendiente |
+
+## Conocimiento y Vida
+
+| Isla | Archivo | Repo operativo | Estado |
+|---|---|---|---|
+| 📚 Conocimiento | [conocimiento.md](conocimiento.md) | `WIKI---PERSONAL` | 🟡 Activo |
+| 🌱 Formación | [formacion.md](formacion.md) | `formacion-tech` | 🔴 Estructura creada, contenido vacío |
+| 🧬 Vida personal | [vida.md](vida.md) | `VIDAPERSONAL` | ✅ Canon migrado 2026-07-10 |
+| 🖨️ Impresión 3D | [impresion3d.md](impresion3d.md) | — | 🟡 Activo |
+
+## Desarrollo y Labs
+
+| Isla | Archivo | Repo operativo | Estado |
+|---|---|---|---|
+| 🧪 Labs | [labs.md](labs.md) | `dev-labs` | 🔴 Vacío sandbox |
+| 🌍 Ecosistema (mapa) | [ecosistema.md](ecosistema.md) | todos | ✅ Activo |
 
 ---
 
-_Actualizado: 2026-07-09 23:15 CEST · Perplexity-MCP_
+## Repos del ecosistema
+
+| Repo | Visibilidad | Rol | Isla asociada |
+|---|---|---|---|
+| `yggdrasil-dew` | 🟢 Público | Gobernanza, issues, CI | Todos |
+| `yggdrasil-wiki` | 🔒 Privado | Conocimiento, islas | Conocimiento |
+| `yggdrasil-secops` | 🔒 Privado | Blue team, hallazgos | Seguridad |
+| `THDORA-PERSONAL` | 🔒 Privado | Bot IA personal | THDORA |
+| `VIDAPERSONAL` | 🔒 Privado | Diario, hábitos, vida | Vida |
+| `madre-config` | 🔒 Privado | IaC servidor Madre | Madre / Infra |
+| `acer-config` | 🔒 Privado | Config Acer | Acer |
+| `formacion-tech` | 🔒 Privado | Cursos, notas técnicas | Formación |
+| `ollama-stack` | 🔒 Privado | Stack Ollama | IA Local |
+| `local-brain` | 🔒 Privado | RAG, embeddings | Cerebro |
+| `investigacion-ia` | 🔒 Privado | Research IA | Cerebro |
+| `dev-labs` | 🔒 Privado | Sandbox experimentos | Labs |
+
+---
+
+_Actualizado: 2026-07-13 · Perplexity-MCP_
