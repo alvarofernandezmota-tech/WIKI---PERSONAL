@@ -1,45 +1,71 @@
 ---
-title: Isla Cerebro
 tipo: isla
-nombre: Cerebro
-descripcion: Mapa conceptual del cerebro técnico del ecosistema — automatización, conocimiento y desarrollo
-repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-dew
-github_issues: https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues
-obsidian_link: "[[cerebro]]"
-depende_de: [infra]
-sirve_a: [thdora, ia-local, seguridad]
-estado: estable
 author: Alvaro Fernandez Mota
-creado: 2026-07-05
-actualizado: 2026-07-05
-tags: [cerebro, dew, n8n, gitea, automatizacion]
+creado: 2026-07-10
+actualizado: 2026-07-13
+ruta: wiki/islas/cerebro.md
+tags: [isla, cerebro, wiki, conocimiento, segundo-cerebro, dew, vidapersonal]
+status: auditada
 ---
 
-# 🧠 Isla: Cerebro
+# Isla: Cerebro (Segundo cerebro digital)
 
-El cerebro es la capa de inteligencia y automatización del ecosistema. Conecta servicios, almacena conocimiento y permite desarrollar desde cualquier dispositivo.
-
-> ⚡ Canon, arquitectura y diarios → [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)
-
----
-
-## Servicios
-
-| Contenedor | Función | Acceso |
-|---|---|---|
-| `n8n` | Automatizaciones y flujos de trabajo | Solo Tailscale |
-| `gitea` | Git local privado — espejo o alternativa a GitHub | Solo Tailscale |
-| `code-server` | VS Code en el navegador desde cualquier dispositivo | Solo Tailscale |
+> Sistema de gestión del conocimiento personal del ecosistema.
+> El triángulo que lo forma: **DEW** (operativo) + **Wiki** (conocimiento) + **VIDAPERSONAL** (vida).
 
 ---
 
-## Repos canónicos del cerebro
+## El triángulo del cerebro
 
-| Repo | Propósito |
-|---|---|
-| [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Canon, arquitectura, diarios, ADRs |
-| [`WIKI---PERSONAL`](https://github.com/alvarofernandezmota-tech/WIKI---PERSONAL) | Mapa conceptual del ecosistema |
+```
+        DEW
+       (plan, issues, canon, ADRs)
+      /         \
+     /           \
+  Wiki ———— VIDAPERSONAL
+(fichas,       (diarios, hábitos,
+ islas,         proyectos vida)
+historial)
+```
+
+| Repo | Qué guarda | Actualización |
+|------|-----------|---------------|
+| [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Plan maestro, issues, canon, ADRs | Continua (cada sesión) |
+| [`yggdrasil-wiki`](https://github.com/alvarofernandezmota-tech/yggdrasil-wiki) | Fichas de islas, convenciones, historial | Continua (cada cambio de estado) |
+| [`VIDAPERSONAL`](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL) | Diarios, hábitos, metas, proyectos vida | Semanal (cada domingo) |
 
 ---
 
-_Actualizado: 2026-07-05 23:43 CEST · Perplexity-MCP_
+## Regla de alineación DEW ↔ Wiki
+
+> **Cada cambio de estado en una isla → actualizar su ficha en Wiki.**
+> **Cada tarea pendiente → issue en DEW, nunca en un chat.**
+> **Nunca duplicar información.** Si está en Wiki, DEW referencia Wiki. No repite.
+
+---
+
+## Agentes que alimentan el cerebro
+
+| Agente | Rol |
+|--------|-----|
+| Perplexity (MCP) | Gestiona repos, crea issues, actualiza Wiki y DEW |
+| Claude | Auditorías profundas, análisis de estructura |
+| THDORA | Interfaz Telegram — consultas rápidas al ecosistema |
+
+---
+
+## Estado real — 2026-07-13
+
+✅ **DEW y Wiki activos y en alineación continua.**
+🟡 **VIDAPERSONAL**: migrada a estructura canónica el 2026-07-10, pendiente limpieza final (DEW #48).
+
+---
+
+## Issues DEW relacionados
+
+- [DEW #48 — AUDIT-006 VIDAPERSONAL](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/48)
+- [DEW #50 — GOB-001 Filosofía](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/50)
+
+---
+
+_Actualizado: 2026-07-13 · Perplexity-MCP_

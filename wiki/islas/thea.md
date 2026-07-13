@@ -2,47 +2,64 @@
 tipo: isla
 author: Alvaro Fernandez Mota
 creado: 2026-07-10
-actualizado: 2026-07-10
+actualizado: 2026-07-13
 ruta: wiki/islas/thea.md
-tags: [isla, thea, ia, agente, python]
-status: borrador
+tags: [isla, thea, ia, agente, python, thdora]
+status: auditada
 repo_principal: thea-ia
 ---
 
-# Isla: Thea IA
+# Isla: Thea IA (core Python)
 
-> Agente IA personal — core Python.
-> Parte del ecosistema THDORA / Thea.
+> Core de inteligencia artificial personal del ecosistema.
+> `thea-ia` es la librería Python base. `THDORA-PERSONAL` es la interfaz Telegram + API que la consume.
 
 ---
 
-## Qué es
-
-Thea es el agente IA personal. `thea-ia` es el core Python del proyecto.
-`THDORA-PERSONAL` es la capa de interfaz (bot Telegram + FastAPI).
+## Arquitectura
 
 ```
-thea-ia (core IA)
-    └── THDORA-PERSONAL (interfaz Telegram + API)
-            └── Madre (corre en Docker)
+thea-ia (core IA — Python)
+    └── THDORA-PERSONAL (bot Telegram + FastAPI)
+            └── Madre (Docker — thdora-bot + thdora-api)
+                    └── Telegram (canal de comunicación)
 ```
 
----
-
-## Estado
-
-🟡 **Repo sin actividad desde febrero 2026.**
-
-Decisión pendiente:
-- [ ] ¿Sigue activo o se archiva?
-- [ ] ¿Se fusiona con `THDORA-PERSONAL`?
-- [ ] ¿Se convierte en librería que consume THDORA?
+| Repo | Rol | Estado |
+|------|-----|--------|
+| [`thea-ia`](https://github.com/alvarofernandezmota-tech/thea-ia) | Core Python IA | 🔴 Sin actividad desde feb 2026 |
+| [`THDORA-PERSONAL`](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) | Bot + API | 🔴 Caído (HAL-007 + HAL-008) |
 
 ---
 
-## Links
+## Decisión arquitectural pendiente
 
-→ [thea-ia repo](https://github.com/alvarofernandezmota-tech/thea-ia)
-→ [thdora.md](thdora.md)
+> **¿Qué es thea-ia hoy?** Hay tres opciones abiertas:
 
-_Creado: 2026-07-10 · Perplexity-MCP_
+| Opción | Descripción | Consecuencia |
+|--------|-------------|---------------|
+| A. Archivar | thea-ia queda obsoleto | THDORA funciona sin core separado |
+| B. Fusionar | Código de thea-ia → dentro de THDORA-PERSONAL | Un solo repo |
+| C. Librería | thea-ia se convierte en paquete que importa THDORA | Arquitectura limpia |
+
+⚠️ **Esta decisión debe tomarse antes de reactivar THDORA** (ver [DEW #49](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/49)).
+
+---
+
+## Estado real — 2026-07-13
+
+- `thea-ia`: sin commits desde febrero 2026, decisión pendiente
+- `THDORA-PERSONAL`: bot y API caídos por `.env` malformado (HAL-007) y token Telegram revocado (HAL-008)
+- Ollama corre en Madre y puede ser el motor LLM una vez THDORA vuelva
+
+---
+
+## Issues DEW relacionados
+
+- [DEW #44 — HAL-007 .env malformado](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/44) 🔴 BLOQUEANTE
+- [DEW #45 — HAL-008 rotar token Telegram](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) 🔴 BLOQUEANTE
+- [DEW #49 — AUDIT-007 Orquestador](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/49)
+
+---
+
+_Actualizado: 2026-07-13 · Perplexity-MCP_
