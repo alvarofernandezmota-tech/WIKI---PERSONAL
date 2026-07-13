@@ -60,11 +60,12 @@ Ver tabla completa en [wiki/islas/INDEX.md](wiki/islas/INDEX.md).
 | Repo | Rol |
 |---|---|
 | [`yggdrasil-dew`](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Gobernanza, issues, CI — el cerebro operativo |
-| `yggdrasil-wiki` | Este repo — conocimiento y mapas |
-| `yggdrasil-secops` | Blue team, hallazgos de seguridad |
-| `THDORA-PERSONAL` | Bot IA personal |
-| `VIDAPERSONAL` | Diario, hábitos, vida |
+| [`yggdrasil-wiki`](https://github.com/alvarofernandezmota-tech/yggdrasil-wiki) | Este repo — conocimiento y mapas |
+| [`yggdrasil-tracking`](https://github.com/alvarofernandezmota-tech/yggdrasil-tracking) | Vida personal, metas, reflexiones, filosofía |
+| [`yggdrasil-scripts`](https://github.com/alvarofernandezmota-tech/yggdrasil-scripts) | Orquestación, scripts, GitHub Actions del ecosistema |
+| [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) | Blue team, hallazgos de seguridad |
+| [`THDORA-PERSONAL`](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) | Bot IA personal |
 
 ---
 
-_Actualizado: 2026-07-13 · Perplexity-MCP_
+_Actualizado: 2026-07-13 · F2 alineación tridente · Perplexity MCP_
