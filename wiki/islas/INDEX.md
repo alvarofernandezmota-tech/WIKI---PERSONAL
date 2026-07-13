@@ -2,7 +2,7 @@
 tipo: canon
 author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-13T18:43:00+02:00
+actualizado: 2026-07-13T19:53:00+02:00
 ruta: wiki/islas/INDEX.md
 tags: [canon, indice, islas, wiki]
 status: vigente
@@ -21,7 +21,7 @@ status: vigente
 |------|---------|---------------|--------|
 | Ecosistema general | [ecosistema.md](ecosistema.md) | yggdrasil-dew | ✅ |
 | Arquitectura C4 | → [ARQUITECTURA-C4.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/ARQUITECTURA-C4.md) | yggdrasil-dew | ✅ |
-| Filosofia y principios | [filosofia.md](filosofia.md) | yggdrasil-wiki | ✅ |
+| Filosofia y principios | [filosofia.md](filosofia.md) | WIKI---PERSONAL | ✅ |
 | Normas del tridente | → [NORMAS.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/NORMAS.md) | yggdrasil-dew | ✅ |
 
 ---
@@ -67,8 +67,8 @@ status: vigente
 |------|---------|---------------|--------|
 | Dev Labs (sandbox) | [dev-labs.md](dev-labs.md) | dev-labs | 🟡 Sin auditar |
 | Labs generales | [labs.md](labs.md) | dev-labs | ⚠️ Solapamiento con dev-labs — unificar |
-| Conocimiento técnico | [conocimiento.md](conocimiento.md) | formacion-tech | ⚠️ Solapamiento con formacion — revisar |
-| Formación técnica | [formacion.md](formacion.md) | yggdrasil-formacion- | 🟡 Stub — necesita input Alvaro |
+| Conocimiento técnico | [conocimiento.md](conocimiento.md) | WIKI---PERSONAL | ⚠️ Solapamiento con formacion — revisar |
+| Formación técnica | [formacion.md](formacion.md) | yggdrasil-formacion | 🟡 Stub — necesita input Alvaro |
 
 ---
 
@@ -76,7 +76,7 @@ status: vigente
 
 | Isla | Archivo | Repo asociado | Estado |
 |------|---------|---------------|--------|
-| Tracking (vida personal) | [tracking.md](tracking.md) | yggdrasil-tracking | ✅ Nueva 2026-07-13 |
+| Tracking (vida personal) | [tracking.md](tracking.md) | yggdrasil-tracking | ✅ Activa 2026-07-13 |
 | VIDAPERSONAL (deprecado) | [VIDAPERSONAL.md](VIDAPERSONAL.md) | — | ⛔ Deprecado → ver tracking.md |
 | Impresión 3D | [impresion3d.md](impresion3d.md) | impresion-3d | 🟡 Stub — necesita input Alvaro |
 
@@ -94,7 +94,7 @@ status: vigente
 
 ---
 
-## Números clave — 2026-07-13 18:43 CEST
+## Números clave — 2026-07-13 19:53 CEST
 
 | Métrica | Valor |
 |---------|-------|
@@ -109,4 +109,4 @@ status: vigente
 
 ---
 
-_Actualizado: 2026-07-13 18:43 CEST · Perplexity-MCP · tracking activa · ADR-011_
+_Actualizado: 2026-07-13 19:53 CEST · Alineación cuarteto · formacion renombrado · Perplexity MCP_
