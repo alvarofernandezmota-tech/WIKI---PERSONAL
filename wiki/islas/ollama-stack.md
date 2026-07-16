@@ -1,66 +1,85 @@
----
-tipo: isla
-repo: ollama-stack
-creado: 2026-07-13
-actualizado: 2026-07-13
-tags: [ia, ollama, llm, litellm, qdrant, rag]
-status: auditado-parcial
----
+# 🧠 Ollama Stack
 
-# Isla: Ollama Stack
+> Motor de inferencia IA local del ecosistema. Corre en Madre sobre GTX 1060 6GB.
 
-> Stack de IA local del ecosistema Yggdrasil. Modelos LLM corriendo en Madre sin depender de APIs externas.
+| Campo | Valor |
+|---|---|
+| **Repo principal** | [`ollama-stack`](https://github.com/alvarofernandezmota-tech/ollama-stack) |
+| **Máquina** | Madre · GPU GTX 1060 6GB |
+| **Estado operativo** | ✅ Activo |
+| **Última auditoría** | 2026-07-16 |
 
 ---
 
-## Qué es
+## 📌 Qué es
 
-Repo [`ollama-stack`](https://github.com/alvarofernandezmota-tech/ollama-stack) — stack Docker completo para inferencia local:
-- **Ollama** — servidor de modelos LLM (llama3, mistral, codellama...)
-- **Open WebUI** — interfaz web para chat con modelos
-- **LiteLLM** — gateway proxy unificado (expone OpenAI API compatible)
-- **Qdrant** — base de datos vectorial para RAG
+Ollama es el servidor de modelos de lenguaje locales del ecosistema. Corre en Docker en Madre, usando la GPU GTX 1060 6GB para inferencia. Open WebUI proporciona la interfaz de chat local. Es la base sobre la que se construirá el sistema de agentes autónomos (Fase 7).
 
 ---
 
-## Estado actual
+## 🛠️ Stack y modelos
 
-| Componente | Estado | Puerto |
-|-----------|--------|--------|
-| Ollama | 🟡 Sin verificar | 11434 |
-| Open WebUI | 🟡 Sin verificar | 3000 |
-| LiteLLM | 🟡 Sin verificar | 4000 |
-| Qdrant | 🟡 Sin verificar | 6333 |
+| Componente | Estado | Notas |
+|---|---|---|
+| Ollama server | ✅ Activo | Docker en Madre |
+| Open WebUI | ✅ Activo | Interfaz chat local |
+| GPU GTX 1060 6GB | ✅ Activo | Aceleración CUDA |
 
-> ⚠️ Pendiente: auditoría terminal (#55 en DEW). No hay confirmación de que todos los servicios estén healthy.
-
----
-
-## Conexiones en el ecosistema
-
-- **Madre** → corre todos los servicios Docker
-- **THDORA** → puede invocar modelos Ollama vía LiteLLM
-- **local-brain** → RAG usa Qdrant como vector store
-- **n8n** → puede llamar a LiteLLM para flujos con IA
-- **investigacion-ia** → PoCs usan Ollama como backend
+```
+Modelos cargados:
+  Llama 3       — activo
+  Mistral       — activo
+  Phi-3         — activo
+```
 
 ---
 
-## Seguridad
+## 📊 Estado actual
 
-- [ ] Verificar que Ollama NO está expuesto en interfaz pública
-- [ ] Verificar que LiteLLM tiene autenticación (LITELLM_MASTER_KEY)
-- [ ] Verificar que Qdrant no tiene acceso sin auth desde exterior
-- [ ] LITELLM_MASTER_KEY fue expuesta (HAL-008 #45) — confirmar rotación
-
----
-
-## Pendientes
-
-- `AUDIT-012` (#55 DEW) — auditoría terminal de todo el stack
-- Verificar modelos activos vs zombi (`ollama list`)
-- Documentar endpoint LiteLLM en `madre.md`
+| Servicio | Estado | Última verificación |
+|---|---|---|
+| Ollama server | ✅ Activo | 2026-07-16 |
+| Open WebUI | ✅ Activo | 2026-07-16 |
+| Inferencia GPU | ✅ Activo | 2026-07-16 |
+| Agentes IA locales | 🔴 No iniciado | Fase 7 |
 
 ---
 
-_Creado: 2026-07-13 · Perplexity-MCP · Pendiente auditoría terminal_
+## 🗺️ Relaciones con el ecosistema
+
+```
+Ollama Stack
+  ├── corre en → Madre
+  ├── alimenta → local-brain (RAG)
+  ├── futuro → thea-ia (agentes)
+  └── futuro → TOKI (bot Telegram con LLM local)
+```
+
+---
+
+## 🔗 DEW — Issues y decisiones
+
+### Issues activas
+
+| Issue | Título | Prioridad |
+|---|---|---|
+| [#49](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/49) | Decisión arquitectural `thea-ia` — afecta integración agentes | 🟡 Pendiente |
+
+### ADRs relevantes
+
+| ADR | Decisión | Estado |
+|---|---|---|
+| — | Ollama como motor de inferencia local (vs cloud) | ✅ Vigente |
+| — | GTX 1060 6GB suficiente para modelos 7B | ✅ Vigente |
+
+---
+
+## 📝 Decisiones pendientes
+
+- [ ] Definir arquitectura de agentes locales (depende de decisión `thea-ia` — DEW #49)
+- [ ] Integrar Ollama con local-brain (RAG pipeline)
+- [ ] Evaluar modelos para tareas específicas del ecosistema
+
+---
+
+_Actualizado: 2026-07-16 · Perplexity-MCP_

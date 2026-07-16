@@ -1,159 +1,115 @@
----
-tipo: isla
-author: Alvaro Fernandez Mota
-creado: 2026-07-09
-actualizado: 2026-07-13T10:17:00+02:00
-ruta: wiki/islas/madre.md
-tags: [isla, madre, infra, docker, servidor, homelab, hal, ollama, ia]
-status: vigente
-repo_principal: madre-config
----
+# 🖥️ Madre
 
-# Isla: Madre
-
-> Servidor HP Ubuntu — núcleo físico del ecosistema Yggdrasil.
-> Todo el stack Docker corre aquí. Acceso remoto vía Tailscale.
-> **Madre es el único servidor de producción del ecosistema.**
-
----
-
-## Identidad del servidor
+> Servidor 24/7 en casa. Núcleo físico del ecosistema Yggdrasil. Toda la infraestructura productiva corre aquí.
 
 | Campo | Valor |
-|-------|-------|
-| Hostname | `varpc` |
-| Usuario | `varopc` |
-| OS | Ubuntu Server |
-| Cifrado | LUKS + Btrfs |
-| CPU | Intel i5-8400 |
-| RAM | 16 GB |
-| GPU | GTX 1060 — usada por **Ollama** para inferencia LLM |
-| Red local | WiFi `wlan0` |
-| VPN | Tailscale |
-| SSH | Puerto 22, solo clave pública |
-| Acceso móvil | Blink Shell / Shellfish (iPhone Thea) |
+|---|---|
+| **Repo principal** | [`madre-config`](https://github.com/alvarofernandezmota-tech/madre-config) |
+| **Máquina** | Torre de sobremesa · Madrid |
+| **OS** | Arch Linux (Omarchy) |
+| **IP Tailscale** | `100.91.112.32` |
+| **Estado operativo** | ✅ Online · 24/7 |
+| **Última auditoría** | 2026-07-16 |
+| **Issues abiertas** | 2 críticas en DEW |
 
 ---
 
-## Mapa de dependencias — qué coge Madre de quién
+## 📌 Qué es
+
+Madre es el servidor principal del ecosistema. Corre Docker con más de 20 servicios productivos (Batcueva), la GPU GTX 1060 6GB que alimenta Ollama, y actúa como hub de red con Tailscale, Pi-hole y hostapd WiFi. Todo lo que es infraestructura de producción vive aquí.
+
+---
+
+## 🛠️ Stack y servicios Docker (Batcueva)
+
+| Servicio | Estado | Notas |
+|---|---|---|
+| Portainer | ✅ Activo | Gestión Docker |
+| Grafana + Prometheus + Alertmanager | ✅ Activo | Monitorización |
+| Ollama + Open WebUI | ✅ Activo | IA local · GTX 1060 6GB |
+| Nextcloud | ✅ Activo | Almacenamiento privado |
+| Vaultwarden | ✅ Activo | Gestor contraseñas |
+| Nginx + Let’s Encrypt | ✅ Activo | Reverse proxy |
+| Pi-hole + Unbound DoT | ✅ Activo | DNS + filtrado |
+| hostapd WiFi AP | ✅ Activo | r8852be |
+| nftables firewall | ✅ Activo | Reglas activas |
+| Wazuh SIEM | 🟡 En progreso | Fase 3 |
+| Suricata IDS | 🟡 En progreso | Fase 4 |
+| Fail2ban | 🔴 Pendiente | No instalado |
 
 ```
-Madre (hardware)
-├── GTX 1060 ────────────────► ollama-stack (Ollama usa GPU para inferencia)
-├── Docker daemon ────────► madre-config (IaC — todos los docker-compose)
-├── /home/varopc/.env ───► THDORA-PERSONAL + yggdrasil-secops (consumen variables)
-├── Puerto 22 SSH ───────► Acer + Thea (acceso remoto vía Tailscale)
-└── Disco HDD ──────────► Todos los datos del ecosistema
-```
-
-### Flujo completo de petición de IA en Madre
-
-```
-Usuario / THDORA / n8n
-    │
-    ▼
-LiteLLM (puerto 4000) — router unificado
-    │
-    ▼
-Ollama (puerto 11434) — GTX 1060 hace inferencia
-    │
-    ▼
-Modelo (llama3 / mistral / phi / qwen)
-
-(Para RAG:)
-Local-brain → Qdrant (puerto 6333) → embeddings → contexto → Ollama
+Red:
+  Tailscale (WireGuard mesh)     — activo
+  VLANs / macvlan para OSINT     — en progreso
+  SSH: ed25519 only              — hardening parcial
+  FTP puerto 21 router Digi      — 🔴 EXPUESTO — p0
 ```
 
 ---
 
-## Stack completo de servicios en Madre (16)
+## 📊 Estado actual
 
-### IA (ollama-stack)
-| Servicio | Puerto | RAM límite | GPU | Depende de |
-|---------|--------|------------|-----|------------|
-| Ollama (chat) | 11434 | 7 GB | ✅ GTX 1060 | — |
-| Ollama (embeddings) | 11435 | 2 GB | ✅ GTX 1060 | — |
-| Open WebUI | 3000 | 1 GB | No | Ollama |
-| LiteLLM | 4000 | 0.5 GB | No | Ollama |
-| Qdrant | 6333 | 2 GB | No | — |
+| Servicio | Estado | Última verificación |
+|---|---|---|
+| Online / SSH | ✅ | 2026-07-16 |
+| Docker stack | ✅ | 2026-07-16 |
+| Tailscale | ✅ | 2026-07-16 |
+| SSH `PasswordAuthentication no` | 🔴 Pendiente | — |
+| FTP puerto 21 router | 🔴 EXPUESTO | 2026-07-16 |
 
-**GPU GTX 1060:** Ollama la usa directamente para inferencia. Sin GPU, los modelos corren en CPU (~5x más lentos).
-⚠️ **NO cargar qwen2.5:14b con stack activo** — OOM Killer. RAM total IA: ~12.5 GB / 16 GB.
-
-### Dev (THDORA-PERSONAL + n8n)
-| Servicio | Puerto | Depende de |
-|---------|--------|------------|
-| THDORA API (FastAPI) | 8000 | .env, Ollama vía LiteLLM |
-| THDORA Bot (Telegram) | — | .env (TELEGRAM_BOT_TOKEN) |
-| n8n (orquestador flujos) | 5678 | .env |
-| Code-server | 8080 | .env |
-
-### Monitoring
-| Servicio | Puerto | Depende de |
-|---------|--------|------------|
-| Grafana | 3001 | Prometheus |
-| Prometheus | 9090 | — |
-| Watchtower | — | Docker daemon |
-
-### Secops (yggdrasil-secops)
-| Servicio | Puerto | Depende de |
-|---------|--------|------------|
-| log_guardian_bot | — | .env (Telegram) ⚠️ Caído #46 |
-| local_tripwire | — | — ⚠️ Caído #46 |
-| Watchdog | — | Docker daemon |
-| SpiderFoot (OSINT) | 5001 | — |
+**Alertas activas:**
+- 🔴 FTP puerto 21 expuesto en router Digi `http://192.168.1.1` — ver [DEW #issue-ftp](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
+- 🔴 SSH `PasswordAuthentication no` pendiente — Fase 2
 
 ---
 
-## IaC — compose files (problema activo)
+## 🗺️ Relaciones con el ecosistema
 
-| Ruta en Madre | Stack | Versionado en repo |
-|--------------|-------|--------------------|
-| `/home/varopc/docker-compose.yml` | IA principal | ❌ No (#43) |
-| `/home/varopc/Projects/thdora/` | THDORA | ❌ No (#43) |
-| `/home/varopc/spiderfoot/` | SpiderFoot | ❌ No (#43) |
-| `/home/varopc/yggdrasil-secops/blue_team/` | Blue team | ⚠️ Parcial |
-
-**Objetivo #43:** mover todo a `madre-config/docker/{ia,dev,monitoring,secops}/`
-
----
-
-## Estado de salud (2026-07-10)
-
-| Atributo | Valor | Estado |
-|----------|-------|--------|
-| HDD Power_On_Hours | 28.811 h | 🟡 Vigilar |
-| Reallocated_Sector_Ct | 0 | ✅ |
-| Temperatura | 45°C | ✅ |
-| Puerto 21 FTP | filtered | 🟡 Verificar externo |
-| RAM usada | ~12.5/16 GB | ✅ |
+```
+Madre
+  ├── aloja → ollama-stack (IA local)
+  ├── aloja → local-brain (RAG)
+  ├── aloja → THDORA-PERSONAL (bot)
+  ├── monitoriza → Grafana/Prometheus
+  ├── protege → Wazuh SIEM + Suricata
+  └── accede desde → Acer/iPhone via Tailscale
+```
 
 ---
 
-## ⚠️ Incidencias abiertas
+## 🔗 DEW — Issues y decisiones
 
-| HAL | Issue | Descripción | Prioridad |
-|-----|-------|-------------|----------|
-| HAL-007 | [#44](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/44) | .env malformado — bloquea todo | 🔴 CRÍTICO |
-| HAL-008 | [#45](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) | Rotar token Telegram + LITELLM_KEY | 🔴 CRÍTICO |
-| HAL-009 | [#46](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/46) | log_guardian crash loop | 🟡 ALTA |
-| — | [#43](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/43) | IaC — versionar 16 compose files | 🔴 CRÍTICO |
-| — | [#31](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/31) | HDD 28k horas | 🟡 VIGILAR |
+### Issues activas
+
+| Issue | Título | Prioridad |
+|---|---|---|
+| [#44](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/44) | HAL-007: THDORA `.env` malformado (corre en Madre) | 🔴 Crítico |
+| [#45](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) | HAL-008: Token Telegram revocado (THDORA en Madre) | 🔴 Crítico |
+
+### Historial de incidentes
+
+| HAL | Descripción | Estado |
+|---|---|---|
+| HAL-007 | THDORA caída — `.env` malformado | 🔴 Abierto |
+| HAL-008 | Token Telegram revocado | 🔴 Abierto |
+
+### ADRs relevantes
+
+| ADR | Decisión | Estado |
+|---|---|---|
+| — | Arch Linux Omarchy como OS base | ✅ Vigente |
+| — | Docker para todos los servicios productivos | ✅ Vigente |
+| — | Tailscale como red privada del ecosistema | ✅ Vigente |
 
 ---
 
-## 🔗 Conexiones con otras islas
+## 📝 Decisiones pendientes
 
-| Isla | Relación |
-|------|----------|
-| [ollama-stack.md](ollama-stack.md) | Madre provee GPU + Docker para el stack IA |
-| [ia-local.md](ia-local.md) | Detalle de la capa IA que corre en Madre |
-| [thdora.md](thdora.md) | THDORA corre en Madre, consume Ollama vía LiteLLM |
-| [orquestador.md](orquestador.md) | n8n corre en Madre como orquestador de flujos |
-| [seguridad.md](seguridad.md) | Blue team (secops) corre en Madre |
-| [infra.md](infra.md) | Vista técnica ampliada de la infraestructura |
-| [scripts.md](scripts.md) | Scripts de mantenimiento se ejecutan en Madre |
+- [ ] Desactivar FTP puerto 21 en router Digi — **PRIORIDAD MÁXIMA**
+- [ ] SSH: `PasswordAuthentication no` — Fase 2
+- [ ] Instalar Fail2ban
+- [ ] Completar VLANs / macvlan para OSINT
 
 ---
 
-_Actualizado: 2026-07-13 10:17 CEST · Perplexity-MCP · Cierre sesión matinal_
+_Actualizado: 2026-07-16 · Perplexity-MCP_

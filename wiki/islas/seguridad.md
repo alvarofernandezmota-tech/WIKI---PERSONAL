@@ -1,73 +1,88 @@
----
-tipo: isla
-author: Alvaro Fernandez Mota
-creado: 2026-07-10
-actualizado: 2026-07-13
-ruta: wiki/islas/seguridad.md
-tags: [isla, seguridad, secops, blue-team, pentest, wazuh, suricata]
-status: auditada
-repo_principal: yggdrasil-secops
----
+# 🛡️ Seguridad
 
-# Isla: Seguridad (SecOps)
-
-> Capa de seguridad defensiva y ofensiva del ecosistema.
-> Blue team activo en Madre. Repo privado: `yggdrasil-secops`.
-
----
-
-## Stack de seguridad
-
-### 🟦 Blue team (defensivo) — en Madre
-
-| Servicio | Docker | Estado | Propósito |
-|---------|--------|--------|----------|
-| `log_guardian_bot` | ✅ | 🔴 Crash loop | Alertas de seguridad vía Telegram |
-| `local_tripwire` | ✅ | 🔴 Crash loop | Detector de cambios en el sistema |
-| `yggdrasil_watchdog` | ✅ | 🟡 Sin verificar | Watchdog general del ecosistema |
-| `network-radar` | ✅ | ⚪ Sin verificar | Monitor de red local |
-| SpiderFoot | ✅ | ⚪ Sin verificar | OSINT automatizado |
-| Wazuh | ❌ | 🔴 Pendiente | SIEM principal |
-| Suricata IDS | ❌ | 🔴 Pendiente | Detección de intrusos en red |
-
-### 🟥 Red team (ofensivo) — en Madre
-
-| Servicio | Docker | Estado | Propósito |
-|---------|--------|--------|----------|
-| Kali VNC | ✅ | ⚪ Sin verificar | Entorno pentest |
-
----
-
-## Repo `yggdrasil-secops`
+> Capa defensiva y ofensiva del ecosistema: SIEM, IDS, OSINT y hardening.
 
 | Campo | Valor |
-|-------|-------|
-| Repo | [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) |
-| Visibilidad | 🔒 Privado (desde 2026-07-09) |
-| Estado | 🟡 Pendiente auditoría Fase 1 |
-| Hallazgo | `docs/hallazgos/SEC-001-ref.md` apunta a ruta inexistente |
-| Colisión | HAL-001 existe en DEW Y en secops con distinto significado |
+|---|---|
+| **Repos principales** | [`yggdrasil-secops`](https://github.com/alvarofernandezmota-tech/yggdrasil-secops) · [`osint-stack`](https://github.com/alvarofernandezmota-tech/osint-stack) |
+| **Máquina** | Madre (SIEM/IDS) · Acer (OSINT) |
+| **Estado operativo** | 🟡 En progreso · vulnerabilidades activas |
+| **Última auditoría** | 2026-07-16 |
 
 ---
 
-## Hallazgos de seguridad abiertos
+## 📌 Qué es
 
-| Hallazgo | Descripción | Issue DEW |
-|---------|-------------|----------|
-| Puerto 21 FTP abierto | FTP en texto plano expuesto en router | [#15](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15) 🔴 |
-| Secretos expuestos en chat | Token Telegram + claves en sesión 2026-07-10 | [#45](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) 🔴 |
-| log_guardian + tripwire caídos | Blue team sin monitorización activa | [#46](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/46) 🔴 |
+Isla que cubre toda la postura de seguridad del ecosistema: seguridad defensiva (Wazuh SIEM, Suricata IDS, nftables, hardening SSH) en `yggdrasil-secops`, y seguridad ofensiva/OSINT en `osint-stack`. Los hallazgos de incidentes se documentan como HAL-XXX en el DEW.
 
 ---
 
-## Issues DEW relacionados
+## 🛠️ Stack de seguridad
 
-- [DEW #15 — Puerto 21 FTP cerrar](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/15)
-- [DEW #19 — Levantar Wazuh + Suricata + Pihole](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/19)
-- [DEW #37 — AUDIT-004 secops Fase 1](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/37)
-- [DEW #45 — HAL-008 secretos expuestos](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45)
-- [DEW #46 — HAL-009 crash loop blue team](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/46)
+| Herramienta | Estado | Notas |
+|---|---|---|
+| nftables firewall | ✅ Activo | Reglas en Madre |
+| Wazuh SIEM | 🟡 En progreso | Fase 3 — agentes pendientes |
+| Suricata IDS | 🟡 En progreso | Fase 4 |
+| Fail2ban | 🔴 Pendiente | No instalado |
+| SSH hardening | 🟡 Parcial | Falta `PasswordAuthentication no` |
+| FTP router | 🔴 EXPUESTO | Puerto 21 — p0 CRÍTICO |
 
 ---
 
-_Actualizado: 2026-07-13 · Perplexity-MCP_
+## 📊 Estado actual
+
+| Área | Estado | Última verificación |
+|---|---|---|
+| Firewall nftables | ✅ | 2026-07-16 |
+| Wazuh agentes | 🟡 Parcial | 2026-07-16 |
+| FTP puerto 21 | 🔴 EXPUESTO | 2026-07-16 |
+| SSH passwords off | 🔴 Pendiente | — |
+
+**Alerta activa p0:**
+- 🔴 **FTP puerto 21** expuesto en router Digi — desactivar en `http://192.168.1.1` — VER [DEW hallazgos FTP](https://github.com/alvarofernandezmota-tech/yggdrasil-dew)
+
+---
+
+## 🗺️ Relaciones con el ecosistema
+
+```
+Seguridad
+  ├── protege → Madre + toda la red
+  ├── monitoriza → Grafana (métricas seguridad)
+  ├── audita → todos los repos (SAST)
+  └── OSINT en → Acer/Thdora
+```
+
+---
+
+## 🔗 DEW — Issues y decisiones
+
+### Historial de incidentes
+
+| HAL | Descripción | Estado |
+|---|---|---|
+| HAL-007 | THDORA caída — `.env` malformado | 🔴 Abierto |
+| HAL-008 | Token Telegram revocado | 🔴 Abierto |
+
+### ADRs relevantes
+
+| ADR | Decisión | Estado |
+|---|---|---|
+| — | SSH ed25519 only, sin contraseñas | ⏳ Parcial |
+| — | Wazuh como SIEM principal | ✅ Vigente |
+| — | Suricata como IDS | ✅ Vigente |
+
+---
+
+## 📝 Decisiones pendientes
+
+- [ ] **P0: Desactivar FTP puerto 21 router Digi** — inmediato
+- [ ] SSH `PasswordAuthentication no` en Madre y Acer
+- [ ] Instalar Fail2ban
+- [ ] Completar agentes Wazuh — Fase 3
+- [ ] Completar Suricata — Fase 4
+
+---
+
+_Actualizado: 2026-07-16 · Perplexity-MCP_
