@@ -2,7 +2,7 @@
 tipo: canon
 author: Alvaro Fernandez Mota
 creado: 2026-07-09
-actualizado: 2026-07-16T16:49:00+02:00
+actualizado: 2026-07-16T19:00:00+02:00
 ruta: wiki/islas/INDEX.md
 tags: [canon, indice, islas, wiki]
 status: vigente
@@ -11,7 +11,7 @@ status: vigente
 # Índice de Islas — Wiki Yggdrasil
 
 > Mapa completo de todo el conocimiento documentado del ecosistema.
-> 23 islas · 20 repos · Auditado: 2026-07-16 · Purga completada
+> **21 islas** · Auditado: 2026-07-16 19:00 CEST · Alineación completa
 
 ---
 
@@ -65,7 +65,7 @@ status: vigente
 | Isla | Archivo | Repo asociado | Estado |
 |------|---------|---------------|--------|
 | Dev Labs (sandbox) | [dev-labs.md](dev-labs.md) | dev-labs | 🟡 Sin auditar |
-| Conocimiento técnico | [conocimiento.md](conocimiento.md) | yggdrasil-wiki | ⚠️ Posible solapamiento con formacion — revisar |
+| Conocimiento técnico | [conocimiento.md](conocimiento.md) | yggdrasil-wiki | ⚠️ Revisar solapamiento con formacion |
 | Formación técnica | [formacion.md](formacion.md) | yggdrasil-formacion | 🟡 Stub — necesita input Alvaro |
 
 ---
@@ -80,17 +80,17 @@ status: vigente
 
 ---
 
-## Números clave — 2026-07-16
+## 📊 Números reales — 2026-07-16 19:00 CEST
 
 | Métrica | Valor |
 |---------|-------|
-| Islas totales | 23 |
-| Islas completas (✅) | 12 |
-| Islas parciales (🟡) | 8 |
-| Islas stub (⚪) | 2 |
+| **Islas totales (en disco)** | **21** |
+| Islas completas (✅) | 9 |
+| Islas parciales/sin auditar (🟡) | 10 |
+| Islas con problema (🔴) | 1 |
 | Solapamientos pendientes | 1 (conocimiento ↔ formacion) |
-| Repos sin auditar | 6 |
+| Refs externas (→) | 2 |
 
 ---
 
-_Actualizado: 2026-07-16 16:49 CEST · Purga wiki — 3 deprecados borrados, repos alineados · Perplexity-MCP_
+_Actualizado: 2026-07-16 19:00 CEST · Alineación completa — 21 islas reales verificadas · Perplexity-MCP_

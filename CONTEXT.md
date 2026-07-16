@@ -1,88 +1,62 @@
 ---
 tipo: context
 author: Alvaro Fernandez Mota
-creado: 2026-07-16
 actualizado: 2026-07-16
 ruta: CONTEXT.md
-tags: [context, ecosistema, wiki]
-status: vigente
-version: 1
+tags: [context, ecosistema, canon]
 ---
 
-# CONTEXT.md — WIKI---PERSONAL
+# CONTEXT.md — yggdrasil-wiki
 
-> Contexto del ecosistema Yggdrasil para agentes IA.  
-> Leer junto con `AGENT.md` al inicio de cada sesión.
+> Contexto del ecosistema para agentes IA. Complementa AGENT.md con el mapa completo de repos.
 
 ---
 
-## El ecosistema Yggdrasil
+## 🌳 El ecosistema Yggdrasil
 
-Yggdrasil es el sistema operativo personal de Álvaro Fernández Mota.  
-No es solo código — es la infraestructura completa de vida técnica y personal.
+Ecosistema personal de Álvaro Fernández Mota. Tres capas:
 
-### Repos canónicos (nombres exactos — no usar aliases nunca)
-
-| Repo | Propósito | Tipo |
-|---|---|---|
-| `yggdrasil-dew` | Canon técnico, ADRs, decisiones, issues, protocolos | Canon |
-| `WIKI---PERSONAL` | Conocimiento estático, mapas, islas del ecosistema | Wiki |
-| `yggdrasil-tracking` | Vida personal, diarios, metas, hábitos | Personal |
-| `yggdrasil-formacion` | Formación técnica, apuntes, recursos | Formación |
-| `madre-config` | IaC de Madre, docker-compose, scripts | Config |
-| `THDORA-PERSONAL` | Bot Telegram + agente IA personal | Operativo |
-| `yggdrasil-secops` | Seguridad, SecOps, blue team | Operativo |
-| `local-brain` | RAG local, Qdrant, embeddings | IA |
-| `acer-config` | Dotfiles Arch/Hyprland del laptop secundario | Config |
-| `dev-labs` | Sandbox, experimentos, prototipos | Labs |
-| `yggdrasil-scripts` | Scripts bash, GitHub Actions, CI | Scripts |
-
-### Hardware del ecosistema
-
-| Nodo | Nombre | Rol |
-|---|---|---|
-| Servidor principal | Madre | Docker, servicios, RAG, n8n |
-| Laptop principal | Theodora | Desarrollo, NixOS |
-| Laptop secundario | Acer | Secundario, Arch/Hyprland |
-| Móvil | Thea | iPhone — apps, Tailscale |
+| Capa | Repo | Rol |
+|------|------|-----|
+| **Raíz** (DEW) | `yggdrasil-dew` | Canon, protocolos, normas, estado del sistema |
+| **Wiki** | `yggdrasil-wiki` | Conocimiento documentado, islas temáticas |
+| **Tracking** | `yggdrasil-tracking` | Seguimiento de vida personal, hábitos, objetivos |
 
 ---
 
-## Este repo en el ecosistema
+## 🏝️ Islas activas (21 en disco, 2026-07-16)
 
-**Repo:** `WIKI---PERSONAL`  
-**Propósito:** Mapa estático del ecosistema — islas, convenciones, conocimiento  
-**Posición en el Tridente:** WIKI (vértice de conocimiento y mapa)
-
-### Dependencias directas
-
-| Repo | Tipo de dependencia |
-|---|---|
-| `yggdrasil-dew` | Canon: todos los protocolos viven en DEW |
-| Todos los repos | Cada repo tiene isla en `wiki/islas/` |
+| Dominio | Islas |
+|---------|-------|
+| Ecosistema | ecosistema, filosofia, mapa |
+| Infra/HW | madre, infra, scripts, acer, thea |
+| IA/Auto | thdora, ollama-stack, ia-local, investigacion-ia, orquestador, mcp |
+| Seguridad | seguridad, osint |
+| Dev | dev-labs, conocimiento, formacion |
+| Vida | tracking, vida, impresion3d |
 
 ---
 
-## Principios del ecosistema
+## 🤖 Repos principales del ecosistema
 
-1. **Soberanía digital** — todo en repos propios, nada en SaaS sin alternativa
-2. **Transparencia interna** — toda decisión tiene ADR, toda tarea tiene issue
-3. **Un solo punto de verdad** — DEW es el canon, wiki es el mapa
-4. **Sistemas que perduran** — si no está documentado, no existe
-5. **Automatizar lo repetible** — lo manual se ejecuta una vez y se automatiza
-6. **Deuda visible** — toda deuda técnica tiene issue abierto en DEW
-
----
-
-## Convenciones de nombres
-
-| Tipo | Formato | Ejemplo |
-|---|---|---|
-| Archivos isla | `kebab-case.md` | `ia-local.md`, `dev-labs.md` |
-| Archivos canon | `MAYUSCULAS.md` | `AGENT.md`, `INDEX.md` |
-| Commits | `tipo(scope): descripción — closes #N` | `feat(wiki): isla orquestador` |
+| Repo | Propósito | AGENT.md |
+|------|-----------|----------|
+| `yggdrasil-dew` | Canon y protocolos | ✅ |
+| `yggdrasil-wiki` | Esta wiki | ✅ |
+| `yggdrasil-tracking` | Vida personal | ⚠️ pendiente |
+| `THDORA-PERSONAL` | Bot IA Álvaro | ⚠️ pendiente |
+| `madre-config` | Servidor Madre | — |
+| `acer-config` | Laptop Arch | — |
 
 ---
 
-_Instanciado desde: `yggdrasil-dew/docs/canon/CONTEXT-template.md`_  
-_Última actualización: 2026-07-16_
+## 📍 Estado actual — 2026-07-16
+
+- Ecosistema **estable y auditado**
+- Protocolos de sesión operativos en DEW
+- Plantillas canónicas disponibles en `wiki/plantillas/`
+- Pendiente: instanciar AGENT.md en `yggdrasil-tracking` y `THDORA-PERSONAL`
+
+---
+
+_Instanciado desde `CONTEXT-template.md` · 2026-07-16 · Perplexity MCP_

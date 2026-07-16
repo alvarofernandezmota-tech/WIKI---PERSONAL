@@ -1,95 +1,72 @@
 ---
-tipo: agent
+tipo: agent-context
 author: Alvaro Fernandez Mota
-creado: 2026-07-16
 actualizado: 2026-07-16
 ruta: AGENT.md
-tags: [agent, protocolo, wiki]
-status: vigente
-version: 1
+tags: [agent, contexto, canon]
 ---
 
-# AGENT.md — WIKI---PERSONAL
+# AGENT.md — yggdrasil-wiki
 
-> Instrucciones para agentes IA que trabajen en este repo.  
-> Leer este archivo **antes de ejecutar cualquier acción**.
-
----
-
-## Identidad del repo
-
-| Campo | Valor |
-|---|---|
-| **Nombre** | `WIKI---PERSONAL` |
-| **Propósito** | Conocimiento estático del ecosistema: mapas, islas, convenciones |
-| **Tipo** | Wiki — mapa del ecosistema, no decisión ni tracking |
-| **Isla wiki** | Este repo ES la wiki |
-| **ADR principal** | ADR-003 (fundación de la wiki) |
+> Fichero de arranque para cualquier agente IA que opere en este repo.  
+> Leer COMPLETO antes de ejecutar cualquier acción.
 
 ---
 
-## Protocolo de inicio (obligatorio)
+## 🧭 Identidad del repo
 
-Antes de cualquier acción, leer en este orden:
-
-1. `yggdrasil-dew/docs/sesiones/PROXIMA-SESION.md` — estado y bloques pendientes
-2. `CONTEXT.md` — contexto del ecosistema completo
-3. `wiki/islas/INDEX.md` — estado actual de todas las islas
-4. Issues abiertos en DEW con label relevante para la sesión
+- **Nombre canónico:** `yggdrasil-wiki`
+- **Propósito:** Wiki central del ecosistema Yggdrasil. Contiene el conocimiento documentado de todos los dominios de vida y tecnología de Álvaro Fernández Mota.
+- **Tipo:** Wiki de conocimiento — NO es un repo de código ejecutable.
+- **Dueño:** Álvaro Fernández Mota (`alvarofernandezmota-tech`)
 
 ---
 
-## Reglas de este repo
-
-### ✅ Hacer siempre
-- Toda isla nueva sigue `yggdrasil-dew/docs/canon/NORMA-ENTRADA-NUEVA-ISLA.md`
-- Toda isla nueva se añade a `wiki/islas/INDEX.md` y `wiki/mapa-islas.md`
-- Nombres de repos siempre los canónicos exactos (ver `CONTEXT.md`)
-- Frontmatter completo en todos los archivos `.md`
-- Commit message: `tipo(scope): descripción — closes #N`
-
-### ❌ Nunca hacer
-- Usar nombres de repos aliases o viejos (ej: `yggdrasil-wiki`, `vidapersonal`)
-- Crear archivos sin frontmatter
-- Borrar islas sin issue aprobado y sin comprobar que no hay referencias
-- Editar `INDEX.md` sin actualizar `mapa-islas.md` en el mismo commit
-
----
-
-## Estructura del repo
+## 🗺️ Estructura
 
 ```
-WIKI---PERSONAL/
-└── wiki/
-    ├── 00-mapa.md         ← punto de entrada del ecosistema
-    ├── mapa-islas.md      ← vista de todas las islas
-    ├── CONVENCIONES.md    ← normas de escritura
-    ├── MODELO-MENTAL.md   ← filosofía del ecosistema
-    └── islas/
-        ├── INDEX.md           ← índice canónico de todas las islas
-        └── [nombre].md        ← ficha de cada isla
+yggdrasil-wiki/
+├── AGENT.md              ← estás aquí
+├── CONTEXT.md            ← contexto del ecosistema completo
+├── wiki/
+│   ├── 00-mapa.md        ← mapa general del ecosistema
+│   ├── mapa-islas.md     ← mapa visual de islas
+│   ├── plantillas/       ← plantillas canónicas instanciables
+│   │   ├── README.md
+│   │   ├── AGENT-template.md
+│   │   └── CONTEXT-template.md
+│   └── islas/            ← 21 islas de conocimiento
+│       └── INDEX.md      ← índice completo con estados
 ```
 
 ---
 
-## Conexiones con el ecosistema
+## 📋 Normas de operación
 
-| Repo relacionado | Relación |
-|---|---|
-| `yggdrasil-dew` | Canon: decisiones, protocolos, issues — siempre |
-| `yggdrasil-tracking` | Isla `tracking.md` referencia este repo |
-| Todos los repos | Cada repo tiene isla en `wiki/islas/` |
+### Antes de crear cualquier archivo
+1. Consultar `wiki/islas/INDEX.md` — verificar que no existe ya
+2. Usar la plantilla en `wiki/plantillas/` si aplica
+3. Añadir la isla al `INDEX.md` y `mapa-islas.md` en el **mismo commit**
+
+### Antes de modificar cualquier isla
+1. Leer el archivo completo antes de editar
+2. Respetar el frontmatter YAML existente
+3. Actualizar `actualizado:` con fecha ISO
+
+### Nunca
+- Borrar islas sin deprecar primero (añadir `status: deprecado` + redirect)
+- Crear archivos fuera de `wiki/islas/` sin consultar
+- Modificar `INDEX.md` sin actualizar `mapa-islas.md`
 
 ---
 
-## Protocolo de cierre (obligatorio)
+## 🔗 Referencias clave
 
-1. `wiki/islas/INDEX.md` actualizado si se tocó alguna isla
-2. `wiki/mapa-islas.md` sincronizado con INDEX.md
-3. `git push` limpio
-4. Seguir `yggdrasil-dew/docs/canon/PROTOCOLO-CIERRE-SESION.md`
+- Normas del ecosistema: [NORMAS.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/NORMAS.md)
+- Protocolo de inicio de sesión: [PROTOCOLO-INICIO-SESION.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/docs/canon/PROTOCOLO-INICIO-SESION.md)
+- Estado del sistema: [ESTADO-SISTEMA.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/ESTADO-SISTEMA.md)
+- Índice de islas: [wiki/islas/INDEX.md](wiki/islas/INDEX.md)
 
 ---
 
-_Instanciado desde: `yggdrasil-dew/docs/canon/AGENT-template.md`_  
-_Última actualización: 2026-07-16_
+_Instanciado desde `AGENT-template.md` · 2026-07-16 · Perplexity MCP_
