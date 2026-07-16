@@ -1,128 +1,113 @@
 ---
 tipo: isla
 author: Alvaro Fernandez Mota
-creado: 2026-07-13
+creado: 2026-07-16
 actualizado: 2026-07-16
 ruta: wiki/islas/orquestador.md
-tags: [isla, orquestador, n8n, automatizacion, agentes, mcp, protocolos]
-status: vigente
+tags: [orquestador, agentes, ia, ecosistema, protocolos, mcp]
+status: activa
 ---
 
-# 🎄 Isla Orquestador
+# Isla: Orquestador
 
-> El tejido conectivo del ecosistema. Orquestador no ejecuta ni almacena — conecta, dispara y coordina.
-> Cualquier flujo automático que cruza dos islas pasa por aquí.
-> Los protocolos de sesión que gobiernan cómo los agentes trabajan en el ecosistema viven aquí.
-
----
-
-## Rol en el ecosistema
-
-Orquestador es la isla que hace que el ecosistema se comporte como un sistema, no como una colección de herramientas. Gestiona:
-
-- **Protocolos de sesión** — cómo arrancan y cierran los agentes en cada repo
-- **Automatizaciones** — flujos n8n que conectan servicios
-- **Agentes IA** — THDORA, Perplexity, Claude actuando sobre el sistema
-- **MCP (Model Context Protocol)** — protocolo de contexto para agentes
-- **Webhooks y triggers** — eventos que disparan acciones cross-isla
+> El orquestador es el cerebro de arranque del ecosistema Yggdrasil.
+> Coordina agentes, carga contexto por repo, ejecuta protocolos de sesion y conecta todos los repos del ecosistema bajo una unica capa de inteligencia.
 
 ---
 
-## Estructura del ecosistema — 4 repos principales
+## Que es el orquestador
 
-| Repo | Rol | `AGENT.md` | `CONTEXT.md` | Protocolos |
-|---|---|---|---|---|
-| [yggdrasil-wiki](https://github.com/alvarofernandezmota-tech/yggdrasil-wiki) | Conocimiento / documentación | ✅ | ✅ | `protocolo/por-repo/yggdrasil-wiki.md` |
-| [yggdrasil-dew](https://github.com/alvarofernandezmota-tech/yggdrasil-dew) | Trabajo activo / issues | ✅ | ✅ | `protocolo/` completo |
-| [THDORA-PERSONAL](https://github.com/alvarofernandezmota-tech/THDORA-PERSONAL) | Bot Telegram + API personal | ✅ | ✅ | `docs/sesiones/` |
-| madre-config | Infra / servidores / Docker | ✅ | ✅ | `protocolo/por-repo/madre-config.md` |
+El orquestador es un sistema (repo propio: `yggdrasil-orquestador`) que:
+
+1. Lee el `AGENT.md` del repo objetivo para conocer su identidad y reglas
+2. Lee el `CONTEXT.md` del repo objetivo para conocer su estado actual
+3. Carga el `PROTOCOLO-INICIO-SESION` desde `yggdrasil-dew`
+4. Ejecuta la sesion de trabajo sobre ese repo
+5. Al finalizar, ejecuta `PROTOCOLO-CIERRE-SESION` y actualiza `CONTEXT.md`
+
+**Principio clave:** ningun agente arranca sin haber leido su `AGENT.md` + `CONTEXT.md`. El orquestador lo garantiza.
 
 ---
 
-## Protocolo de inicio de sesión (universal)
-
-Cualquier agente que arranque en el ecosistema:
+## Arquitectura
 
 ```
-1. Identificar repo objetivo
-2. Leer AGENT.md del repo
-3. Leer CONTEXT.md del repo
-4. Revisar issues abiertos en yggdrasil-dew
-5. Verificar bloqueantes (HAL) antes de proponer trabajo
-6. Declarar objetivo de sesión
+yggdrasil-orquestador/
+  AGENT.md                  <- identidad del orquestador mismo
+  CONTEXT.md                <- estado del orquestador
+  README.md
+  protocols/
+    boot.md                 <- protocolo de arranque general
+    session.md              <- protocolo de sesion por repo
+    shutdown.md             <- protocolo de cierre y commit
+  agents/
+    dew.md                  <- configuracion agente DEW
+    wiki.md                 <- configuracion agente WIKI
+    tracking.md             <- configuracion agente TRACKING
+    formacion.md            <- configuracion agente FORMACION
+    thdora.md               <- configuracion agente THDORA
+    madre.md                <- configuracion agente MADRE
 ```
-
-→ Protocolo completo: [yggdrasil-dew/protocolo/inicio-sesion.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/protocolo/inicio-sesion.md)
 
 ---
 
-## Protocolo de cierre de sesión (universal)
-
-Cualquier agente al terminar:
+## Flujo de una sesion orquestada
 
 ```
-1. Actualizar CONTEXT.md del repo
-2. Crear issues en yggdrasil-dew para trabajo pendiente
-3. Crear log en docs/sesiones/YYYY-MM-DD.md
-4. Actualizar CHANGELOG.md si hubo cambios de código
-5. Cerrar issues resueltos con comentario
+[INICIO]
+  1. orquestador lee AGENT.md del repo objetivo
+  2. orquestador lee CONTEXT.md del repo objetivo
+  3. orquestador carga PROTOCOLO-INICIO-SESION desde yggdrasil-dew
+  4. agente arranca con contexto completo
+  5. sesion de trabajo
+[CIERRE]
+  6. orquestador ejecuta PROTOCOLO-CIERRE-SESION
+  7. orquestador actualiza CONTEXT.md del repo
+  8. orquestador hace commit canon con fecha + version
+  9. orquestador actualiza MASTER-PENDIENTES en yggdrasil-dew
 ```
-
-→ Protocolo completo: [yggdrasil-dew/protocolo/cierre-sesion.md](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/blob/main/protocolo/cierre-sesion.md)
 
 ---
 
-## Servicios en Madre
+## Repos del ecosistema gestionados
 
-| Servicio | Puerto | Rol | Estado |
+| Repo | AGENT.md | CONTEXT.md | Estado |
 |---|---|---|---|
-| n8n | 5678 | Motor de flujos | 🟡 Running, sin auditar |
-| thdora-bot | — | Agente Telegram | 🔴 Caído (HAL-007) |
-| thdora-api | — | API del bot | 🔴 Caído (HAL-007) |
-| Ollama | 11434 | Modelos locales | 🟢 Running |
-| Qdrant | 6333 | Vector DB | 🟢 Running |
+| `yggdrasil-dew` | yes | yes | Operativo |
+| `yggdrasil-wiki` | yes | yes | Operativo |
+| `yggdrasil-tracking` | yes | yes | Operativo |
+| `THDORA-PERSONAL` | yes | yes | Operativo |
+| `yggdrasil-formacion` | yes | yes | Operativo |
+| `madre-config` | pendiente | pendiente | F21 |
+| `yggdrasil-secops` | pendiente | pendiente | F21 |
+| `ollama-stack` | pendiente | pendiente | F21 |
+| `yggdrasil-orquestador` | pendiente | pendiente | F22 |
 
 ---
 
-## Automatizaciones
+## Reglas canon del orquestador
 
-> Pendiente documentar tras AUDIT-003 ([DEW #36](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/36))
-
-- [ ] Flujos n8n activos — listar y documentar
-- [ ] Webhooks de THDORA — qué eventos dispara
-- [ ] Integraciones Telegram activas
-
----
-
-## Dependencias
-
-| Depende de | Por qué |
-|---|---|
-| 🏗️ Infra (Madre) | n8n y thdora corren en Madre |
-| 🧬 IA Local | Modelos locales que THDORA puede invocar |
-| 🛡️ Seguridad | Token Telegram gestionado por Vaultwarden |
+- **Un agente, un repo.** Cada repo tiene su propio agente con su propio `AGENT.md`.
+- **El contexto se actualiza en cada cierre.** `CONTEXT.md` refleja el estado real post-sesion.
+- **El DEW es la fuente de verdad.** Todos los protocolos y plantillas viven en `yggdrasil-dew/docs/canon/`.
+- **Sin AGENT.md no hay sesion.** Si un repo no tiene `AGENT.md`, el orquestador lo crea antes de arrancar.
+- **El orquestador no decide.** Coordina y ejecuta. Las decisiones son del humano (Alvaro).
 
 ---
 
-## Issues activos
+## Issues relacionadas
 
-| Issue | Título | Prioridad |
-|---|---|---|
-| [DEW #44](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/44) | HAL-007 — .env THDORA malformado | 🚨 P0 |
-| [DEW #45](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/45) | HAL-008 — Rotar token Telegram | 🚨 P0 |
-| [DEW #36](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/36) | AUDIT-003 — thdora-personal completo | 🟡 P1 |
-| [DEW #42](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues/42) | AUDIT-005 — MCP/agentes | 🟡 P1 |
+- [F22 — Crear repo yggdrasil-orquestador](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
+- [F21 — AGENT.md en madre-config, secops, ollama-stack](https://github.com/alvarofernandezmota-tech/yggdrasil-dew/issues)
 
 ---
 
-## Próximos pasos
+## ADRs relacionados
 
-1. **Cerrar HAL-007 (#44)** → corregir `.env` → desbloquea thdora-bot + thdora-api
-2. **Cerrar HAL-008 (#45)** → rotar token Telegram en Vaultwarden
-3. **Ejecutar AUDIT-003 (#36)** → auditoría completa THDORA-PERSONAL
-4. **Ejecutar AUDIT-005 (#42)** → consolidar documentación MCP/agentes
-5. **Documentar flujos n8n** → actualizar sección automatizaciones de esta isla
+- ADR-001 — Estructura canon del ecosistema
+- ADR-007 — Separacion de responsabilidades por repo
+- ADR-012 — AGENT.md como contrato de agente
 
 ---
 
-_Actualizado: 2026-07-16 · Perplexity-MCP_
+_Actualizado: 2026-07-16 — F20 activa — Perplexity MCP_
