@@ -2,17 +2,20 @@
 tipo: isla
 author: Alvaro Fernandez Mota
 creado: 2026-07-10
-actualizado: 2026-07-13T10:21:00+02:00
+actualizado: 2026-07-16
 ruta: wiki/islas/formacion.md
 tags: [isla, formacion, cursos, apuntes, laboratorios, tech]
 status: vigente
-repos: [formacion-tech, VIDAPERSONAL]
+repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-formacion
 ---
 
 # Isla: Formación Técnica
 
 > Todo lo que aprendes y cómo lo aprendes.
-> Técnico: `formacion-tech`. Personal: `VIDAPERSONAL/02_formacion/`.
+> Repo principal: [yggdrasil-formacion](https://github.com/alvarofernandezmota-tech/yggdrasil-formacion)
+
+> ⚠️ Nota histórica: antes del 2026-07-13 el repo de formación se llamaba `formacion-tech` y luego
+> `yggdrasil-formacion-` (con guión final). El nombre canónico vigente es `yggdrasil-formacion`.
 
 ---
 
@@ -20,9 +23,8 @@ repos: [formacion-tech, VIDAPERSONAL]
 
 | Tipo | Repo | Ruta |
 |------|------|------|
-| Cursos técnicos, labs, apuntes | [formacion-tech](https://github.com/alvarofernandezmota-tech/formacion-tech) | `cursos/`, `labs/`, `apuntes/` |
-| Libros, formación personal | [VIDAPERSONAL](https://github.com/alvarofernandezmota-tech/VIDAPERSONAL) | `02_formacion/` |
-| Tracking aprendizaje | VIDAPERSONAL | `01_traking_diario/` |
+| Cursos técnicos, labs, apuntes | [yggdrasil-formacion](https://github.com/alvarofernandezmota-tech/yggdrasil-formacion) | `cursos/`, `labs/`, `apuntes/` |
+| Formación personal / libros | [yggdrasil-tracking](https://github.com/alvarofernandezmota-tech/yggdrasil-tracking) | `04_curiosidad/`, `05_contenido/` |
 
 ---
 
@@ -33,10 +35,10 @@ repos: [formacion-tech, VIDAPERSONAL]
 
 Flujo:
 ```
-Formacion-tech (aprendo)
+yggdrasil-formacion (aprendo)
     │
     ▼
-Dev-labs / investigacion-ia (experimento)
+dev-labs / investigacion-ia (experimento)
     │
     ▼
 THDORA / yggdrasil-scripts (produzco)
@@ -44,12 +46,11 @@ THDORA / yggdrasil-scripts (produzco)
 
 ---
 
-## Estado — 2026-07-13
+## Estado — 2026-07-16
 
 | Repo | Estado | Pendiente |
 |------|--------|----------|
-| formacion-tech | 🟡 Sin auditar | Verificar estructura interna |
-| VIDAPERSONAL/02_formacion/ | 🟡 Sin auditar | Comprobar si existe la carpeta |
+| yggdrasil-formacion | ⚪ Pendiente auditoría | Verificar estructura interna post-migración |
 
 ---
 
@@ -60,8 +61,8 @@ THDORA / yggdrasil-scripts (produzco)
 | [dev-labs.md](dev-labs.md) | Labs son el destino natural de lo aprendido |
 | [investigacion-ia.md](investigacion-ia.md) | PoCs de IA nacen de la formación en LLMs |
 | [thdora.md](thdora.md) | Mejoras a THDORA vienen de lo aprendido |
-| [vida.md](vida.md) | Libros y formación personal documentados en VIDAPERSONAL |
+| [tracking.md](tracking.md) | Libros y formación personal documentados en tracking |
 
 ---
 
-_Actualizado: 2026-07-13 10:21 CEST · Perplexity-MCP · Cierre sesión final_
+_Actualizado: 2026-07-16 · fix #65 · eliminadas refs a formacion-tech y VIDAPERSONAL · Perplexity MCP_

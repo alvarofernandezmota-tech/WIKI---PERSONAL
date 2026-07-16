@@ -7,7 +7,7 @@ repo_principal: https://github.com/alvarofernandezmota-tech/yggdrasil-tracking
 estado: estable
 author: Alvaro Fernandez Mota
 creado: 2026-07-13
-actualizado: 2026-07-13
+actualizado: 2026-07-16
 ruta: wiki/islas/tracking.md
 tags: [isla, tracking, vida, diario, metas, filosofia]
 status: vigente
@@ -37,7 +37,7 @@ status: vigente
 
 **Regla de oro:**
 - Vida personal, diario, metas, filosofía → `yggdrasil-tracking`
-- Formación técnica, cursos, apuntes → `yggdrasil-formacion-`
+- Formación técnica, cursos, apuntes → `yggdrasil-formacion`
 - Nunca mezclar los dos en el mismo repo
 
 ---
@@ -78,4 +78,4 @@ status: vigente
 
 ---
 
-_Creado: 2026-07-13 · Migración VIDAPERSONAL · Perplexity MCP_
+_Actualizado: 2026-07-16 · fix #65 · yggdrasil-formacion sin guión · Perplexity MCP_
