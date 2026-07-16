@@ -1,171 +1,95 @@
-# AGENT.md — Contexto para agentes IA
+---
+tipo: agent
+author: Alvaro Fernandez Mota
+creado: 2026-07-16
+actualizado: 2026-07-16
+ruta: AGENT.md
+tags: [agent, protocolo, wiki]
+status: vigente
+version: 1
+---
 
-> **Lee este archivo al inicio de CADA sesión.**
-> Contiene todo lo que necesitas para trabajar en este ecosistema sin preguntar.
-> Si algo cambió estructuralmente, está aquí reflejado.
+# AGENT.md — WIKI---PERSONAL
+
+> Instrucciones para agentes IA que trabajen en este repo.  
+> Leer este archivo **antes de ejecutar cualquier acción**.
 
 ---
 
-## 👤 Usuario
+## Identidad del repo
 
-- **Nombre:** Álvaro Fernández Mota
-- **Perfil:** Ingeniero de sistemas autodidacta. Stack: Python, Docker, Linux, IA local, OSINT.
-- **Filosofía:** Producción primero, perfección después. El ritmo importa más que el sprint. Ver `wiki/islas/filosofia.md`.
-- **Ubicación habitual:** Casa (Madre + Thdora) / móvil desde iPhone 11 cuando está fuera.
-
----
-
-## 🖥️ Ecosistema de máquinas
-
-| Máquina | Alias | OS | IP Tailscale | Rol | MCP disponible |
-|---|---|---|---|---|---|
-| Ordenador Madre | `Madre` | Arch Linux (Omarchy) | `100.91.112.32` | Servidor 24/7 · Docker · Batcueva | ❌ directo |
-| Portátil Acer | `Thdora` / `varopc` | Arch Linux + Hyprland | `100.86.119.102` | Terminal de trabajo · Dev · OSINT | ⏳ pendiente Cursor |
-| iPhone 11 | `móvil` | iOS | Tailscale activo | Trabajo remoto · Perplexity + MCP | ✅ vía Perplexity |
-| HP TouchSmart | `HP` | Linux Mint (pendiente) | — | Dashboard / visualización | ❌ |
+| Campo | Valor |
+|---|---|
+| **Nombre** | `WIKI---PERSONAL` |
+| **Propósito** | Conocimiento estático del ecosistema: mapas, islas, convenciones |
+| **Tipo** | Wiki — mapa del ecosistema, no decisión ni tracking |
+| **Isla wiki** | Este repo ES la wiki |
+| **ADR principal** | ADR-003 (fundación de la wiki) |
 
 ---
 
-## 🗂️ Repos activos del ecosistema
+## Protocolo de inicio (obligatorio)
 
-| Repo | Visibilidad | Para qué |
-|---|---|---|
-| `yggdrasil-wiki` | Privado | **Este repo** — wiki central, mapa conceptual, segundo cerebro |
-| `yggdrasil-dew` | Privado | Segundo cerebro técnico · infraestructura · docs · diarios |
-| `THDORA-PERSONAL` | Privado | Bot TOKI · FastAPI · Docker |
-| `thea-ia` | Privado | Core Python IA (decisión arquitectural pendiente — ver thea.md) |
-| `madre-config` | Privado | Configuración Madre (Arch Linux, Docker, servicios) |
-| `ollama-stack` | Privado | Ollama + modelos locales |
-| `local-brain` | Privado | RAG + Qdrant + memoria |
-| `yggdrasil-secops` | Privado | Seguridad defensiva (hallazgos HAL-XXX) |
-| `osint-stack` | Privado | Seguridad ofensiva / OSINT / pentest |
-| `yggdrasil-formacion` | Privado | Aprendizaje, cursos, Python |
-| `yggdrasil-tracking` | Privado | Vida personal, diarios, finanzas |
-| `investigacion-ia` | Privado | PoCs de IA |
-| `acer-config` | Privado | Configuración Acer (Arch Linux + Hyprland) |
-| `dev-labs` | Privado | Sandbox antes de crear repo propio |
-| `alvarofernandezmota-tech` | Público | Profile README de GitHub |
+Antes de cualquier acción, leer en este orden:
+
+1. `yggdrasil-dew/docs/sesiones/PROXIMA-SESION.md` — estado y bloques pendientes
+2. `CONTEXT.md` — contexto del ecosistema completo
+3. `wiki/islas/INDEX.md` — estado actual de todas las islas
+4. Issues abiertos en DEW con label relevante para la sesión
 
 ---
 
-## 📋 Reglas del sistema — OBLIGATORIAS
+## Reglas de este repo
 
-1. **Leer antes de actuar** — `AGENT.md` → `CONTEXT.md` → `wiki/CONVENCIONES.md`
-2. **Todo entra por `inbox/`** — nunca sobrescribir ficheros existentes directamente
-3. **Verificar SHA** antes de actualizar cualquier fichero existente
-4. **CONTEXT.md** = estado actual — actualizar al inicio Y al final de cada sesión
-5. **HOME.md** = índice de navegación — actualizar cuando se añade sección nueva
-6. **Diario de sesión** = obligatorio al cierre en `docs/diarios/YYYY-MM-DD.md`
-7. **Convenciones** = `kebab-case` en `docs/` y `wiki/`, `MAYÚSCULAS` en raíz
-8. **No crear stubs vacíos** — si no hay contenido real, no crear el fichero
-9. **Purga y alineación** = norma de ecosistema — AGENT.md + CONTEXT.md se sincronizan siempre al inicio y cierre de sesión
+### ✅ Hacer siempre
+- Toda isla nueva sigue `yggdrasil-dew/docs/canon/NORMA-ENTRADA-NUEVA-ISLA.md`
+- Toda isla nueva se añade a `wiki/islas/INDEX.md` y `wiki/mapa-islas.md`
+- Nombres de repos siempre los canónicos exactos (ver `CONTEXT.md`)
+- Frontmatter completo en todos los archivos `.md`
+- Commit message: `tipo(scope): descripción — closes #N`
 
----
-
-## 🤖 Agentes del ecosistema
-
-| Agente | Fortaleza | MCP GitHub | Cuándo usarlo |
-|---|---|---|---|
-| **Perplexity** | Búsqueda web + gestión repo + docs | ✅ Space configurado | Principal — todo lo que se pueda |
-| **Grok** | Datos frescos · razonamiento lateral | ❌ | Investigación / noticias |
-| **Gemini** | Código largo · arquitectura · contexto grande | ❌ | Ficheros grandes · refactors |
-| **Claude** | Razonamiento profundo · código calidad | ⏳ posible vía Cursor | Arquitectura compleja |
-| **OpenCode** | Terminal · local | ✅ local | Cuando esté en Thdora |
-| **TOKI** | Control móvil desde Telegram | ⏳ en desarrollo | Bot propio |
+### ❌ Nunca hacer
+- Usar nombres de repos aliases o viejos (ej: `yggdrasil-wiki`, `vidapersonal`)
+- Crear archivos sin frontmatter
+- Borrar islas sin issue aprobado y sin comprobar que no hay referencias
+- Editar `INDEX.md` sin actualizar `mapa-islas.md` en el mismo commit
 
 ---
 
-## 🛠️ Stack técnico activo
+## Estructura del repo
 
 ```
-Infraestructura:
-  Madre (24/7):
-    - Docker: Batcueva (20+ servicios)
-    - Wazuh SIEM + Suricata IDS       [fase 3-4, en progreso]
-    - Grafana + Prometheus + Alertmgr  [activo]
-    - Ollama (Llama3, Mistral, Phi3)   [activo · GTX 1060 6GB]
-    - Open WebUI                       [activo]
-    - Nextcloud + Vaultwarden          [activo]
-    - Nginx reverse proxy + Let's Enc  [activo]
-    - Pi-hole + Unbound DoT            [activo]
-    - hostapd WiFi AP (r8852be)        [activo]
-    - nftables firewall                [activo]
-
-  Red:
-    - Tailscale (WireGuard mesh)       [activo]
-    - VLANs / macvlan para OSINT       [en progreso]
-
-Desarrollo:
-  - Python 3 + FastAPI + LangGraph
-  - Docker Compose (todo containerizado)
-  - Cursor + MCP GitHub               [pendiente en Thdora/Acer]
-
-Seguridad:
-  - SSH: ed25519 only, no passwords    [pendiente hardening completo]
-  - Fail2ban                           [pendiente]
-  - nftables                           [activo]
-  - FTP puerto 21 router Digi          [🔴 EXPUESTO — remediar]
-  - Wazuh agentes                      [en progreso]
+WIKI---PERSONAL/
+└── wiki/
+    ├── 00-mapa.md         ← punto de entrada del ecosistema
+    ├── mapa-islas.md      ← vista de todas las islas
+    ├── CONVENCIONES.md    ← normas de escritura
+    ├── MODELO-MENTAL.md   ← filosofía del ecosistema
+    └── islas/
+        ├── INDEX.md           ← índice canónico de todas las islas
+        └── [nombre].md        ← ficha de cada isla
 ```
 
 ---
 
-## 🗺️ Mapa de islas (referencia rápida)
+## Conexiones con el ecosistema
 
-| Isla | Repo | Estado |
-|---|---|---|
-| 🗺️ Wiki/Conocimiento | yggdrasil-wiki (este repo) | ✅ Activo · purga completada 2026-07-16 |
-| 🖥️ Infra/Madre | madre-config | ✅ Activo |
-| 🤖 IA Local (RAG) | local-brain | ✅ Activo |
-| 🧠 Ollama Stack | ollama-stack | ✅ Activo |
-| 🦾 THDORA | THDORA-PERSONAL | 🔴 Caído (HAL-007 + HAL-008) |
-| 🧬 Thea IA (core) | thea-ia | 🟡 Decisión arquitectural pendiente |
-| 🛡️ Seguridad | yggdrasil-secops + osint-stack | 🟡 Iniciado |
-| 📚 Formación | yggdrasil-formacion + investigacion-ia | ✅ Activo |
-| 📍 Tracking personal | yggdrasil-tracking | ✅ Activo desde 2026-07-13 |
-| 🧪 Labs | dev-labs | 🟡 Sandbox |
-
-Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`](wiki/mapa-islas.md) · [`wiki/islas/INDEX.md`](wiki/islas/INDEX.md)
+| Repo relacionado | Relación |
+|---|---|
+| `yggdrasil-dew` | Canon: decisiones, protocolos, issues — siempre |
+| `yggdrasil-tracking` | Isla `tracking.md` referencia este repo |
+| Todos los repos | Cada repo tiene isla en `wiki/islas/` |
 
 ---
 
-## 📐 Flujo de trabajo estándar
+## Protocolo de cierre (obligatorio)
 
-```
-┌─────────────────────────────────────────────────┐
-│              INICIO DE SESIÓN                   │
-│  1. Leer AGENT.md (este fichero)                │
-│  2. Leer CONTEXT.md (estado actual)             │
-│  3. Leer wiki/CONVENCIONES.md (normas)          │
-└───────────────────┬─────────────────────────────┘
-                    ↓
-             Trabajar (inbox/ primero)
-                    ↓
-┌───────────────────┴─────────────────────────────┐
-│              CIERRE DE SESIÓN                   │
-│  1. Escribir diario en docs/diarios/YYYY-MM-DD  │
-│  2. Actualizar CONTEXT.md                       │
-│  3. Actualizar AGENT.md si hubo cambio struct.  │
-│  4. Procesar inbox/ si hay items                │
-│  5. Commit de cierre                            │
-└─────────────────────────────────────────────────┘
-```
+1. `wiki/islas/INDEX.md` actualizado si se tocó alguna isla
+2. `wiki/mapa-islas.md` sincronizado con INDEX.md
+3. `git push` limpio
+4. Seguir `yggdrasil-dew/docs/canon/PROTOCOLO-CIERRE-SESION.md`
 
 ---
 
-## 🚦 Estado de fases
-
-| Fase | Nombre | Estado |
-|---|---|---|
-| **0** | Repo limpio + wiki estructurada | ✅ 100% — purga completada 2026-07-16 |
-| **1** | Tailscale + acceso remoto | ✅ Activo |
-| **2** | SSH hardening completo | 🔴 Pendiente (`PasswordAuthentication no`) |
-| **3** | Wazuh SIEM | 🟡 En progreso |
-| **4** | Suricata IDS + reglas | 🟡 En progreso |
-| **5** | GitHub Actions automatización | 🔴 No iniciado |
-| **6** | Cursor + MCP en Thdora/Acer | 🔴 Pendiente |
-| **7** | Ollama agentes + workflows IA | 🔴 No iniciado |
-
----
-
-_Actualizado: 2026-07-16 16:55 CEST · Purga wiki completada · repos alineados · Fase 0 cerrada · Perplexity-MCP_
+_Instanciado desde: `yggdrasil-dew/docs/canon/AGENT-template.md`_  
+_Última actualización: 2026-07-16_
