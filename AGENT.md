@@ -10,7 +10,7 @@
 
 - **Nombre:** Álvaro Fernández Mota
 - **Perfil:** Ingeniero de sistemas autodidacta. Stack: Python, Docker, Linux, IA local, OSINT.
-- **Filosofía:** Producción primero, perfección después. El ritmo importa más que el sprint. Ver `docs/filosofia/`.
+- **Filosofía:** Producción primero, perfección después. El ritmo importa más que el sprint. Ver `wiki/islas/filosofia.md`.
 - **Ubicación habitual:** Casa (Madre + Thdora) / móvil desde iPhone 11 cuando está fuera.
 
 ---
@@ -30,15 +30,17 @@
 
 | Repo | Visibilidad | Para qué |
 |---|---|---|
-| `WIKI---PERSONAL` | Privado | **Este repo** — wiki central, mapa conceptual, segundo cerebro |
+| `yggdrasil-wiki` | Privado | **Este repo** — wiki central, mapa conceptual, segundo cerebro |
 | `yggdrasil-dew` | Privado | Segundo cerebro técnico · infraestructura · docs · diarios |
-| `thdora` / `THDORA-PERSONAL` | Privado | Bot TOKI · FastAPI · Docker |
+| `THDORA-PERSONAL` | Privado | Bot TOKI · FastAPI · Docker |
+| `thea-ia` | Privado | Core Python IA (decisión arquitectural pendiente — ver thea.md) |
 | `madre-config` | Privado | Configuración Madre (Arch Linux, Docker, servicios) |
 | `ollama-stack` | Privado | Ollama + modelos locales |
 | `local-brain` | Privado | RAG + Qdrant + memoria |
 | `yggdrasil-secops` | Privado | Seguridad defensiva (hallazgos HAL-XXX) |
 | `osint-stack` | Privado | Seguridad ofensiva / OSINT / pentest |
-| `formacion-tech` | Privado | Aprendizaje, cursos, Python |
+| `yggdrasil-formacion` | Privado | Aprendizaje, cursos, Python |
+| `yggdrasil-tracking` | Privado | Vida personal, diarios, finanzas |
 | `investigacion-ia` | Privado | PoCs de IA |
 | `acer-config` | Privado | Configuración Acer (Arch Linux + Hyprland) |
 | `dev-labs` | Privado | Sandbox antes de crear repo propio |
@@ -48,7 +50,7 @@
 
 ## 📋 Reglas del sistema — OBLIGATORIAS
 
-1. **Leer antes de actuar** — `AGENT.md` → `CONTEXT.md` → `docs/CONVENCIONES.md`
+1. **Leer antes de actuar** — `AGENT.md` → `CONTEXT.md` → `wiki/CONVENCIONES.md`
 2. **Todo entra por `inbox/`** — nunca sobrescribir ficheros existentes directamente
 3. **Verificar SHA** antes de actualizar cualquier fichero existente
 4. **CONTEXT.md** = estado actual — actualizar al inicio Y al final de cada sesión
@@ -56,6 +58,7 @@
 6. **Diario de sesión** = obligatorio al cierre en `docs/diarios/YYYY-MM-DD.md`
 7. **Convenciones** = `kebab-case` en `docs/` y `wiki/`, `MAYÚSCULAS` en raíz
 8. **No crear stubs vacíos** — si no hay contenido real, no crear el fichero
+9. **Purga y alineación** = norma de ecosistema — AGENT.md + CONTEXT.md se sincronizan siempre al inicio y cierre de sesión
 
 ---
 
@@ -111,16 +114,18 @@ Seguridad:
 
 | Isla | Repo | Estado |
 |---|---|---|
-| 🧠 Cerebro | yggdrasil-dew | ✅ Activo |
-| 🗺️ Wiki/Conocimiento | WIKI---PERSONAL (este repo) | ✅ Activo |
+| 🗺️ Wiki/Conocimiento | yggdrasil-wiki (este repo) | ✅ Activo · purga completada 2026-07-16 |
 | 🖥️ Infra/Madre | madre-config | ✅ Activo |
-| 🤖 IA Local | ollama-stack + local-brain | ✅ Activo |
-| 🦾 Thdora | THDORA-PERSONAL | ✅ Activo (deuda técnica) |
+| 🤖 IA Local (RAG) | local-brain | ✅ Activo |
+| 🧠 Ollama Stack | ollama-stack | ✅ Activo |
+| 🦾 THDORA | THDORA-PERSONAL | 🔴 Caído (HAL-007 + HAL-008) |
+| 🧬 Thea IA (core) | thea-ia | 🟡 Decisión arquitectural pendiente |
 | 🛡️ Seguridad | yggdrasil-secops + osint-stack | 🟡 Iniciado |
-| 📚 Formación | formacion-tech + investigacion-ia | ✅ Activo |
+| 📚 Formación | yggdrasil-formacion + investigacion-ia | ✅ Activo |
+| 📍 Tracking personal | yggdrasil-tracking | ✅ Activo desde 2026-07-13 |
 | 🧪 Labs | dev-labs | 🟡 Sandbox |
 
-Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`](wiki/mapa-islas.md)
+Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`](wiki/mapa-islas.md) · [`wiki/islas/INDEX.md`](wiki/islas/INDEX.md)
 
 ---
 
@@ -131,7 +136,7 @@ Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`
 │              INICIO DE SESIÓN                   │
 │  1. Leer AGENT.md (este fichero)                │
 │  2. Leer CONTEXT.md (estado actual)             │
-│  3. Leer docs/CONVENCIONES.md (normas)          │
+│  3. Leer wiki/CONVENCIONES.md (normas)          │
 └───────────────────┬─────────────────────────────┘
                     ↓
              Trabajar (inbox/ primero)
@@ -140,8 +145,9 @@ Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`
 │              CIERRE DE SESIÓN                   │
 │  1. Escribir diario en docs/diarios/YYYY-MM-DD  │
 │  2. Actualizar CONTEXT.md                       │
-│  3. Procesar inbox/ si hay items                │
-│  4. Commit de cierre                            │
+│  3. Actualizar AGENT.md si hubo cambio struct.  │
+│  4. Procesar inbox/ si hay items                │
+│  5. Commit de cierre                            │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -151,7 +157,7 @@ Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`
 
 | Fase | Nombre | Estado |
 |---|---|---|
-| **0** | Repo limpio + wiki estructurada | 🟡 95% — islas pendientes de rellenar |
+| **0** | Repo limpio + wiki estructurada | ✅ 100% — purga completada 2026-07-16 |
 | **1** | Tailscale + acceso remoto | ✅ Activo |
 | **2** | SSH hardening completo | 🔴 Pendiente (`PasswordAuthentication no`) |
 | **3** | Wazuh SIEM | 🟡 En progreso |
@@ -162,4 +168,4 @@ Ver mapa completo: [`wiki/00-mapa.md`](wiki/00-mapa.md) · [`wiki/mapa-islas.md`
 
 ---
 
-_Actualizado: 2026-07-05 · Fase 0 activa · wiki reorganizada · Perplexity-MCP_
+_Actualizado: 2026-07-16 16:55 CEST · Purga wiki completada · repos alineados · Fase 0 cerrada · Perplexity-MCP_
