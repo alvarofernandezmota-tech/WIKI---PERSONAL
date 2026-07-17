@@ -1,62 +1,29 @@
 ---
-tipo: context
-author: Alvaro Fernandez Mota
-actualizado: 2026-07-16
-ruta: CONTEXT.md
-tags: [context, ecosistema, canon]
+actualizado: 2026-07-18
 ---
 
-# CONTEXT.md — yggdrasil-wiki
+# CONTEXT — yggdrasil-wiki
 
-> Contexto del ecosistema para agentes IA. Complementa AGENT.md con el mapa completo de repos.
+## Estado actual
 
----
+Repo activo. Funciona como segundo cerebro del ecosistema. Base de conocimiento para RAG con Qdrant + Ollama en Madre. Última actividad 2026-07-17.
 
-## 🌳 El ecosistema Yggdrasil
+## Pendientes
 
-Ecosistema personal de Álvaro Fernández Mota. Tres capas:
+- [ ] Verificar estructura de islas existentes
+- [ ] Confirmar que local-brain apunta a este repo para embeddings
+- [ ] Revisar issue abierto #1
 
-| Capa | Repo | Rol |
-|------|------|-----|
-| **Raíz** (DEW) | `yggdrasil-dew` | Canon, protocolos, normas, estado del sistema |
-| **Wiki** | `yggdrasil-wiki` | Conocimiento documentado, islas temáticas |
-| **Tracking** | `yggdrasil-tracking` | Seguimiento de vida personal, hábitos, objetivos |
+## Issues abiertos
 
----
+- 1 issue abierto — revisar
 
-## 🏝️ Islas activas (21 en disco, 2026-07-16)
+## Relación con local-brain
 
-| Dominio | Islas |
-|---------|-------|
-| Ecosistema | ecosistema, filosofia, mapa |
-| Infra/HW | madre, infra, scripts, acer, thea |
-| IA/Auto | thdora, ollama-stack, ia-local, investigacion-ia, orquestador, mcp |
-| Seguridad | seguridad, osint |
-| Dev | dev-labs, conocimiento, formacion |
-| Vida | tracking, vida, impresion3d |
+Este repo es la fuente de datos para el pipeline RAG:
+`yggdrasil-wiki` → `local-brain` (embeddings) → `Qdrant` (vector DB) → `Ollama` (queries)
 
----
+## Notas
 
-## 🤖 Repos principales del ecosistema
-
-| Repo | Propósito | AGENT.md |
-|------|-----------|----------|
-| `yggdrasil-dew` | Canon y protocolos | ✅ |
-| `yggdrasil-wiki` | Esta wiki | ✅ |
-| `yggdrasil-tracking` | Vida personal | ⚠️ pendiente |
-| `THDORA-PERSONAL` | Bot IA Álvaro | ⚠️ pendiente |
-| `madre-config` | Servidor Madre | — |
-| `acer-config` | Laptop Arch | — |
-
----
-
-## 📍 Estado actual — 2026-07-16
-
-- Ecosistema **estable y auditado**
-- Protocolos de sesión operativos en DEW
-- Plantillas canónicas disponibles en `wiki/plantillas/`
-- Pendiente: instanciar AGENT.md en `yggdrasil-tracking` y `THDORA-PERSONAL`
-
----
-
-_Instanciado desde `CONTEXT-template.md` · 2026-07-16 · Perplexity MCP_
+- Repo PRIVADO
+- No confundir con yggdrasil-dew (plan) ni yggdrasil-tracking (personal)
