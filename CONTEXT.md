@@ -6,24 +6,37 @@ actualizado: 2026-07-18
 
 ## Estado actual
 
-Repo activo. Funciona como segundo cerebro del ecosistema. Base de conocimiento para RAG con Qdrant + Ollama en Madre. Última actividad 2026-07-17.
+Repo activo. Segundo cerebro del ecosistema. Base de conocimiento organizada en islas por dominio. Última actividad 2026-07-17.
+
+## Nombre real del repo
+
+`WIKI---PERSONAL` en GitHub (nombre canon interno: `yggdrasil-wiki`)
+
+## Estructura verificada
+
+```
+wiki/islas/       ← fuente de verdad — ver INDEX.md
+wiki/conocimiento/
+wiki/infra/
+wiki/agentes/
+wiki/operaciones/
+wiki/vida/
+wiki/relaciones/
+HOME.md
+```
 
 ## Pendientes
 
-- [ ] Verificar estructura de islas existentes
-- [ ] Confirmar que local-brain apunta a este repo para embeddings
-- [ ] Revisar issue abierto #1
-
-## Issues abiertos
-
-- 1 issue abierto — revisar
+- [ ] Revisar issue #1 abierto
+- [ ] Verificar que `wiki/islas/INDEX.md` está actualizado post-reestructuración
+- [ ] Confirmar que `local-brain` apunta a este repo para embeddings RAG
 
 ## Relación con local-brain
 
-Este repo es la fuente de datos para el pipeline RAG:
-`yggdrasil-wiki` → `local-brain` (embeddings) → `Qdrant` (vector DB) → `Ollama` (queries)
+Este repo es fuente de datos para pipeline RAG:
+`yggdrasil-wiki` → `local-brain` (embeddings) → `Qdrant` → `Ollama`
 
-## Notas
+## Última sesión
 
-- Repo PRIVADO
-- No confundir con yggdrasil-dew (plan) ni yggdrasil-tracking (personal)
+2026-07-17 — última actividad
+2026-07-18 — AGENT.md + CONTEXT.md reescritos con estructura real (auditoría MCP)
